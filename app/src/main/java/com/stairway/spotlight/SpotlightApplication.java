@@ -1,12 +1,11 @@
 package com.stairway.spotlight;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.facebook.stetho.*;
 import com.stairway.data.manager.DatabaseManager;
 import com.stairway.data.manager.Logger;
-import com.stairway.data.persistance.GenericCache;
+import com.stairway.data.GenericCache;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 

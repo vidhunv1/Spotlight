@@ -1,4 +1,4 @@
-package com.stairway.data.persistance;
+package com.stairway.data;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,9 +42,7 @@ public class GenericCache {
 
     public boolean put(final String key, final String value) {
 
-        Observable<Object> putObservable= Observable.create(new Observable.OnSubscribe<Object>() {
-            @Override
-            public void call(Subscriber<? super Object> subscriber) {
+        Observable<Object> putObservable= Observable.create( (subscriber) -> {
                 Logger.v("GeneticCache.put() on thread = " + Thread.currentThread().getName());
 
                 SQLiteDatabase db = databaseManager.openConnection();
@@ -70,7 +68,6 @@ public class GenericCache {
                 databaseManager.closeConnection();
 
                 subscriber.onCompleted();
-            }
         });
 
         putObservable.subscribeOn(Schedulers.io());
@@ -143,11 +140,7 @@ public class GenericCache {
     {
         memoryStore.remove(key);
         Observable<Object> deleteObservable = Observable
-                .create(new Observable.OnSubscribe<Object>()
-                {
-                    @Override
-                    public void call(Subscriber<? super Object> subscriber)
-                    {
+                .create( (subscriber) -> {
                         synchronized (TAG)
                         {
                             Logger.v("GeneticCache.remove() on thread = " + Thread.currentThread()
@@ -166,7 +159,6 @@ public class GenericCache {
 
                             subscriber.onCompleted();
                         }
-                    }
                 });
 
         deleteObservable.subscribeOn(Schedulers.io());

@@ -3,7 +3,7 @@ package com.stairway.data.manager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.stairway.data.persistance.core.SQLiteHelper;
+import com.stairway.data.manager.SQLiteHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,14 +28,14 @@ public class DatabaseManager {
     {
         instance = new DatabaseManager();
         sqliteHelper = new SQLiteHelper(context);
-        LogWrapper.d("DatabaseManager initialized");
+        Logger.d("DatabaseManager initialized");
     }
 
     public static synchronized DatabaseManager getInstance()
     {
         if(instance == null)
         {
-            LogWrapper.e("DatabaseManager not initialized");
+            Logger.e("DatabaseManager not initialized");
             throw new IllegalStateException("DatabaseManager not initialized");
         }
         return instance;

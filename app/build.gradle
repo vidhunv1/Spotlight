@@ -18,6 +18,11 @@ android {
         }
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
+
+    compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
 }
 
 dependencies {
@@ -42,3 +47,7 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 
 }
+
+
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
