@@ -2,6 +2,7 @@ package com.stairway.spotlight.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Created by vidhun on 05/07/16.
  */
-public class BaseActivity extends Activity implements BaseFragment.BackHandlerInterface {
+public class BaseActivity extends AppCompatActivity implements BaseFragment.BackHandlerInterface {
     private List<BaseFragment> baseFragmentList = new ArrayList<>();
 
     @Override
