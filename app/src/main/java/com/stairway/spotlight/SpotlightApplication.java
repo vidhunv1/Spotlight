@@ -6,6 +6,9 @@ import com.facebook.stetho.*;
 import com.stairway.data.manager.DatabaseManager;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.GenericCache;
+import com.stairway.spotlight.internal.di.component.DaggerNetComponent;
+import com.stairway.spotlight.internal.di.component.NetComponent;
+import com.stairway.spotlight.internal.di.module.NetModule;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -13,12 +16,15 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  * Created by vidhun on 05/07/16.
  */
 public class SpotlightApplication extends Application {
+    private NetComponent netComponent;
+    private String baseUrl = "http://spotlight.com";
     @Override
     public void onCreate() {
         super.onCreate();
 
-        DatabaseManager.init(this);
-        GenericCache gc = new GenericCache();
+        initdagger();
+//        DatabaseManager.init(this);
+//        GenericCache gc = new GenericCache();
 
 
         // Setting default font
@@ -37,9 +43,19 @@ public class SpotlightApplication extends Application {
                             .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
                             .build());
 
-            Logger.initLogging();
+            Logger.init();
         }
 
     }
 
+    public void initdagger() {
+        netComponent = DaggerNetComponent.builder()
+                .netModule(new NetModule(baseUrl))
+                .build();
+    }
+
+
+    public NetComponent getNetComponent() {
+        return netComponent;
+    }
 }

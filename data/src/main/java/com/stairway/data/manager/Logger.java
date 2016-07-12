@@ -9,7 +9,7 @@ import timber.log.Timber;
 public class Logger {
     private static boolean isTimberInitialized = false;
 
-    public static void initLogging() {
+    public static void init() {
 
         initTimber();
     }
