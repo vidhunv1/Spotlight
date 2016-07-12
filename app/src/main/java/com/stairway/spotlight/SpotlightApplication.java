@@ -6,9 +6,11 @@ import com.facebook.stetho.*;
 import com.stairway.data.manager.DatabaseManager;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.GenericCache;
-import com.stairway.spotlight.internal.di.component.DaggerNetComponent;
-import com.stairway.spotlight.internal.di.component.NetComponent;
+import com.stairway.spotlight.internal.di.component.AppComponent;
+import com.stairway.spotlight.internal.di.component.DaggerAppComponent;
+import com.stairway.spotlight.internal.di.module.AppModule;
 import com.stairway.spotlight.internal.di.module.NetModule;
+import com.stairway.spotlight.internal.di.module.UtilModule;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -16,15 +18,15 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  * Created by vidhun on 05/07/16.
  */
 public class SpotlightApplication extends Application {
-    private NetComponent netComponent;
-    private String baseUrl = "http://spotlight.com";
+    private AppComponent appComponent;
+    private String netBaseUrl;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-        initdagger();
-//        DatabaseManager.init(this);
-//        GenericCache gc = new GenericCache();
+        initDatabase();
+        initDagger();
 
 
         // Setting default font
@@ -48,14 +50,20 @@ public class SpotlightApplication extends Application {
 
     }
 
-    public void initdagger() {
-        netComponent = DaggerNetComponent.builder()
-                .netModule(new NetModule(baseUrl))
+    public void initDagger() {
+
+        appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .utilModule(new UtilModule())
+                .netModule(new NetModule(netBaseUrl))
                 .build();
     }
 
+    public void initDatabase() {
+        DatabaseManager.init(this);
+    }
 
-    public NetComponent getNetComponent() {
-        return netComponent;
+    public AppComponent getAppComponent() {
+        return appComponent;
     }
 }

@@ -4,7 +4,7 @@ package com.stairway.data.manager;
  * Created by vidhun on 05/07/16.
  */
 public abstract class SQLiteContract {
-    public static final class GenericCache {
+    public static final class GenericCacheContract {
         public static final String TABLE_NAME = "generic_cache";
 
         public static final String COLUMN_KEY = "key";

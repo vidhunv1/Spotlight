@@ -1,28 +1,32 @@
 package com.stairway.spotlight.ui.flows;
 
-import android.app.Activity;
 import android.os.Bundle;
 
+import com.stairway.data.GenericCache;
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.internal.di.component.AppComponent;
+import com.stairway.spotlight.ui.BaseActivity;
 import com.stairway.spotlight.ui.flows.home.HomeActivity;
 
 import javax.inject.Inject;
 
-import okhttp3.OkHttpClient;
 
-public class LauncherActivity extends Activity {
-    @Inject
-    OkHttpClient okHttpClient;
+public class LauncherActivity extends BaseActivity {
+    @Inject GenericCache genericCache;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-        ((SpotlightApplication) getApplication()).getNetComponent().inject(this);
-        Logger.d(okHttpClient.toString());
-
+        genericCache.put("dagger_test", "success");
+        Logger.d(genericCache.get("dagger_test"));
         startActivity(HomeActivity.callingIntent(this));
+    }
+
+    @Override
+    protected void injectComponent(AppComponent appComponent) {
+        appComponent.inject(this);
     }
 }

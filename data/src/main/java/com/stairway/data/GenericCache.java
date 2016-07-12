@@ -48,7 +48,7 @@ public class GenericCache {
                 SQLiteDatabase db = databaseManager.openConnection();
                 db.beginTransactionNonExclusive();
 
-                SQLiteStatement stmt = db.compileStatement(SQLiteContract.GenericCache.SQL_DELETE);
+                SQLiteStatement stmt = db.compileStatement(SQLiteContract.GenericCacheContract.SQL_DELETE);
                 stmt.bindString(1, key);
                 stmt.execute();
                 stmt.execute();
@@ -56,7 +56,7 @@ public class GenericCache {
                 stmt.close();
 
 
-                stmt = db.compileStatement(SQLiteContract.GenericCache.SQL_INSERT);
+                stmt = db.compileStatement(SQLiteContract.GenericCacheContract.SQL_INSERT);
                 stmt.bindString(1,key);
                 stmt.bindString(2, value);
                 stmt.execute();
@@ -106,12 +106,12 @@ public class GenericCache {
             {
                 SQLiteDatabase db = databaseManager.openConnection();
 
-                String[] projection = {SQLiteContract.GenericCache.COLUMN_VALUE};
-                String selection = SQLiteContract.GenericCache.COLUMN_KEY + " = ?";
+                String[] projection = {SQLiteContract.GenericCacheContract.COLUMN_VALUE};
+                String selection = SQLiteContract.GenericCacheContract.COLUMN_KEY + " = ?";
                 String[] selectionArgs = {key};
 
                 Cursor cursor = db
-                        .query(SQLiteContract.GenericCache.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+                        .query(SQLiteContract.GenericCacheContract.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
                 cursor.moveToFirst();
 
                 try
@@ -149,7 +149,7 @@ public class GenericCache {
                             SQLiteDatabase db = databaseManager.openConnection();
 
                             SQLiteStatement statement = db
-                                    .compileStatement(SQLiteContract.GenericCache.SQL_DELETE);
+                                    .compileStatement(SQLiteContract.GenericCacheContract.SQL_DELETE);
                             statement.bindString(1, key);
                             statement.execute();
                             statement.clearBindings();

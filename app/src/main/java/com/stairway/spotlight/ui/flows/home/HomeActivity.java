@@ -21,9 +21,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.internal.di.component.AppComponent;
 import com.stairway.spotlight.ui.BaseActivity;
 
-public class HomeActivity extends AppCompatActivity implements HomeScreen{
+public class HomeActivity extends BaseActivity implements HomeScreen{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -61,6 +62,11 @@ public class HomeActivity extends AppCompatActivity implements HomeScreen{
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+    }
+
+    @Override
+    protected void injectComponent(AppComponent appComponent) {
+        appComponent.inject(this);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.stairway.spotlight.internal.di.module;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.stairway.spotlight.internal.di.scope.ApplicationScope;
 
 import javax.inject.Singleton;
 
@@ -34,7 +35,7 @@ public class NetModule {
 //    }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     Gson provideGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
@@ -42,7 +43,7 @@ public class NetModule {
     }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     OkHttpClient provideOkHttpClient() {
         OkHttpClient client = new OkHttpClient();
         //client.setCache(cache);
@@ -50,7 +51,7 @@ public class NetModule {
     }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))

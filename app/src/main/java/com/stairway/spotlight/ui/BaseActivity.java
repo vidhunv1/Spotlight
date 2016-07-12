@@ -4,18 +4,22 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.internal.di.component.AppComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by vidhun on 05/07/16.
  */
-public class BaseActivity extends AppCompatActivity implements BaseFragment.BackHandlerInterface {
+public abstract class BaseActivity extends AppCompatActivity implements BaseFragment.BackHandlerInterface {
     private List<BaseFragment> baseFragmentList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        injectComponent(((SpotlightApplication) getApplication()).getAppComponent());
     }
 
     @Override
@@ -34,4 +38,6 @@ public class BaseActivity extends AppCompatActivity implements BaseFragment.Back
             return baseFragmentList.get(size - 1);
         return null;
     }
+
+    protected abstract void injectComponent(AppComponent appComponent);
 }
