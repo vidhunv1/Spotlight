@@ -4,10 +4,8 @@ import com.stairway.spotlight.internal.di.module.AppModule;
 import com.stairway.spotlight.internal.di.module.NetModule;
 import com.stairway.spotlight.internal.di.module.UtilModule;
 import com.stairway.spotlight.internal.di.scope.ApplicationScope;
-import com.stairway.spotlight.ui.flows.LauncherActivity;
-import com.stairway.spotlight.ui.flows.home.HomeActivity;
-
-import javax.inject.Singleton;
+import com.stairway.spotlight.screens.LauncherActivity;
+import com.stairway.spotlight.screens.home.HomeActivity;
 
 import dagger.Component;
 

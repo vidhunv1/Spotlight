@@ -1,4 +1,4 @@
-package com.stairway.spotlight.mvp;
+package com.stairway.spotlight.screens;
 
 /**
  * Created by vidhun on 04/07/16.

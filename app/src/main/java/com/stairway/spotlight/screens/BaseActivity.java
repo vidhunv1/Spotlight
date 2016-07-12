@@ -1,6 +1,5 @@
-package com.stairway.spotlight.ui;
+package com.stairway.spotlight.screens;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 

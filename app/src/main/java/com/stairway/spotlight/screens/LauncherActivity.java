@@ -1,13 +1,11 @@
-package com.stairway.spotlight.ui.flows;
+package com.stairway.spotlight.screens;
 
 import android.os.Bundle;
 
 import com.stairway.data.GenericCache;
-import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.internal.di.component.AppComponent;
-import com.stairway.spotlight.ui.BaseActivity;
-import com.stairway.spotlight.ui.flows.home.HomeActivity;
+import com.stairway.spotlight.screens.home.HomeActivity;
 
 import javax.inject.Inject;
 
@@ -20,8 +18,6 @@ public class LauncherActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-        genericCache.put("dagger_test", "success");
-        Logger.d(genericCache.get("dagger_test"));
         startActivity(HomeActivity.callingIntent(this));
     }
 

@@ -1,4 +1,4 @@
-package com.stairway.spotlight.ui;
+package com.stairway.spotlight.screens;
 
 import android.app.Fragment;
 import android.os.Bundle;
