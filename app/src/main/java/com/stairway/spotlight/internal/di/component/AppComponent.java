@@ -1,5 +1,7 @@
 package com.stairway.spotlight.internal.di.component;
 
+import android.content.Context;
+
 import com.stairway.spotlight.internal.di.module.AppModule;
 import com.stairway.spotlight.internal.di.module.NetModule;
 import com.stairway.spotlight.internal.di.module.UtilModule;
@@ -14,7 +16,10 @@ import dagger.Component;
  */
 @ApplicationScope
 @Component(modules = {AppModule.class, UtilModule.class, NetModule.class})
+
 public interface AppComponent {
-    void inject(LauncherActivity activity);
+    Context appContext();
+
     void inject(HomeActivity activity);
+    void inject(LauncherActivity activity);
 }

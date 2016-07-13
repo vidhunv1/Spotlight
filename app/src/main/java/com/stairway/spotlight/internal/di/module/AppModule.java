@@ -1,6 +1,7 @@
 package com.stairway.spotlight.internal.di.module;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.stairway.spotlight.SpotlightApplication;
 import com.stairway.spotlight.internal.di.scope.ApplicationScope;
@@ -22,6 +23,12 @@ public class AppModule {
     @Provides
     @ApplicationScope
     Application providesApplication() {
+        return application;
+    }
+
+    @Provides
+    @ApplicationScope
+    Context provideApplicationContext() {
         return application;
     }
 }

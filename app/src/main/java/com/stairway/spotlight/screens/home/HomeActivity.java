@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.internal.di.component.AppComponent;
+import com.stairway.spotlight.internal.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.BaseActivity;
 
 public class HomeActivity extends BaseActivity implements HomeScreen{
@@ -25,8 +25,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen{
     }
 
     @Override
-    protected void injectComponent(AppComponent appComponent) {
-        appComponent.inject(this);
+    protected void injectComponent(ComponentContainer componentContainer) {
+        componentContainer.getAppComponent().inject(this);
     }
-
 }

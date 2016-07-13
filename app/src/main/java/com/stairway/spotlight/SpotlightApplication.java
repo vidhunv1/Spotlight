@@ -7,6 +7,7 @@ import com.stairway.data.manager.DatabaseManager;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.GenericCache;
 import com.stairway.spotlight.internal.di.component.AppComponent;
+import com.stairway.spotlight.internal.di.component.ComponentContainer;
 import com.stairway.spotlight.internal.di.component.DaggerAppComponent;
 import com.stairway.spotlight.internal.di.module.AppModule;
 import com.stairway.spotlight.internal.di.module.NetModule;
@@ -18,7 +19,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  * Created by vidhun on 05/07/16.
  */
 public class SpotlightApplication extends Application {
-    private AppComponent appComponent;
+    private ComponentContainer componentContainer;
     private String netBaseUrl;
 
     @Override
@@ -52,18 +53,20 @@ public class SpotlightApplication extends Application {
 
     public void initDagger() {
 
-        appComponent = DaggerAppComponent.builder()
+        AppComponent appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .utilModule(new UtilModule())
                 .netModule(new NetModule(netBaseUrl))
                 .build();
+
+        componentContainer = new ComponentContainer(appComponent);
     }
 
     public void initDatabase() {
         DatabaseManager.init(this);
     }
 
-    public AppComponent getAppComponent() {
-        return appComponent;
+    public ComponentContainer getComponentContainer() {
+        return componentContainer;
     }
 }

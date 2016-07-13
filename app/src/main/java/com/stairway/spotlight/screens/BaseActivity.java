@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.spotlight.SpotlightApplication;
 import com.stairway.spotlight.internal.di.component.AppComponent;
+import com.stairway.spotlight.internal.di.component.ComponentContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        injectComponent(((SpotlightApplication) getApplication()).getAppComponent());
+        injectComponent(((SpotlightApplication) getApplication()).getComponentContainer());
     }
 
     @Override
@@ -38,5 +39,5 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         return null;
     }
 
-    protected abstract void injectComponent(AppComponent appComponent);
+    protected abstract void injectComponent(ComponentContainer componentContainer);
 }
