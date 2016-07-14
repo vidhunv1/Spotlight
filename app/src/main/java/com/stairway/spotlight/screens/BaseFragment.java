@@ -3,6 +3,9 @@ package com.stairway.spotlight.screens;
 import android.app.Fragment;
 import android.os.Bundle;
 
+import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.internal.di.component.ComponentContainer;
+
 /**
  * Created by vidhun on 04/07/16.
  */
@@ -11,6 +14,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        injectComponent(((SpotlightApplication) getActivity().getApplication()).getComponentContainer());
 
         if(!(getActivity() instanceof BackHandlerInterface))
             throw new ClassCastException(getActivity().getLocalClassName()+" must implement BackHandlerInterface");
@@ -37,4 +41,6 @@ public abstract class BaseFragment extends Fragment {
 
         void removeSelectedFragment(BaseFragment backHandledFragment);
     }
+
+    protected abstract void injectComponent(ComponentContainer componentContainer);
 }

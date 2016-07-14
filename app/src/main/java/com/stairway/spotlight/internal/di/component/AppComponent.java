@@ -8,6 +8,8 @@ import com.stairway.spotlight.internal.di.module.UtilModule;
 import com.stairway.spotlight.internal.di.scope.ApplicationScope;
 import com.stairway.spotlight.screens.LauncherActivity;
 import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;
+import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 
 import dagger.Component;
 
@@ -20,6 +22,9 @@ import dagger.Component;
 public interface AppComponent {
     Context appContext();
 
+    ChatListViewComponent plus(ChatListViewModule chatListViewModule);
+
+    // Test
     void inject(HomeActivity activity);
     void inject(LauncherActivity activity);
 }
