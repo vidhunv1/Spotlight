@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="79dp"
+    android:weightSum="1">
+
+<LinearLayout
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="78dp"
     android:weightSum="1">
@@ -39,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:text="time"
                 android:id="@+id/tv_chatItem_time"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="9dp"
                 android:gravity="right"
                 android:layout_marginRight="14dp"
                 android:textSize="11dp"
@@ -60,7 +66,7 @@
                 android:layout_marginLeft="14dp"
                 android:textSize="14dp"
                 android:alpha="0.85"
-                android:lineSpacingExtra="2dp"/>
+                android:lineSpacingExtra="1dp"/>
 
             <TextView
                 android:layout_width="16dp"
@@ -73,4 +79,15 @@
 
         </LinearLayout>
     </LinearLayout>
+</LinearLayout>
+    <LinearLayout
+        android:id="@+id/rectangle"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="0.33dp"
+        android:background="#FFC2C2C2"
+        android:paddingLeft="10dp"
+        android:layout_marginLeft="82dp">
+    </LinearLayout>
+
 </LinearLayout>
