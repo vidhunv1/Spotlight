@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by vidhun on 13/07/16.
  */
 public interface ChatListContract {
-    interface View extends com.stairway.spotlight.screens.View {
+    interface View extends com.stairway.spotlight.core.View {
         /*
             Delivery status:
                  - waiting to send
@@ -21,7 +21,7 @@ public interface ChatListContract {
         void displayChatList(ArrayList<ChatListItem> chatList);
     }
 
-    interface Presenter extends com.stairway.spotlight.screens.Presenter<View> {
+    interface Presenter extends com.stairway.spotlight.core.Presenter<View> {
         void initChatList();
     }
 }

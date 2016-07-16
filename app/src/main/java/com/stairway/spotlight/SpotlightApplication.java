@@ -5,13 +5,12 @@ import android.app.Application;
 import com.facebook.stetho.*;
 import com.stairway.data.manager.DatabaseManager;
 import com.stairway.data.manager.Logger;
-import com.stairway.data.GenericCache;
-import com.stairway.spotlight.internal.di.component.AppComponent;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
-import com.stairway.spotlight.internal.di.component.DaggerAppComponent;
-import com.stairway.spotlight.internal.di.module.AppModule;
-import com.stairway.spotlight.internal.di.module.NetModule;
-import com.stairway.spotlight.internal.di.module.UtilModule;
+import com.stairway.spotlight.core.di.component.AppComponent;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.di.component.DaggerAppComponent;
+import com.stairway.spotlight.core.di.module.AppModule;
+import com.stairway.spotlight.core.di.module.NetModule;
+import com.stairway.spotlight.core.di.module.UtilModule;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 

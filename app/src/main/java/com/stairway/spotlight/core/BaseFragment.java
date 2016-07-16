@@ -1,10 +1,10 @@
-package com.stairway.spotlight.screens;
+package com.stairway.spotlight.core;
 
 import android.app.Fragment;
 import android.os.Bundle;
 
 import com.stairway.spotlight.SpotlightApplication;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
 
 /**
  * Created by vidhun on 04/07/16.

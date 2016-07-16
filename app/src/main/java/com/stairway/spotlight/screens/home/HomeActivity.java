@@ -8,8 +8,8 @@ import android.os.Bundle;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.BaseActivity;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.screens.home.chatlist.ChatListFragment;
 
 public class HomeActivity extends BaseActivity{

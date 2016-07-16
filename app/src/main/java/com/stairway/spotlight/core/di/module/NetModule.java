@@ -1,15 +1,12 @@
-package com.stairway.spotlight.internal.di.module;
+package com.stairway.spotlight.core.di.module;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stairway.spotlight.internal.di.scope.ApplicationScope;
-
-import javax.inject.Singleton;
+import com.stairway.spotlight.core.di.scope.ApplicationScope;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

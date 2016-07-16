@@ -1,11 +1,10 @@
-package com.stairway.spotlight.screens;
+package com.stairway.spotlight.core;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.spotlight.SpotlightApplication;
-import com.stairway.spotlight.internal.di.component.AppComponent;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,6 @@
-package com.stairway.spotlight.internal.di.component;
+package com.stairway.spotlight.core.di.component;
+
+import com.stairway.spotlight.core.di.component.AppComponent;
 
 /**
  * Created by vidhun on 13/07/16.

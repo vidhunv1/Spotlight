@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.BaseActivity;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.BaseActivity;
 
 public class ChatActivity extends BaseActivity {
 

@@ -1,11 +1,11 @@
-package com.stairway.spotlight.internal.di.module;
+package com.stairway.spotlight.core.di.module;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.stairway.data.GenericCache;
 import com.stairway.spotlight.SpotlightApplication;
-import com.stairway.spotlight.internal.di.scope.ApplicationScope;
+import com.stairway.spotlight.core.di.scope.ApplicationScope;
 
 import dagger.Module;
 import dagger.Provides;

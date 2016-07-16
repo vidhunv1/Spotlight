@@ -6,13 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.data.model.ChatListItem;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.internal.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.BaseFragment;
+import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.screens.chat.ChatActivity;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 

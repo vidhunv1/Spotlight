@@ -1,11 +1,11 @@
-package com.stairway.spotlight.internal.di.component;
+package com.stairway.spotlight.core.di.component;
 
 import android.content.Context;
 
-import com.stairway.spotlight.internal.di.module.AppModule;
-import com.stairway.spotlight.internal.di.module.NetModule;
-import com.stairway.spotlight.internal.di.module.UtilModule;
-import com.stairway.spotlight.internal.di.scope.ApplicationScope;
+import com.stairway.spotlight.core.di.module.AppModule;
+import com.stairway.spotlight.core.di.module.NetModule;
+import com.stairway.spotlight.core.di.module.UtilModule;
+import com.stairway.spotlight.core.di.scope.ApplicationScope;
 import com.stairway.spotlight.screens.LauncherActivity;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;

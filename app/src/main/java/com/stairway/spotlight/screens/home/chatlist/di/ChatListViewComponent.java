@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.home.chatlist.di;
 
-import com.stairway.spotlight.internal.di.scope.ViewScope;
+import com.stairway.spotlight.core.di.scope.ViewScope;
 import com.stairway.spotlight.screens.home.chatlist.ChatListFragment;
 
 import dagger.Subcomponent;

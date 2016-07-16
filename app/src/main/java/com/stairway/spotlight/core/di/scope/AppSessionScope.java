@@ -1,4 +1,4 @@
-package com.stairway.spotlight.internal.di.scope;
+package com.stairway.spotlight.core.di.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Scope;
 
 /**
- * Created by vidhun on 14/07/16.
+ * Created by vidhun on 16/07/16.
  */
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ViewScope {
+public @interface AppSessionScope {
 }
