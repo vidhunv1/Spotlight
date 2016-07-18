@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.stairway.spotlight.core.di.module.AppModule;
 import com.stairway.spotlight.core.di.module.NetModule;
+import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.module.UtilModule;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
 import com.stairway.spotlight.screens.LauncherActivity;
@@ -23,6 +24,9 @@ public interface AppComponent {
     Context appContext();
 
     ChatListViewComponent plus(ChatListViewModule chatListViewModule);
+
+    // User Session Component
+    UserSessionComponent plus(UserSessionModule userSessionModule);
 
     // Test
     void inject(HomeActivity activity);
