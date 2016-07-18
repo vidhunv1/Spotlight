@@ -75,7 +75,8 @@
                 android:id="@+id/tv_chatlist_notification"
                 android:layout_marginLeft="23dp"
                 android:layout_marginTop="5dp"
-                android:background="#F2D2D2D2" />
+                android:background="#F2D2D2D2"
+                android:textAlignment="center" />
 
         </LinearLayout>
     </LinearLayout>
