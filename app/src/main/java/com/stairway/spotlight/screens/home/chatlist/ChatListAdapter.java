@@ -69,15 +69,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
         @Bind(R.id.tv_chatlist_notification)
         TextView notificationCount;
 
-        long userId;
-
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             chatListContent.setOnClickListener(view -> {
                 if(chatClickListener != null)
-                    chatClickListener.onChatItemClicked(userId);
+                    chatClickListener.onChatItemClicked((long)contactName.getTag());
             });
         }
 
@@ -88,8 +86,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
             profileImage.setImageResource(R.drawable.default_profile_image);
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
 
-
-            userId = chatListItem.getChatId();
+            // Set userId to pass through onClick.
+            contactName.setTag(chatListItem.getChatId());
         }
     }
 
