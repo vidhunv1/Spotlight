@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.home.chatlist;
 
-import com.stairway.data.model.ChatListItem;
+import com.stairway.spotlight.core.BasePresenter;
+import com.stairway.spotlight.core.BaseView;
 
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  * Created by vidhun on 13/07/16.
  */
 public interface ChatListContract {
-    interface View extends com.stairway.spotlight.core.View {
+    interface View extends BaseView {
         /*
             Delivery status:
                  - waiting to send
@@ -18,10 +19,10 @@ public interface ChatListContract {
          */
         void setDeliveryStatus(int status, int chatId);
 
-        void displayChatList(ArrayList<ChatListItem> chatList);
+        void displayChatList(ArrayList<ChatListItemModel> chatList);
     }
 
-    interface Presenter extends com.stairway.spotlight.core.Presenter<View> {
+    interface Presenter extends BasePresenter<ChatListContract.View> {
         void initChatList();
     }
 }

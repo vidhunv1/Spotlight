@@ -1,6 +1,6 @@
 package com.stairway.spotlight.core.di.module;
 
-import com.stairway.data.model.UserSession;
+import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 
 import dagger.Module;
@@ -11,14 +11,15 @@ import dagger.Provides;
  */
 @Module
 public class UserSessionModule {
-    private UserSession session;
-    public UserSessionModule(UserSession appSession) {
+    private UserSessionResult session;
+    public UserSessionModule(UserSessionResult appSession) {
         this.session = appSession;
     }
 
     @Provides
     @UserSessionScope
-    public UserSession providesSession() {
+    public UserSessionResult providesSession() {
         return session;
     }
+
 }

@@ -3,7 +3,7 @@ package com.stairway.spotlight.core.di.module;
 import android.app.Application;
 import android.content.Context;
 
-import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
 
 import dagger.Module;

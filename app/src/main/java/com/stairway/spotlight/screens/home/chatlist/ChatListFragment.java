@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.model.ChatListItem;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseFragment;
@@ -89,7 +88,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     }
 
     @Override
-    public void displayChatList(ArrayList<ChatListItem> chats) {
+    public void displayChatList(ArrayList<ChatListItemModel> chats) {
 
         chatList.setAdapter(new ChatListAdapter(getActivity(), chats, this));
     }

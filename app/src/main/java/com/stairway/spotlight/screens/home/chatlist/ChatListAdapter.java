@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stairway.data.model.ChatListItem;
 import com.stairway.spotlight.R;
 
 import java.util.List;
@@ -19,10 +18,10 @@ import butterknife.ButterKnife;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
     private Context context;
-    private List<ChatListItem> chatList;
+    private List<ChatListItemModel> chatList;
     private ChatClickListener chatClickListener;
 
-    public ChatListAdapter(Context context, List<ChatListItem> chatList, ChatClickListener chatClickListener) {
+    public ChatListAdapter(Context context, List<ChatListItemModel> chatList, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
         this.chatList = chatList;
         this.context = context;
@@ -79,7 +78,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
             });
         }
 
-        public void renderItem(ChatListItem chatListItem) {
+        public void renderItem(ChatListItemModel chatListItem) {
             contactName.setText(chatListItem.getChatName());
             lastMessage.setText(chatListItem.getLastMessage());
             time.setText(chatListItem.getTime());
