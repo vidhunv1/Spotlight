@@ -1,10 +1,9 @@
 package com.stairway.spotlight.core.di.component;
 
-import com.stairway.data.model.UserSession;
+import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 
-import dagger.Component;
 import dagger.Subcomponent;
 
 /**
@@ -13,7 +12,6 @@ import dagger.Subcomponent;
 @UserSessionScope
 @Subcomponent(modules = UserSessionModule.class)
 public interface UserSessionComponent {
-    UserSession getUserSession();
-
+    UserSessionResult getUserSession();
 
 }
