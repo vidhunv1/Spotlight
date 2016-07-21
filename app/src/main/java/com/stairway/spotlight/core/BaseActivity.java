@@ -3,11 +3,14 @@ package com.stairway.spotlight.core;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by vidhun on 05/07/16.
@@ -29,6 +32,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     @Override
     public void setSelectedFragment(BaseFragment backHandledFragment) {
         baseFragmentList.add(backHandledFragment);
+    }
+
+    public Scheduler getUiScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 
     private BaseFragment getCurrentFragment() {

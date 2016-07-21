@@ -3,8 +3,11 @@ package com.stairway.spotlight.core;
 import android.app.Fragment;
 import android.os.Bundle;
 
-import com.stairway.spotlight.SpotlightApplication;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by vidhun on 04/07/16.
@@ -34,6 +37,10 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroy();
 
         backHandlerInterface.removeSelectedFragment(this);
+    }
+
+    public Scheduler getUiScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 
     public interface BackHandlerInterface {

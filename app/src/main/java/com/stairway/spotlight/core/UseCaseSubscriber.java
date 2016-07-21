@@ -1,5 +1,7 @@
 package com.stairway.spotlight.core;
 
+import android.view.*;
+
 import com.stairway.data.manager.Logger;
 
 import rx.Subscriber;
@@ -9,11 +11,11 @@ import rx.Subscriber;
  */
 public abstract class UseCaseSubscriber<T> extends Subscriber<T>
 {
-    protected View baseView;
+    protected BaseView view;
 
-    public UseCaseSubscriber(View view)
+    public UseCaseSubscriber(BaseView baseView)
     {
-        baseView = view;
+        view = baseView;
     }
 
     @Override
@@ -31,11 +33,15 @@ public abstract class UseCaseSubscriber<T> extends Subscriber<T>
     @Override
     public void onError(Throwable e)
     {
+        onSessionNotFound();
         // TODO: Call based on error
 
         // if network error, onNetworkError()
         // if server error, on ServerError()
         // id sessionExpired, sessionExpired()
+    }
+
+    public void onSessionNotFound() {
     }
 
     public void onNetworkError()
