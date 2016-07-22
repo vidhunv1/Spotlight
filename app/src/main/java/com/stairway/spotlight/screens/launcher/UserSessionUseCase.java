@@ -64,7 +64,9 @@ public class UserSessionUseCase {
 
             @Override
             public void onError(Throwable e) {
-                subscriber.onError(e);
+                // Return existing token even if error(network error?).
+                if(!subscriber.isUnsubscribed())
+                    subscriber.onNext(userSessionResult);
             }
 
             @Override
