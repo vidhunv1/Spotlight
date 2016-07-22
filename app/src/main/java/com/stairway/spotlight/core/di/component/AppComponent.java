@@ -13,6 +13,8 @@ import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 import com.stairway.spotlight.screens.launcher.di.LauncherComponent;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;
+import com.stairway.spotlight.screens.welcome.di.WelcomeComponent;
+import com.stairway.spotlight.screens.welcome.di.WelcomeModule;
 
 import dagger.Component;
 
@@ -26,8 +28,10 @@ public interface AppComponent {
     Context appContext();
 
     // Subcomponents
+    // TODO: move chatlistviewcomponent to subcomponent if UserSession
     ChatListViewComponent plus(ChatListViewModule chatListViewModule);
     LauncherComponent plus(LauncherModule launcherModule);
+    WelcomeComponent plus(WelcomeModule welcomeModule);
 
     // User Session Component
     UserSessionComponent plus(UserSessionModule userSessionModule); // ComponentContainer

@@ -11,7 +11,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 public interface LauncherContract {
     interface View extends BaseView {
         void navigateToHomeActivity();
-        void navigateToRegisterActivity();
+        void navigateToWelcomeActivity();
         void updateSessionDetails(UserSessionResult userSessionResult);
     }
 

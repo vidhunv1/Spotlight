@@ -36,7 +36,7 @@ public class LauncherPresenter implements LauncherContract.Presenter {
 
                     @Override
                     public void onSessionNotFound() {
-                        launcherView.navigateToRegisterActivity();
+                        launcherView.navigateToWelcomeActivity();
                     }
                 });
 

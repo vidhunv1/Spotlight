@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:paddingBottom="0dp"
+android:paddingLeft="0dp"
+android:paddingRight="0dp"
+android:paddingTop="0dp"
+tools:context="com.stairway.spotlight.screens.welcome.WelcomeActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/welcome_welcome"
+        android:id="@+id/tv_welcome_welcome"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="286dp"
+        android:textSize="33dp" />
+
+    <TextView
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome_tag"
+        android:id="@+id/textView"
+        android:layout_below="@+id/tv_welcome_welcome"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:textSize="16dp"
+        android:textAlignment="center"
+        />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="186dp"
+        android:layout_height="44dp"
+        android:text="Sign up for Stairway"
+        android:id="@+id/btn_welcome_signup"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="#26353B"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>
+

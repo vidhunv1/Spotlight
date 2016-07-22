@@ -12,6 +12,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;
 import com.stairway.spotlight.screens.register.RegisterActivity;
+import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 
 import javax.inject.Inject;
 
@@ -51,9 +52,9 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
     }
 
     @Override
-    public void navigateToRegisterActivity() {
+    public void navigateToWelcomeActivity() {
         // Login details not availble: register user.
-        startActivity(RegisterActivity.callingIntent(this));
+        startActivity(WelcomeActivity.callingIntent(this));
     }
 
     @Override
