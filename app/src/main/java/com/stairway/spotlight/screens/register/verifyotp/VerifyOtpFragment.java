@@ -109,8 +109,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @Override
     public void invalidOtpError() {
-        Toast.makeText(getActivity(), "Invalid OTP",
-                Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Invalid OTP", Toast.LENGTH_LONG).show();
 
         otpEditText.setText("");
     }
@@ -128,9 +127,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @OnClick(R.id.btn_otp_continue)
     public void onContinueClicked() {
         if(otpEditText.getText().toString().length() == 6) {
-            //TODO: Implement auth use case here.
-
-            Logger.d("Continue clicked");
             verifyOtpPresenter.registerUser(getArguments().getString("MOBILE").toString(), otpEditText.getText().toString());
         }
     }
