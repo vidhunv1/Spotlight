@@ -27,7 +27,7 @@ public class HomeActivity extends BaseActivity{
         Logger.v("[Home Activity]");
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.FragmentContainer, ChatListFragment.newInstance());
+        fragmentTransaction.add(R.id.home_FragmentContainer, ChatListFragment.newInstance());
         fragmentTransaction.commit();
     }
 

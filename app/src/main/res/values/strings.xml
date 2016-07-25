@@ -5,4 +5,24 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="welcome_welcome">Welcome</string>
     <string name="welcome_tag">Stairway connects you with things that matter the most to you.</string>
+    <string name="register_sign_up">Sign Up</string>
+    <string name="register_enter_phone_number">Enter your phone number</string>
+    <string name="register_select_country">Select Country</string>
+    <string name="welcome_button_signup">Sign up for Stairway</string>
+    <string name="register_send_code">SEND CONFIRMATION CODE</string>
+
+    <string-array name="register_country_codes">
+        <item>India +91</item>
+        <item>United States +11</item>
+        <item>China +99</item>
+        <item>Japan +12</item>
+        <item>Germany +32</item>
+        <item>France +51</item>
+        <item>Italy +12</item>
+        <item>Malaysia +18</item>
+
+    </string-array>
+
+    <string name="otp_enterotp">_\t_\t_\t_\t_\t_</string>
+    <string name="otp_enter_otp">Enter the 6-digit OTP</string>
 </resources>

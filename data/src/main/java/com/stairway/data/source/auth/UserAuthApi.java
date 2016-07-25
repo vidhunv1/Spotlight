@@ -23,7 +23,7 @@ public class UserAuthApi {
         return Observable.just(userSessionResult);
     }
 
-    public Observable<UserSessionResult> registerUser(String mobile, int otp) {
+    public Observable<UserSessionResult> registerUser(String mobile, String otp) {
         // TODO: register user api.
         Logger.v("Register user: ["+mobile+","+otp+"]");
         return Observable.just(new UserSessionResult("spotlight", "12345", mobile));

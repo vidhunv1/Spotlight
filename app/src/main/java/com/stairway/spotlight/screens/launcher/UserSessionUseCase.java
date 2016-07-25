@@ -25,6 +25,15 @@ public class UserSessionUseCase {
         this.userSessionStore = userSessionStore;
     }
 
+    /*
+    Get user session. Flow: Read from store(execute) -> authenticate(token) ->
+        if authenticated
+            return token
+        else
+            refreshToken
+            storeNewToken(newToken)
+
+     */
     public Observable<UserSessionResult> execute() {
         Logger.d("GETUSERSESSION UseCase");
         Observable<UserSessionResult> getUserSession = Observable.create( (subscriber) -> {
@@ -41,7 +50,7 @@ public class UserSessionUseCase {
 
                 @Override
                 public void onNext(UserSessionResult userSession) {
-                    authenticateOrRefreshToken(userSession, subscriber);
+                    authenticate(userSession, subscriber);
                 }
             });
         });
@@ -52,7 +61,7 @@ public class UserSessionUseCase {
     /*
         Authenticate access token and check if valid. Update with new token if expired.
     */
-    private void authenticateOrRefreshToken(UserSessionResult userSessionResult, final Subscriber<? super UserSessionResult> subscriber) {
+    private void authenticate(UserSessionResult userSessionResult, final Subscriber<? super UserSessionResult> subscriber) {
         Observable<Boolean> isAuthenticated = userAuthApi.authenticate(userSessionResult)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
