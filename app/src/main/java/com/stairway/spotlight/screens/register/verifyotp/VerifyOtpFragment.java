@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.stairway.data.manager.Logger;
+import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -39,6 +41,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @Inject
     VerifyOtpPresenter verifyOtpPresenter;
+
+    ComponentContainer componentContainer;
 
     public VerifyOtpFragment() {
         return;
@@ -97,10 +101,18 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     }
 
     @Override
-    public void navigateToHome() {
+    public void navigateToHome(UserSessionResult userSessionResult) {
         Logger.d("Navigate to home");
-
+        componentContainer.initUserSession(userSessionResult);
         startActivity(HomeActivity.callingIntent(getActivity()));
+    }
+
+    @Override
+    public void invalidOtpError() {
+        Toast.makeText(getActivity(), "Invalid OTP",
+                Toast.LENGTH_LONG).show();
+
+        otpEditText.setText("");
     }
 
     @OnTextChanged(R.id.et_otp_otp)
@@ -125,6 +137,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
+        this.componentContainer = componentContainer;
         componentContainer.getAppComponent().plus(new VerifyOtpViewModule()).inject(this);
     }
 }

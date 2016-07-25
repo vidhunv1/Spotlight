@@ -30,8 +30,6 @@ public interface AppComponent {
     Context appContext();
 
     // Subcomponents
-    // TODO: move chatlistviewcomponent to subcomponent if UserSession
-    ChatListViewComponent plus(ChatListViewModule chatListViewModule);
 
     LauncherComponent plus(LauncherModule launcherModule);
     WelcomeComponent plus(WelcomeModule welcomeModule);

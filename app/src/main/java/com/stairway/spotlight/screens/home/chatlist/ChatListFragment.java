@@ -84,7 +84,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.getAppComponent().plus(new ChatListViewModule()).inject(this);
+        componentContainer.userSessionComponent().plus(new ChatListViewModule()).inject(this);
     }
 
     @Override

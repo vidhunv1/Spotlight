@@ -1,5 +1,6 @@
 package com.stairway.data.source.auth;
 
+import com.stairway.data.error.DataException;
 import com.stairway.data.manager.Logger;
 
 import rx.Observable;
@@ -26,7 +27,14 @@ public class UserAuthApi {
     public Observable<UserSessionResult> registerUser(String mobile, String otp) {
         // TODO: register user api.
         Logger.v("Register user: ["+mobile+","+otp+"]");
-        return Observable.just(new UserSessionResult("spotlight", "12345", mobile));
+        if(otp.equals("123456"))
+            return Observable.just(new UserSessionResult("spotlight", "12345", mobile));
 
+        else {
+            Observable<UserSessionResult> registerObservable = Observable.create( subscriber -> {
+                subscriber.onError(new DataException("Invalid OTP", DataException.Kind.OTP_INVALID));
+            });
+            return registerObservable;
+        }
     }
 }

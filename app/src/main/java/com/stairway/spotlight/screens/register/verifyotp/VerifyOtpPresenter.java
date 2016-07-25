@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
+import com.stairway.data.error.DataException;
 import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
@@ -27,11 +28,14 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
                 .subscribe(new UseCaseSubscriber<UserSessionResult>(verifyOtpView) {
                     @Override
                     public void onResult(UserSessionResult result) {
-                        verifyOtpView.navigateToHome();
+                        verifyOtpView.navigateToHome(result);
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        if(e instanceof DataException)
+                            if(((DataException) e).getKind()== DataException.Kind.OTP_INVALID)
+                                verifyOtpView.invalidOtpError();
                     }
                 });
 

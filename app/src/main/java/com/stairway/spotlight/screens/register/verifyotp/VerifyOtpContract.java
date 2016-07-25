@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
+import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
@@ -8,7 +9,8 @@ import com.stairway.spotlight.core.BaseView;
  */
 public interface VerifyOtpContract {
     interface View extends BaseView {
-        void navigateToHome();
+        void navigateToHome(UserSessionResult userSessionResult);
+        void invalidOtpError();
     }
 
     interface Presenter extends BasePresenter<VerifyOtpContract.View> {
