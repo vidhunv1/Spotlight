@@ -43,6 +43,7 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
     @Override
     public void navigateToHomeActivity() {
         startActivity(HomeActivity.callingIntent(this));
+        finish();
     }
 
     @Override
@@ -55,6 +56,7 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
     public void navigateToWelcomeActivity() {
         // Login details not availble: register user.
         startActivity(WelcomeActivity.callingIntent(this));
+        finish();
     }
 
     @Override

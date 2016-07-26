@@ -105,6 +105,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
         Logger.d("Navigate to home");
         componentContainer.initUserSession(userSessionResult);
         startActivity(HomeActivity.callingIntent(getActivity()));
+        getActivity().finish();
     }
 
     @Override
