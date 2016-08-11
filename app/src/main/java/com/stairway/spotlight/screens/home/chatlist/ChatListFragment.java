@@ -11,7 +11,7 @@ import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseFragment;
-import com.stairway.spotlight.screens.chat.ChatActivity;
+import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 
 import java.util.ArrayList;
@@ -20,10 +20,11 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.measite.minidns.record.A;
 
 public class ChatListFragment extends BaseFragment implements ChatListContract.View, ChatListAdapter.ChatClickListener{
 
-    @Bind(R.id.chat_list)
+    @Bind(R.id.rv_chat_list)
     RecyclerView chatList;
 
     @Inject
@@ -59,7 +60,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
         // Initialize recycler view
         chatList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        chatList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
     @Override
     public void onChatItemClicked(long userId) {
-        startActivity(ChatActivity.callingIntent(this.getActivity(), userId));
+        startActivity(MessageActivity.callingIntent(this.getActivity(), userId));
 
     }
 

@@ -4,6 +4,7 @@ import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vidhun on 13/07/16.

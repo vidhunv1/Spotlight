@@ -16,6 +16,7 @@ public class RegisterActivity extends BaseActivity {
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, RegisterActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 

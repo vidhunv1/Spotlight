@@ -20,7 +20,7 @@ public class ChatListPresenter implements ChatListContract.Presenter {
 
     @Override
     public void detachView() {
-
+        view = null;
     }
 
     @Override

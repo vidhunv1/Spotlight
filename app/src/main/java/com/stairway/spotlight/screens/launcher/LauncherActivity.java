@@ -36,8 +36,20 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
         Logger.v("[Launcher Activity]");
 
         ButterKnife.bind(this);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         launcherPresenter.attachView(this);
         launcherPresenter.getUserSession();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        launcherPresenter.detachView();
     }
 
     @Override
