@@ -24,13 +24,14 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
-        Logger.d("Sqlite cache database created");
+        db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         db.execSQL(SQLiteContract.GenericCacheContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.MessagesContract.SQL_DELETE_TABLE);
         onCreate(db);
         Logger.d("Sqlite Cache database upgraded");
     }

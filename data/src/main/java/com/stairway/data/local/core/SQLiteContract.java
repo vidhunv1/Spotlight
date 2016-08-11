@@ -24,6 +24,25 @@ public abstract class SQLiteContract {
     public static final class MessagesContract {
         public static final String TABLE_NAME = "messages";
 
-        public static final String COLUMN_KEY = "";
+        public static final String COLUMN_ROW_ID = "rowid";
+        public static final String COLUMN_CHAT_ID = "chat_id";
+        public static final String COLUMN_FROM_ID = "from_id";
+        public static final String COLUMN_MESSAGE = "message";
+        public static final String COLUMN_DELIVERY_STATUS = "delivery_status";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_CHAT_ID + " INTEGER, " +
+                COLUMN_FROM_ID + " INTEGER, " +
+                COLUMN_MESSAGE + " TEXT, " +
+                COLUMN_DELIVERY_STATUS + " INTEGER)";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String SQL_INSERT_MESSAGE = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?)";
+        public static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE_NAME;
+
+        public static final String SQL_SELECT_MESSAGES = "SELECT "+COLUMN_CHAT_ID+", "+COLUMN_FROM_ID+", "+
+                COLUMN_MESSAGE+", "+COLUMN_DELIVERY_STATUS+" FROM "+TABLE_NAME+" WHERE "+COLUMN_CHAT_ID+"=?;";
+
     }
 }
