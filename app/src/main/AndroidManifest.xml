@@ -11,8 +11,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".screens.launcher.LauncherActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,7 @@
             android:name=".screens.home.HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme" />
-        <activity android:name=".screens.chat.ChatActivity" />
+        <activity android:name=".screens.message.MessageActivity" />
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"
@@ -31,9 +31,12 @@
         <activity
             android:name=".screens.welcome.WelcomeActivity"
             android:label="WelcomActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        </activity>
+        <service
+            android:name=".core.xmpp.XmppService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
