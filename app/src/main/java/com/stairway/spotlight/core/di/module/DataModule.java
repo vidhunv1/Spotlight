@@ -2,9 +2,13 @@ package com.stairway.spotlight.core.di.module;
 
 import android.content.Context;
 
+import com.stairway.data.manager.XMPPManager;
 import com.stairway.data.source.auth.UserSessionStore;
 import com.stairway.data.source.auth.UserAuthApi;
+import com.stairway.data.source.message.MessageApi;
+import com.stairway.data.source.message.MessageStore;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
+import com.stairway.spotlight.core.di.scope.UserSessionScope;
 
 import dagger.Module;
 import dagger.Provides;
@@ -26,5 +30,18 @@ public class DataModule {
     @ApplicationScope
     public UserAuthApi userSessionApi() {
         return new UserAuthApi();
+    }
+
+    @Provides
+    @UserSessionScope
+    public MessageApi messageApi(XMPPManager xmppManager) {
+        // TODO: MessageApi might require XMPPManager
+        return new MessageApi(xmppManager);
+    }
+
+    @Provides
+    @UserSessionScope
+    public MessageStore messageStore() {
+        return new MessageStore();
     }
 }
