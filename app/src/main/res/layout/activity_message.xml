@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <EditText
+            android:id="@+id/et_sendmessage_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:autoText="true"
+            android:hint="type message"
+            android:layout_toLeftOf="@+id/btn_sendMessage_send"
+            android:layout_toStartOf="@+id/btn_sendMessage_send" />
+
+        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rv_messageitem"
+            android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentTop="false"
+            android:layout_marginBottom="20dp"
+            android:layout_above="@+id/et_sendmessage_message"
+            android:layout_marginTop="10dp"
+            />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:id="@+id/btn_sendMessage_send"
+            android:layout_alignBottom="@+id/et_sendmessage_message"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+
+    </RelativeLayout>
+</LinearLayout>

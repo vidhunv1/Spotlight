@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="79dp"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_chatItem_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="28dp">
+
+                <TextView
+                    android:layout_width="194.67dp"
+                    android:layout_height="wrap_content"
+                    android:text="Contact Name"
+                    android:id="@+id/tv_messageItem_contactName"
+                    android:layout_marginLeft="14dp"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:alpha="0.95"
+                    android:layout_marginTop="9dp"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="time"
+                    android:id="@+id/tv_messageitem_time"
+                    android:layout_marginTop="9dp"
+                    android:gravity="right"
+                    android:layout_marginRight="14dp"
+                    android:textSize="11dp"
+                    android:alpha="0.85" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="260dp"
+                    android:layout_height="37.17dp"
+                    android:text="message"
+                    android:id="@+id/tv_messageitem_message"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginLeft="14dp"
+                    android:textSize="14dp"
+                    android:alpha="0.85"
+                    android:lineSpacingExtra="1dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="37.17dp"
+                    android:text="0"
+                    android:id="@+id/tv_messageitem_deliverystatus"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginLeft="14dp"
+                    android:textSize="14dp"
+                    android:alpha="0.85"
+                    android:lineSpacingExtra="1dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

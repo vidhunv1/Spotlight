@@ -42,6 +42,9 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
 
+    compile 'org.igniterealtime.smack:smack-core:4.1.7'
+    compile 'org.igniterealtime.smack:smack-tcp:4.1.7'
+    compile 'org.igniterealtime.smack:smack-im:4.1.7'
 }
 
 //apply plugin: 'com.android.application'
