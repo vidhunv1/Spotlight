@@ -44,7 +44,7 @@ public class UserSessionStore {
         Observable<Boolean> putObservable = Observable.create( subscriber -> {
             final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
 
-            if(userSessionResult.getUserId()!=null && !userSessionResult.getUserId().isEmpty())
+            if(userSessionResult.getUserId()!=null || userSessionResult.getUserId().isEmpty())
                 editor.putString(KEY_USER_ID, userSessionResult.getUserId());
             if(userSessionResult.getAccessToken()!=null && !userSessionResult.getAccessToken().isEmpty())
                 editor.putString(KEY_ACCESS_TOKEN, userSessionResult.getAccessToken());
