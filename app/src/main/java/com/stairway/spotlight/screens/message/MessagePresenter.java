@@ -6,9 +6,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import java.util.List;
 
-import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action0;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -17,19 +15,22 @@ import rx.subscriptions.CompositeSubscription;
 public class MessagePresenter implements MessageContract.Presenter {
     private MessageContract.View messageView;
     private CompositeSubscription compositeSubscription;
-    private GetMessagesUseCase getMessageUseCase;
+    private LoadMessagesUseCase getMessageUseCase;
     private StoreMessageUseCase storeMessageUseCase;
     private SendMessageUseCase sendMessageUseCase;
+    private ReceiveMessagesUseCase receiveMessagesUseCase;
 
-    public MessagePresenter(GetMessagesUseCase messageUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase) {
+    public MessagePresenter(LoadMessagesUseCase messageUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase, ReceiveMessagesUseCase receiveMessagesUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
+        this.receiveMessagesUseCase = receiveMessagesUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
     @Override
     public void loadMessages(String chatId) {
+        Logger.v("ChatId load messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
                 .observeOn(messageView.getUiScheduler())
                 .toList()
@@ -70,7 +71,19 @@ public class MessagePresenter implements MessageContract.Presenter {
                     }
                 });
 
+        compositeSubscription.add(subscription);
+    }
 
+    @Override
+    public void receiveMessages() {
+        Subscription subscription = receiveMessagesUseCase.execute()
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
+                    @Override
+                    public void onResult(MessageResult result) {
+                        messageView.addMessageToList(result);
+                    }
+                });
 
         compositeSubscription.add(subscription);
     }
@@ -78,6 +91,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void attachView(MessageContract.View view) {
         this.messageView = view;
+        receiveMessages();
     }
 
     @Override

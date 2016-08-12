@@ -19,5 +19,7 @@ public interface MessageContract {
     interface Presenter extends BasePresenter<MessageContract.View> {
         void loadMessages(String chatId);
         void sendMessage(MessageResult result);
+        void receiveMessages();
+
     }
 }
