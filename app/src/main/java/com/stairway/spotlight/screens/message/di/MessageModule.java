@@ -1,8 +1,9 @@
 package com.stairway.spotlight.screens.message.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.message.GetMessagesUseCase;
+import com.stairway.spotlight.screens.message.LoadMessagesUseCase;
 import com.stairway.spotlight.screens.message.MessagePresenter;
+import com.stairway.spotlight.screens.message.ReceiveMessagesUseCase;
 import com.stairway.spotlight.screens.message.SendMessageUseCase;
 import com.stairway.spotlight.screens.message.StoreMessageUseCase;
 
@@ -16,9 +17,9 @@ import dagger.Provides;
 public class MessageModule {
     @Provides
     @ViewScope
-    public MessagePresenter providesPresenter(GetMessagesUseCase getMessagesUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase) {
-        if(getMessagesUseCase==null || storeMessageUseCase ==null || sendMessageUseCase == null)
+    public MessagePresenter providesPresenter(LoadMessagesUseCase loadMessagesUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase, ReceiveMessagesUseCase receiveMessagesUseCase) {
+        if(loadMessagesUseCase ==null || storeMessageUseCase ==null || sendMessageUseCase == null)
             throw new IllegalStateException("UseCase is null");
-        return new MessagePresenter(getMessagesUseCase, storeMessageUseCase, sendMessageUseCase);
+        return new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, receiveMessagesUseCase);
     }
 }

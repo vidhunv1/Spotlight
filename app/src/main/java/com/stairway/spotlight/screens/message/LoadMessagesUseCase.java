@@ -1,0 +1,19 @@
+Unstaged changes after reset:
+M	app/src/main/java/com/stairway/spotlight/screens/home/chatlist/ChatListAdapter.java
+M	app/src/main/java/com/stairway/spotlight/screens/home/chatlist/ChatListFragment.java
+M	app/src/main/java/com/stairway/spotlight/screens/home/chatlist/ChatListItemModel.java
+M	app/src/main/java/com/stairway/spotlight/screens/home/chatlist/ChatListPresenter.java
+D	app/src/main/java/com/stairway/spotlight/screens/message/GetMessagesUseCase.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/LoadMessagesUseCase.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/MessageActivity.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/MessageContract.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/MessagePresenter.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/MessagesAdapter.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/ReceiveMessagesUseCase.java
+M	app/src/main/java/com/stairway/spotlight/screens/message/di/MessageModule.java
+M	data/build.gradle
+M	data/src/main/java/com/stairway/data/manager/XMPPManager.java
+M	data/src/main/java/com/stairway/data/source/auth/UserSessionResult.java
+M	data/src/main/java/com/stairway/data/source/message/MessageApi.java
+M	data/src/main/java/com/stairway/data/source/message/MessageResult.java
+M	data/src/main/java/com/stairway/data/source/message/MessageStore.java
