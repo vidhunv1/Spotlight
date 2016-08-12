@@ -95,7 +95,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
             contactName.setText(messageResult.getFromId());
             message.setText(messageResult.getMessage());
             time.setText("09:45");
-            deliveryStatus.setText(String.valueOf(messageResult.getDeliveryStatus().ordinal()));
+            if(messageResult.getDeliveryStatus() == null || messageResult.getDeliveryStatus() == MessageResult.DeliveryStatus.NOT_AVAILABLE)
+                deliveryStatus.setText("");
+            else
+                deliveryStatus.setText(String.valueOf(messageResult.getDeliveryStatus().ordinal()));
         }
     }
 }

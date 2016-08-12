@@ -42,7 +42,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     private MessagesAdapter messagesAdapter;
 
 
-    public static Intent callingIntent(Context context, long userId) {
+    public static Intent callingIntent(Context context, String userId) {
         Intent intent = new Intent(context, MessageActivity.class);
         intent.putExtra(USER_ID, userId);
 
@@ -67,17 +67,17 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
             return;
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
-        chatId = Long.toString(receivedIntent.getLongExtra(USER_ID, 0));
+        chatId = receivedIntent.getStringExtra(USER_ID);
         ab.setTitle(chatId);
 
         messagePresenter.attachView(this);
         messagePresenter.loadMessages(chatId);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        messagePresenter.attachView(this);
     }
 
     @Override
