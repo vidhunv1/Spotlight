@@ -5,8 +5,8 @@ package com.stairway.data.source.message;
  */
 public class MessageResult {
     private String message;
-    private String chatId;
-    private String fromId;
+    private String chatId; //The chat id for screen, contains id of sender
+    private String fromId; //
     private DeliveryStatus deliveryStatus;
     private String messageId;
 
@@ -14,7 +14,8 @@ public class MessageResult {
         NOT_SENT,
         SENT,
         DELIVERED,
-        READ
+        READ,
+        NOT_AVAILABLE
     }
 
     public MessageResult(String chatId, String fromId, String message) {
@@ -72,7 +73,7 @@ public class MessageResult {
 
     @Override
     public String toString() {
-        return "Message: "+message+", DS:"+deliveryStatus+", from"+fromId+", chatId:"+chatId+", "+messageId;
+        return "Message: "+message+", DS: "+deliveryStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId;
     }
 }
 

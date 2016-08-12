@@ -5,9 +5,14 @@ import com.stairway.data.manager.XMPPManager;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
+import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Stanza;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -79,7 +84,31 @@ public class MessageApi {
         return sendMessage;
     }
 
-    public void sendMessageXMPP(XMPPConnection connection, MessageResult message, final Subscriber<? super MessageResult> subscriber) {
+    public Observable<MessageResult> receiveMessages() {
+        Observable<MessageResult> receiveMessages = Observable.create(subscriber -> {
+            ChatManager chatManager = ChatManager.getInstanceFor(connection.getConnection());
+
+            chatManager.addChatListener(new ChatManagerListener() {
+                @Override
+                public void chatCreated(Chat chat, boolean createdLocally) {
+                    chat.addMessageListener(new ChatMessageListener() {
+                        @Override
+                        public void processMessage(Chat chat, Message message) {
+                            String participant = chat.getParticipant().split("@")[0];
+                            MessageResult receivedMessage = new MessageResult(participant, participant, message.getBody());
+                            receivedMessage.setDeliveryStatus(MessageResult.DeliveryStatus.NOT_AVAILABLE);
+                            subscriber.onNext(receivedMessage);
+                        }
+                    });
+                }
+            });
+
+        });
+
+        return receiveMessages;
+    }
+
+    private void sendMessageXMPP(XMPPConnection connection, MessageResult message, final Subscriber<? super MessageResult> subscriber) {
         Logger.v("Sending message");
 
         if(connection.isAuthenticated())
@@ -87,9 +116,10 @@ public class MessageApi {
         else
             Logger.v("[XMPP] Connection authenticated");
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        Chat newChat = chatManager.createChat("test@spotlight.p1.im", (chat, receivedMessage) -> Logger.v("Received message :"+receivedMessage));
+        Chat newChat = chatManager.createChat(message.getChatId()+"@spotlight.p1.im");
 
         try {
+
             newChat.sendMessage(message.getMessage());
 
             // TODO: check for acknowledgement
