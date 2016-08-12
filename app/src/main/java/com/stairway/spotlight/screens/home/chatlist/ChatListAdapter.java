@@ -74,7 +74,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
 
             chatListContent.setOnClickListener(view -> {
                 if(chatClickListener != null)
-                    chatClickListener.onChatItemClicked((long)contactName.getTag());
+                    chatClickListener.onChatItemClicked(contactName.getTag().toString());
             });
         }
 
@@ -91,6 +91,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     }
 
     public interface ChatClickListener {
-        void onChatItemClicked(long userId);
+        void onChatItemClicked(String userId);
     }
 }
