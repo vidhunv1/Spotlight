@@ -4,7 +4,7 @@ package com.stairway.data.source.auth;
  * Created by vidhun on 16/07/16.
  */
 public class UserSessionResult {
-    private String userId;
+    private String userId; //The mobile number
     private String accessToken;
     private String refreshToken;
 

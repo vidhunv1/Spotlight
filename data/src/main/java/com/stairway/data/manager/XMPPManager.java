@@ -36,7 +36,7 @@ public class XMPPManager {
 
     public XMPPManager(String userName, String password) {
         this.password = "spotlight";
-        this.userName = "vidhun";
+        this.userName = userName;
         presenceOnline = new Presence(Presence.Type.available);
         presenceOffline = new Presence(Presence.Type.unavailable);
 
@@ -51,6 +51,7 @@ public class XMPPManager {
 
         connection = new XMPPTCPConnection(config.build());
         XMPPTCPConnection.setUseStreamManagementDefault(true);
+        XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
         initConnection();
 
 //        connection = new XMPPTCPConnection(config);
