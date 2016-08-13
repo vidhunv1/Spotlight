@@ -78,6 +78,13 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     protected void onResume() {
         super.onResume();
         messagePresenter.attachView(this);
+        messagePresenter.receiveMessages();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        messagePresenter.detachView();
     }
 
     @Override

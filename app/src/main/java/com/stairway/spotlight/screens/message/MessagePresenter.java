@@ -82,6 +82,7 @@ public class MessagePresenter implements MessageContract.Presenter {
                     @Override
                     public void onResult(MessageResult result) {
                         messageView.addMessageToList(result);
+                        Logger.d("[MessagePresenter] receive messages");
                     }
                 });
 
@@ -91,7 +92,6 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void attachView(MessageContract.View view) {
         this.messageView = view;
-        receiveMessages();
     }
 
     @Override
