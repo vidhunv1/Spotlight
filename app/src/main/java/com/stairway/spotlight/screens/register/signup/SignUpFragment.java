@@ -1,8 +1,8 @@
 package com.stairway.spotlight.screens.register.signup;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +90,7 @@ public class SignUpFragment extends BaseFragment{
         Logger.d("Mobile Number = "+mobileNumber);
 
         if(mobileEditText.getText().toString().length()>=10) {
-            FragmentTransaction fragmentTransaction = getActivity().getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.register_FragmentContainer, VerifyOtpFragment.getInstance(mobileNumber, countryCode));
 //            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
             fragmentTransaction.addToBackStack("SignUpFragment");

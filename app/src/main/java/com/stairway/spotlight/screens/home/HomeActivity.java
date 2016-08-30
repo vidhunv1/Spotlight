@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
@@ -27,9 +29,15 @@ public class HomeActivity extends BaseActivity{
         setContentView(R.layout.activity_home);
         Logger.v("[Home Activity]");
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.home_FragmentContainer, ChatListFragment.newInstance());
-        fragmentTransaction.commit();
+//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//        fragmentTransaction.add(R.id.home_FragmentContainer, ChatListFragment.newInstance());
+//        fragmentTransaction.commit();
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
+        viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override

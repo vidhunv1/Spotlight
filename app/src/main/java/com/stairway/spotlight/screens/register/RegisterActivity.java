@@ -1,9 +1,9 @@
 package com.stairway.spotlight.screens.register;
 
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
@@ -26,7 +26,7 @@ public class RegisterActivity extends BaseActivity {
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.register_FragmentContainer, SignUpFragment.getInstance());
         fragmentTransaction.commit();
     }
