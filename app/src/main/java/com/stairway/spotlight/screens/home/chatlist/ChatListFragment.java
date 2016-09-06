@@ -33,7 +33,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     public ChatListFragment() {
     }
 
-    public static ChatListFragment newInstance() {
+    public static ChatListFragment getInstance() {
         ChatListFragment fragment = new ChatListFragment();
         return fragment;
     }
@@ -41,7 +41,6 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -89,7 +88,6 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
     @Override
     public void displayChatList(ArrayList<ChatListItemModel> chats) {
-
         chatList.setAdapter(new ChatListAdapter(getActivity(), chats, this));
     }
 

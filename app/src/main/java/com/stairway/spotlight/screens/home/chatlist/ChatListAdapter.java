@@ -36,7 +36,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater
                 .from(parent.getContext())
-                .inflate(R.layout.chat_list_item, parent, false);
+                .inflate(R.layout.item_chat_list, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(view);
 

@@ -4,10 +4,10 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 apply plugin: 'me.tatarka.retrolambda'
 
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.2"
 
     defaultConfig {
@@ -30,6 +30,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         incremental false
     }
+}
+
+ext {
+    supportLibVersion = "24.2.0"
 }
 
 repositories {
@@ -62,10 +66,10 @@ dependencies {
     // Custom Fonts
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
 
     // Smack dependencies
     compile "org.igniterealtime.smack:smack-android-extensions:4.1.7"
