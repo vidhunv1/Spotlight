@@ -49,4 +49,16 @@ public class ContactsResult {
                 ", contactName='" + contactName + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof ContactsResult) {
+            ContactsResult temp = (ContactsResult) o;
+            if(temp.getPhoneNumber().equals(this.getPhoneNumber())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
