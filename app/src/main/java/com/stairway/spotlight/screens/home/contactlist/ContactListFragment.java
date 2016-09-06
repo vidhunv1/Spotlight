@@ -1,7 +1,9 @@
 package com.stairway.spotlight.screens.home.contactlist;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewModule;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -30,6 +33,8 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
 
     @Inject
     ContactListPresenter contactListPresenter;
+
+    ContactListAdapter contactListAdapter;
 
     public ContactListFragment() {
     }
@@ -50,14 +55,16 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         ButterKnife.bind(this, view);
 
-        Logger.v("[ContactListFragment] onCreateView");
+        Logger.d("[ContactListFragment] onCreateView");
+        contactListAdapter = new ContactListAdapter(getActivity(), this, new ArrayList<>());
+        contactList.setAdapter(contactListAdapter);
+
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -65,6 +72,7 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
     public void onResume() {
         super.onResume();
         contactListPresenter.attachView(this);
+        contactListPresenter.initContactList();
     }
 
     @Override
@@ -75,7 +83,17 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
 
     @Override
     public void displayContactList(ArrayList<ContactListItemModel> contactListItemModels) {
-        contactList.setAdapter(new ContactListAdapter(getActivity(), contactListItemModels, this));
+        Logger.d("Display contact list");
+    }
+
+    @Override
+    public void addContact(ContactListItemModel contactListItemModel) {
+        contactListAdapter.addContact(contactListItemModel);
+    }
+
+    @Override
+    public void addContacts(List<ContactListItemModel> contactListItemModel) {
+        contactListAdapter.addContacts(contactListItemModel);
     }
 
     @Override
@@ -85,6 +103,5 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
 
     @Override
     public void onContactItemClicked(String userId) {
-
     }
 }

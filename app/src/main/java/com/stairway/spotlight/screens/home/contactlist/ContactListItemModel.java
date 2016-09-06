@@ -7,11 +7,16 @@ public class ContactListItemModel {
     private String contactName;
     private String inviteFlag;
     private String chatId;
+    private String mobileNumber;
 
-    public ContactListItemModel(String contactName, String inviteFlag, String chatId) {
+    public ContactListItemModel() {
+    }
+
+    public ContactListItemModel(String contactName, String inviteFlag, String chatId, String mobileNumber) {
         this.contactName = contactName;
         this.inviteFlag = inviteFlag;
         this.chatId = chatId;
+        this.mobileNumber = mobileNumber;
     }
 
     public String getContactName() {
@@ -36,5 +41,13 @@ public class ContactListItemModel {
 
     public void setChatId(String chatId) {
         this.chatId = chatId;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 }

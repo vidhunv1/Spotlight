@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -24,10 +25,27 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private Context context;
     private List<ContactListItemModel> contactList;
 
-    public ContactListAdapter(Context context, List<ContactListItemModel> contactList, ContactClickListener contactClickListener) {
+    public ContactListAdapter(Context context, ContactClickListener contactClickListener, List<ContactListItemModel> contacts) {
         this.contactClickListener = contactClickListener;
         this.context = context;
-        this.contactList = contactList;
+        this.contactList = contacts;
+    }
+
+    public void setContacts(List<ContactListItemModel> contacts) {
+        this.contactList.clear();
+        this.contactList.addAll(contacts);
+        this.notifyItemRangeInserted(0, contactList.size() - 1);
+    }
+
+    public void addContact(ContactListItemModel contact) {
+        contactList.add(contact);
+        this.notifyItemInserted(contactList.size()-1);
+    }
+
+    public void addContacts(List<ContactListItemModel> contacts) {
+        int position = contactList.size()-1;
+        contactList.addAll(contacts);
+        this.notifyItemRangeChanged(position, contactList.size());
     }
 
     @Override
@@ -76,7 +94,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         public void renderItem(ContactListItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-
+            status.setText(contactItem.getMobileNumber());
             contactName.setTag(contactItem.getChatId());
         }
     }

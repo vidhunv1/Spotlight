@@ -3,6 +3,9 @@ package com.stairway.spotlight.screens.home.contactlist;
 import com.stairway.data.source.contacts.ContactsContent;
 import com.stairway.data.source.contacts.ContactsResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -19,24 +22,33 @@ public class GetContactsUseCase {
         this.contactsContent = contactsContent;
     }
 
-    public Observable<ContactsResult> execute() {
-        Observable<ContactsResult> getContacts = Observable.create(subscriber -> {
-            contactsContent.getContacts().subscribe(new Subscriber<ContactsResult>() {
-                @Override
-                public void onCompleted() {
-                    subscriber.onCompleted();
-                }
+    public Observable<List<ContactListItemModel>> execute() {
+        Observable<List<ContactListItemModel>> getContacts = Observable.create(subscriber -> {
+            contactsContent.getContacts()
+                    .subscribe(new Subscriber<List<ContactsResult>>() {
+                        @Override
+                        public void onCompleted() {
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onError(Throwable e) {
+                        }
 
-                }
+                        @Override
+                        public void onNext(List<ContactsResult> contactsResults) {
+                            List<ContactListItemModel> contactListItemModels = new ArrayList<ContactListItemModel>(contactsResults.size());
+                            for(ContactsResult contactsResult: contactsResults) {
+                                contactListItemModels.add(new ContactListItemModel(
+                                        contactsResult.getDisplayName(),
+                                        "Invite",
+                                        String.valueOf(contactsResult.getContactId()),
+                                        contactsResult.getPhoneNumber()
+                                ));
+                            }
 
-                @Override
-                public void onNext(ContactsResult contactsResult) {
-                    subscriber.onNext(contactsResult);
-                }
-            });
+                            subscriber.onNext(contactListItemModels);
+                        }
+                    });
         });
 
         return getContacts;
