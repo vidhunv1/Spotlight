@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.screens.home.chatlist.ChatListFragment;
+import com.stairway.spotlight.screens.home.contactlist.ContactListFragment;
+import com.stairway.spotlight.screens.register.signup.SignUpFragment;
 
 /**
  * Created by Dell on 8/27/2016.
@@ -22,7 +25,17 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ChatListFragment.newInstance();
+        switch (position) {
+            case 0:
+                return ChatListFragment.getInstance();
+            case 1:
+                return ChatListFragment.getInstance();
+            case 2:
+                return ContactListFragment.getInstance();
+            default:
+                return null;
+        }
+
     }
 
     @Override

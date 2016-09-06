@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.home;
 
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 
@@ -12,9 +11,8 @@ import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.screens.home.chatlist.ChatListFragment;
 
-public class HomeActivity extends BaseActivity{
+public class    HomeActivity extends BaseActivity{
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -34,10 +32,12 @@ public class HomeActivity extends BaseActivity{
 //        fragmentTransaction.commit();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
+
     }
 
     @Override
