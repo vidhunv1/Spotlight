@@ -12,7 +12,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 
-public class    HomeActivity extends BaseActivity{
+public class HomeActivity extends BaseActivity{
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -26,10 +26,6 @@ public class    HomeActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Logger.v("[Home Activity]");
-
-//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-//        fragmentTransaction.add(R.id.home_FragmentContainer, ChatListFragment.newInstance());
-//        fragmentTransaction.commit();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
         viewPager.setOffscreenPageLimit(3);
