@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stairway.spotlight">
+    
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".application.SpotlightApplication"
@@ -22,7 +25,7 @@
         <activity
             android:name=".screens.home.HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".screens.message.MessageActivity" />
         <activity
             android:name=".screens.register.RegisterActivity"
