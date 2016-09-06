@@ -135,6 +135,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         this.componentContainer = componentContainer;
-        componentContainer.getAppComponent().plus(new VerifyOtpViewModule()).inject(this);
+        componentContainer.getAppComponent().plus(new VerifyOtpViewModule(getContext())).inject(this);
     }
 }

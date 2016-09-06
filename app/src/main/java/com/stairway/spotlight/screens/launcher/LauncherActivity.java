@@ -74,6 +74,6 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         this.componentContainer = componentContainer;
-        componentContainer.getAppComponent().plus(new LauncherModule()).inject(this);
+        componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
     }
 }

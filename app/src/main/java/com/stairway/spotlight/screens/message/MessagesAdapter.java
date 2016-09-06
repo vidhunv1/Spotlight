@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
 
@@ -63,7 +62,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater
                 .from(parent.getContext())
-                .inflate(R.layout.message_list_item, parent, false);
+                .inflate(R.layout.item_message_list, parent, false);
 
         return new ViewHolder(view);
     }
