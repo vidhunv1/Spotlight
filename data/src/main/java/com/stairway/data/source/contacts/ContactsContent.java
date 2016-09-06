@@ -5,10 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 
+import com.stairway.data.local.core.SQLiteContract;
 import com.stairway.data.manager.Logger;
+import com.stairway.data.source.message.MessageResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import rx.Observable;
 
@@ -16,12 +19,7 @@ import rx.Observable;
  * Created by vidhun on 01/09/16.
  */
 public class ContactsContent {
-    private static final String CONTACT_ID = ContactsContract.Contacts._ID;
-    private static final String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
-
-    private static final String PHONE_NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
-    private static final String PHONE_CONTACT_ID = ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
-    private static final String CONTACT_NAME = ContactsContract.PRIMARY_ACCOUNT_NAME;
+    private static final String CONTACT_NAME = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY;
 
     private Context context;
 
@@ -29,38 +27,45 @@ public class ContactsContent {
         this.context = context;
     }
 
-    public Observable<ContactsResult> getContacts() {
+    public Observable<List<ContactsResult>> getContacts() {
+        Logger.d("ContactsContent: ");
 
-        Observable<ContactsResult> getContacts = Observable.create(subscriber -> {
-            ContentResolver cr = context.getContentResolver();
+        Observable<List<ContactsResult>> getContacts = Observable.create(
+                subscriber -> {
+                    ContentResolver cr = context.getContentResolver();
+                    List<ContactsResult> contactsResults = new ArrayList<>();
+                    try{
+                        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, CONTACT_NAME + " ASC");
 
-            Cursor cursor = cr.query(
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    new String[]{PHONE_NUMBER, PHONE_CONTACT_ID, CONTACT_ID, CONTACT_NAME, PHONE_NUMBER, HAS_PHONE_NUMBER},
-                    HAS_PHONE_NUMBER + " > 0",
-                    null,
-                    null
-            );
+                        cursor.moveToFirst();
+                        while(!cursor.isAfterLast()) {
+                            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 
-            if(cursor != null){
-                if(cursor.getCount() > 0) {
-                    ArrayList<ContactsResult> result = new ArrayList<>();
+                            if(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
+                            {
+                                Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",new String[]{ id }, null);
+                                while (pCur.moveToNext())
+                                {
+                                    String contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                    String contactName = pCur.getString(pCur.getColumnIndex(CONTACT_NAME));
+                                    contactsResults.add(new ContactsResult(Integer.valueOf(id), contactNumber, contactName));
+                                    break;
+                                }
+                                pCur.close();
+                            }
+                            cursor.moveToNext();
+                        }
 
-                    while (cursor.moveToNext()) {
-                        ContactsResult contact = new ContactsResult();
-                        contact.setContactId(cursor.getInt(cursor.getColumnIndex(PHONE_CONTACT_ID)));
-                        contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
-                        contact.setDisplayName(cursor.getString(cursor.getColumnIndex(CONTACT_NAME)));
+                        subscriber.onNext(contactsResults);
+                        cursor.close();
+                        subscriber.onCompleted();
 
-                        Logger.d("Contacts: "+contact.toString());
-
-                        subscriber.onNext(contact);
+                    } catch (Exception e) {
+                        Logger.e("MessageStore sqlite error");
+                        subscriber.onError(e);
+                        subscriber.onCompleted();
                     }
-                }
-                cursor.close();
-            }
-        });
-
+                });
         return getContacts;
     }
 }

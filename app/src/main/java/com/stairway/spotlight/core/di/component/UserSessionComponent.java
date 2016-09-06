@@ -7,6 +7,8 @@ import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.manager.XMPPManager;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
+import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewComponent;
+import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewModule;
 import com.stairway.spotlight.screens.message.di.MessageComponent;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 
@@ -24,5 +26,6 @@ public interface UserSessionComponent {
     // Subcomponents
     ChatListViewComponent plus(ChatListViewModule chatListViewModule);
     MessageComponent plus(MessageModule messageModule);
+    ContactListViewComponent plus(ContactListViewModule contactListViewModule);
 
 }

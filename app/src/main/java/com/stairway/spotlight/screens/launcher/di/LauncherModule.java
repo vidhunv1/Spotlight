@@ -1,5 +1,9 @@
 package com.stairway.spotlight.screens.launcher.di;
 
+import android.content.Context;
+
+import com.stairway.data.source.auth.UserSessionStore;
+import com.stairway.spotlight.core.di.scope.ApplicationScope;
 import com.stairway.spotlight.core.di.scope.ViewScope;
 import com.stairway.spotlight.screens.launcher.LauncherPresenter;
 import com.stairway.spotlight.screens.launcher.UserSessionUseCase;
@@ -12,8 +16,12 @@ import dagger.Provides;
  */
 @Module
 public class LauncherModule {
+    private final Context context;
 
-    // TODO: How is UserSessionUseCase injected?
+    public LauncherModule(Context context) {
+        this.context = context;
+    }
+
     @Provides
     @ViewScope
     public LauncherPresenter providesLauncherPresenter(UserSessionUseCase userSessionUseCase) {

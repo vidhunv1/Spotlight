@@ -5,6 +5,7 @@ import android.content.Context;
 import com.stairway.data.manager.XMPPManager;
 import com.stairway.data.source.auth.UserSessionStore;
 import com.stairway.data.source.auth.UserAuthApi;
+import com.stairway.data.source.contacts.ContactsContent;
 import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.message.MessageStore;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
@@ -44,4 +45,11 @@ public class DataModule {
     public MessageStore messageStore() {
         return new MessageStore();
     }
+
+    @Provides
+    @UserSessionScope
+    public ContactsContent contactsContent(Context context) {
+        return new ContactsContent(context);
+    }
+
 }
