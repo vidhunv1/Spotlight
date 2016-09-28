@@ -25,8 +25,8 @@ import rx.schedulers.Schedulers;
 public class XMPPManager {
     private String userName;
     private String password;
-    private String serviceName = "spotlight.p1.im";
-    private String host = "hosted.im";
+    private String serviceName = "ip-172-31-16-182.us-west-2.compute.internal";
+    private String host = "54.187.12.140";
     private int port = 5222;
     private Presence presenceOnline;
     private Presence presenceOffline;

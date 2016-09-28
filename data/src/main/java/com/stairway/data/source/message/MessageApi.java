@@ -116,7 +116,7 @@ public class MessageApi {
         else
             Logger.v("[XMPP] Connection authenticated");
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        Chat newChat = chatManager.createChat(message.getChatId()+"@spotlight.p1.im");
+        Chat newChat = chatManager.createChat(message.getChatId()+"@"+connection.getServiceName());
 
         try {
 
