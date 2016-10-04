@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.screens.home.chatlist.ChatListFragment;
 import com.stairway.spotlight.screens.home.contactlist.ContactListFragment;
+import com.stairway.spotlight.screens.home.profile.ProfileFragment;
 import com.stairway.spotlight.screens.register.signup.SignUpFragment;
 
 /**
@@ -15,7 +16,7 @@ import com.stairway.spotlight.screens.register.signup.SignUpFragment;
  */
 public class HomePagerAdapter extends FragmentPagerAdapter {
     private final int PAGE_COUNT = 3;
-    private String tabTitles[] = new String[] {"Channels", "Chats", "Contacts"};
+    private String tabTitles[] = new String[] {"contacts", "chats", "profile"};
     private Context context;
 
     public HomePagerAdapter(FragmentManager fragmentManager, Context context) {
@@ -27,11 +28,11 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ChatListFragment.getInstance();
+                return ContactListFragment.getInstance();
             case 1:
                 return ChatListFragment.getInstance();
             case 2:
-                return ContactListFragment.getInstance();
+                return ProfileFragment.getInstance();
             default:
                 return null;
         }
