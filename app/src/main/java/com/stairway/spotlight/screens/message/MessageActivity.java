@@ -2,9 +2,12 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.widget.EditText;
 
 import com.stairway.data.manager.Logger;
@@ -54,6 +57,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
+
         messagesAdapter = new MessagesAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
@@ -68,7 +72,11 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
         chatId = receivedIntent.getStringExtra(USER_ID);
-        ab.setTitle(chatId);
+        ab.setTitle(Html.fromHtml("<font color='#686868'>  "+chatId+"</font>"));
+        ab.setSubtitle(Html.fromHtml("<font color='#cecece'> Last seen at 3:30 PM</font>"));
+        getSupportActionBar().setElevation(0);
+
+        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
         messagePresenter.attachView(this);
         messagePresenter.loadMessages(chatId);
