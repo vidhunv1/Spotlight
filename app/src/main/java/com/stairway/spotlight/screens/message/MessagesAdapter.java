@@ -24,6 +24,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
     private Context context;
     private List<MessageResult> messageList;
+    private final int VIEW_TYPE_SEND = 0;
+    private final int VIEW_TYPE_RECV = 1;
 
     public MessagesAdapter(Context context) {
         this.context = context;
@@ -60,11 +62,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.item_message_list, parent, false);
-
-        return new ViewHolder(view);
+        ViewHolder viewHolder = null;
+        switch (viewType) {
+            case VIEW_TYPE_SEND:
+                View view1 = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.item_message_receive, parent, false);
+                viewHolder = new ViewHolder(view1);
+                break;
+            case VIEW_TYPE_RECV:
+                View view2 = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.item_message_send, parent, false);
+                viewHolder = new ViewHolder(view2);
+                break;
+        }
+        return viewHolder;
     }
 
     @Override
@@ -72,9 +85,16 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         holder.renderItem(messageList.get(position));
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if(messageList.get(position).getChatId() == messageList.get(position).getFromId())
+            return VIEW_TYPE_SEND;
+        return VIEW_TYPE_RECV;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.tv_messageItem_contactName)
-        TextView contactName;
+//        @Bind(R.id.tv_messageItem_contactName)
+//        TextView contactName;
 
         @Bind(R.id.tv_messageitem_message)
         TextView message;
@@ -82,8 +102,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         @Bind(R.id.tv_messageitem_time)
         TextView time;
 
-        @Bind(R.id.tv_messageitem_deliverystatus)
-        TextView deliveryStatus;
+//        @Bind(R.id.tv_messageitem_deliverystatus)
+//        TextView deliveryStatus;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -91,13 +111,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         }
 
         public void renderItem(MessageResult messageResult) {
-            contactName.setText(messageResult.getFromId());
-            message.setText(messageResult.getMessage());
+//            contactName.setText(messageResult.getFromId());
+//            if(messageResult.getMessage().length()%27==0)
+//                messageResult.setMessage(messageResult.getMessage()+"\n");
+//            else
+//                messageResult.setMessage(messageResult.getMessage()+"        ");
+//            message.setText(messageResult.getMessage());
+
+            message.setText(messageResult.getMessage().trim() + "        ");
             time.setText("09:45");
-            if(messageResult.getDeliveryStatus() == null || messageResult.getDeliveryStatus() == MessageResult.DeliveryStatus.NOT_AVAILABLE)
-                deliveryStatus.setText("");
-            else
-                deliveryStatus.setText(String.valueOf(messageResult.getDeliveryStatus().ordinal()));
+//            if(messageResult.getDeliveryStatus() == null || messageResult.getDeliveryStatus() == MessageResult.DeliveryStatus.NOT_AVAILABLE)
+//                deliveryStatus.setText("");
+//            else
+//                deliveryStatus.setText(String.valueOf(messageResult.getDeliveryStatus().ordinal()));
         }
     }
 }

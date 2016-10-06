@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="72dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/bubble"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardUseCompatPadding="true"
+        android:layout_gravity="left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardPreventCornerOverlap="false"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="6dp">
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rel_layout_left"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtDate"
+            android:visibility="visible"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lblMsgFrom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="kfhdjbh"
+                android:textColor="#FFE6e6e6"
+                android:textSize="12dp"
+                android:textStyle="italic"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/lblMsgFrom"
+                android:layout_marginRight="-5dp" />
+            <!--android:src="@drawable/bubble_corner"-->
+
+
+            <FrameLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/bg_msg_receive"
+                android:layout_toRightOf="@+id/imageView">
+
+                <TextView
+                    android:id="@+id/tv_messageitem_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="5dp"
+                    android:text="20:05"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_gravity="bottom|right"
+                    android:padding="4dp"
+                    android:textSize="10dp"
+                    android:textStyle="italic"
+                    android:layout_below="@+id/tv_messageitem_message"
+                    android:layout_alignRight="@+id/tv_messageitem_message"
+                    android:layout_alignEnd="@+id/tv_messageitem_message" />
+
+                <TextView
+                    android:id="@+id/tv_messageitem_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/imageView"
+                    android:layout_toEndOf="@+id/lblMsgFrom"
+                    android:layout_toRightOf="@+id/imageView"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_gravity="left|center_vertical"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

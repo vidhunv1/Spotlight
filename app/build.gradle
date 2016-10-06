@@ -74,4 +74,5 @@ dependencies {
     // Smack dependencies
     compile "org.igniterealtime.smack:smack-android-extensions:4.1.7"
     compile "org.igniterealtime.smack:smack-tcp:4.1.7"
+    compile 'com.android.support:cardview-v7:+'
 }

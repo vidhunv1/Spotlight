@@ -5,20 +5,9 @@
 
     <RelativeLayout
         android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <EditText
-            android:id="@+id/et_sendmessage_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:autoText="true"
-            android:hint="type message"
-            android:layout_toLeftOf="@+id/btn_sendMessage_send"
-            android:layout_toStartOf="@+id/btn_sendMessage_send" />
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/rv_messageitem"
@@ -27,10 +16,18 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="false"
             android:layout_alignParentTop="false"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:layout_above="@+id/et_sendmessage_message"
-            android:layout_marginTop="10dp"
             />
+
+        <EditText
+            android:id="@+id/et_sendmessage_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:hint="type message"
+            android:layout_toLeftOf="@+id/btn_sendMessage_send"
+            android:layout_toStartOf="@+id/btn_sendMessage_send" />
 
         <Button
             style="?android:attr/buttonStyleSmall"

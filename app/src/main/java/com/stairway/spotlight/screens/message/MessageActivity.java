@@ -95,9 +95,12 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @OnClick(R.id.btn_sendMessage_send)
     public void onSendClicked() {
-        String message = messageBox.getText().toString();
-        messageBox.setText("");
-        messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.DeliveryStatus.NOT_SENT));
+        String message = messageBox.getText().toString().trim();
+
+        if(message.length()>=1) {
+            messageBox.setText("");
+            messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.DeliveryStatus.NOT_SENT));
+        }
     }
 
     @Override
