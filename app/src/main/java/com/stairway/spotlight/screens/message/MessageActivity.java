@@ -57,21 +57,20 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
-
-        messagesAdapter = new MessagesAdapter(this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
-        messageItem.setLayoutManager(linearLayoutManager);
-
-        messageItem.setAdapter(messagesAdapter);
-
-
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(USER_ID))
             return;
+        chatId = receivedIntent.getStringExtra(USER_ID);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        messagesAdapter = new MessagesAdapter(this);
+        messageItem.setLayoutManager(linearLayoutManager);
+        messageItem.setAdapter(messagesAdapter);
+
+        Logger.d("[MessagesActivity]Loading messages");
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
-        chatId = receivedIntent.getStringExtra(USER_ID);
         ab.setTitle(Html.fromHtml("<font color='#686868'>  "+chatId+"</font>"));
         ab.setSubtitle(Html.fromHtml("<font color='#cecece'> Last seen at 3:30 PM</font>"));
         getSupportActionBar().setElevation(0);
@@ -86,7 +85,6 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     protected void onResume() {
         super.onResume();
         messagePresenter.attachView(this);
-        messagePresenter.receiveMessages();
     }
 
     @Override
@@ -113,8 +111,8 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void displayMessages(List<MessageResult> messages) {
-        messagesAdapter.setMessages(messages);
         Logger.d("Init messages list");
+        messagesAdapter.setMessages(messages);
     }
 
     @Override

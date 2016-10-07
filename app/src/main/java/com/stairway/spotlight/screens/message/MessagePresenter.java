@@ -19,6 +19,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     private StoreMessageUseCase storeMessageUseCase;
     private SendMessageUseCase sendMessageUseCase;
     private ReceiveMessagesUseCase receiveMessagesUseCase;
+    private boolean isReceivingMessages = false;
 
     public MessagePresenter(LoadMessagesUseCase messageUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase, ReceiveMessagesUseCase receiveMessagesUseCase) {
         this.getMessageUseCase = messageUseCase;
@@ -30,9 +31,15 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     @Override
     public void loadMessages(String chatId) {
-        Logger.v("ChatId load messages: "+chatId);
+        Logger.d("[MessagePresenter]Loading chat messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
                 .observeOn(messageView.getUiScheduler())
+//                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
+//                    @Override
+//                    public void onResult(MessageResult result) {
+//                        messageView.addMessageToList(result);
+//                    }
+//                });
                 .toList()
                 .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
                     @Override
@@ -92,11 +99,16 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void attachView(MessageContract.View view) {
         this.messageView = view;
+        if(!isReceivingMessages) {
+            this.receiveMessages();
+            isReceivingMessages = true;
+        }
     }
 
     @Override
     public void detachView() {
         compositeSubscription.clear();
+        isReceivingMessages = false;
         messageView = null;
     }
 }
