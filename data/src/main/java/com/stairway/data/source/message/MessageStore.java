@@ -28,9 +28,9 @@ public class MessageStore {
     /*
     Get messages with chatId.
      */
-    public Observable<MessageResult> getMessages(String chatId) {
+    public Observable<List<MessageResult>> getMessages(String chatId) {
 
-        Observable<MessageResult> getMessages = Observable.create(subscriber -> {
+        Observable<List<MessageResult>> getMessages = Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
 
@@ -41,7 +41,8 @@ public class MessageStore {
                             SQLiteContract.MessagesContract.COLUMN_FROM_ID,
                             SQLiteContract.MessagesContract.COLUMN_MESSAGE,
                             SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS,
-                            SQLiteContract.MessagesContract.COLUMN_ROW_ID};
+                            SQLiteContract.MessagesContract.COLUMN_ROW_ID,
+                            SQLiteContract.MessagesContract.COLUMN_CREATED_AT};
 
             try{
 
@@ -60,16 +61,16 @@ public class MessageStore {
                     MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.DeliveryStatus.valueOf(deliveryStatus));
                     msg.setMessageId(messageId);
                     Logger.d("[MessageStore] Message:"+msg.toString());
-                    subscriber.onNext(msg);
+                    result.add(msg);
                     cursor.moveToNext();
                 }
+                subscriber.onNext(result);
                 subscriber.onCompleted();
 
                 databaseManager.closeConnection();
-                Logger.d("[Message store] results count: "+result.size());
 
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error");
+                Logger.e("MessageStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -100,7 +101,7 @@ public class MessageStore {
 
         });
 
-        Logger.d("Message store: storeMessage");
+        Logger.d("Message store: storedMessage "+messageResult.toString());
 
         return storeMessage;
     }
@@ -174,7 +175,7 @@ public class MessageStore {
                 Logger.d("[Message store] results count: "+result.size());
 
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error");
+                Logger.e("MessageStore sqlite error: "+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();

@@ -25,13 +25,13 @@ public class LoadMessagesUseCase {
         this.messageStore = messageStore;
     }
 
-    public Observable<MessageResult> execute(String chatId) {
+    public Observable<List<MessageResult>> execute(String chatId) {
 
-        Observable<MessageResult> getMessages = Observable.create(subscriber -> {
-            messageStore.getMessages(chatId).subscribe(new Subscriber<MessageResult>() {
+        Observable<List<MessageResult>> getMessages = Observable.create(subscriber -> {
+            messageStore.getMessages(chatId).subscribe(new Subscriber<List<MessageResult>>() {
                 @Override
                 public void onCompleted() {
-                    subscriber.onCompleted();
+
                 }
 
                 @Override
@@ -40,7 +40,7 @@ public class LoadMessagesUseCase {
                 }
 
                 @Override
-                public void onNext(MessageResult messageResults) {
+                public void onNext(List<MessageResult> messageResults) {
                     subscriber.onNext(messageResults);
                 }
             });

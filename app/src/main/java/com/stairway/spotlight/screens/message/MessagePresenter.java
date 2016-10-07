@@ -34,13 +34,6 @@ public class MessagePresenter implements MessageContract.Presenter {
         Logger.d("[MessagePresenter]Loading chat messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
                 .observeOn(messageView.getUiScheduler())
-//                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
-//                    @Override
-//                    public void onResult(MessageResult result) {
-//                        messageView.addMessageToList(result);
-//                    }
-//                });
-                .toList()
                 .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
                     @Override
                     public void onResult(List<MessageResult> result) {

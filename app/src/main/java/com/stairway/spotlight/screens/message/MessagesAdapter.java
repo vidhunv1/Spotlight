@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
 
@@ -33,6 +34,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     }
 
     public void setMessages(List<MessageResult> messages) {
+        Logger.d("[MessagesAdapter] add all messages");
         this.messageList.clear();
         this.messageList.addAll(messages);
         this.notifyItemRangeInserted(0, messageList.size() - 1);
@@ -87,7 +89,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if(messageList.get(position).getChatId() == messageList.get(position).getFromId())
+        if(messageList.get(position).getChatId().equals(messageList.get(position).getFromId()))
             return VIEW_TYPE_SEND;
         return VIEW_TYPE_RECV;
     }
