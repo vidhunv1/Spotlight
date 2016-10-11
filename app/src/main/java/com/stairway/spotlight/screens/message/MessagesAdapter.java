@@ -113,15 +113,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         }
 
         public void renderItem(MessageResult messageResult) {
-//            contactName.setText(messageResult.getFromId());
-//            if(messageResult.getMessage().length()%27==0)
-//                messageResult.setMessage(messageResult.getMessage()+"\n");
-//            else
-//                messageResult.setMessage(messageResult.getMessage()+"        ");
-//            message.setText(messageResult.getMessage());
 
             message.setText(messageResult.getMessage().trim() + "        ");
-            time.setText("09:45");
+            time.setText(messageResult.getTime());
 //            if(messageResult.getDeliveryStatus() == null || messageResult.getDeliveryStatus() == MessageResult.DeliveryStatus.NOT_AVAILABLE)
 //                deliveryStatus.setText("");
 //            else

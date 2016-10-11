@@ -29,12 +29,14 @@ public abstract class SQLiteContract {
         public static final String COLUMN_FROM_ID = "from_id";
         public static final String COLUMN_MESSAGE = "message";
         public static final String COLUMN_DELIVERY_STATUS = "delivery_status";
+        public static final String COLUMN_CREATED_AT = "created_at";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_CHAT_ID + " INTEGER, " +
                 COLUMN_FROM_ID + " INTEGER, " +
                 COLUMN_MESSAGE + " TEXT, " +
-                COLUMN_DELIVERY_STATUS + " INTEGER)";
+                COLUMN_DELIVERY_STATUS + " INTEGER, " +
+                COLUMN_CREATED_AT+ " DATETIME);";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
