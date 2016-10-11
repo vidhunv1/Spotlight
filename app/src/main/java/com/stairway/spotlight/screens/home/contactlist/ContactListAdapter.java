@@ -95,7 +95,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public void renderItem(ContactListItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
             status.setText(contactItem.getMobileNumber());
-            contactName.setTag(contactItem.getChatId());
+
+            contactName.setTag(contactItem.getMobileNumber());
         }
     }
 

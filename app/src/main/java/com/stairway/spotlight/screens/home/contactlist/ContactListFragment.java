@@ -15,6 +15,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewModule;
+import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,5 +104,6 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
 
     @Override
     public void onContactItemClicked(String userId) {
+        startActivity(MessageActivity.callingIntent(this.getActivity(), userId));
     }
 }
