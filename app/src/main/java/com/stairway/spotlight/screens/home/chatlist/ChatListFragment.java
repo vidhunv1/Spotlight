@@ -15,6 +15,7 @@ import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -87,7 +88,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     }
 
     @Override
-    public void displayChatList(ArrayList<ChatListItemModel> chats) {
+    public void displayChatList(List<ChatListItemModel> chats) {
         chatList.setAdapter(new ChatListAdapter(getActivity(), chats, this));
     }
 

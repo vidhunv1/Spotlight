@@ -32,6 +32,7 @@ public class ContactListPresenter implements ContactListContract.Presenter {
     @Override
     public void detachView() {
         contactsView = null;
+        compositeSubscription.unsubscribe();
     }
 
     @Override

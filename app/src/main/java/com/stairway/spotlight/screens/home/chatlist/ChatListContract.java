@@ -20,7 +20,7 @@ public interface ChatListContract {
          */
         void setDeliveryStatus(int status, int chatId);
 
-        void displayChatList(ArrayList<ChatListItemModel> chatList);
+        void displayChatList(List<ChatListItemModel> chatList);
     }
 
     interface Presenter extends BasePresenter<ChatListContract.View> {

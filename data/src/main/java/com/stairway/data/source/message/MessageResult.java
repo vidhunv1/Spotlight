@@ -12,6 +12,7 @@ public class MessageResult {
     private DeliveryStatus deliveryStatus;
     private String messageId;
     private String time;
+    private String name;
 
     public static enum DeliveryStatus {
         NOT_SENT,
@@ -88,6 +89,14 @@ public class MessageResult {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

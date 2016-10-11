@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.stairway.data.local.core.DatabaseManager;
-import com.stairway.data.local.core.SQLiteContract;
+import com.stairway.data.local.core.SQLiteContract.MessagesContract;
 import com.stairway.data.manager.Logger;
 
 import java.text.ParseException;
@@ -36,28 +36,28 @@ public class MessageStore {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
 
-            String selection = SQLiteContract.MessagesContract.COLUMN_CHAT_ID + " = ?";
+            String selection = MessagesContract.COLUMN_CHAT_ID + " = ?";
             String[] selectionArgs = {chatId};
             String[] columns = {
-                            SQLiteContract.MessagesContract.COLUMN_CHAT_ID,
-                            SQLiteContract.MessagesContract.COLUMN_FROM_ID,
-                            SQLiteContract.MessagesContract.COLUMN_MESSAGE,
-                            SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS,
-                            SQLiteContract.MessagesContract.COLUMN_ROW_ID,
-                            SQLiteContract.MessagesContract.COLUMN_CREATED_AT};
+                            MessagesContract.COLUMN_CHAT_ID,
+                            MessagesContract.COLUMN_FROM_ID,
+                            MessagesContract.COLUMN_MESSAGE,
+                            MessagesContract.COLUMN_DELIVERY_STATUS,
+                            MessagesContract.COLUMN_ROW_ID,
+                            MessagesContract.COLUMN_CREATED_AT};
 
             try{
-                Cursor cursor = db.query(SQLiteContract.MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-                Logger.d("[MESSAGE STORE]: QUERY"+SQLiteContract.MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                Logger.d("[MESSAGE STORE]: QUERY"+MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
-                    String chat_id = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CHAT_ID));
-                    String fromId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_FROM_ID));
-                    String message = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_MESSAGE));
-                    String deliveryStatus = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS));
-                    String messageId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_ROW_ID));
-                    String time = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CREATED_AT));
+                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String deliveryStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
 
                     MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.DeliveryStatus.valueOf(deliveryStatus),getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
@@ -85,13 +85,13 @@ public class MessageStore {
             String currentTime = getDateTime();
 
             ContentValues values = new ContentValues();
-            values.put(SQLiteContract.MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
-            values.put(SQLiteContract.MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
-            values.put(SQLiteContract.MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
-            values.put(SQLiteContract.MessagesContract.COLUMN_CREATED_AT, currentTime);
+            values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
+            values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
+            values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
+            values.put(MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
+            values.put(MessagesContract.COLUMN_CREATED_AT, currentTime);
 
-            long rowId = db.insert(SQLiteContract.MessagesContract.TABLE_NAME, null, values);
+            long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
             messageResult.setTime(getFormattedTime(currentTime, "hh:mm"));
             messageResult.setMessageId(String.valueOf(rowId));
 
@@ -107,12 +107,12 @@ public class MessageStore {
         Observable<MessageResult> updateMessage = Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
-            values.put(SQLiteContract.MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
-            values.put(SQLiteContract.MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
-            values.put(SQLiteContract.MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
+            values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
+            values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
+            values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
+            values.put(MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
 
-            db.update(SQLiteContract.MessagesContract.TABLE_NAME, values, SQLiteContract.MessagesContract.COLUMN_ROW_ID+"="+messageResult.getMessageId(), null);
+            db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_ROW_ID+"="+messageResult.getMessageId(), null);
 
             subscriber.onNext(messageResult);
             subscriber.onCompleted();
@@ -126,30 +126,30 @@ public class MessageStore {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
 
-            String selection = SQLiteContract.MessagesContract.COLUMN_CHAT_ID + "=? AND "
-                    +SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS + "=?";
+            String selection = MessagesContract.COLUMN_CHAT_ID + "=? AND "
+                    +MessagesContract.COLUMN_DELIVERY_STATUS + "=?";
 
             String[] selectionArgs = {chatId, MessageResult.DeliveryStatus.NOT_SENT.name()};
             String[] columns = {
-                    SQLiteContract.MessagesContract.COLUMN_CHAT_ID,
-                    SQLiteContract.MessagesContract.COLUMN_FROM_ID,
-                    SQLiteContract.MessagesContract.COLUMN_MESSAGE,
-                    SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS,
-                    SQLiteContract.MessagesContract.COLUMN_ROW_ID,
-                    SQLiteContract.MessagesContract.COLUMN_CREATED_AT};
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_DELIVERY_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT};
 
             try{
-                Cursor cursor = db.query(SQLiteContract.MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
                 cursor.moveToFirst();
 
-                Logger.d("[MESSAGE STORE]: QUERY"+SQLiteContract.MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
+                Logger.d("[MESSAGE STORE]: QUERY"+MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
                 while(!cursor.isAfterLast()) {
-                    String chat_id = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CHAT_ID));
-                    String fromId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_FROM_ID));
-                    String message = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_MESSAGE));
-                    String delivery = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_DELIVERY_STATUS));
-                    String messageId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_ROW_ID));
-                    String time = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CREATED_AT));
+                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
 
                     MessageResult.DeliveryStatus deliveryStatus = MessageResult.DeliveryStatus.valueOf(delivery);
 
@@ -170,6 +170,54 @@ public class MessageStore {
             }
         });
         return getMessages;
+    }
+
+    public Observable<List<MessageResult>> getChatList() {
+        Observable<List<MessageResult>> getChatList = Observable.create(subscriber -> {
+            List<MessageResult> result = new ArrayList<>();
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            try {
+                Cursor cursor = db.rawQuery("SELECT a."+MessagesContract.COLUMN_CHAT_ID+", b."+
+                        MessagesContract.COLUMN_FROM_ID+", MAX(a."+
+                        MessagesContract.COLUMN_ROW_ID+") AS rowid, b."+
+                        MessagesContract.COLUMN_MESSAGE+", b."+
+                        MessagesContract.COLUMN_DELIVERY_STATUS+", b."+
+                        MessagesContract.COLUMN_CREATED_AT +" FROM "+
+                        MessagesContract.TABLE_NAME+" a INNER JOIN "+
+                        MessagesContract.TABLE_NAME+" b on a."+
+                        MessagesContract.COLUMN_ROW_ID+"=b."+
+                        MessagesContract.COLUMN_ROW_ID+" GROUP BY a."+
+                        MessagesContract.COLUMN_CHAT_ID+" ORDER BY a."+
+                        MessagesContract.COLUMN_ROW_ID+" DESC;", null);
+                cursor.moveToFirst();
+
+                while(!cursor.isAfterLast()) {
+                    String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+
+                    MessageResult.DeliveryStatus deliveryStatus = MessageResult.DeliveryStatus.valueOf(delivery);
+
+                    MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
+                    msg.setMessageId(messageId);
+
+                    result.add(msg);
+                    cursor.moveToNext();
+                }
+                subscriber.onNext(result);
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }
+        });
+        return getChatList;
     }
 
     private String getDateTime() {

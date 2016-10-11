@@ -2,6 +2,7 @@ package com.stairway.spotlight.screens.home.chatlist.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
 import com.stairway.spotlight.screens.home.chatlist.ChatListPresenter;
+import com.stairway.spotlight.screens.home.chatlist.GetChatsUseCase;
 
 import dagger.Module;
 import dagger.Provides;
@@ -13,7 +14,9 @@ import dagger.Provides;
 public class ChatListViewModule {
     @Provides
     @ViewScope
-    public ChatListPresenter providesChatListPresenter() {
-        return new ChatListPresenter();
+    public ChatListPresenter providesChatListPresenter(GetChatsUseCase getChatsUseCase) {
+        if(getChatsUseCase==null)
+            throw new IllegalStateException("UseCase is null");
+        return new ChatListPresenter(getChatsUseCase);
     }
 }
