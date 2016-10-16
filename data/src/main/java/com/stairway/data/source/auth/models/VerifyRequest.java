@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by vidhun on 16/10/16.
  */
-
-public class CreateRequest {
-    public CreateRequest(String countryCode, String mobile) {
+public class VerifyRequest {
+    public VerifyRequest(String countryCode, String mobile, String verificationCode) {
         this.user = new User(countryCode, mobile);
+        user.setVerificationCode(verificationCode);
     }
 
     @SerializedName("user")

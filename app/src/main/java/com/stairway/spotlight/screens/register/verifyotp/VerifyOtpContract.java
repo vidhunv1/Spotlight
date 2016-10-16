@@ -14,6 +14,6 @@ public interface VerifyOtpContract {
     }
 
     interface Presenter extends BasePresenter<VerifyOtpContract.View> {
-        void registerUser(String mobile, String otp);
+        void registerUser(String countryCode, String mobile, String otp);
     }
 }

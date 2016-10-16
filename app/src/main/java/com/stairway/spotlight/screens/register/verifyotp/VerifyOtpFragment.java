@@ -44,6 +44,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     ComponentContainer componentContainer;
 
+    int OTP_LENGTH = 4;
+
     public VerifyOtpFragment() {
         return;
     }
@@ -58,7 +60,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
         return verifyOtpFragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,13 +112,12 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @Override
     public void invalidOtpError() {
         Toast.makeText(getActivity(), "Invalid OTP", Toast.LENGTH_LONG).show();
-
         otpEditText.setText("");
     }
 
     @OnTextChanged(R.id.et_otp_otp)
     public void onMobileTextChanged() {
-        if(otpEditText.getText().toString().length()==6) {
+        if(otpEditText.getText().toString().length()==OTP_LENGTH) {
             continueButton.setAlpha(1);
         } else {
             continueButton.setAlpha(.2f);
@@ -127,8 +127,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @OnClick(R.id.btn_otp_continue)
     public void onContinueClicked() {
-        if(otpEditText.getText().toString().length() == 6) {
-            verifyOtpPresenter.registerUser(getArguments().getString("MOBILE").toString(), otpEditText.getText().toString());
+        if(otpEditText.getText().toString().length() == OTP_LENGTH) {
+            verifyOtpPresenter.registerUser(getArguments().getString("COUNTRY_CODE").toString(), getArguments().getString("MOBILE").toString(), otpEditText.getText().toString());
         }
     }
 

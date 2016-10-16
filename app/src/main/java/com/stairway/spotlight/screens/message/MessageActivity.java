@@ -105,6 +105,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
         if(message.length()>=1) {
             messageBox.setText("");
+            Logger.d("chatId: "+chatId+", currentUser: "+currentUser);
             messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.DeliveryStatus.NOT_SENT));
         }
     }
@@ -129,6 +130,6 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
-        currentUser = componentContainer.userSessionComponent().getUserSession().getUserId();
+        currentUser = componentContainer.userSessionComponent().getUserSession().getChatId();
     }
 }

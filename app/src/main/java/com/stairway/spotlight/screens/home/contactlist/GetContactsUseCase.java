@@ -41,7 +41,7 @@ public class GetContactsUseCase {
                                 contactListItemModels.add(new ContactListItemModel(
                                         contactsResult.getDisplayName(),
                                         "Invite",
-                                        String.valueOf(contactsResult.getContactId()),
+                                        contactsResult.getContactId(),
                                         contactsResult.getPhoneNumber()
                                 ));
                             }

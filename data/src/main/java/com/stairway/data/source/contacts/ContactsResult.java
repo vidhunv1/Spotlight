@@ -4,11 +4,12 @@ package com.stairway.data.source.contacts;
  * Created by vidhun on 01/09/16.
  */
 public class ContactsResult {
-    private int contactId;
+    private String contactId;
     private String phoneNumber;
+    private String countryCode;
     private String contactName;
 
-    public ContactsResult(int contactId, String phoneNumber, String displayName) {
+    public ContactsResult(String contactId, String countryCode, String phoneNumber, String displayName) {
         this.contactId = contactId;
         this.phoneNumber = phoneNumber;
         this.contactName = displayName;
@@ -17,7 +18,7 @@ public class ContactsResult {
     public ContactsResult() {
     }
 
-    public int getContactId() {
+    public String getContactId() {
         return contactId;
     }
 
@@ -29,7 +30,7 @@ public class ContactsResult {
         return contactName;
     }
 
-    public void setContactId(int contactId) {
+    public void setContactId(String contactId) {
         this.contactId = contactId;
     }
 

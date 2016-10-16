@@ -1,5 +1,7 @@
 package com.stairway.data.source.auth.models;
 
+import android.view.ViewDebug;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -19,6 +21,29 @@ public class User {
     @SerializedName("country_code")
     @Expose
     private String countryCode;
+    @SerializedName("verification_code")
+    @Expose
+    private String verificationCode;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("is_registered")
+    @Expose
+    private String isRegistered;
+    @SerializedName("id")
+    @Expose
+    private String id;
+    @SerializedName("phone_formatted")
+    @Expose
+    private String phoneFormatted;
+
+    public String getPhoneFormatted() {
+        return phoneFormatted;
+    }
+
+    public void setPhoneFormatted(String phone_formatted) {
+        this.phoneFormatted = phone_formatted;
+    }
 
     public String getPhone() {
         return phone;
@@ -36,4 +61,35 @@ public class User {
         this.countryCode = countryCode;
     }
 
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIsRegistered() {
+        return isRegistered;
+    }
+
+    public void setIsRegistered(String is_registered) {
+        this.isRegistered = is_registered;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
 }

@@ -22,8 +22,8 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
     }
 
     @Override
-    public void registerUser(String mobile, String otp) {
-        Subscription subscription = registerUseCase.execute(mobile, otp)
+    public void registerUser(String countryCode, String mobile, String otp) {
+        Subscription subscription = registerUseCase.execute(countryCode, mobile, otp)
                 .observeOn(verifyOtpView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<UserSessionResult>(verifyOtpView) {
                     @Override

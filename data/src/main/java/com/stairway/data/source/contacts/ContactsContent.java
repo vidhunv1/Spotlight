@@ -77,9 +77,11 @@ public class ContactsContent {
                                     contactNumberFormat = phoneNumberUtil.parse(contactNumber, defaultCountryIso);
 
                                     if(phoneNumberUtil.isValidNumber(contactNumberFormat)) {
-                                        contactNumberFormatted = "+" + contactNumberFormat.getCountryCode() + " " + String.valueOf(contactNumberFormat.getNationalNumber());
+                                        String countryCode = Integer.toString(contactNumberFormat.getCountryCode());
+                                        String mobileNumber = Long.toString(contactNumberFormat.getNationalNumber());
+                                        contactNumberFormatted = contactNumberFormat.getCountryCode() + "-" + String.valueOf(contactNumberFormat.getNationalNumber());
 
-                                        contactsResults.add(new ContactsResult(Integer.valueOf(contactId), contactNumberFormatted, contactName));
+                                        contactsResults.add(new ContactsResult(contactNumberFormatted, countryCode, mobileNumber, contactName));
                                     }
                                     break;
                                 }

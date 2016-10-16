@@ -18,6 +18,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
 
     public SignUpPresenter(CreateUserUseCase createUserUseCase) {
         this.createUserUseCase = createUserUseCase;
+        compositeSubscription = new CompositeSubscription();
     }
 
     @Override

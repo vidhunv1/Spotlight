@@ -4,6 +4,7 @@ import com.stairway.data.manager.Logger;
 import com.stairway.data.source.auth.UserAuthApi;
 import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.data.source.auth.UserSessionStore;
+import com.stairway.data.source.auth.models.VerifyResponse;
 
 import javax.inject.Inject;
 
@@ -25,9 +26,9 @@ public class RegisterUseCase {
         this.userSessionStore = userSessionStore;
     }
 
-    public Observable<UserSessionResult> execute(String mobile, String otp) {
+    public Observable<UserSessionResult> execute(String countryCode, String mobile, String otp) {
         Observable<UserSessionResult> register = Observable.create( subscriber -> {
-            userAuthApi.registerUser(mobile, otp).subscribe(new Subscriber<UserSessionResult>() {
+            userAuthApi.verifyUser(countryCode, mobile, otp).subscribe(new Subscriber<VerifyResponse>() {
                 @Override
                 public void onCompleted() {
                     if(!subscriber.isUnsubscribed())
@@ -40,8 +41,15 @@ public class RegisterUseCase {
                 }
 
                 @Override
-                public void onNext(UserSessionResult userSessionResult) {
-                    if(!subscriber.isUnsubscribed()) {
+                public void onNext(VerifyResponse verifyResponse) {
+                    if(!subscriber.isUnsubscribed()){
+                        UserSessionResult userSessionResult = new UserSessionResult(verifyResponse.getUser().getId());
+                        userSessionResult.setAccessToken(verifyResponse.getAccessToken());
+                        userSessionResult.setPhone(verifyResponse.getUser().getPhone());
+                        userSessionResult.setCountryCode(verifyResponse.getUser().getCountryCode());
+                        userSessionResult.setExpiry(verifyResponse.getExpiry());
+                        userSessionResult.setChatId(verifyResponse.getUser().getPhoneFormatted());
+
                         storeToken(userSessionResult);
                         subscriber.onNext(userSessionResult);
                     }

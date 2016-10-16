@@ -26,7 +26,7 @@ public class UserSessionModule {
     @Provides
     @UserSessionScope
     public XMPPManager providesXMPPConnection() {
-        XMPPManager connection = new XMPPManager(userSessionResult.getUserId(), userSessionResult.getAccessToken());
+        XMPPManager connection = new XMPPManager(userSessionResult.getChatId(), userSessionResult.getAccessToken());
         return connection;
     }
 
