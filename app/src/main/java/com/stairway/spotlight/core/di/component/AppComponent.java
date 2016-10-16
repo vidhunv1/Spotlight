@@ -13,6 +13,8 @@ import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
 import com.stairway.spotlight.screens.launcher.di.LauncherComponent;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;
+import com.stairway.spotlight.screens.register.signup.di.SignUpViewComponent;
+import com.stairway.spotlight.screens.register.signup.di.SignUpViewModule;
 import com.stairway.spotlight.screens.register.verifyotp.di.VerifyOtpViewComponent;
 import com.stairway.spotlight.screens.register.verifyotp.di.VerifyOtpViewModule;
 import com.stairway.spotlight.screens.welcome.di.WelcomeComponent;
@@ -37,6 +39,7 @@ public interface AppComponent {
     // User Session Component
     UserSessionComponent plus(UserSessionModule userSessionModule); // ComponentContainer
     VerifyOtpViewComponent plus(VerifyOtpViewModule verifyOtpViewModule);
+    SignUpViewComponent plus(SignUpViewModule signUpViewModule);
 
     // Test
 }

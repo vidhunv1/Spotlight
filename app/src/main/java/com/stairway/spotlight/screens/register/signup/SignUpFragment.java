@@ -14,7 +14,10 @@ import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.screens.register.signup.di.SignUpViewModule;
 import com.stairway.spotlight.screens.register.verifyotp.VerifyOtpFragment;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,7 +27,7 @@ import butterknife.OnTextChanged;
 /**
  * Created by vidhun on 22/07/16.
  */
-public class SignUpFragment extends BaseFragment{
+public class SignUpFragment extends BaseFragment implements SignUpContract.View{
 
     @Bind(R.id.dropdown_register_country_code)
     Spinner countryCodeSpinner;
@@ -34,6 +37,9 @@ public class SignUpFragment extends BaseFragment{
 
     @Bind(R.id.btn_register_send_confirmation)
     Button confirmationButton;
+
+    @Inject
+    SignUpPresenter signUpPresenter;
 
     public static SignUpFragment getInstance() {
         SignUpFragment signUpFragment = new SignUpFragment();
@@ -71,6 +77,8 @@ public class SignUpFragment extends BaseFragment{
 
         if(mobileEditText.getText().length() >= 10)
             confirmationButton.setAlpha(1);
+
+        signUpPresenter.attachView(this);
     }
 
     @Override
@@ -80,7 +88,7 @@ public class SignUpFragment extends BaseFragment{
 
     @OnClick(R.id.btn_register_send_confirmation)
     public void onConfirmationClicked() {
-        int countryCodeStart = countryCodeSpinner.getSelectedItem().toString().lastIndexOf("+");
+        int countryCodeStart = countryCodeSpinner.getSelectedItem().toString().lastIndexOf("+")+1;
         int countrCodeEnd = countryCodeSpinner.getSelectedItem().toString().length();
 
         String countryCode = countryCodeSpinner.getSelectedItem().toString().substring(countryCodeStart, countrCodeEnd);
@@ -90,11 +98,7 @@ public class SignUpFragment extends BaseFragment{
         Logger.d("Mobile Number = "+mobileNumber);
 
         if(mobileEditText.getText().toString().length()>=10) {
-            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.register_FragmentContainer, VerifyOtpFragment.getInstance(mobileNumber, countryCode));
-//            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
-            fragmentTransaction.addToBackStack("SignUpFragment");
-            fragmentTransaction.commit();
+            signUpPresenter.createUser(countryCode, mobileNumber);
         }
     }
 
@@ -109,7 +113,16 @@ public class SignUpFragment extends BaseFragment{
     }
 
     @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
+    public void navigateToVerifyOtp(String countryCode, String mobileNumber) {
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, VerifyOtpFragment.getInstance(mobileNumber, countryCode));
+//      fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+        fragmentTransaction.addToBackStack("SignUpFragment");
+        fragmentTransaction.commit();
+    }
 
+    @Override
+    protected void injectComponent(ComponentContainer componentContainer) {
+        componentContainer.getAppComponent().plus(new SignUpViewModule()).inject(this);
     }
 }

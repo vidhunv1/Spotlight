@@ -1,7 +1,11 @@
 package com.stairway.data.source.auth;
 
 import com.stairway.data.error.DataException;
+import com.stairway.data.manager.ApiManager;
 import com.stairway.data.manager.Logger;
+import com.stairway.data.source.auth.models.CreateRequest;
+import com.stairway.data.source.auth.models.CreateResponse;
+import com.stairway.data.source.auth.models.User;
 
 import rx.Observable;
 
@@ -26,6 +30,7 @@ public class UserAuthApi {
 
     public Observable<UserSessionResult> registerUser(String mobile, String otp) {
         // TODO: register user api.
+
         Logger.v("Register user: ["+mobile+","+otp+"]");
         if(otp.equals("123456"))
             return Observable.just(new UserSessionResult("spotlight", "12345", mobile));
@@ -36,5 +41,12 @@ public class UserAuthApi {
             });
             return registerObservable;
         }
+    }
+
+    public Observable<CreateResponse> createUser(String countryCode, String mobile){
+        UserEndpoint userEndpoint = ApiManager.getInstance().create(UserEndpoint.class);
+        Observable<CreateResponse> createUser= userEndpoint.createUser(new CreateRequest(new User(countryCode, mobile)));
+
+        return createUser;
     }
 }
