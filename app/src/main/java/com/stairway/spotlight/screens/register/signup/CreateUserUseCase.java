@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.register.signup;
 
-import com.stairway.data.source.auth.UserAuthApi;
-import com.stairway.data.source.auth.models.CreateResponse;
+import com.stairway.data.source.user.UserAuthApi;
+import com.stairway.data.source.user.models.StatusResponse;
 
 import javax.inject.Inject;
 
@@ -20,9 +20,9 @@ public class CreateUserUseCase {
         this.userAuthApi = userAuthApi;
     }
 
-    public Observable<CreateResponse> execute(String countryCode, String mobile){
-        Observable<CreateResponse> create = Observable.create(subscriber -> {
-            userAuthApi.createUser(countryCode, mobile).subscribe(new Subscriber<CreateResponse>() {
+    public Observable<StatusResponse> execute(String countryCode, String mobile){
+        Observable<StatusResponse> create = Observable.create(subscriber -> {
+            userAuthApi.createUser(countryCode, mobile).subscribe(new Subscriber<StatusResponse>() {
                 @Override
                 public void onCompleted() {
                     if(!subscriber.isUnsubscribed())
@@ -35,7 +35,7 @@ public class CreateUserUseCase {
                 }
 
                 @Override
-                public void onNext(CreateResponse createResponse) {
+                public void onNext(StatusResponse createResponse) {
                     if(!subscriber.isUnsubscribed())
                         subscriber.onNext(createResponse);
                 }

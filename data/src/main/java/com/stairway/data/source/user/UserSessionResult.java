@@ -1,4 +1,4 @@
-package com.stairway.data.source.auth;
+package com.stairway.data.source.user;
 
 /**
  * Created by vidhun on 16/07/16.
@@ -11,6 +11,9 @@ public class UserSessionResult {
     private String phone;
     private String expiry;
     private String chatId;
+
+    public UserSessionResult() {
+    }
 
     public String getChatId() {
         return chatId;

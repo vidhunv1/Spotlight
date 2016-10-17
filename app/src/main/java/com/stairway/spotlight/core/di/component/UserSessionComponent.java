@@ -1,6 +1,6 @@
 package com.stairway.spotlight.core.di.component;
 
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.di.module.DataModule;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
@@ -27,5 +27,4 @@ public interface UserSessionComponent {
     ChatListViewComponent plus(ChatListViewModule chatListViewModule);
     MessageComponent plus(MessageModule messageModule);
     ContactListViewComponent plus(ContactListViewModule contactListViewModule);
-
 }

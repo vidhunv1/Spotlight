@@ -1,10 +1,10 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.auth.UserAuthApi;
-import com.stairway.data.source.auth.UserSessionResult;
-import com.stairway.data.source.auth.UserSessionStore;
-import com.stairway.data.source.auth.models.VerifyResponse;
+import com.stairway.data.source.user.UserAuthApi;
+import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.data.source.user.UserSessionStore;
+import com.stairway.data.source.user.models.UserResponse;
 
 import javax.inject.Inject;
 
@@ -28,7 +28,7 @@ public class RegisterUseCase {
 
     public Observable<UserSessionResult> execute(String countryCode, String mobile, String otp) {
         Observable<UserSessionResult> register = Observable.create( subscriber -> {
-            userAuthApi.verifyUser(countryCode, mobile, otp).subscribe(new Subscriber<VerifyResponse>() {
+            userAuthApi.verifyUser(countryCode, mobile, otp).subscribe(new Subscriber<UserResponse>() {
                 @Override
                 public void onCompleted() {
                     if(!subscriber.isUnsubscribed())
@@ -41,7 +41,7 @@ public class RegisterUseCase {
                 }
 
                 @Override
-                public void onNext(VerifyResponse verifyResponse) {
+                public void onNext(UserResponse verifyResponse) {
                     if(!subscriber.isUnsubscribed()){
                         UserSessionResult userSessionResult = new UserSessionResult(verifyResponse.getUser().getId());
                         userSessionResult.setAccessToken(verifyResponse.getAccessToken());

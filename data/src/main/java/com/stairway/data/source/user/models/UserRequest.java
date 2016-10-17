@@ -1,4 +1,4 @@
-package com.stairway.data.source.auth.models;
+package com.stairway.data.source.user.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,10 +6,13 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by vidhun on 16/10/16.
  */
-public class VerifyRequest {
-    public VerifyRequest(String countryCode, String mobile, String verificationCode) {
+
+public class UserRequest {
+    public UserRequest(String countryCode, String mobile) {
         this.user = new User(countryCode, mobile);
-        user.setVerificationCode(verificationCode);
+    }
+
+    public UserRequest(){
     }
 
     @SerializedName("user")

@@ -1,6 +1,6 @@
 package com.stairway.spotlight.core.di.module;
 
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.manager.XMPPManager;
 

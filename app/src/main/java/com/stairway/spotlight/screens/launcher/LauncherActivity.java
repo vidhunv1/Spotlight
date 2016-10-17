@@ -1,24 +1,19 @@
 package com.stairway.spotlight.screens.launcher;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;
-import com.stairway.spotlight.screens.register.RegisterActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 public class LauncherActivity extends BaseActivity implements LauncherContract.View{

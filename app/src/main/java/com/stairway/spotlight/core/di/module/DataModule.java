@@ -3,8 +3,8 @@ package com.stairway.spotlight.core.di.module;
 import android.content.Context;
 
 import com.stairway.data.manager.XMPPManager;
-import com.stairway.data.source.auth.UserSessionStore;
-import com.stairway.data.source.auth.UserAuthApi;
+import com.stairway.data.source.user.UserSessionStore;
+import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.contacts.ContactsContent;
 import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.message.MessageStore;
@@ -20,7 +20,6 @@ import dagger.Provides;
 
 @Module
 public class DataModule {
-
     @Provides
     @ApplicationScope
     public UserSessionStore userSessionStore(Context context) {
@@ -36,7 +35,6 @@ public class DataModule {
     @Provides
     @UserSessionScope
     public MessageApi messageApi(XMPPManager xmppManager) {
-        // TODO: MessageApi might require XMPPManager
         return new MessageApi(xmppManager);
     }
 
@@ -51,5 +49,4 @@ public class DataModule {
     public ContactsContent contactsContent(Context context) {
         return new ContactsContent(context);
     }
-
 }

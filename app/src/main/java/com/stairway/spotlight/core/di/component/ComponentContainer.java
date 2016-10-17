@@ -2,7 +2,7 @@ package com.stairway.spotlight.core.di.component;
 
 import android.content.Context;
 
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.screens.register.RegisterActivity;
 
@@ -34,16 +34,6 @@ public class ComponentContainer {
             Context context = getAppComponent().appContext();
             context.startActivity(RegisterActivity.callingIntent(context));
         }
-
-//        UserSessionUseCase userSessionUseCase = userSessionComponent.getUserSessionUseCase();
-//        userSessionUseCase.execute().observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new UseCaseSubscriber<UserSession>() {
-//                    @Override
-//                    public void onResult(UserSession result) {
-//                        userSessionComponent = getAppComponent().plus(new UserSessionModule(result));
-//                    }
-//                });
         return userSessionComponent;
     }
-
 }

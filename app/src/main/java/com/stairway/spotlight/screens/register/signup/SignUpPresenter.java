@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.register.signup;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.auth.models.CreateResponse;
+import com.stairway.data.source.user.models.StatusResponse;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;
@@ -26,9 +26,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         Logger.d("[SignUpPresenter]");
         Subscription subscription = createUserUseCase.execute(countryCode, phone)
                 .observeOn(signUpView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<CreateResponse>(signUpView) {
+                .subscribe(new UseCaseSubscriber<StatusResponse>(signUpView) {
                     @Override
-                    public void onResult(CreateResponse result) {
+                    public void onResult(StatusResponse result) {
                         Logger.d("[SignUpPresenter] gotresutl"+result);
                         signUpView.navigateToVerifyOtp(countryCode, phone);
                     }

@@ -2,8 +2,6 @@ package com.stairway.spotlight.screens.launcher.di;
 
 import android.content.Context;
 
-import com.stairway.data.source.auth.UserSessionStore;
-import com.stairway.spotlight.core.di.scope.ApplicationScope;
 import com.stairway.spotlight.core.di.scope.ViewScope;
 import com.stairway.spotlight.screens.launcher.LauncherPresenter;
 import com.stairway.spotlight.screens.launcher.UserSessionUseCase;

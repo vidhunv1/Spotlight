@@ -1,4 +1,4 @@
-package com.stairway.data.source.auth;
+package com.stairway.data.source.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,13 +16,13 @@ public class UserSessionStore {
     private static SharedPreferences prefs;
     private Context context;
 
-    private String KEY_USER_ID = "SESSION_USER_ID";
-    private String  KEY_ACCESS_TOKEN = "SESSION_ACCESS_TOKEN";
-    private String  KEY_COUNTRY_CODE = "SESSION_COUNTRY_CODE";
-    private String  KEY_PHONE = "SESSION_PHONE";
-    private String KEY_REFRESH_TOKEN = "SESSION_REFRESH_TOKEN";
-    private String KEY_EXPIRY = "SESSION_EXPIRY";
-    private String KEY_CHAT_ID = "SESSION_CHAT_ID";
+    public static String KEY_USER_ID = "SESSION_USER_ID";
+    public static String  KEY_ACCESS_TOKEN = "SESSION_ACCESS_TOKEN";
+    public static String  KEY_COUNTRY_CODE = "SESSION_COUNTRY_CODE";
+    public static String  KEY_PHONE = "SESSION_PHONE";
+    public static String KEY_REFRESH_TOKEN = "SESSION_REFRESH_TOKEN";
+    public static String KEY_EXPIRY = "SESSION_EXPIRY";
+    public static String KEY_CHAT_ID = "SESSION_CHAT_ID";
 
     public UserSessionStore(Context context) {
         // TODO: Storing tokens in sharedpreference: right approach?

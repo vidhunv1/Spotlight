@@ -1,4 +1,4 @@
-package com.stairway.data.source.auth.models;
+package com.stairway.data.source.user.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by vidhun on 16/10/16.
  */
 
-public class VerifyResponse {
+public class UserResponse {
     @SerializedName("user")
     @Expose
     private User user;

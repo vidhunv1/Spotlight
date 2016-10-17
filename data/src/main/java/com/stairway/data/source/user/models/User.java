@@ -1,6 +1,4 @@
-package com.stairway.data.source.auth.models;
-
-import android.view.ViewDebug;
+package com.stairway.data.source.user.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -13,6 +11,9 @@ public class User {
     public User(String countryCode, String phone) {
         this.phone = phone;
         this.countryCode = countryCode;
+    }
+
+    public User() {
     }
 
     @SerializedName("phone")
@@ -36,6 +37,17 @@ public class User {
     @SerializedName("phone_formatted")
     @Expose
     private String phoneFormatted;
+    @SerializedName("notification_token")
+    @Expose
+    private String notificationToken;
+
+    public String getNotificationToken() {
+        return notificationToken;
+    }
+
+    public void setNotificationToken(String notificationToken) {
+        this.notificationToken = notificationToken;
+    }
 
     public String getPhoneFormatted() {
         return phoneFormatted;

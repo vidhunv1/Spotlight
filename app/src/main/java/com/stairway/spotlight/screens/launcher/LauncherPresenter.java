@@ -1,8 +1,7 @@
 package com.stairway.spotlight.screens.launcher;
 
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;

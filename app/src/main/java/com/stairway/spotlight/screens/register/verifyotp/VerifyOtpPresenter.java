@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
 import com.stairway.data.error.DataException;
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;

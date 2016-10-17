@@ -10,9 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.auth.UserSessionResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -44,8 +43,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     VerifyOtpPresenter verifyOtpPresenter;
 
     ComponentContainer componentContainer;
-
-    String fCMToken;
 
     int OTP_LENGTH = 4;
 
@@ -83,8 +80,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
         super.onActivityCreated(savedInstanceState);
         String mobile = getArguments().getString("MOBILE").toString();
         String countryCode = getArguments().getString("COUNTRY_CODE").toString();
-        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
-        fCMToken = instanceId.getToken();
 
         mobileNumberTextView.setText(countryCode+" "+mobile);
     }

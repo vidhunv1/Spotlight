@@ -1,9 +1,9 @@
 package com.stairway.spotlight.screens.launcher;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.auth.UserSessionResult;
-import com.stairway.data.source.auth.UserSessionStore;
-import com.stairway.data.source.auth.UserAuthApi;
+import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.data.source.user.UserSessionStore;
+import com.stairway.data.source.user.UserAuthApi;
 
 import javax.inject.Inject;
 
