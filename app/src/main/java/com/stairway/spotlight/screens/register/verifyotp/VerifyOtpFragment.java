@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.source.auth.UserSessionResult;
 import com.stairway.spotlight.R;
@@ -43,6 +44,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     VerifyOtpPresenter verifyOtpPresenter;
 
     ComponentContainer componentContainer;
+
+    String fCMToken;
 
     int OTP_LENGTH = 4;
 
@@ -80,6 +83,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
         super.onActivityCreated(savedInstanceState);
         String mobile = getArguments().getString("MOBILE").toString();
         String countryCode = getArguments().getString("COUNTRY_CODE").toString();
+        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
+        fCMToken = instanceId.getToken();
 
         mobileNumberTextView.setText(countryCode+" "+mobile);
     }
@@ -122,7 +127,6 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
         } else {
             continueButton.setAlpha(.2f);
         }
-
     }
 
     @OnClick(R.id.btn_otp_continue)

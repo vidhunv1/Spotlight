@@ -34,6 +34,10 @@ public class XMPPManager {
     private XMPPTCPConnectionConfiguration.Builder config;
     private static AbstractXMPPConnection connection = null;
 
+    public String getChatId() {
+        return userName;
+    }
+
     public XMPPManager(String userName, String password) {
         this.password = "spotlight";
         this.userName = userName;

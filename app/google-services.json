@@ -1,35 +1,27 @@
 {
   "project_info": {
-    "project_number": "456969396575",
-    "firebase_url": "https://spotlight-1350.firebaseio.com",
-    "project_id": "spotlight-1350",
-    "storage_bucket": "spotlight-1350.appspot.com"
+    "project_number": "394862153525",
+    "firebase_url": "https://spotlight-d6f67.firebaseio.com",
+    "project_id": "spotlight-d6f67",
+    "storage_bucket": "spotlight-d6f67.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:456969396575:android:2c80eaba73a6932b",
+        "mobilesdk_app_id": "1:394862153525:android:2c80eaba73a6932b",
         "android_client_info": {
           "package_name": "com.stairway.spotlight"
         }
       },
       "oauth_client": [
         {
-          "client_id": "456969396575-v6kgsldok9tokg4m5qheive4uclthmb1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.stairway.spotlight",
-            "certificate_hash": "1AA39F58BA82FF819F93D084C185C55689C0E3A0"
-          }
-        },
-        {
-          "client_id": "456969396575-ipj18oiudj4l7ej363e5lq167jfj4hnq.apps.googleusercontent.com",
+          "client_id": "394862153525-o8nigd0hn1ce2m7ppdnlae4hqd49uann.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBTkN9hAy4_6U5peob2ZE2mGmWquwoggvA"
+          "current_key": "AIzaSyCKT2tlRxZYpZzNHQiebrcbMyMhoIty_WM"
         }
       ],
       "services": {
@@ -37,13 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "456969396575-ipj18oiudj4l7ej363e5lq167jfj4hnq.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

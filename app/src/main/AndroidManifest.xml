@@ -40,6 +40,18 @@
             android:name=".core.xmpp.XmppService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <service
+            android:name=".core.FCMMessageHandler"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+
+        <service android:name=".core.RegistrationIntentService" android:exported="false"/>
+
     </application>
 
 </manifest>

@@ -48,6 +48,7 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contactListAdapter = new ContactListAdapter(getActivity(), this, new ArrayList<>());
     }
 
     @Nullable
@@ -57,7 +58,7 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
         ButterKnife.bind(this, view);
 
         Logger.d("[ContactListFragment] onCreateView");
-        contactListAdapter = new ContactListAdapter(getActivity(), this, new ArrayList<>());
+        contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
         contactList.setAdapter(contactListAdapter);
 
         return view;
@@ -66,7 +67,6 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
