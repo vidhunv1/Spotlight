@@ -5,10 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.screens.register.signup.SignUpContract;
 
@@ -26,7 +28,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private SearchClickListener searchClickListener;
     private Context context;
     private List<Object> itemList;
-    private final int SEARCH=0, CONTACT=1;
+    private final int SEARCH=0, CONTACT=1, INVITE=2;
 
     public ContactListAdapter(Context context, ContactClickListener contactClickListener, List<ContactListItemModel> contacts) {
         this.contactClickListener = contactClickListener;
@@ -58,8 +60,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemViewType(int position) {
         if(itemList.get(position) instanceof String) {
             return SEARCH;
-        } else if(itemList.get(position) instanceof ContactListItemModel)
-            return CONTACT;
+        } else if(itemList.get(position) instanceof ContactListItemModel) {
+            if(((ContactListItemModel) itemList.get(position)).getInviteFlag())
+                return INVITE;
+            else
+                return CONTACT;
+        }
         return -1;
     }
 
@@ -77,6 +83,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 View contactView = inflater.inflate(R.layout.item_contact_list, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
+            case INVITE:
+                View inviteView = inflater.inflate(R.layout.item_contact_list_invite, parent, false);
+                viewHolder = new InviteViewHolder(inviteView);
+                break;
             default:
                 return null;
         }
@@ -93,6 +103,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem((ContactListItemModel) itemList.get(position));
+                break;
+            case INVITE:
+                InviteViewHolder iVH = (InviteViewHolder) holder;
+                iVH.renderItem((ContactListItemModel) itemList.get(position));
                 break;
             default:
                 break;
@@ -130,6 +144,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public void renderItem(ContactListItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
             status.setText(contactItem.getMobileNumber());
+            profileImage.setImageResource(R.mipmap.default_profile_image);
+            Logger.d("Invite flag"+contactItem.getInviteFlag());
 
             contactName.setTag(contactItem.getChatId());
         }
@@ -137,6 +153,33 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public interface ContactClickListener {
         void onContactItemClicked(String userId);
+    }
+
+    public class InviteViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.ll_contactItem_content)
+        LinearLayout contactListContent;
+
+        @Bind(R.id.btn_contactItem_invite)
+        Button inviteButton;
+
+        @Bind(R.id.tv_contactItem_contactName)
+        TextView contactName;
+
+        @Bind(R.id.tv_contactItem_number)
+        TextView number;
+
+        public InviteViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+        }
+        public void renderItem(ContactListItemModel contactItem) {
+            contactName.setText(contactItem.getContactName());
+            number.setText(contactItem.getMobileNumber());
+            Logger.d("Invite flag"+contactItem.getInviteFlag());
+
+            contactName.setTag(contactItem.getChatId());
+        }
     }
 
     public class SearchViewHolder extends RecyclerView.ViewHolder {

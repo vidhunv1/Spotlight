@@ -63,7 +63,7 @@ public class HomeActivity extends BaseActivity{
         viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
         TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
-        viewPager.setCurrentItem(2);
+        viewPager.setCurrentItem(1);
 
         Intent intent = new Intent(this, FCMRegistrationIntentService.class);
         startService(intent);

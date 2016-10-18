@@ -5,14 +5,14 @@ package com.stairway.spotlight.screens.home.contactlist;
  */
 public class ContactListItemModel {
     private String contactName;
-    private String inviteFlag;
+    private boolean inviteFlag;
     private String chatId;
     private String mobileNumber;
 
     public ContactListItemModel() {
     }
 
-    public ContactListItemModel(String contactName, String inviteFlag, String chatId, String mobileNumber) {
+    public ContactListItemModel(String contactName, boolean inviteFlag, String chatId, String mobileNumber) {
         this.contactName = contactName;
         this.inviteFlag = inviteFlag;
         this.chatId = chatId;
@@ -23,7 +23,7 @@ public class ContactListItemModel {
         return contactName;
     }
 
-    public String getInviteFlag() {
+    public boolean getInviteFlag() {
         return inviteFlag;
     }
 
@@ -35,7 +35,7 @@ public class ContactListItemModel {
         this.contactName = contactName;
     }
 
-    public void setInviteFlag(String inviteFlag) {
+    public void setInviteFlag(boolean inviteFlag) {
         this.inviteFlag = inviteFlag;
     }
 

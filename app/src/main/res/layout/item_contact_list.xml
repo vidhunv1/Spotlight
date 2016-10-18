@@ -8,13 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-    <ImageView
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_marginLeft="14dp"
-        android:id="@+id/iv_contactItem_profileImage"
-        android:layout_marginTop="12dp"
-        android:background="#7a7a7a"/>
+
+        <ImageView
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:id="@+id/iv_contactItem_profileImage"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="13dp"
+            android:background="#e6e6e6"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -33,11 +34,10 @@
                 android:text="Name"
                 android:id="@+id/tv_contactItem_contactName"
                 android:layout_marginLeft="14dp"
-                android:layout_marginTop="13.47dp"
+                android:layout_marginTop="14.47dp"
                 android:maxWidth="190dp"
                 android:textSize="17sp"
-                android:textColor="#0A0919"
-                android:maxLines="1"/>
+                android:textColor="#0A0919" />
 
         </LinearLayout>
 
