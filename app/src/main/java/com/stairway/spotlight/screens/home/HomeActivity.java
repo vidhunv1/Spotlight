@@ -26,6 +26,8 @@ import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Subscriber;
 
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
@@ -44,17 +46,17 @@ public class HomeActivity extends BaseActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int MyVersion = Build.VERSION.SDK_INT;
-
         // Permissions
         if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (!checkIfAlreadyhavePermission()) {
                 requestForSpecificPermission();
             }
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
         viewPager.setOffscreenPageLimit(3);
