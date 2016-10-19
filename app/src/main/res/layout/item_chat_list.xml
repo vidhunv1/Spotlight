@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="14dp"
                     android:textSize="15dp"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textColor="#a6000000"
                     android:id="@+id/tv_chatItem_message"/>
 
@@ -71,7 +71,7 @@
                     android:gravity="center_vertical|center_horizontal"
                     android:id="@+id/tv_chatlist_notification"
                     android:layout_marginLeft="14dp"
-                    android:textSize="15sp"
+                    android:textSize="11sp"
                     android:textColor="#800a0919"
                     android:maxLines="1"
                     android:layout_marginTop="4dp"

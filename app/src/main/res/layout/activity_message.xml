@@ -7,7 +7,57 @@
         android:id="@+id/container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#FF888888">
+        <LinearLayout
+            android:layout_width="340dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/keyboard_background"
+            android:id="@+id/ll_keyboard"
+            android:layout_alignParentBottom="true">
+
+            <ImageButton
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:id="@+id/imageButton"
+                android:layout_marginTop="14.5dp"
+                android:layout_marginLeft="13.25dp"
+                android:layout_marginBottom="15dp"
+                android:src="@drawable/ic_smiley_icon"
+                android:layout_gravity="bottom"
+                android:background="#FFFFFFFF"/>
+
+            <EditText
+                android:layout_width="249dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_sendmessage_message"
+                android:hint="Type Something..."
+                android:layout_marginTop="6.5dp"
+                android:textSize="15sp"
+                android:maxLines="6"
+                android:minHeight="35dp"
+                android:background="@drawable/keyboard_edit_text"
+                android:layout_marginLeft="13.25dp"
+                android:layout_marginStart="13.25dp" />
+
+            <ImageButton
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:id="@+id/btn_sendMessage_send"
+                android:src="@drawable/ic_send_icon_rest"
+                android:layout_marginTop="14.5dp"
+                android:layout_marginStart="13.25dp"
+                android:layout_marginRight="13dp"
+                android:layout_marginEnd="13dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="13.25dp"
+                android:background="#FFFFFFFF"/>
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/rv_messageitem"
@@ -17,39 +67,7 @@
             android:layout_alignParentLeft="false"
             android:layout_alignParentTop="false"
             android:layout_marginBottom="10dp"
-            android:layout_above="@+id/et_sendmessage_message"
+            android:layout_above="@id/ll_keyboard"
             />
-        <ImageButton
-            android:layout_width="19dp"
-            android:layout_height="19dp"
-            android:id="@+id/imageButton"
-            android:layout_marginTop="14.5dp"
-            android:layout_marginLeft="13.25dp"
-            android:layout_toLeftOf="@+id/et_sendmessage_message"
-            android:layout_toStartOf="@+id/et_sendmessage_message"
-            android:layout_alignParentBottom="true"/>
-
-        <EditText
-            android:id="@+id/et_sendmessage_message"
-            android:layout_width="249dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="Type Something"
-            android:textSize="15sp"
-            android:maxHeight="112dp"
-            android:layout_toLeftOf="@+id/btn_sendMessage_send"
-            android:layout_toStartOf="@+id/btn_sendMessage_send" />
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send"
-            android:id="@+id/btn_sendMessage_send"
-            android:layout_alignBottom="@+id/et_sendmessage_message"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
-
     </RelativeLayout>
 </LinearLayout>
