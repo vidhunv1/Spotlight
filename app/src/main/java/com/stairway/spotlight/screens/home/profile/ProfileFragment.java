@@ -40,7 +40,7 @@ public class ProfileFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, view);
-        profileImage.setImageResource(R.drawable.default_profile_image);
+        profileImage.setImageResource(R.drawable.default_profile_image_qr);
         return view;
     }
 

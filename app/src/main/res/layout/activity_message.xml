@@ -19,13 +19,24 @@
             android:layout_marginBottom="10dp"
             android:layout_above="@+id/et_sendmessage_message"
             />
+        <ImageButton
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:id="@+id/imageButton"
+            android:layout_marginTop="14.5dp"
+            android:layout_marginLeft="13.25dp"
+            android:layout_toLeftOf="@+id/et_sendmessage_message"
+            android:layout_toStartOf="@+id/et_sendmessage_message"
+            android:layout_alignParentBottom="true"/>
 
         <EditText
             android:id="@+id/et_sendmessage_message"
-            android:layout_width="match_parent"
+            android:layout_width="249dp"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:hint="type message"
+            android:text="Type Something"
+            android:textSize="15sp"
+            android:maxHeight="112dp"
             android:layout_toLeftOf="@+id/btn_sendMessage_send"
             android:layout_toStartOf="@+id/btn_sendMessage_send" />
 

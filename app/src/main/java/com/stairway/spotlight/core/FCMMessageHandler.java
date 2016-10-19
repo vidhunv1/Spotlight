@@ -32,12 +32,10 @@ public class FCMMessageHandler extends FirebaseMessagingService {
     private void createNotification(RemoteMessage.Notification notification) {
         Context context = getBaseContext();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.default_profile_image).setContentTitle(notification.getTitle())
+                .setSmallIcon(R.mipmap.ic_launcher).setContentTitle(notification.getTitle())
                 .setContentText(notification.getBody());
         NotificationManager mNotificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(MESSAGE_NOTIFICATION_ID, mBuilder.build());
     }
-
-
 }

@@ -82,7 +82,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
             contactName.setText(chatListItem.getChatName());
             lastMessage.setText(chatListItem.getLastMessage());
             time.setText(chatListItem.getTime());
-            profileImage.setImageResource(R.mipmap.default_profile_image);
+            profileImage.setImageResource(R.drawable.default_profile_image);
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
 
             // Set userId to pass through onClick.

@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.register.signup.SignUpContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,7 +143,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public void renderItem(ContactListItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
             status.setText(contactItem.getMobileNumber());
-            profileImage.setImageResource(R.mipmap.default_profile_image);
+            profileImage.setImageResource(R.drawable.default_profile_image);
             Logger.d("Invite flag"+contactItem.getInviteFlag());
 
             contactName.setTag(contactItem.getChatId());
@@ -168,6 +167,9 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Bind(R.id.tv_contactItem_number)
         TextView number;
 
+        @Bind(R.id.iv_contactItem_profileImage)
+        ImageView profileImage;
+
         public InviteViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -176,6 +178,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public void renderItem(ContactListItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
             number.setText(contactItem.getMobileNumber());
+            profileImage.setImageResource(R.drawable.default_profile_image);
             Logger.d("Invite flag"+contactItem.getInviteFlag());
 
             contactName.setTag(contactItem.getChatId());

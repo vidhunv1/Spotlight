@@ -14,8 +14,7 @@
             android:layout_height="54dp"
             android:id="@+id/iv_contactItem_profileImage"
             android:layout_marginLeft="14dp"
-            android:layout_marginTop="13dp"
-            android:background="#e6e6e6"/>
+            android:layout_marginTop="13dp" />
 
     <LinearLayout
         android:orientation="vertical"
