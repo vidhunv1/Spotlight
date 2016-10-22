@@ -36,6 +36,6 @@
         android:layout_toRightOf="@+id/linearLayout"
         android:layout_toEndOf="@+id/linearLayout"
         android:layout_marginLeft="14dp"
-        android:background="#FFE6e6e6"
+        android:src="@drawable/default_profile_image"
         android:layout_marginTop="8dp" />
 </RelativeLayout>

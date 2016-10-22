@@ -58,12 +58,15 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_message);
-        ButterKnife.bind(this);
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(USER_ID))
             return;
+
         chatId = receivedIntent.getStringExtra(USER_ID);
+        setContentView(R.layout.activity_message);
+        ButterKnife.bind(this);
+
+        getWindow().setBackgroundDrawableResource(R.drawable.bg_chat);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
@@ -80,12 +83,11 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 //        ab.setTitle(Html.fromHtml("<font color='#686868'>  "+chatId+"</font>"));
 //        ab.setSubtitle(Html.fromHtml("<font color='#cecece'> Last seen at 3:30 PM</font>"));
 
-        ab.setBackgroundDrawable(new ColorDrawable(Color.GRAY));
+        ab.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
         View v =getSupportActionBar().getCustomView();
         ImageButton profileDP = (ImageButton) v.findViewById(R.id.actionbar_message_profile);
-        profileDP.setImageResource(R.drawable.default_profile_image);
 
         ((ImageButton)v.findViewById(R.id.actionbar_message_profile)).setOnClickListener(new View.OnClickListener() {
             @Override
