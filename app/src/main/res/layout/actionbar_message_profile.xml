@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/imageView8"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/actionbar_menu"
+        android:layout_toEndOf="@+id/linearLayout"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

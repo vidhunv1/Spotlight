@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/et_sendmessage_message"
                 android:hint="Type Something..."
+                android:focusable="false"
                 android:layout_marginTop="6.5dp"
                 android:textSize="15sp"
                 android:maxLines="6"

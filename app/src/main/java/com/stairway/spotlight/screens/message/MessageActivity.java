@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageResult;
@@ -17,6 +19,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.manager.XMPPManager;
 import com.stairway.spotlight.screens.message.di.MessageModule;
+import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 
 import java.util.List;
 
@@ -71,11 +74,26 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         Logger.d("[MessagesActivity]Loading messages");
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
-        ab.setTitle(Html.fromHtml("<font color='#686868'>  "+chatId+"</font>"));
-        ab.setSubtitle(Html.fromHtml("<font color='#cecece'> Last seen at 3:30 PM</font>"));
-        getSupportActionBar().setElevation(0);
+        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+        ab.setCustomView(R.layout.actionbar_message_name);
 
-        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+//        ab.setTitle(Html.fromHtml("<font color='#686868'>  "+chatId+"</font>"));
+//        ab.setSubtitle(Html.fromHtml("<font color='#cecece'> Last seen at 3:30 PM</font>"));
+
+        ab.setBackgroundDrawable(new ColorDrawable(Color.GRAY));
+
+
+        View v =getSupportActionBar().getCustomView();
+        ImageButton profileDP = (ImageButton) v.findViewById(R.id.actionbar_message_profile);
+        profileDP.setImageResource(R.drawable.default_profile_image);
+
+        ((ImageButton)v.findViewById(R.id.actionbar_message_profile)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Logger.d("[MessageActivity]ImageProfile");
+                startActivity(UserProfileActivity.callingIntent(getBaseContext(), "12"));
+            }
+        });
 
         messagePresenter.attachView(this);
         messagePresenter.loadMessages(chatId);

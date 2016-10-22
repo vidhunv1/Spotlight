@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/miActionButton"
+        app:showAsAction="ifRoom"
+        app:actionLayout="@layout/actionbar_message_profile"
+        android:title="Loading..." />
+</menu>
