@@ -29,12 +29,12 @@ public class SpotlightApplication extends Application {
         initDagger();
 
 
-        // Setting default font
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/helvetica.ttf")
-                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
-                .build()
-        );
+//        // Setting default font
+//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+//                .setDefaultFontPath("fonts/din_regular.otf")
+//                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
+//                .build()
+//        );
 
 
         if(com.stairway.spotlight.BuildConfig.DEBUG) {

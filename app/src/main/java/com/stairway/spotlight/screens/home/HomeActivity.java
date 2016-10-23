@@ -65,9 +65,10 @@ public class HomeActivity extends BaseActivity{
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(1);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_contacts_tab);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_call);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_chat_tab);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_profile_tab);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_contacts_tab);
+        tabLayout.getTabAt(3).setIcon(R.drawable.ic_profile_tab);
 
         Intent intent = new Intent(this, FCMRegistrationIntentService.class);
         startService(intent);
