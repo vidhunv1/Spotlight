@@ -23,9 +23,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:windowSoftInputMode="adjustNothing"
             android:name=".screens.home.HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_home"/>
         <activity android:name=".screens.message.MessageActivity" android:windowSoftInputMode="adjustUnspecified" />
         <activity
             android:name=".screens.register.RegisterActivity"

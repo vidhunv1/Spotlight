@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,6 +16,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.view.LayoutInflater;
+import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.stairway.data.manager.Logger;
@@ -49,8 +54,14 @@ public class HomeActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        android.support.v7.app.ActionBar ab = getSupportActionBar();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int MyVersion = Build.VERSION.SDK_INT;
+
+        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        ab.setCustomView(R.layout.actionbar_home);
+        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
         // Permissions
         if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (!checkIfAlreadyhavePermission()) {
@@ -58,17 +69,7 @@ public class HomeActivity extends BaseActivity{
             }
         }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
-        viewPager.setOffscreenPageLimit(3);
-        viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.setCurrentItem(1);
-
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_call);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_chat_tab);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_contacts_tab);
-        tabLayout.getTabAt(3).setIcon(R.drawable.ic_profile_tab);
+        initializeNavigationTabs();
 
         Intent intent = new Intent(this, FCMRegistrationIntentService.class);
         startService(intent);
@@ -94,6 +95,35 @@ public class HomeActivity extends BaseActivity{
                 }
             });
         }
+    }
+
+    public void initializeNavigationTabs() {
+        ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        viewPager.setCurrentItem(1);
+
+        TextView callTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        callTab.setText("Calls");
+        callTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_call_tab,0,0);
+        tabLayout.getTabAt(0).setCustomView(callTab);
+
+        TextView chatTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        chatTab.setText("Chats");
+        chatTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_chat_tab,0,0);
+        tabLayout.getTabAt(1).setCustomView(chatTab);
+
+        TextView contactTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        contactTab.setText("Contacts");
+        contactTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_contacts_tab,0,0);
+        tabLayout.getTabAt(2).setCustomView(contactTab);
+
+        TextView profileTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        profileTab.setText("Profile");
+        profileTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_profile_tab,0,0);
+        tabLayout.getTabAt(3).setCustomView(profileTab);
     }
 
     private boolean checkIfAlreadyhavePermission() {

@@ -43,7 +43,7 @@ public class GetContactsUseCase {
                             for(ContactsResult contactsResult: contactsResults) {
                                 contactListItemModels.add(new ContactListItemModel(
                                         contactsResult.getDisplayName(),
-                                        true,
+                                        false,
                                         contactsResult.getContactId(),
                                         contactsResult.getPhoneNumber()
                                 ));

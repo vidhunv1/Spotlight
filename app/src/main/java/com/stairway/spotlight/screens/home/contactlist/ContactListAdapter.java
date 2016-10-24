@@ -33,13 +33,13 @@ public class ContactListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.contactClickListener = contactClickListener;
         this.context = context;
         this.itemList = new ArrayList<>();
-        this.itemList.add("Search");
+//        this.itemList.add("Search");
         this.itemList.addAll(contacts);
     }
 
     public void setContacts(List<ContactListItemModel> contacts) {
         this.itemList.clear();
-        this.itemList.add("Search");
+//        this.itemList.add("Search");
         this.itemList.addAll(contacts);
         this.notifyItemRangeInserted(0, itemList.size() - 1);
     }
