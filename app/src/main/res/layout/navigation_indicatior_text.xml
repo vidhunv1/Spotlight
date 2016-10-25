@@ -8,16 +8,20 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
         android:id="@+id/navigation_icon"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:src="@android:drawable/screen_background_dark" />
 
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/navigation_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="2.15dp"
         android:layout_gravity="center_horizontal"
         android:textSize="11sp"
         android:layout_marginTop="2dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:text="Text" />
 </LinearLayout>

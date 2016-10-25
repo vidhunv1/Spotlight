@@ -6,23 +6,30 @@
         android:layout_width="298dp"
         android:layout_height="48dp"
         android:background="@android:color/transparent"
-        android:id="@+id/editText"
+        android:id="@+id/actionbar_search"
         android:layout_alignParentTop="true"
         android:hint="Search"
         android:textColorHint="#FFC9C9C9"
+        android:paddingLeft="18dp"
         android:textSize="16dp"
+        android:drawableLeft="@drawable/ic_search"
+        android:drawablePadding="10dp"
         android:textColor="#c9c9c9"
         android:textColorLink="@android:color/black" />
 
     <ImageButton
         android:layout_width="fill_parent"
         android:layout_height="48dp"
-        android:text="New Button"
-        android:src="@drawable/ic_chat"
-        android:id="@+id/button"
+        android:id="@+id/actionbar_image"
         android:background="#00FFFFFF"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/editText"
-        android:layout_toEndOf="@+id/editText" />
+        android:layout_toRightOf="@+id/actionbar_search"
+        android:layout_toEndOf="@+id/actionbar_search" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#FFF0F0F0"
+        android:layout_below="@id/actionbar_search"/>
 
 </RelativeLayout>

@@ -25,6 +25,7 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -57,12 +58,13 @@ public class HomeActivity extends BaseActivity{
         return intent;
     }
 
-    View callView, chatView, contactView, profileView;
+    View callView, chatView, contactView, profileView, actionBarView;
     TextView callText, chatText, contactText, profileText;
     ImageView callImage, chatImage, contactImage, profileImage;
     ViewPager viewPager;
     TabLayout tabLayout;
     Drawable profileIcon, chatIcon, contactIcon, callIcon;
+    ImageButton actionBarIB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +104,9 @@ public class HomeActivity extends BaseActivity{
         ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         ab.setCustomView(R.layout.actionbar_home);
         ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        ab.setElevation(0);
+        actionBarView = ab.getCustomView();
+        actionBarIB = (ImageButton) actionBarView.findViewById(R.id.actionbar_image);
 
         // Permissions
         if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -175,6 +180,7 @@ public class HomeActivity extends BaseActivity{
                 if(isActive) {
                     callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                    actionBarIB.setImageResource(R.drawable.ic_new_call);
                 }
                 else {
                     callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
@@ -188,6 +194,7 @@ public class HomeActivity extends BaseActivity{
                 if(isActive) {
                     chatIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     chatText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                    actionBarIB.setImageResource(R.drawable.ic_new_chat);
                 }
                 else {
                     chatIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
@@ -201,6 +208,7 @@ public class HomeActivity extends BaseActivity{
                 if(isActive) {
                     contactIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     contactText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                    actionBarIB.setImageResource(R.drawable.ic_new_contact);
                 }
                 else {
                     contactIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
@@ -214,6 +222,7 @@ public class HomeActivity extends BaseActivity{
                 if(isActive) {
                     profileIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     profileText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                    actionBarIB.setImageResource(R.drawable.ic_camera);
                 }
                 else {
                     profileIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
