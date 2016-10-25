@@ -1,9 +1,7 @@
-package com.stairway.spotlight.screens.home.contactlist;
+package com.stairway.spotlight.screens.home.contacts;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +12,7 @@ import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewModule;
+import com.stairway.spotlight.screens.home.contacts.di.ContactListViewModule;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.ArrayList;

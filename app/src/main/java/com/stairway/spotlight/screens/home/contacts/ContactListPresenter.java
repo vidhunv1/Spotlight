@@ -1,11 +1,8 @@
-package com.stairway.spotlight.screens.home.contactlist;
+package com.stairway.spotlight.screens.home.contacts;
 
 import com.stairway.data.manager.Logger;
-import com.stairway.data.source.contacts.ContactsContent;
-import com.stairway.data.source.contacts.ContactsResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscription;

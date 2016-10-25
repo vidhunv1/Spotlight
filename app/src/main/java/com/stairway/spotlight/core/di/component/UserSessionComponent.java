@@ -5,10 +5,10 @@ import com.stairway.spotlight.core.di.module.DataModule;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.manager.XMPPManager;
-import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewComponent;
-import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
-import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewComponent;
-import com.stairway.spotlight.screens.home.contactlist.di.ContactListViewModule;
+import com.stairway.spotlight.screens.home.chats.di.ChatListViewComponent;
+import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
+import com.stairway.spotlight.screens.home.contacts.di.ContactListViewComponent;
+import com.stairway.spotlight.screens.home.contacts.di.ContactListViewModule;
 import com.stairway.spotlight.screens.message.di.MessageComponent;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 

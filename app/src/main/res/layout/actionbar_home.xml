@@ -5,6 +5,7 @@
     <EditText
         android:layout_width="298dp"
         android:layout_height="48dp"
+        android:background="@android:color/transparent"
         android:id="@+id/editText"
         android:layout_alignParentTop="true"
         android:hint="Search"

@@ -1,5 +1,6 @@
 package com.stairway.spotlight.core;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by vidhun on 05/07/16.
@@ -33,6 +35,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     public void setSelectedFragment(BaseFragment backHandledFragment) {
         baseFragmentList.add(backHandledFragment);
     }
+
+//    @Override
+//    protected void attachBaseContext(Context newBase) {
+//        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+//    }
 
     public Scheduler getUiScheduler() {
         return AndroidSchedulers.mainThread();

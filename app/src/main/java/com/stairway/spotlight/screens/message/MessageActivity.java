@@ -66,7 +66,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
 
-        getWindow().setBackgroundDrawableResource(R.drawable.bg_chat);
+//        getWindow().setBackgroundDrawableResource(R.drawable.bg_chat);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);

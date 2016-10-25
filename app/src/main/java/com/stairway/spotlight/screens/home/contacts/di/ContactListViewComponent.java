@@ -1,8 +1,7 @@
-package com.stairway.spotlight.screens.home.contactlist.di;
+package com.stairway.spotlight.screens.home.contacts.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
-import com.stairway.spotlight.screens.home.contactlist.ContactListFragment;
+import com.stairway.spotlight.screens.home.contacts.ContactListFragment;
 
 import dagger.Subcomponent;
 

@@ -1,9 +1,8 @@
-package com.stairway.spotlight.screens.home.contactlist.di;
+package com.stairway.spotlight.screens.home.contacts.di;
 
-import com.stairway.data.source.contacts.ContactsContent;
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.contactlist.ContactListPresenter;
-import com.stairway.spotlight.screens.home.contactlist.GetContactsUseCase;
+import com.stairway.spotlight.screens.home.contacts.ContactListPresenter;
+import com.stairway.spotlight.screens.home.contacts.GetContactsUseCase;
 
 import dagger.Module;
 import dagger.Provides;

@@ -9,5 +9,5 @@
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".screens.home.chatlist.ChatListFragment"
+    tools:context=".screens.home.chats.ChatListFragment"
     tools:listitem="@layout/item_chat_list" />

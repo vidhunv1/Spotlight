@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.chatlist;
+package com.stairway.spotlight.screens.home.chats;
 
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.message.MessageStore;

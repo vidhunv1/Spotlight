@@ -26,7 +26,7 @@
             android:windowSoftInputMode="adjustNothing"
             android:name=".screens.home.HomeActivity"
             android:label="@string/title_activity_home"/>
-        <activity android:name=".screens.message.MessageActivity" android:windowSoftInputMode="adjustUnspecified" />
+        <activity android:name=".screens.message.MessageActivity"/>
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"
@@ -36,10 +36,6 @@
             android:label="WelcomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name=".core.xmpp.XmppService"
-            android:enabled="true"
-            android:exported="true" />
         <service
             android:name=".core.FCMMessageHandler"
             android:exported="false">

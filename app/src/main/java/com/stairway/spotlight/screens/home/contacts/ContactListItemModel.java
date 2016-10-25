@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.contactlist;
+package com.stairway.spotlight.screens.home.contacts;
 
 /**
  * Created by vidhun on 31/08/16.

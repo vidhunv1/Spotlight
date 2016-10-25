@@ -1,9 +1,8 @@
-package com.stairway.spotlight.screens.home.chatlist;
+package com.stairway.spotlight.screens.home.chats;
 
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

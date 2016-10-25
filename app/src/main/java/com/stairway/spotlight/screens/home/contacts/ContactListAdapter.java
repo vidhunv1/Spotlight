@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.contactlist;
+package com.stairway.spotlight.screens.home.contacts;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

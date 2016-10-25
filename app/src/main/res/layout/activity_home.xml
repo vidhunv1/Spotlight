@@ -14,8 +14,8 @@
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="0.5dp"
-        android:background="#FFF0F0F0"/>
+        android:layout_height="1dp"
+        android:background="#FFE8E8E8"/>
 
     <android.support.design.widget.TabLayout
         android:id="@+id/home_sliding_tabs"
@@ -24,6 +24,6 @@
         android:layout_gravity="bottom"
         app:tabGravity="fill"
         app:tabMode="fixed"
-        android:background="#FFFBFBFB"
+        android:background="#FFFFFFFF"
         app:tabIndicatorHeight="0dp" />
 </LinearLayout>

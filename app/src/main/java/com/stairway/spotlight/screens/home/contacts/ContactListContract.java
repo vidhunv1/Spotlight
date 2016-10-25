@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.contactlist;
+package com.stairway.spotlight.screens.home.contacts;
 
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;

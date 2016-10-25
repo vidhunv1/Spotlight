@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.chatlist;
+package com.stairway.spotlight.screens.home.chats;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,16 +12,14 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.screens.message.MessageActivity;
-import com.stairway.spotlight.screens.home.chatlist.di.ChatListViewModule;
+import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import de.measite.minidns.record.A;
 
 public class ChatListFragment extends BaseFragment implements ChatListContract.View, ChatListAdapter.ChatClickListener{
 

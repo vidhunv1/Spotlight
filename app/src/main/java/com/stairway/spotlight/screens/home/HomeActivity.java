@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,9 +19,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -49,10 +57,43 @@ public class HomeActivity extends BaseActivity{
         return intent;
     }
 
+    View callView, chatView, contactView, profileView;
+    TextView callText, chatText, contactText, profileText;
+    ImageView callImage, chatImage, contactImage, profileImage;
+    ViewPager viewPager;
+    TabLayout tabLayout;
+    Drawable profileIcon, chatIcon, contactIcon, callIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        viewPager  = (ViewPager) findViewById(R.id.home_viewpager);
+        tabLayout  = (TabLayout) findViewById(R.id.home_sliding_tabs);
+
+        callView = LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        callText = (TextView) callView.findViewById(R.id.navigation_text);
+        callImage = (ImageView) callView.findViewById(R.id.navigation_icon);
+
+        chatView = LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        chatText = (TextView) chatView.findViewById(R.id.navigation_text);
+        chatImage = (ImageView) chatView.findViewById(R.id.navigation_icon);
+
+        contactView = LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        contactText = (TextView) contactView.findViewById(R.id.navigation_text);
+        contactImage = (ImageView) contactView.findViewById(R.id.navigation_icon);
+
+        profileView = LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
+        profileText = (TextView) profileView.findViewById(R.id.navigation_text);
+        profileImage = (ImageView) profileView.findViewById(R.id.navigation_icon);
+
+
+        profileIcon = ContextCompat.getDrawable(this, R.drawable.ic_profile_tab);
+        contactIcon = ContextCompat.getDrawable(this, R.drawable.ic_contacts_tab);
+        chatIcon = ContextCompat.getDrawable(this, R.drawable.ic_chat_tab);
+        callIcon = ContextCompat.getDrawable(this, R.drawable.ic_call_tab);
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -69,12 +110,40 @@ public class HomeActivity extends BaseActivity{
             }
         }
 
-        initializeNavigationTabs();
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
+        tabLayout.setupWithViewPager(viewPager);
+
+        setTab(0, false);
+        setTab(1, false);
+        setTab(2, false);
+        setTab(3, false);
+
+        viewPager.setCurrentItem(0);
+        // bug workaround
+        setTab(0, true);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                setTab(tab.getPosition(), true);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                setTab(tab.getPosition(), false);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
         Intent intent = new Intent(this, FCMRegistrationIntentService.class);
         startService(intent);
         FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
         String fCMToken = instanceId.getToken();
+
         //Upload to token to server if FCM token not updated
         if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
             String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
@@ -97,33 +166,66 @@ public class HomeActivity extends BaseActivity{
         }
     }
 
-    public void initializeNavigationTabs() {
-        ViewPager viewPager = (ViewPager) findViewById(R.id.home_viewpager);
-        viewPager.setOffscreenPageLimit(3);
-        viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), HomeActivity.this));
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.home_sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.setCurrentItem(1);
-
-        TextView callTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
-        callTab.setText("Calls");
-        callTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_call_tab,0,0);
-        tabLayout.getTabAt(0).setCustomView(callTab);
-
-        TextView chatTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
-        chatTab.setText("Chats");
-        chatTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_chat_tab,0,0);
-        tabLayout.getTabAt(1).setCustomView(chatTab);
-
-        TextView contactTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
-        contactTab.setText("Contacts");
-        contactTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_contacts_tab,0,0);
-        tabLayout.getTabAt(2).setCustomView(contactTab);
-
-        TextView profileTab = (TextView) LayoutInflater.from(this).inflate(R.layout.navigation_indicatior_text, null);
-        profileTab.setText("Profile");
-        profileTab.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_profile_tab,0,0);
-        tabLayout.getTabAt(3).setCustomView(profileTab);
+    /*
+    * Works only if all tabs are initialized first and then isActive set to 'true'.
+    * */
+    private void setTab(int tabPosition, boolean isActive){
+        switch (tabPosition){
+            case 0:
+                if(isActive) {
+                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
+                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                }
+                else {
+                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
+                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+                }
+                callImage.setImageDrawable(callIcon);
+                callText.setText("Calls");
+                tabLayout.getTabAt(0).setCustomView(callView);
+                break;
+            case 1:
+                if(isActive) {
+                    chatIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
+                    chatText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                }
+                else {
+                    chatIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
+                    chatText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+                }
+                chatImage.setImageDrawable(chatIcon);
+                chatText.setText("Chats");
+                tabLayout.getTabAt(1).setCustomView(chatView);
+                break;
+            case 2:
+                if(isActive) {
+                    contactIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
+                    contactText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                }
+                else {
+                    contactIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
+                    contactText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+                }
+                contactImage.setImageDrawable(contactIcon);
+                contactText.setText("Contacts");
+                tabLayout.getTabAt(2).setCustomView(contactView);
+                break;
+            case 3:
+                if(isActive) {
+                    profileIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
+                    profileText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                }
+                else {
+                    profileIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
+                    profileText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+                }
+                profileImage.setImageDrawable(profileIcon);
+                profileText.setText("Profile");
+                tabLayout.getTabAt(3).setCustomView(profileView);
+                break;
+            default:
+                throw new IllegalArgumentException("Unspecified tab");
+        }
     }
 
     private boolean checkIfAlreadyhavePermission() {
