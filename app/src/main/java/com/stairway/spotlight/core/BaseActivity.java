@@ -36,10 +36,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         baseFragmentList.add(backHandledFragment);
     }
 
-//    @Override
-//    protected void attachBaseContext(Context newBase) {
-//        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-//    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     public Scheduler getUiScheduler() {
         return AndroidSchedulers.mainThread();

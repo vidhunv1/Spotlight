@@ -11,19 +11,19 @@
 
         <ImageView
             android:layout_width="82dp"
-            android:layout_height="75.5dp"
+            android:layout_height="73.5dp"
             android:id="@+id/iv_chatItem_profileImage"
             android:paddingRight="14dp"
             android:paddingLeft="14dp"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"/>
+            android:paddingTop="10.75dp"
+            android:paddingBottom="10.75dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:paddingTop="14.25dp">
+            android:gravity="center_vertical">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -32,19 +32,21 @@
 
                 <TextView
                     android:layout_width="190dp"
+                    tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
+                    fontPath="fonts/din_medium.otf"
                     android:text="Name"
-                    android:id="@+id/tv_chatItem_contactName"
-                    android:maxWidth="190dp"
+                    android:textColor="#F2000000"
                     android:textSize="17sp"
-                    android:textColor="#f2000000" />
+                    android:id="@+id/tv_chatItem_contactName"
+                    android:maxWidth="190dp" />
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="New Text"
                     android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="14dp"
+                    android:paddingRight="14sp"
                     android:textAlignment="viewEnd"
                     android:textSize="12sp"
                     android:textColor="#1da1f2"
@@ -55,7 +57,7 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp">
+                android:layout_marginTop="1.95dp">
 
                 <TextView
                     android:layout_width="240dp"
@@ -69,8 +71,10 @@
                     android:paddingBottom="1.1dp" />
 
                 <TextView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    tools:ignore="MissingPrefix"
+                    fontPath="fonts/din_medium.otf"
                     android:text="1"
                     android:gravity="center_vertical|center_horizontal"
                     android:layout_gravity="center_horizontal|center_vertical"

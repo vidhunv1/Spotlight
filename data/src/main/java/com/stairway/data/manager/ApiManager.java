@@ -21,7 +21,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class ApiManager {
-    public static final String BASE_URL = "http://54.187.12.140:8080/v1/";
+    public static final String BASE_URL = "http://192.168.1.245:4000/v1/";
 
     public static Retrofit getInstance(){
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -60,7 +60,6 @@ public class ApiManager {
                 .addCallAdapterFactory(rxAdapter)
                 .client(httpClient.build())
                 .build();
-
         return retrofit;
     }
 }

@@ -122,11 +122,10 @@ public class HomeActivity extends BaseActivity{
         setTab(0, false);
         setTab(1, false);
         setTab(2, false);
-        setTab(3, false);
 
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(1);
         // bug workaround
-        setTab(0, true);
+        setTab(1, true);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -176,20 +175,20 @@ public class HomeActivity extends BaseActivity{
     * */
     private void setTab(int tabPosition, boolean isActive){
         switch (tabPosition){
-            case 0:
-                if(isActive) {
-                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
-                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
-                    actionBarIB.setImageResource(R.drawable.ic_new_call);
-                }
-                else {
-                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
-                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
-                }
-                callImage.setImageDrawable(callIcon);
-                callText.setText("Calls");
-                tabLayout.getTabAt(0).setCustomView(callView);
-                break;
+//            case 0:
+//                if(isActive) {
+//                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
+//                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+//                    actionBarIB.setImageResource(R.drawable.ic_new_call);
+//                }
+//                else {
+//                    callIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN));
+//                    callText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+//                }
+//                callImage.setImageDrawable(callIcon);
+//                callText.setText("Calls");
+//                tabLayout.getTabAt(0).setCustomView(callView);
+//                break;
             case 1:
                 if(isActive) {
                     chatIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
@@ -204,7 +203,7 @@ public class HomeActivity extends BaseActivity{
                 chatText.setText("Chats");
                 tabLayout.getTabAt(1).setCustomView(chatView);
                 break;
-            case 2:
+            case 0:
                 if(isActive) {
                     contactIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     contactText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -216,9 +215,9 @@ public class HomeActivity extends BaseActivity{
                 }
                 contactImage.setImageDrawable(contactIcon);
                 contactText.setText("Contacts");
-                tabLayout.getTabAt(2).setCustomView(contactView);
+                tabLayout.getTabAt(0).setCustomView(contactView);
                 break;
-            case 3:
+            case 2:
                 if(isActive) {
                     profileIcon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN));
                     profileText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -230,7 +229,7 @@ public class HomeActivity extends BaseActivity{
                 }
                 profileImage.setImageDrawable(profileIcon);
                 profileText.setText("Profile");
-                tabLayout.getTabAt(3).setCustomView(profileView);
+                tabLayout.getTabAt(2).setCustomView(profileView);
                 break;
             default:
                 throw new IllegalArgumentException("Unspecified tab");

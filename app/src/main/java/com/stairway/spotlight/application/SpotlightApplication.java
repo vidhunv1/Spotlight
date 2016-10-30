@@ -32,10 +32,10 @@ public class SpotlightApplication extends Application {
 
 
         // Setting default font
-//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//                .setDefaultFontPath("fonts/din_regular.otf")
-//                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
-//                .build());
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/din_regular.otf")
+                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
+                .build());
 
 
 

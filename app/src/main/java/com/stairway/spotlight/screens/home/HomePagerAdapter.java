@@ -14,7 +14,7 @@ import com.stairway.spotlight.screens.home.profile.ProfileFragment;
  * Created by Dell on 8/27/2016.
  */
 public class HomePagerAdapter extends FragmentPagerAdapter {
-    private final int PAGE_COUNT = 4;
+    private final int PAGE_COUNT = 3;
     private String tabTitles[] = new String[] {"chats", "calls", "contacts", "profile"};
     private Context context;
 
@@ -26,13 +26,13 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
+//            case 0:
+//                return CallListFragment.getInstance();
             case 0:
-                return CallListFragment.getInstance();
+                return ContactListFragment.getInstance();
             case 1:
                 return ChatListFragment.getInstance();
             case 2:
-                return ContactListFragment.getInstance();
-            case 3:
                 return ProfileFragment.getInstance();
             default:
                 return null;

@@ -25,8 +25,8 @@ import rx.schedulers.Schedulers;
 public class XMPPManager {
     private String userName;
     private String password;
-    private String serviceName = "ip-172-31-16-182.us-west-2.compute.internal";
-    private String host = "54.187.12.140";
+    private String serviceName = "localhost";
+    private String host = "192.168.1.245";
     private int port = 5222;
     private Presence presenceOnline;
     private Presence presenceOffline;
