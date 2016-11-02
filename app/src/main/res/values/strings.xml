@@ -25,4 +25,8 @@
 
     <string name="otp_enterotp">_\t_\t_\t_\t_\t_</string>
     <string name="otp_enter_otp">Enter the 6-digit OTP</string>
+    <string name="title_activity_home_drawer">HomeActivityDrawer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

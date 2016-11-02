@@ -22,11 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:windowSoftInputMode="adjustNothing"
-            android:name=".screens.home.HomeActivity"
-            android:label="@string/title_activity_home"/>
-        <activity android:name=".screens.message.MessageActivity"/>
+        <activity android:name=".screens.message.MessageActivity" />
+        <activity android:name=".screens.home.contacts.ContactListFragment" />
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"
@@ -51,9 +48,13 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".screens.user_profile.UserProfileActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+        <activity
+            android:name=".screens.user_profile.UserProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".screens.home.HomeActivity"
+            android:label="@string/title_activity_home_drawer"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
