@@ -16,7 +16,7 @@ public class UserSessionStore {
     private static SharedPreferences prefs;
     private Context context;
 
-    public static String KEY_USER_ID = "SESSION_USER_ID";
+    public static String KEY_USER_ID = "SESSION_USER_NAME";
     public static String  KEY_ACCESS_TOKEN = "SESSION_ACCESS_TOKEN";
     public static String  KEY_COUNTRY_CODE = "SESSION_COUNTRY_CODE";
     public static String  KEY_PHONE = "SESSION_PHONE";
@@ -45,8 +45,8 @@ public class UserSessionStore {
         Observable<Boolean> putObservable = Observable.create( subscriber -> {
             final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
 
-            if(userSessionResult.getUserId()!=null || !userSessionResult.getUserId().isEmpty())
-                editor.putString(KEY_USER_ID, userSessionResult.getUserId());
+            if(userSessionResult.getUserName()!=null || !userSessionResult.getUserName().isEmpty())
+                editor.putString(KEY_USER_ID, userSessionResult.getUserName());
             if(userSessionResult.getAccessToken()!=null && !userSessionResult.getAccessToken().isEmpty())
                 editor.putString(KEY_ACCESS_TOKEN, userSessionResult.getAccessToken());
             if(userSessionResult.getRefreshToken()!=null && !userSessionResult.getRefreshToken().isEmpty())

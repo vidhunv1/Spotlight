@@ -43,7 +43,7 @@ public class RegisterUseCase {
                 @Override
                 public void onNext(UserResponse verifyResponse) {
                     if(!subscriber.isUnsubscribed()){
-                        UserSessionResult userSessionResult = new UserSessionResult(verifyResponse.getUser().getId());
+                        UserSessionResult userSessionResult = new UserSessionResult(verifyResponse.getUser().getUsername());
                         userSessionResult.setAccessToken(verifyResponse.getAccessToken());
                         userSessionResult.setPhone(verifyResponse.getUser().getPhone());
                         userSessionResult.setCountryCode(verifyResponse.getUser().getCountryCode());

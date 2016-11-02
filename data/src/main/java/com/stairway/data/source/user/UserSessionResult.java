@@ -4,7 +4,7 @@ package com.stairway.data.source.user;
  * Created by vidhun on 16/07/16.
  */
 public class UserSessionResult {
-    private String userId;
+    private String userName;
     private String accessToken;
     private String refreshToken;
     private String countryCode;
@@ -31,8 +31,8 @@ public class UserSessionResult {
         this.expiry = expiry;
     }
 
-    public UserSessionResult(String userId) {
-        this.userId = userId;
+    public UserSessionResult(String userName) {
+        this.userName = userName;
     }
 
     public String getCountryCode() {
@@ -59,10 +59,6 @@ public class UserSessionResult {
         return refreshToken;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
@@ -71,14 +67,18 @@ public class UserSessionResult {
         this.refreshToken = refreshToken;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Override
     public String toString() {
         return "UserSessionResult{" +
-                "userId='" + userId + '\'' +
+                "userId='" + userName + '\'' +
                 ", accessToken='" + accessToken + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 ", countryCode='" + countryCode + '\'' +

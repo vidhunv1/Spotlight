@@ -31,9 +31,9 @@ public class User {
     @SerializedName("is_registered")
     @Expose
     private String isRegistered;
-    @SerializedName("id")
+    @SerializedName("username")
     @Expose
-    private String id;
+    private String username;
     @SerializedName("phone_formatted")
     @Expose
     private String phoneFormatted;
@@ -93,12 +93,12 @@ public class User {
         this.isRegistered = is_registered;
     }
 
-    public String getId() {
-        return id;
+    public String getUsername() {
+        return username;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setVerificationCode(String verificationCode) {
