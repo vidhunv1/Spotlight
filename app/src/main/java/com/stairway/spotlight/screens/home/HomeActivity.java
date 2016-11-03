@@ -23,7 +23,6 @@ import com.stairway.spotlight.screens.home.profile.ProfileFragment;
 
 public class HomeActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private View actionBarView;
     private ActionBarDrawerToggle toggle;
     private FloatingActionButton fab;
     private Toolbar toolbar;
@@ -90,7 +89,6 @@ public class HomeActivity extends BaseActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -114,9 +112,7 @@ public class HomeActivity extends BaseActivity
         } else if (id == R.id.nav_profile) {
             setProfileFragment();
         } else if (id == R.id.nav_manage) {
-
         }
-
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -132,15 +128,6 @@ public class HomeActivity extends BaseActivity
         fragmentTransaction.commit();
 
         toggle.setDrawerIndicatorEnabled(false);
-//        android.support.v7.app.ActionBar ab = getSupportActionBar();
-//        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//        ab.setCustomView(R.layout.actionbar_home);
-//        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-//        ab.setElevation(0);
-//        actionBarView = ab.getCustomView();
-//        EditText search = (EditText) actionBarView.findViewById(R.id.actionbar_search);
-//        search.setHint("Search Contacts");
-
         toolbar.setTitle(TITLE_CONTACTS);
         fab.setVisibility(View.GONE);
     }

@@ -46,14 +46,16 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     int OTP_LENGTH = 4;
 
+    private static String KEY_MOBILE = "MOBILE";
+    private static String KEY_COUNTRY_CODE = "COUNTRY_CODE";
+
     public VerifyOtpFragment() {
-        return;
     }
 
     public static VerifyOtpFragment getInstance(String mobile, String countryCode) {
         Bundle bundle = new Bundle();
-        bundle.putString("MOBILE", mobile);
-        bundle.putString("COUNTRY_CODE", countryCode);
+        bundle.putString(KEY_MOBILE, mobile);
+        bundle.putString(KEY_COUNTRY_CODE, countryCode);
 
         VerifyOtpFragment verifyOtpFragment = new VerifyOtpFragment();
         verifyOtpFragment.setArguments(bundle);
@@ -78,10 +80,10 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String mobile = getArguments().getString("MOBILE").toString();
-        String countryCode = getArguments().getString("COUNTRY_CODE").toString();
+        String mobile = getArguments().getString(KEY_MOBILE);
+        String countryCode = getArguments().getString(KEY_COUNTRY_CODE);
 
-        mobileNumberTextView.setText(countryCode+" "+mobile);
+        mobileNumberTextView.setText(countryCode+"-"+mobile);
     }
 
     @Override
@@ -127,7 +129,10 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @OnClick(R.id.btn_otp_continue)
     public void onContinueClicked() {
         if(otpEditText.getText().toString().length() == OTP_LENGTH) {
-            verifyOtpPresenter.registerUser(getArguments().getString("COUNTRY_CODE").toString(), getArguments().getString("MOBILE").toString(), otpEditText.getText().toString());
+            verifyOtpPresenter.registerUser(
+                    getArguments().getString(KEY_COUNTRY_CODE),
+                    getArguments().getString(KEY_MOBILE),
+                    otpEditText.getText().toString());
         }
     }
 
