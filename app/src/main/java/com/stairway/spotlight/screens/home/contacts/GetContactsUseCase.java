@@ -37,9 +37,10 @@ public class GetContactsUseCase {
                         @Override
                         public void onNext(List<ContactsResult> contactsResults) {
                             List<ContactListItemModel> contactListItemModels = new ArrayList<ContactListItemModel>(contactsResults.size());
-                            contactListItemModels.add(new ContactListItemModel("Police", false, "100", "100"));
-                            contactListItemModels.add(new ContactListItemModel("Emergency", false, "911", "911"));
-                            contactListItemModels.add(new ContactListItemModel("Hospital", false, "101", "101"));
+                            contactListItemModels.add(new ContactListItemModel("Police", true, "100", "100"));
+                            contactListItemModels.add(new ContactListItemModel("Emergency", true, "911", "911"));
+                            contactListItemModels.add(new ContactListItemModel("Hospital", true, "101", "101"));
+                            contactListItemModels.add(new ContactListItemModel("Vidhun Vinod", false, "91-9489339336", "91-9489339336"));
                             for(ContactsResult contactsResult: contactsResults) {
                                 contactListItemModels.add(new ContactListItemModel(
                                         contactsResult.getDisplayName(),

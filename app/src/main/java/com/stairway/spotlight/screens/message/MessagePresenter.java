@@ -19,13 +19,19 @@ public class MessagePresenter implements MessageContract.Presenter {
     private StoreMessageUseCase storeMessageUseCase;
     private SendMessageUseCase sendMessageUseCase;
     private ReceiveMessagesUseCase receiveMessagesUseCase;
+    private GetPresenceUseCase getPresenceUseCase;
     private boolean isReceivingMessages = false;
 
-    public MessagePresenter(LoadMessagesUseCase messageUseCase, StoreMessageUseCase storeMessageUseCase, SendMessageUseCase sendMessageUseCase, ReceiveMessagesUseCase receiveMessagesUseCase) {
+    public MessagePresenter(LoadMessagesUseCase messageUseCase,
+                            StoreMessageUseCase storeMessageUseCase,
+                            SendMessageUseCase sendMessageUseCase,
+                            ReceiveMessagesUseCase receiveMessagesUseCase,
+                            GetPresenceUseCase getPresenceUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
         this.receiveMessagesUseCase = receiveMessagesUseCase;
+        this.getPresenceUseCase = getPresenceUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -83,6 +89,20 @@ public class MessagePresenter implements MessageContract.Presenter {
                     public void onResult(MessageResult result) {
                         messageView.addMessageToList(result);
                         Logger.d("[MessagePresenter] receive messages");
+                    }
+                });
+
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void getPresence(String chatId) {
+        Subscription subscription = getPresenceUseCase.execute(chatId)
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<String>(messageView) {
+                    @Override
+                    public void onResult(String result) {
+                        messageView.updatePresence(result);
                     }
                 });
 

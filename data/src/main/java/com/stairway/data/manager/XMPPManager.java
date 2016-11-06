@@ -1,9 +1,6 @@
 package com.stairway.data.manager;
 
 import android.os.AsyncTask;
-
-import com.stairway.data.manager.Logger;
-
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
@@ -14,100 +11,42 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
 /**
  * Created by vidhun on 26/07/16.
  */
 public class XMPPManager {
     private String userName;
-    private String password;
-    private String serviceName = "localhost";
-    private String host = "192.168.1.245";
-    private int port = 5222;
-    private Presence presenceOnline;
-    private Presence presenceOffline;
 
-    private XMPPTCPConnectionConfiguration.Builder config;
     private static AbstractXMPPConnection connection = null;
 
     public String getChatId() {
         return userName;
     }
 
-    public XMPPManager(String userName, String password) {
-        this.password = "spotlight";
+    public XMPPManager(String userName, String pass) {
+        XMPPTCPConnectionConfiguration.Builder config;
+        String password = "spotlight";
         this.userName = userName;
-        presenceOnline = new Presence(Presence.Type.available);
-        presenceOffline = new Presence(Presence.Type.unavailable);
 
         config = XMPPTCPConnectionConfiguration.builder();
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setUsernameAndPassword(this.userName, this.password);
-        config.setHost(host);
-        config.setPort(port);
-        config.setServiceName(this.serviceName);
+        config.setUsernameAndPassword(this.userName, password);
+        config.setHost(DataConfig.XMPP_HOST);
+        config.setPort(DataConfig.XMPP_PORT);
+        config.setServiceName(DataConfig.XMPP_SERVICE_NAME);
         config.setDebuggerEnabled(true);
-
 
         connection = new XMPPTCPConnection(config.build());
         XMPPTCPConnection.setUseStreamManagementDefault(true);
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
         initConnection();
-
-//        connection = new XMPPTCPConnection(config);
-
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public static String getJidFromUserName(String jid) {
+        return jid+"@"+DataConfig.XMPP_SERVICE_NAME;
     }
 
     public void initConnection(){
-    /*    Observable<AbstractXMPPConnection> xmppConnection = Observable.create(subscriber -> {
-            try {
-
-                Logger.d("THread::"+Thread.currentThread().getName());
-                AbstractXMPPConnection c = new XMPPTCPConnection(config).connect();
-                //subscriber.onNext(c);
-                subscriber.onNext(null);
-                subscriber.onCompleted();
-            } catch (Exception e) {subscriber.onError(e);}
-//            catch (SmackException e) {
-//                subscriber.onError(e);
-//            } catch (IOException e) {
-//                subscriber.onError(e);
-//            } catch (XMPPException e) {
-//                subscriber.onError(e);
-//            }
-
-        });
-
-        xmppConnection.subscribeOn(Schedulers.io());
-        xmppConnection.observeOn(AndroidSchedulers.mainThread());
-
-        xmppConnection.subscribe(new Subscriber<AbstractXMPPConnection>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Logger.e(e.getMessage());
-            }
-
-            @Override
-            public void onNext(AbstractXMPPConnection abstractXMPPConnection) {
-//                connection = abstractXMPPConnection;
-            }
-        });*/
-
-
-
 
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
 
@@ -131,9 +70,7 @@ public class XMPPManager {
             }
         };
         connectionThread.execute();
-
         Logger.v("Connected xmpp");
-
     }
 
     public AbstractXMPPConnection getConnection(){
@@ -145,26 +82,47 @@ public class XMPPManager {
         }
     }
 
-    public void setPresenceOnline() {
+    public boolean isConnected() {
+        return connection!=null;
+    }
 
-        if(connection!=null)
-            try {
-                connection.sendStanza(presenceOnline);
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-                initConnection();
+    public void setPresenceOnline() {
+        Presence presenceOnline = new Presence(Presence.Type.available);
+        presenceOnline.setMode(Presence.Mode.available);
+
+        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if(connection!=null)
+                    try {
+                        connection.sendStanza(presenceOnline);
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                        initConnection();
+                    }
+                return null;
             }
+        };
+        connectionThread.execute();
     }
 
     public void setPresenceOffline() {
-        Presence presence = new Presence(Presence.Type.unavailable);
+        Presence presenceOffline = new Presence(Presence.Type.available);
+        presenceOffline.setMode(Presence.Mode.away);
 
-        if(connection!=null)
-            try {
-                connection.sendStanza(presenceOffline);
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-                initConnection();
+        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if(connection!=null)
+                    try {
+                        connection.sendStanza(presenceOffline);
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                        initConnection();
+                    }
+                return null;
             }
+        };
+        connectionThread.execute();
     }
 }

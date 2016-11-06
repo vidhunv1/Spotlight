@@ -47,7 +47,7 @@ public class SpotlightApplication extends Application {
 //                            .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
 //                            .build());
 
-//            Logger.init();
+            Logger.init();
 //        }
 
     }

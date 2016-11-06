@@ -1,10 +1,12 @@
 package com.stairway.spotlight.screens.launcher;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.HomeActivity;
@@ -14,9 +16,11 @@ import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
 
-public class LauncherActivity extends BaseActivity implements LauncherContract.View{
+public class LauncherActivity extends AppCompatActivity implements LauncherContract.View{
 
     @Inject
     LauncherPresenter launcherPresenter;
@@ -27,11 +31,18 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+        componentContainer = ((SpotlightApplication) getApplication()).getComponentContainer();
+        componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
 
         Logger.v("[Launcher Activity]");
 
         ButterKnife.bind(this);
 
+    }
+
+    @Override
+    public Scheduler getUiScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 
     @Override
@@ -66,9 +77,4 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
         finish();
     }
 
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        this.componentContainer = componentContainer;
-        componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
-    }
 }

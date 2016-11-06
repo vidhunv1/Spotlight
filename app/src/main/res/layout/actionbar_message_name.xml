@@ -16,26 +16,26 @@
             android:layout_height="wrap_content"
             android:text="Name"
             android:id="@+id/textView18"
+            android:paddingLeft="8dp"
             android:textSize="17sp"
-            android:layout_marginTop="6.97dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_marginTop="6.97dp" />
 
         <TextView
+            android:paddingLeft="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Last seen at 3:30"
-            android:id="@+id/textView19"
-            android:layout_marginTop="1dp"
-            android:layout_gravity="center_horizontal" />
+            android:id="@+id/tv_message_presence"
+            android:layout_marginTop="1dp" />
     </LinearLayout>
     <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:id="@+id/actionbar_message_profile"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/linearLayout"
-        android:layout_toEndOf="@+id/linearLayout"
+        android:layout_toLeftOf="@+id/linearLayout"
         android:layout_marginLeft="14dp"
         android:src="@drawable/default_profile_image"
+        android:background="@null"
         android:layout_marginTop="8dp" />
 </RelativeLayout>

@@ -1,5 +1,7 @@
 package com.stairway.data.source.message;
 
+import android.util.Log;
+
 import com.stairway.data.manager.Logger;
 import com.stairway.data.manager.XMPPManager;
 
@@ -7,12 +9,19 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smackx.iqlast.LastActivityManager;
+
+import java.util.Collection;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -31,7 +40,7 @@ public class MessageApi {
         Logger.d("Sending message"+message.getMessage()+" to "+message.getChatId());
 
         Observable<MessageResult> sendMessage = Observable.create(subscriber -> {
-            String recipient = message.getChatId() + "@" + connection.getServiceName();
+            String recipient = XMPPManager.getJidFromUserName(message.getChatId());
 
             if(!connection.getConnection().isAuthenticated()) {
                 Logger.v("XMPP Not connected");
@@ -119,7 +128,6 @@ public class MessageApi {
         Chat newChat = chatManager.createChat(message.getChatId()+"@"+connection.getServiceName());
 
         try {
-
             newChat.sendMessage(message.getMessage());
 
             // TODO: check for acknowledgement
@@ -133,5 +141,65 @@ public class MessageApi {
             subscriber.onNext(message);
             Logger.e("XMPP error: "+e);
         }
+    }
+
+    // userId: 91-9999999999
+    public Observable<Presence.Mode> getPresence(String userId) {
+        String jid = XMPPManager.getJidFromUserName(userId);
+        Observable<Presence.Mode> getPresence;
+        getPresence = Observable.create(subscriber -> {
+            //initial presence
+            subscriber.onNext(Presence.Mode.away);
+            Roster roster = Roster.getInstanceFor(connection.getConnection());
+            roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+
+            boolean pre = roster.addRosterListener(new RosterListener() {
+
+                @Override
+                public void entriesAdded(Collection<String> addresses) {
+
+                }
+
+                @Override
+                public void entriesUpdated(Collection<String> addresses) {
+
+                }
+
+                @Override
+                public void entriesDeleted(Collection<String> addresses) {
+
+                }
+
+                public void presenceChanged(Presence presence) {
+                    if(presence.getFrom().split("/")[0].equals(jid))
+                        subscriber.onNext(presence.getMode());
+                }
+            });
+        });
+
+        return getPresence;
+    }
+
+    // userId: 91-9999999999
+    public Observable<Long> getLastActivity(String userId) {
+        Logger.d("Getting last activity");
+        String jid = XMPPManager.getJidFromUserName(userId);
+        Observable<Long> getLastActivity = Observable.create(subscriber -> {
+            LastActivityManager activity = LastActivityManager.getInstanceFor(connection.getConnection());
+            try {
+                subscriber.onNext(activity.getLastActivity(jid).lastActivity);
+            } catch (SmackException.NoResponseException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
+            } catch (XMPPException.XMPPErrorException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
+            }
+        });
+
+        return getLastActivity;
     }
 }

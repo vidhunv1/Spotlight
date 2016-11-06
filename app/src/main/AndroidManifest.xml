@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".screens.message.MessageActivity" />
+        <activity android:name=".screens.message.MessageActivity" android:icon="@drawable/default_profile_image"/>
         <activity android:name=".screens.home.contacts.ContactListFragment" />
         <activity
             android:name=".screens.register.RegisterActivity"

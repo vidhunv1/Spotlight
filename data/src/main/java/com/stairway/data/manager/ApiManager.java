@@ -1,15 +1,7 @@
 package com.stairway.data.manager;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.IOException;
-import java.util.logging.Level;
-
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -21,7 +13,6 @@ import rx.schedulers.Schedulers;
  */
 
 public class ApiManager {
-    public static final String BASE_URL = "http://192.168.1.245:4000/v1/";
 
     public static Retrofit getInstance(){
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -31,14 +22,12 @@ public class ApiManager {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(logging);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+        return new Retrofit.Builder()
+                .baseUrl(DataConfig.API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(rxAdapter)
                 .client(httpClient.build())
                 .build();
-
-        return retrofit;
     }
 
     public static Retrofit getInstance(String authorization){
@@ -54,12 +43,11 @@ public class ApiManager {
             return chain.proceed(request);
         });
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+        return new Retrofit.Builder()
+                .baseUrl(DataConfig.API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(rxAdapter)
                 .client(httpClient.build())
                 .build();
-        return retrofit;
     }
 }

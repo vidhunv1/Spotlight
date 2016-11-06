@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.stairway.data.manager.Logger;
+import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.models.User;
@@ -34,9 +35,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
 import com.stairway.spotlight.screens.home.contacts.ContactListFragment;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
-
 import rx.Subscriber;
-
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
 public class HomeActivity extends BaseActivity
@@ -76,12 +75,7 @@ public class HomeActivity extends BaseActivity
         setChatFragment();
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setContactsFragment();
-            }
-        });
+        fab.setOnClickListener(view -> setContactsFragment());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -111,33 +105,6 @@ public class HomeActivity extends BaseActivity
                     sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
                 }
             });
-        }
-    }
-
-    private boolean checkIfAlreadyhavePermission() {
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else
-            return false;
-    }
-
-    private void requestForSpecificPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 101:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //granted
-                } else {
-                    //not granted
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -229,6 +196,33 @@ public class HomeActivity extends BaseActivity
         fragmentTransaction.commit();
         toolbar.setTitle(TITLE_HOME);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private boolean checkIfAlreadyhavePermission() {
+        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else
+            return false;
+    }
+
+    private void requestForSpecificPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

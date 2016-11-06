@@ -14,12 +14,13 @@ public interface MessageContract {
         void displayMessages(List<MessageResult> result);
         void addMessageToList(MessageResult message);
         void updateDeliveryStatus(MessageResult messageResult);
+        void updatePresence(String presence);
     }
 
     interface Presenter extends BasePresenter<MessageContract.View> {
         void loadMessages(String chatId);
         void sendMessage(MessageResult result);
         void receiveMessages();
-
+        void getPresence(String chatId);
     }
 }
