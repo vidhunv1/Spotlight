@@ -1,10 +1,13 @@
 package com.stairway.spotlight.screens.message;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.manager.XMPPManager;
@@ -54,8 +58,8 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     TextView presenceTextView;
 
     private static String KEY_USER_ID = "USERID";
-    private String chatId;
-    private String currentUser;
+    private String chatId; // contact user, mobile
+    private String currentUser; // this user, mobile
     private MessagesAdapter messagesAdapter;
 
     public static Intent callingIntent(Context context, String userId) {
@@ -89,22 +93,17 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         View v =getSupportActionBar().getCustomView();
         presenceTextView = (TextView) v.findViewById(R.id.tv_message_presence);
         ImageButton profileDP = (ImageButton) v.findViewById(R.id.actionbar_message_profile);
-        profileDP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Logger.d("[MessageActivity]ImageProfile");
-                startActivity(UserProfileActivity.callingIntent(getBaseContext(), "12"));
-            }
-        });
+        profileDP.setOnClickListener(v1 -> startActivity(UserProfileActivity.callingIntent(getBaseContext(), "12")));
         messagePresenter.attachView(this);
+        Logger.d("ChatId: "+chatId+", CurrentUser:"+currentUser);
         messagePresenter.loadMessages(chatId);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        messagePresenter.getPresence(chatId);
         messagePresenter.attachView(this);
+        messagePresenter.getPresence(chatId);
     }
 
     @Override
@@ -132,7 +131,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         if(message.length()>=1) {
             messageBox.setText("");
             Logger.d("chatId: "+chatId+", currentUser: "+currentUser);
-            messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.DeliveryStatus.NOT_SENT));
+            messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.MessageStatus.NOT_SENT));
         }
     }
 
@@ -164,6 +163,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void updatePresence(String presence) {
+        Logger.d("Presence: "+presence);
         presenceTextView.setText(presence);
     }
 
@@ -171,5 +171,12 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     protected void injectComponent(ComponentContainer componentContainer) {
         componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
         currentUser = componentContainer.userSessionComponent().getUserSession().getChatId();
+    }
+
+    @Override
+    public void onMessageReceived(MessageResult messageResult) {
+        messagesAdapter.addMessage(messageResult);
+        messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
+        messagePresenter.updateMessageSeen(messageResult);
     }
 }

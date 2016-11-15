@@ -24,6 +24,7 @@ import android.view.MenuItem;
 
 import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageApi;
+import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.models.User;
@@ -44,6 +45,7 @@ public class HomeActivity extends BaseActivity
     private FloatingActionButton fab;
     UserAuthApi userAuthApi;
     UserSessionResult userSession;
+    ChatListFragment chatListFragment;
     private Toolbar toolbar;
     private static String TITLE_HOME = "Messages";
     private static String TITLE_CONTACTS = "Contacts";
@@ -174,6 +176,7 @@ public class HomeActivity extends BaseActivity
         toggle.setDrawerIndicatorEnabled(false);
         toolbar.setTitle(TITLE_CONTACTS);
         fab.setVisibility(View.GONE);
+        chatListFragment = null;
     }
 
     private void setProfileFragment() {
@@ -186,12 +189,14 @@ public class HomeActivity extends BaseActivity
         toolbar.setTitle(TITLE_PROFILE);
         fab.setVisibility(View.GONE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        chatListFragment = null;
     }
 
     private void setChatFragment() {
         setSupportActionBar(toolbar);
+        chatListFragment = ChatListFragment.getInstance();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, ChatListFragment.getInstance());
+        fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         toolbar.setTitle(TITLE_HOME);
@@ -228,5 +233,12 @@ public class HomeActivity extends BaseActivity
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         userSession = componentContainer.userSessionComponent().getUserSession();
+    }
+
+    @Override
+    public void onMessageReceived(MessageResult messageId) {
+        if(chatListFragment!=null) {
+            chatListFragment.onMessageReceived(messageId);
+        }
     }
 }

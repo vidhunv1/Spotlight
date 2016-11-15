@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.stairway.data.manager.Logger;
+import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseFragment;
@@ -29,6 +30,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     @Inject
     ChatListPresenter presenter;
 
+    private ChatListAdapter chatListAdapter;
     public ChatListFragment() {
     }
 
@@ -58,7 +60,6 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
         // Initialize recycler view
         chatList.setLayoutManager(new LinearLayoutManager(getActivity()));
-
     }
 
     @Override
@@ -87,10 +88,18 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
 
     @Override
     public void displayChatList(List<ChatListItemModel> chats) {
-        chatList.setAdapter(new ChatListAdapter(getActivity(), chats, this));
+        chatListAdapter = new ChatListAdapter(getActivity(), chats, this);
+        chatList.setAdapter(chatListAdapter);
     }
 
     @Override
     public void setDeliveryStatus(int status, int chatId) {
+    }
+
+    @Override
+    public void onMessageReceived(MessageResult messageResult) {
+        ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(),1);
+        chatListAdapter.newChatMessage(item);
+        Logger.d("new notification: "+item);
     }
 }

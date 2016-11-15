@@ -41,7 +41,7 @@ public class GetChatsUseCase {
                                         messageResult.getChatId(),
                                         messageResult.getMessage(),
                                         messageResult.getTime(),
-                                        1));
+                                        messageResult.getUnSeenCount()));
                             }
                             subscriber.onNext(chatListItemModels);
                         }

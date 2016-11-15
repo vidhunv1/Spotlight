@@ -60,4 +60,15 @@ public class ChatListItemModel {
     public void setNotificationCount(int notificationCount) {
         this.notificationCount = notificationCount;
     }
+
+    @Override
+    public String toString() {
+        return "ChatListItemModel{" +
+                "chatId='" + chatId + '\'' +
+                ", chatName='" + chatName + '\'' +
+                ", lastMessage='" + lastMessage + '\'' +
+                ", time='" + time + '\'' +
+                ", notificationCount=" + notificationCount +
+                '}';
+    }
 }

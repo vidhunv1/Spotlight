@@ -60,7 +60,7 @@
                 android:layout_marginTop="1.95dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="240dp"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:maxLines="1"
@@ -68,9 +68,21 @@
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
                     android:paddingTop="1.1dp"
-                    android:paddingBottom="1.1dp"
-                    android:paddingRight="20dp"/>
+                    android:paddingBottom="1.1dp" />
 
+                <TextView
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    tools:ignore="MissingPrefix"
+                    fontPath="fonts/din_medium.otf"
+                    android:text="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:id="@+id/tv_chatlist_notification"
+                    android:textSize="11sp"
+                    android:textColor="#ffffff"
+                    android:maxLines="1"
+                    android:background="@drawable/chat_notification_background" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

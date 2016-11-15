@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created by vidhun on 06/08/16.
@@ -32,7 +33,7 @@ public class MessageStore {
      */
     public Observable<List<MessageResult>> getMessages(String chatId) {
 
-        Observable<List<MessageResult>> getMessages = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
 
@@ -42,7 +43,7 @@ public class MessageStore {
                             MessagesContract.COLUMN_CHAT_ID,
                             MessagesContract.COLUMN_FROM_ID,
                             MessagesContract.COLUMN_MESSAGE,
-                            MessagesContract.COLUMN_DELIVERY_STATUS,
+                            MessagesContract.COLUMN_MESSAGE_STATUS,
                             MessagesContract.COLUMN_ROW_ID,
                             MessagesContract.COLUMN_CREATED_AT};
 
@@ -52,19 +53,37 @@ public class MessageStore {
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
-                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+//                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                     String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
-                    String deliveryStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String messageStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
                     String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
                     String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.DeliveryStatus.valueOf(deliveryStatus),getFormattedTime(time, "hh:mm"));
+                    MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
                     Logger.d("[MessageStore] Message:"+msg.toString());
                     result.add(msg);
+
+                    // Update message to seen
+                    if(messageStatus.equals(MessageResult.MessageStatus.UNSEEN.name())) {
+                        msg.setMessageStatus(MessageResult.MessageStatus.SEEN);
+                        updateMessage(msg).subscribe(new Subscriber<MessageResult>() {
+                            @Override
+                            public void onCompleted() {}
+                            @Override
+                            public void onError(Throwable e) {Logger.e(e.getMessage());}
+
+                            @Override
+                            public void onNext(MessageResult messageResult) {
+                                Logger.d("Changed message to seen");
+                            }
+                        });
+                    }
+
                     cursor.moveToNext();
                 }
+                cursor.close();
                 subscriber.onNext(result);
                 subscriber.onCompleted();
 
@@ -76,11 +95,10 @@ public class MessageStore {
                 subscriber.onCompleted();
             }
         });
-        return getMessages;
     }
 
     public Observable<MessageResult> storeMessage(MessageResult messageResult){
-        Observable<MessageResult> storeMessage = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             String currentTime = getDateTime();
 
@@ -88,7 +106,7 @@ public class MessageStore {
             values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
             values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
             values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
+            values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
             values.put(MessagesContract.COLUMN_CREATED_AT, currentTime);
 
             long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
@@ -99,18 +117,16 @@ public class MessageStore {
             subscriber.onCompleted();
             databaseManager.closeConnection();
         });
-        Logger.d("Message store: storedMessage "+messageResult.toString());
-        return storeMessage;
     }
 
     public Observable<MessageResult> updateMessage(MessageResult messageResult){
-        Observable<MessageResult> updateMessage = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
             values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
             values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
             values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(MessagesContract.COLUMN_DELIVERY_STATUS, messageResult.getDeliveryStatus().name());
+            values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
 
             db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_ROW_ID+"="+messageResult.getMessageId(), null);
 
@@ -118,23 +134,21 @@ public class MessageStore {
             subscriber.onCompleted();
             databaseManager.closeConnection();
         });
-        return updateMessage;
     }
 
     public Observable<MessageResult> getUnsentMessages(String chatId) {
-        Observable<MessageResult> getMessages = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
-            List<MessageResult> result = new ArrayList<>();
 
             String selection = MessagesContract.COLUMN_CHAT_ID + "=? AND "
-                    +MessagesContract.COLUMN_DELIVERY_STATUS + "=?";
+                    +MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
 
-            String[] selectionArgs = {chatId, MessageResult.DeliveryStatus.NOT_SENT.name()};
+            String[] selectionArgs = {chatId, MessageResult.MessageStatus.NOT_SENT.name()};
             String[] columns = {
                     MessagesContract.COLUMN_CHAT_ID,
                     MessagesContract.COLUMN_FROM_ID,
                     MessagesContract.COLUMN_MESSAGE,
-                    MessagesContract.COLUMN_DELIVERY_STATUS,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
                     MessagesContract.COLUMN_ROW_ID,
                     MessagesContract.COLUMN_CREATED_AT};
 
@@ -142,16 +156,15 @@ public class MessageStore {
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
                 cursor.moveToFirst();
 
-                Logger.d("[MESSAGE STORE]: QUERY"+MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
                 while(!cursor.isAfterLast()) {
-                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+//                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                     String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
-                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
                     String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
                     String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
 
-                    MessageResult.DeliveryStatus deliveryStatus = MessageResult.DeliveryStatus.valueOf(delivery);
+                    MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
 
                     MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
@@ -159,9 +172,9 @@ public class MessageStore {
                     subscriber.onNext(msg);
                     cursor.moveToNext();
                 }
+                cursor.close();
                 subscriber.onCompleted();
                 databaseManager.closeConnection();
-                Logger.d("[Message store] results count: "+result.size());
             } catch (Exception e) {
                 Logger.e("MessageStore sqlite error: "+e.getMessage());
                 databaseManager.closeConnection();
@@ -169,20 +182,20 @@ public class MessageStore {
                 subscriber.onCompleted();
             }
         });
-        return getMessages;
     }
 
     public Observable<List<MessageResult>> getChatList() {
-        Observable<List<MessageResult>> getChatList = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
+
             List<MessageResult> result = new ArrayList<>();
             SQLiteDatabase db = databaseManager.openConnection();
-
             try {
+                final String COLUMN_UNSEEN_COUNT = "COUNT_UNSEEN";
                 Cursor cursor = db.rawQuery("SELECT a."+MessagesContract.COLUMN_CHAT_ID+", b."+
                         MessagesContract.COLUMN_FROM_ID+", MAX(a."+
                         MessagesContract.COLUMN_ROW_ID+") AS rowid, b."+
                         MessagesContract.COLUMN_MESSAGE+", b."+
-                        MessagesContract.COLUMN_DELIVERY_STATUS+", b."+
+                        MessagesContract.COLUMN_MESSAGE_STATUS+", b."+
                         MessagesContract.COLUMN_CREATED_AT +" FROM "+
                         MessagesContract.TABLE_NAME+" a INNER JOIN "+
                         MessagesContract.TABLE_NAME+" b on a."+
@@ -196,18 +209,33 @@ public class MessageStore {
                     String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                     String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
-                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_DELIVERY_STATUS));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
                     String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
                     String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
 
-                    MessageResult.DeliveryStatus deliveryStatus = MessageResult.DeliveryStatus.valueOf(delivery);
+                    String selection = MessagesContract.COLUMN_CHAT_ID + "=? AND "
+                            +MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
+                    String[] selectionArgs = {chatId, MessageResult.MessageStatus.UNSEEN.name()};
+                    String[] columns = {"COUNT(*) AS "+COLUMN_UNSEEN_COUNT};
+                    Cursor unSeenCursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, MessagesContract.COLUMN_MESSAGE_STATUS, null, null);
+                    int unSeenCount = 0;
+                    if(unSeenCursor.getCount() > 0) {
+                        unSeenCursor.moveToFirst();
+                        unSeenCount = unSeenCursor.getInt(unSeenCursor.getColumnIndex(COLUMN_UNSEEN_COUNT));
+                    }
+                    Logger.d("Notification count"+unSeenCount);
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
+                    MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(delivery);
+
+                    MessageResult msg = new MessageResult(chatId, fromId, message, messageStatus, getFormattedTime(time, "hh:mm"));
+                    msg.setUnSeenCount(unSeenCount);
                     msg.setMessageId(messageId);
 
                     result.add(msg);
+                    unSeenCursor.close();
                     cursor.moveToNext();
                 }
+                cursor.close();
                 subscriber.onNext(result);
                 databaseManager.closeConnection();
             } catch (Exception e) {
@@ -217,7 +245,6 @@ public class MessageStore {
                 subscriber.onCompleted();
             }
         });
-        return getChatList;
     }
 
     private String getDateTime() {

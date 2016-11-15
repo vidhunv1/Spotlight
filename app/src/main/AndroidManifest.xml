@@ -48,6 +48,8 @@
             </intent-filter>
         </service>
 
+        <service android:enabled="true" android:name=".core.XmppService" />
+
         <activity
             android:name=".screens.user_profile.UserProfileActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>

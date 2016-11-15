@@ -17,12 +17,13 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        injectComponent(((SpotlightApplication) getActivity().getApplication()).getComponentContainer());
 
         if(!(getActivity() instanceof BackHandlerInterface))
             throw new ClassCastException(getActivity().getLocalClassName()+" must implement BackHandlerInterface");
         else
             backHandlerInterface = (BackHandlerInterface)getActivity();
+
+        injectComponent(((SpotlightApplication) getActivity().getApplication()).getComponentContainer());
     }
 
     @Override

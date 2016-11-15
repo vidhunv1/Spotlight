@@ -1,25 +1,40 @@
 package com.stairway.data.source.message;
 
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by vidhun on 06/08/16.
  */
-public class MessageResult {
+public class MessageResult implements Serializable {
     private String message;
     private String chatId; //The chat id for screen, contains id of sender
     private String fromId; //
-    private DeliveryStatus deliveryStatus;
+    private MessageStatus messageStatus;
     private String messageId;
     private String time;
     private String name;
+    private int unSeenCount;
 
-    public static enum DeliveryStatus {
+    public int getUnSeenCount() {
+        return unSeenCount;
+    }
+
+    public void setUnSeenCount(int unSeenCount) {
+        this.unSeenCount = unSeenCount;
+    }
+
+    public static enum MessageStatus {
         NOT_SENT,
         SENT,
         DELIVERED,
         READ,
-        NOT_AVAILABLE
+
+        // Self
+        SEEN,
+        UNSEEN
     }
 
     public MessageResult(String chatId, String fromId, String message) {
@@ -36,17 +51,17 @@ public class MessageResult {
         this.time = time;
     }
 
-    public MessageResult(String chatId, String fromId, String message, DeliveryStatus deliveryStatus, String time) {
+    public MessageResult(String chatId, String fromId, String message, MessageStatus messageStatus, String time) {
         this.chatId = chatId;
-        this.deliveryStatus = deliveryStatus;
+        this.messageStatus = messageStatus;
         this.fromId = fromId;
         this.message = message;
         this.time = time;
     }
 
-    public MessageResult(String chatId, String fromId, String message, DeliveryStatus deliveryStatus) {
+    public MessageResult(String chatId, String fromId, String message, MessageStatus messageStatus) {
         this.chatId = chatId;
-        this.deliveryStatus = deliveryStatus;
+        this.messageStatus = messageStatus;
         this.fromId = fromId;
         this.message = message;
     }
@@ -63,8 +78,8 @@ public class MessageResult {
         return chatId;
     }
 
-    public DeliveryStatus getDeliveryStatus() {
-        return deliveryStatus;
+    public MessageStatus getMessageStatus() {
+        return messageStatus;
     }
 
     public String getFromId() {
@@ -79,8 +94,8 @@ public class MessageResult {
         this.chatId = chatId;
     }
 
-    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
+    public void setMessageStatus(MessageStatus deliveryStatus) {
+        this.messageStatus = deliveryStatus;
     }
 
     public void setFromId(String fromId) {
@@ -101,6 +116,6 @@ public class MessageResult {
 
     @Override
     public String toString() {
-        return "Message: "+message+", DS: "+deliveryStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId+", time"+getTime();
+        return "Message: "+message+", DS: "+messageStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId+", time"+getTime();
     }
 }

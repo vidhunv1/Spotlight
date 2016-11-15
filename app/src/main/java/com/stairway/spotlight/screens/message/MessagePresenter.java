@@ -18,20 +18,19 @@ public class MessagePresenter implements MessageContract.Presenter {
     private LoadMessagesUseCase getMessageUseCase;
     private StoreMessageUseCase storeMessageUseCase;
     private SendMessageUseCase sendMessageUseCase;
-    private ReceiveMessagesUseCase receiveMessagesUseCase;
     private GetPresenceUseCase getPresenceUseCase;
-    private boolean isReceivingMessages = false;
+    private UpdateMessageUseCase updateMessageUseCase;
 
     public MessagePresenter(LoadMessagesUseCase messageUseCase,
                             StoreMessageUseCase storeMessageUseCase,
                             SendMessageUseCase sendMessageUseCase,
-                            ReceiveMessagesUseCase receiveMessagesUseCase,
-                            GetPresenceUseCase getPresenceUseCase) {
+                            GetPresenceUseCase getPresenceUseCase,
+                            UpdateMessageUseCase updateMessageUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
-        this.receiveMessagesUseCase = receiveMessagesUseCase;
         this.getPresenceUseCase = getPresenceUseCase;
+        this.updateMessageUseCase = updateMessageUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -47,6 +46,18 @@ public class MessagePresenter implements MessageContract.Presenter {
                     }
                 });
 
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void updateMessageSeen(MessageResult result) {
+        result.setMessageStatus(MessageResult.MessageStatus.SEEN);
+        Subscription subscription = updateMessageUseCase.execute(result).subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
+            @Override
+            public void onResult(MessageResult result) {
+                //Updated message to seen
+            }
+        });
         compositeSubscription.add(subscription);
     }
 
@@ -81,21 +92,6 @@ public class MessagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void receiveMessages() {
-        Subscription subscription = receiveMessagesUseCase.execute()
-                .observeOn(messageView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
-                    @Override
-                    public void onResult(MessageResult result) {
-                        messageView.addMessageToList(result);
-                        Logger.d("[MessagePresenter] receive messages");
-                    }
-                });
-
-        compositeSubscription.add(subscription);
-    }
-
-    @Override
     public void getPresence(String chatId) {
         Subscription subscription = getPresenceUseCase.execute(chatId)
                 .observeOn(messageView.getUiScheduler())
@@ -112,16 +108,11 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void attachView(MessageContract.View view) {
         this.messageView = view;
-        if(!isReceivingMessages) {
-            this.receiveMessages();
-            isReceivingMessages = true;
-        }
     }
 
     @Override
     public void detachView() {
         compositeSubscription.clear();
-        isReceivingMessages = false;
         messageView = null;
     }
 }

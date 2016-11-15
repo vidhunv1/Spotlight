@@ -44,7 +44,6 @@ public class MessageApi {
 
             if(!connection.getConnection().isAuthenticated()) {
                 Logger.v("XMPP Not connected");
-                connection.initConnection();
 
                 connection.getConnection().addConnectionListener(new ConnectionListener() {
                     @Override
@@ -56,7 +55,6 @@ public class MessageApi {
                     public void authenticated(XMPPConnection connection, boolean resumed) {
                         Logger.v("Authenticated?"+connection.isAuthenticated());
                         sendMessageXMPP(connection, message, subscriber);
-
                     }
 
                     @Override
@@ -93,30 +91,6 @@ public class MessageApi {
         return sendMessage;
     }
 
-    public Observable<MessageResult> receiveMessages() {
-        Observable<MessageResult> receiveMessages = Observable.create(subscriber -> {
-            ChatManager chatManager = ChatManager.getInstanceFor(connection.getConnection());
-
-            chatManager.addChatListener(new ChatManagerListener() {
-                @Override
-                public void chatCreated(Chat chat, boolean createdLocally) {
-                    chat.addMessageListener(new ChatMessageListener() {
-                        @Override
-                        public void processMessage(Chat chat, Message message) {
-                            String participant = chat.getParticipant().split("@")[0];
-                            MessageResult receivedMessage = new MessageResult(participant, participant, message.getBody());
-                            receivedMessage.setDeliveryStatus(MessageResult.DeliveryStatus.NOT_AVAILABLE);
-                            subscriber.onNext(receivedMessage);
-                        }
-                    });
-                }
-            });
-
-        });
-
-        return receiveMessages;
-    }
-
     private void sendMessageXMPP(XMPPConnection connection, MessageResult message, final Subscriber<? super MessageResult> subscriber) {
         Logger.v("Sending message");
 
@@ -132,38 +106,33 @@ public class MessageApi {
 
             // TODO: check for acknowledgement
             if(connection.isAuthenticated())
-                message.setDeliveryStatus(MessageResult.DeliveryStatus.SENT);
+                message.setMessageStatus(MessageResult.MessageStatus.SENT);
             else
-                message.setDeliveryStatus(MessageResult.DeliveryStatus.NOT_SENT);
+                message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
             subscriber.onNext(message);
         }  catch (SmackException.NotConnectedException e) {
-            message.setDeliveryStatus(MessageResult.DeliveryStatus.NOT_SENT);
+            message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
             subscriber.onNext(message);
             Logger.e("XMPP error: "+e);
         }
     }
 
     // userId: 91-9999999999
-    public Observable<Presence.Mode> getPresence(String userId) {
+    public Observable<Presence.Type> getPresence(String userId) {
         String jid = XMPPManager.getJidFromUserName(userId);
-        Observable<Presence.Mode> getPresence;
+        Observable<Presence.Type> getPresence;
         getPresence = Observable.create(subscriber -> {
             //initial presence
-            subscriber.onNext(Presence.Mode.away);
             Roster roster = Roster.getInstanceFor(connection.getConnection());
             roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
             boolean pre = roster.addRosterListener(new RosterListener() {
 
                 @Override
-                public void entriesAdded(Collection<String> addresses) {
-
-                }
+                public void entriesAdded(Collection<String> addresses) {}
 
                 @Override
-                public void entriesUpdated(Collection<String> addresses) {
-
-                }
+                public void entriesUpdated(Collection<String> addresses) {}
 
                 @Override
                 public void entriesDeleted(Collection<String> addresses) {
@@ -171,8 +140,9 @@ public class MessageApi {
                 }
 
                 public void presenceChanged(Presence presence) {
+                    Logger.d("Presence received"+presence.getFrom()+", "+presence.getType());
                     if(presence.getFrom().split("/")[0].equals(jid))
-                        subscriber.onNext(presence.getMode());
+                        subscriber.onNext(presence.getType());
                 }
             });
         });
@@ -188,6 +158,7 @@ public class MessageApi {
             LastActivityManager activity = LastActivityManager.getInstanceFor(connection.getConnection());
             try {
                 subscriber.onNext(activity.getLastActivity(jid).lastActivity);
+                subscriber.onCompleted();
             } catch (SmackException.NoResponseException e) {
                 e.printStackTrace();
                 subscriber.onError(e);
@@ -199,7 +170,6 @@ public class MessageApi {
                 subscriber.onError(e);
             }
         });
-
         return getLastActivity;
     }
 }

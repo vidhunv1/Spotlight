@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.home.chats;
 
+import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
@@ -20,6 +21,8 @@ public interface ChatListContract {
         void setDeliveryStatus(int status, int chatId);
 
         void displayChatList(List<ChatListItemModel> chatList);
+
+        void onMessageReceived(MessageResult messageResult);
     }
 
     interface Presenter extends BasePresenter<ChatListContract.View> {

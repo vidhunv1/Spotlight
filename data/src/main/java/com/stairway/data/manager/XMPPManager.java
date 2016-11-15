@@ -10,12 +10,14 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created by vidhun on 26/07/16.
  */
-public class XMPPManager {
-    private String userName;
+public class XMPPManager implements Serializable{
+    private static String userName;
+    private static String password = "spotlight";
 
     private static AbstractXMPPConnection connection = null;
 
@@ -25,7 +27,6 @@ public class XMPPManager {
 
     public XMPPManager(String userName, String pass) {
         XMPPTCPConnectionConfiguration.Builder config;
-        String password = "spotlight";
         this.userName = userName;
 
         config = XMPPTCPConnectionConfiguration.builder();
@@ -35,51 +36,19 @@ public class XMPPManager {
         config.setPort(DataConfig.XMPP_PORT);
         config.setServiceName(DataConfig.XMPP_SERVICE_NAME);
         config.setDebuggerEnabled(true);
+        config.setSendPresence(true);
 
         connection = new XMPPTCPConnection(config.build());
         XMPPTCPConnection.setUseStreamManagementDefault(true);
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
-        initConnection();
     }
 
     public static String getJidFromUserName(String jid) {
         return jid+"@"+DataConfig.XMPP_SERVICE_NAME;
     }
 
-    public void initConnection(){
-
-        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
-
-            @Override
-            protected Boolean doInBackground(Void... arg0) {
-
-                // Create a connection
-                try {
-                    connection.connect().login();
-                    Logger.d("Init xmpp connection");
-                } catch (IOException e) {
-                    Logger.e("[XMPP]: "+e);
-                } catch (SmackException e) {
-                    Logger.e("[XMPP]: "+e);
-
-                } catch (XMPPException e) {
-                    Logger.e("[XMPP]: "+e);
-                }
-
-                return null;
-            }
-        };
-        connectionThread.execute();
-        Logger.v("Connected xmpp");
-    }
-
-    public AbstractXMPPConnection getConnection(){
-        if(connection!=null)
+    public static AbstractXMPPConnection getConnection(){
             return connection;
-        else {
-            initConnection();
-            return connection;
-        }
     }
 
     public boolean isConnected() {
@@ -88,7 +57,6 @@ public class XMPPManager {
 
     public void setPresenceOnline() {
         Presence presenceOnline = new Presence(Presence.Type.available);
-        presenceOnline.setMode(Presence.Mode.available);
 
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -98,7 +66,6 @@ public class XMPPManager {
                         connection.sendStanza(presenceOnline);
                     } catch (SmackException.NotConnectedException e) {
                         e.printStackTrace();
-                        initConnection();
                     }
                 return null;
             }
@@ -107,8 +74,7 @@ public class XMPPManager {
     }
 
     public void setPresenceOffline() {
-        Presence presenceOffline = new Presence(Presence.Type.available);
-        presenceOffline.setMode(Presence.Mode.away);
+        Presence presenceOffline = new Presence(Presence.Type.unavailable);
 
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -116,9 +82,11 @@ public class XMPPManager {
                 if(connection!=null)
                     try {
                         connection.sendStanza(presenceOffline);
+                        if(isConnected())
+                            connection.disconnect();
                     } catch (SmackException.NotConnectedException e) {
                         e.printStackTrace();
-                        initConnection();
+//                        initConnection();
                     }
                 return null;
             }
