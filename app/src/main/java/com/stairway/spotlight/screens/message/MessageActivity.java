@@ -28,6 +28,7 @@ import com.stairway.data.manager.XMPPManager;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 
+import org.jivesoftware.smackx.chatstates.ChatState;
 import org.w3c.dom.Text;
 
 import java.util.List;
@@ -57,6 +58,8 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     TextView presenceTextView;
 
+    private ChatState currentChatState;
+
     private static String KEY_USER_ID = "USERID";
     private String chatId; // contact user, mobile
     private String currentUser; // this user, mobile
@@ -72,6 +75,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentChatState = ChatState.inactive;
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_USER_ID))
             return;
@@ -140,10 +144,19 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         String message = messageBox.getText().toString().trim();
         if(message.length()>=1) {
             sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
+            if(currentChatState != ChatState.composing) {
+                messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_TYPING);
+                currentChatState = ChatState.composing;
+            }
         } else {
             sendImageButton.setImageResource(R.drawable.ic_keyboard_plus);
+            if(currentChatState != ChatState.paused) {
+                messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_PAUSED);
+                currentChatState = ChatState.paused;
+            }
         }
     }
+
     @Override
     public void displayMessages(List<MessageResult> messages) {
         Logger.d("Init messages list");
@@ -175,8 +188,20 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void onMessageReceived(MessageResult messageResult) {
-        messagesAdapter.addMessage(messageResult);
-        messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
-        messagePresenter.updateMessageSeen(messageResult);
+        if(messageResult.getChatId().equals(chatId)) {
+            messagesAdapter.addMessage(messageResult);
+            messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
+            messagePresenter.updateMessageSeen(messageResult);
+        }
+    }
+
+    @Override
+    public void onChatStateReceived(String from, ChatState chatState) {
+        if(from.equals(chatId)) {
+            if(chatState == ChatState.composing)
+                updatePresence("Typing...");
+            else
+                messagePresenter.getPresence(from);
+        }
     }
 }

@@ -36,6 +36,9 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
 import com.stairway.spotlight.screens.home.contacts.ContactListFragment;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
+
+import org.jivesoftware.smackx.chatstates.ChatState;
+
 import rx.Subscriber;
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
@@ -238,7 +241,13 @@ public class HomeActivity extends BaseActivity
     @Override
     public void onMessageReceived(MessageResult messageId) {
         if(chatListFragment!=null) {
-            chatListFragment.onMessageReceived(messageId);
+            chatListFragment.addNewMessage(messageId);
         }
+    }
+
+    @Override
+    public void onChatStateReceived(String from, ChatState chatState) {
+        if(chatListFragment!=null)
+            chatListFragment.showChatState(from, chatState);
     }
 }

@@ -16,6 +16,8 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.di.component.UserSessionComponent;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
+import org.jivesoftware.smackx.chatstates.ChatState;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +49,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             @Override
             public void onReceive(Context context, Intent intent) {
                 if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_MSG)) {
-                    MessageResult s = (MessageResult) intent.getSerializableExtra(XmppService.XMPP_MESSAGE_RESULT);
+                    MessageResult s = (MessageResult) intent.getSerializableExtra(XmppService.XMPP_RESULT_MESSAGE);
+                    Logger.d("Message received: "+s);
                     onMessageReceived(s);
+                } else if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_STATE)) {
+                    String from = intent.getStringExtra(XmppService.XMPP_RESULT_FROM);
+                    ChatState chatState = (ChatState) intent.getSerializableExtra(XmppService.XMPP_RESULT_STATE);
+                    onChatStateReceived(from, chatState);
                 }
             }
         };
@@ -65,9 +72,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     @Override
     protected void onStart() {
         onApplicationToForeground();
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
-                new IntentFilter(XmppService.XMPP_ACTION_RCV_MSG)
-        );
+        IntentFilter filter = new IntentFilter(XmppService.XMPP_ACTION_RCV_STATE);
+        filter.addAction(XmppService.XMPP_ACTION_RCV_MSG);
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), filter);
         super.onStart();
     }
 
@@ -152,6 +159,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     public void onMessageReceived(MessageResult messageId){
         Logger.d("MessageId "+messageId);
     }
+
+    public void onChatStateReceived(String from, ChatState chatState) { Logger.d("chatState: "+chatState.name()+", from "+from);}
 
     protected abstract void injectComponent(ComponentContainer componentContainer);
 }

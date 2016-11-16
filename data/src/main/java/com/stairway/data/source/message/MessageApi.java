@@ -19,6 +19,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smackx.chatstates.ChatState;
+import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.iqlast.LastActivityManager;
 
 import java.util.Collection;
@@ -54,7 +56,7 @@ public class MessageApi {
                     @Override
                     public void authenticated(XMPPConnection connection, boolean resumed) {
                         Logger.v("Authenticated?"+connection.isAuthenticated());
-                        sendMessageXMPP(connection, message, subscriber);
+                        sendMessageXMPP(message, subscriber);
                     }
 
                     @Override
@@ -84,37 +86,11 @@ public class MessageApi {
                 });
             } else {
                 Logger.v("XMPP connected");
-                sendMessageXMPP(connection.getConnection(), message, subscriber);
+                sendMessageXMPP(message, subscriber);
             }
         });
 
         return sendMessage;
-    }
-
-    private void sendMessageXMPP(XMPPConnection connection, MessageResult message, final Subscriber<? super MessageResult> subscriber) {
-        Logger.v("Sending message");
-
-        if(connection.isAuthenticated())
-            Logger.v("[XMPP] Connection authenticated");
-        else
-            Logger.v("[XMPP] Connection authenticated");
-        ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        Chat newChat = chatManager.createChat(message.getChatId()+"@"+connection.getServiceName());
-
-        try {
-            newChat.sendMessage(message.getMessage());
-
-            // TODO: check for acknowledgement
-            if(connection.isAuthenticated())
-                message.setMessageStatus(MessageResult.MessageStatus.SENT);
-            else
-                message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-            subscriber.onNext(message);
-        }  catch (SmackException.NotConnectedException e) {
-            message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-            subscriber.onNext(message);
-            Logger.e("XMPP error: "+e);
-        }
     }
 
     // userId: 91-9999999999
@@ -171,5 +147,50 @@ public class MessageApi {
             }
         });
         return getLastActivity;
+    }
+
+    //Typing/stopped typing indicators
+    public Observable<Boolean> sendChatState(String chatId, ChatState chatState){
+        return Observable.create(subscriber -> {
+            ChatManager chatManager = ChatManager.getInstanceFor(connection.getConnection());
+            Chat newChat = chatManager.createChat(chatId + "@" + connection.getConnection().getServiceName());
+            try {
+                Message msg = new Message();
+                msg.setBody(null);
+                msg.addExtension(new ChatStateExtension(chatState));
+                newChat.sendMessage(msg);
+                subscriber.onNext(true);
+
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
+            }
+        });
+    }
+
+    private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber) {
+        Logger.v("Sending message");
+
+        if(connection.getConnection().isAuthenticated())
+            Logger.v("[XMPP] Connection authenticated");
+        else
+            Logger.v("[XMPP] Connection authenticated");
+        ChatManager chatManager = ChatManager.getInstanceFor(connection.getConnection());
+        Chat newChat = chatManager.createChat(message.getChatId()+"@"+connection.getConnection().getServiceName());
+
+        try {
+            newChat.sendMessage(message.getMessage());
+
+            // TODO: check for acknowledgement
+            if(connection.getConnection().isAuthenticated())
+                message.setMessageStatus(MessageResult.MessageStatus.SENT);
+            else
+                message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+            subscriber.onNext(message);
+        }  catch (SmackException.NotConnectedException e) {
+            message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+            subscriber.onNext(message);
+            Logger.e("XMPP error: "+e);
+        }
     }
 }

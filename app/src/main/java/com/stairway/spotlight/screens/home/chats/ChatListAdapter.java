@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.stairway.data.manager.Logger;
 import com.stairway.spotlight.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -20,20 +21,20 @@ import butterknife.ButterKnife;
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private List<ChatListItemModel> chatList;
+    private List<ChatListItemModel> temp;
     private ChatClickListener chatClickListener;
     private final int VIEW_WITH_NOTIFICATION=0, VIEW_WITHOUT_NOTIFICATION=1;
 
     public ChatListAdapter(Context context, List<ChatListItemModel> chatList, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
         this.chatList = chatList;
+        temp = new ArrayList<>();
         this.context = context;
     }
 
     public void newChatMessage(ChatListItemModel chatListItemModel){
         for (int i = 0; i < chatList.size(); i++) {
             if(chatListItemModel.getChatId().equals(chatList.get(i).getChatId())){
-                Logger.d("Adapter "+chatListItemModel.toString());
-                Logger.d("Adapter "+chatList.get(i).toString());
                 chatListItemModel.setNotificationCount(chatListItemModel.getNotificationCount() + chatList.get(i).getNotificationCount());
 
                 if(i==0){
@@ -49,6 +50,49 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
         notifyDataSetChanged();
+    }
+
+    public void setChatState(String fromId, String chatState){
+        for (int i = 0; i < chatList.size(); i++) {
+            if(fromId.equals(chatList.get(i).getChatId())){
+                if(chatState.equals(chatList.get(i).getLastMessage()))
+                    return;
+                ChatListItemModel item = chatList.get(i);
+                temp.add(new ChatListItemModel(
+                        item.getChatId(),
+                        item.getChatName(),
+                        item.getLastMessage(),
+                        item.getTime(),
+                        item.getNotificationCount()
+                ));
+                item.setLastMessage(chatState);
+                chatList.set(i, item);
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
+
+    public void resetChatState(String fromId){
+        ChatListItemModel tempItem, item;
+        Logger.d("Temp len: "+temp.size());
+        for (int i = 0; i < chatList.size() ; i++) {
+            item = chatList.get(i);
+            if (fromId.equals(item.getChatId())) {
+                Logger.d("fromId.equals(item.getChatId())");
+                for (int j = 0; j < temp.size(); j++) {
+                    tempItem = temp.get(j);
+                    if(fromId.equals(tempItem.getChatId())) {
+                        Logger.d("fromId.equals(tempItem.getChatId())");
+                        Logger.d("TempItem: "+tempItem);
+                        chatList.set(i, tempItem);
+                        notifyItemChanged(i);
+                        temp.remove(j);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     @Override

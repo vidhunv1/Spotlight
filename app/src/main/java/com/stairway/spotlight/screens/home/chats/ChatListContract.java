@@ -4,6 +4,8 @@ import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
+import org.jivesoftware.smackx.chatstates.ChatState;
+
 import java.util.List;
 
 /**
@@ -21,8 +23,9 @@ public interface ChatListContract {
         void setDeliveryStatus(int status, int chatId);
 
         void displayChatList(List<ChatListItemModel> chatList);
+        void addNewMessage(MessageResult messageResult);
+        void showChatState(String from, ChatState chatState);
 
-        void onMessageReceived(MessageResult messageResult);
     }
 
     interface Presenter extends BasePresenter<ChatListContract.View> {

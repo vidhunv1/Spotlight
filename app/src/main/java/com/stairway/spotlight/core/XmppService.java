@@ -14,8 +14,11 @@ import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.packet.ExtensionElement;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.chatstates.ChatState;
+import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -33,7 +36,10 @@ public class XmppService extends Service {
     public static String TAG_ACTIVITY_NAME = "activity_name";
 
     static final public String XMPP_ACTION_RCV_MSG = "com.stairway.spotlight.core.XmppService.MESSAGE_RECEIVED";
-    static final public String XMPP_MESSAGE_RESULT = "com.stairway.spotlight.core.XmppService.XMPP_MSG";
+    static final public String XMPP_RESULT_MESSAGE = "com.stairway.spotlight.core.XmppService.XMPP_MSG";
+    static final public String XMPP_ACTION_RCV_STATE = "com.stairway.spotlight.core.XmppService.CHAT_STATE_RECEIVED";
+    static final public String XMPP_RESULT_STATE = "com.stairway.spotlight.core.XmppService.XMPP_STATE";
+    static final public String XMPP_RESULT_FROM = "com.stairway.spotlight.core.XmppService.XMPP_FROM";
 
     private static boolean isReceivingMessages = false;
 
@@ -86,20 +92,47 @@ public class XmppService extends Service {
         chatManager.addChatListener((chat, createdLocally) -> {
             chat.addMessageListener((chat1, message) -> {
                 String participant = chat.getParticipant().split("@")[0];
-                MessageResult receivedMessage = new MessageResult(participant, participant, message.getBody());
-                receivedMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
 
-                messageStore.storeMessage(receivedMessage).subscribe(new Subscriber<MessageResult>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {}
+                if(message.getBody()!=null) {
+                    MessageResult receivedMessage = new MessageResult(participant, participant, message.getBody());
+                    receivedMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
+                    messageStore.storeMessage(receivedMessage).subscribe(new Subscriber<MessageResult>() {
+                        @Override
+                        public void onCompleted() {
+                        }
 
-                    @Override
-                    public void onNext(MessageResult messageResult) {
-                        broadcastMessageReceived(receivedMessage);
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+
+                        @Override
+                        public void onNext(MessageResult messageResult) {
+                            broadcastReceivedMessage(receivedMessage);
+                        }
+                    });
+                } else{
+                    ExtensionElement element = message.getExtension(ChatStateExtension.NAMESPACE);
+                    if (element != null) {
+                        switch (element.getElementName()) {
+                            case "composing":
+                                broadcastTypingState(participant, ChatState.composing);
+                                break;
+                            case "paused":
+                                broadcastTypingState(participant, ChatState.paused);
+                                break;
+                            case "active":
+                                broadcastTypingState(participant, ChatState.active);
+                                break;
+                            case "inactive":
+                                broadcastTypingState(participant, ChatState.inactive);
+                                break;
+                            case "gone":
+                                broadcastTypingState(participant, ChatState.gone);
+                                break;
+                        }
                     }
-                });
+                }
+
             });
         });
     }
@@ -150,10 +183,17 @@ public class XmppService extends Service {
         }
     }
 
-    public void broadcastMessageReceived(MessageResult messageId) {
+    private void broadcastReceivedMessage(MessageResult messageId) {
         Intent intent = new Intent(XMPP_ACTION_RCV_MSG);
         if(messageId != null)
-            intent.putExtra(XMPP_MESSAGE_RESULT, messageId);
+            intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
+        broadcaster.sendBroadcast(intent);
+    }
+
+    private void broadcastTypingState(String participant, ChatState state) {
+        Intent intent = new Intent(XMPP_ACTION_RCV_STATE);
+        intent.putExtra(XMPP_RESULT_STATE, state);
+        intent.putExtra(XMPP_RESULT_FROM, participant);
         broadcaster.sendBroadcast(intent);
     }
 }

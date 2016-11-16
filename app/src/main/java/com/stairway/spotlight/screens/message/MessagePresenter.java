@@ -4,6 +4,8 @@ import com.stairway.data.manager.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
+import org.jivesoftware.smackx.chatstates.ChatState;
+
 import java.util.List;
 
 import rx.Subscription;
@@ -20,17 +22,20 @@ public class MessagePresenter implements MessageContract.Presenter {
     private SendMessageUseCase sendMessageUseCase;
     private GetPresenceUseCase getPresenceUseCase;
     private UpdateMessageUseCase updateMessageUseCase;
+    private SendChatStateUseCase sendChatStateUseCase;
 
     public MessagePresenter(LoadMessagesUseCase messageUseCase,
                             StoreMessageUseCase storeMessageUseCase,
                             SendMessageUseCase sendMessageUseCase,
                             GetPresenceUseCase getPresenceUseCase,
-                            UpdateMessageUseCase updateMessageUseCase) {
+                            UpdateMessageUseCase updateMessageUseCase,
+                            SendChatStateUseCase sendChatStateUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
         this.getPresenceUseCase = getPresenceUseCase;
         this.updateMessageUseCase = updateMessageUseCase;
+        this.sendChatStateUseCase = sendChatStateUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -85,6 +90,20 @@ public class MessagePresenter implements MessageContract.Presenter {
                                 });
 
                         compositeSubscription.add(sendMessage);
+                    }
+                });
+
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void sendChatState(String chatId, ChatState chatState) {
+        Subscription subscription = sendChatStateUseCase.execute(chatId, chatState)
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<String>(messageView) {
+                    @Override
+                    public void onResult(String result) {
+                        Logger.d("ChatState: "+result);
                     }
                 });
 

@@ -15,6 +15,8 @@ import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
 
+import org.jivesoftware.smackx.chatstates.ChatState;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -97,9 +99,17 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     }
 
     @Override
-    public void onMessageReceived(MessageResult messageResult) {
+    public void addNewMessage(MessageResult messageResult) {
         ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(),1);
         chatListAdapter.newChatMessage(item);
         Logger.d("new notification: "+item);
+    }
+
+    @Override
+    public void showChatState(String from, ChatState chatState) {
+        if(chatState == ChatState.composing)
+            chatListAdapter.setChatState(from, "Typing...");
+        else
+            chatListAdapter.resetChatState(from);
     }
 }
