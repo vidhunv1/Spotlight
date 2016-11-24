@@ -34,7 +34,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     }
 
     public void setMessages(List<MessageResult> messages) {
-        Logger.d("[MessagesAdapter] add all messages");
         this.messageList.clear();
         this.messageList.addAll(messages);
         this.notifyItemRangeInserted(0, messageList.size() - 1);
@@ -50,6 +49,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         for(MessageResult m: messageList) {
             if(messageResult.getMessageId().equals(m.getMessageId())) {
                 messageList.set(position, messageResult);
+                this.notifyItemChanged(position);
+                break;
+            }
+            position++;
+        }
+    }
+
+    public void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+        // TODO: Might be inefficient
+        int position = 0;
+        for(MessageResult m: messageList) {
+            if(m.getReceiptId()!=null && !m.getReceiptId().isEmpty() && m.getReceiptId().equals(deliveryReceiptId)) {
+                m.setMessageStatus(messageStatus);
+                messageList.set(position, m);
                 this.notifyItemChanged(position);
                 break;
             }
@@ -101,8 +114,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         @Bind(R.id.tv_messageitem_message)
         TextView message;
 
-        @Bind(R.id.tv_messageitem_time)
-        TextView time;
+        @Bind(R.id.tv_messageitem_deliverystatus)
+        TextView deliveryStatus;
 
 //        @Bind(R.id.tv_messageitem_deliverystatus)
 //        TextView deliveryStatus;
@@ -114,12 +127,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
         public void renderItem(MessageResult messageResult) {
 
-            message.setText(messageResult.getMessage().trim() + "        ");
-            time.setText(messageResult.getTime());
-//            if(messageResult.getDeliveryStatus() == null || messageResult.getDeliveryStatus() == MessageResult.DeliveryStatus.NOT_AVAILABLE)
-//                deliveryStatus.setText("");
-//            else
-//                deliveryStatus.setText(String.valueOf(messageResult.getDeliveryStatus().ordinal()));
+            message.setText(messageResult.getMessage().trim());
+//            time.setText(messageResult.getTime());
+            Logger.d("MsgResult : "+messageResult.getMessageStatus().name());
+            if(messageResult.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT)
+                deliveryStatus.setText("  X");
+            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.SENT)
+                deliveryStatus.setText("  S");
+            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.DELIVERED)
+                deliveryStatus.setText("  D");
+            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.READ)
+                deliveryStatus.setText("  R");
+            else
+                deliveryStatus.setText("");
         }
     }
 }

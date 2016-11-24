@@ -16,6 +16,7 @@ public interface MessageContract {
         void displayMessages(List<MessageResult> result);
         void addMessageToList(MessageResult message);
         void updateDeliveryStatus(MessageResult messageResult);
+        void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
         void updatePresence(String presence);
     }
 

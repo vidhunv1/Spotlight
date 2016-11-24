@@ -14,6 +14,16 @@ public class MessageResult implements Serializable {
     private String fromId; //
     private MessageStatus messageStatus;
     private String messageId;
+    private String receiptId;
+
+    public String getReceiptId() {
+        return receiptId;
+    }
+
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
+    }
+
     private String time;
     private String name;
     private int unSeenCount;

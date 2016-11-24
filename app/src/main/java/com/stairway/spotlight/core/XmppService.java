@@ -17,8 +17,11 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.ExtensionElement;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
+import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
+import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -37,9 +40,15 @@ public class XmppService extends Service {
 
     static final public String XMPP_ACTION_RCV_MSG = "com.stairway.spotlight.core.XmppService.MESSAGE_RECEIVED";
     static final public String XMPP_RESULT_MESSAGE = "com.stairway.spotlight.core.XmppService.XMPP_MSG";
+
     static final public String XMPP_ACTION_RCV_STATE = "com.stairway.spotlight.core.XmppService.CHAT_STATE_RECEIVED";
     static final public String XMPP_RESULT_STATE = "com.stairway.spotlight.core.XmppService.XMPP_STATE";
     static final public String XMPP_RESULT_FROM = "com.stairway.spotlight.core.XmppService.XMPP_FROM";
+
+    static final public String XMPP_ACTION_RCV_RECEIPT = "com.stairway.spotlight.core.XmppService.DELIVERY_RECEIPT_RECEIVED";
+    static final public String XMPP_RESULT_MSG_STATUS = "com.stairway.spotlight.core.XmppService.XMPP_MSG_STATUS";
+    static final public String XMPP_RESULT_CHAT_ID = "com.stairway.spotlight.core.XmppService.XMPP_CHAT_ID";
+    static final public String XMPP_RESULT_RECEIPT_ID = "com.stairway.spotlight.core.XmppService.XMPP_RECEIPT_ID";
 
     private static boolean isReceivingMessages = false;
 
@@ -78,6 +87,7 @@ public class XmppService extends Service {
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
         receiveMessages();
+        getDeliveryReceipts();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -91,19 +101,19 @@ public class XmppService extends Service {
 
         chatManager.addChatListener((chat, createdLocally) -> {
             chat.addMessageListener((chat1, message) -> {
-                String participant = chat.getParticipant().split("@")[0];
+                String participant = XMPPManager.getUserNameFromJid(chat.getParticipant());
+                String messageBody = null;
+                if(!message.getBodies().isEmpty())
+                    messageBody = message.getBodies().iterator().next().getMessage();
 
-                if(message.getBody()!=null) {
-                    MessageResult receivedMessage = new MessageResult(participant, participant, message.getBody());
+                if(messageBody!=null && !messageBody.isEmpty()) {
+                    MessageResult receivedMessage = new MessageResult(participant, participant, messageBody);
                     receivedMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
                     messageStore.storeMessage(receivedMessage).subscribe(new Subscriber<MessageResult>() {
                         @Override
-                        public void onCompleted() {
-                        }
-
+                        public void onCompleted() {}
                         @Override
-                        public void onError(Throwable e) {
-                        }
+                        public void onError(Throwable e) {}
 
                         @Override
                         public void onNext(MessageResult messageResult) {
@@ -132,9 +142,26 @@ public class XmppService extends Service {
                         }
                     }
                 }
-
             });
         });
+    }
+
+    public void getDeliveryReceipts(){
+        DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection()).setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
+        DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection())
+                .addReceiptReceivedListener((fromJid, toJid, deliveryReceiptId, stanza) -> {
+                    String chatId = XMPPManager.getUserNameFromJid(fromJid);
+                    messageStore.updateMessageStatus(chatId, deliveryReceiptId, MessageResult.MessageStatus.DELIVERED).subscribe(new Subscriber<Boolean>() {
+                        @Override
+                        public void onCompleted() {
+                            broadcastDeliveryReceipt(XMPPManager.getUserNameFromJid(chatId), deliveryReceiptId, MessageResult.MessageStatus.DELIVERED);
+                        }
+                        @Override
+                        public void onError(Throwable e) {}
+                        @Override
+                        public void onNext(Boolean aBoolean) {}
+                    });
+                });
     }
 
     class TryXMPPConnection extends TimerTask{
@@ -194,6 +221,14 @@ public class XmppService extends Service {
         Intent intent = new Intent(XMPP_ACTION_RCV_STATE);
         intent.putExtra(XMPP_RESULT_STATE, state);
         intent.putExtra(XMPP_RESULT_FROM, participant);
+        broadcaster.sendBroadcast(intent);
+    }
+
+    private void broadcastDeliveryReceipt(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus){
+        Intent intent = new Intent(XMPP_ACTION_RCV_RECEIPT);
+        intent.putExtra(XMPP_RESULT_MSG_STATUS, messageStatus.name());
+        intent.putExtra(XMPP_RESULT_CHAT_ID, chatId);
+        intent.putExtra(XMPP_RESULT_RECEIPT_ID, deliveryReceiptId);
         broadcaster.sendBroadcast(intent);
     }
 }

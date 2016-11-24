@@ -32,7 +32,7 @@ public class MessageStore {
     Get messages with chatId.
      */
     public Observable<List<MessageResult>> getMessages(String chatId) {
-
+        Logger.d("[MsgStore]GetMessages");
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
@@ -45,7 +45,8 @@ public class MessageStore {
                             MessagesContract.COLUMN_MESSAGE,
                             MessagesContract.COLUMN_MESSAGE_STATUS,
                             MessagesContract.COLUMN_ROW_ID,
-                            MessagesContract.COLUMN_CREATED_AT};
+                            MessagesContract.COLUMN_CREATED_AT,
+                            MessagesContract.COLUMN_RECEIPT_ID};
 
             try{
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
@@ -59,9 +60,11 @@ public class MessageStore {
                     String messageStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
                     String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
                     String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+                    String receiptId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_RECEIPT_ID));
 
                     MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
+                    msg.setReceiptId(receiptId);
                     Logger.d("[MessageStore] Message:"+msg.toString());
                     result.add(msg);
 
@@ -108,6 +111,7 @@ public class MessageStore {
             values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
             values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
             values.put(MessagesContract.COLUMN_CREATED_AT, currentTime);
+            values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
 
             long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
             messageResult.setTime(getFormattedTime(currentTime, "hh:mm"));
@@ -123,10 +127,16 @@ public class MessageStore {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
-            values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
-            values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
-            values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
+            if(messageResult.getChatId()!=null && !messageResult.getChatId().isEmpty())
+                values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
+            if(messageResult.getFromId()!=null && !messageResult.getFromId().isEmpty())
+                values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
+            if(messageResult.getMessage()!=null && !messageResult.getMessage().isEmpty())
+                values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
+            if(messageResult.getMessageStatus()!=null)
+                values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
+            if(messageResult.getReceiptId()!=null && !messageResult.getReceiptId().isEmpty())
+                values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
 
             db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_ROW_ID+"="+messageResult.getMessageId(), null);
 
@@ -136,7 +146,20 @@ public class MessageStore {
         });
     }
 
-    public Observable<MessageResult> getUnsentMessages(String chatId) {
+    public Observable<Boolean> updateMessageStatus(String chatId, String receiptId, MessageResult.MessageStatus messageStatus){
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+            ContentValues values = new ContentValues();
+            values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageStatus.name());
+
+            db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_RECEIPT_ID+"='"+receiptId+"' AND "+MessagesContract.COLUMN_CHAT_ID+"='"+chatId+"'", null);
+            subscriber.onNext(true);
+            subscriber.onCompleted();
+            databaseManager.closeConnection();
+        });
+    }
+
+    public Observable<MessageResult> getUnsentMessages(String chatId) {q
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
 

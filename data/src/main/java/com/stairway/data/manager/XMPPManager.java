@@ -43,8 +43,12 @@ public class XMPPManager implements Serializable{
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
     }
 
-    public static String getJidFromUserName(String jid) {
-        return jid+"@"+DataConfig.XMPP_SERVICE_NAME;
+    public static String getJidFromUserName(String userName) {
+        return userName+"@"+DataConfig.XMPP_SERVICE_NAME;
+    }
+
+    public static String getUserNameFromJid(String jid) {
+        return jid.split("@")[0];
     }
 
     public static AbstractXMPPConnection getConnection(){

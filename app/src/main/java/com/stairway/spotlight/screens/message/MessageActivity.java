@@ -134,7 +134,6 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
         if(message.length()>=1) {
             messageBox.setText("");
-            Logger.d("chatId: "+chatId+", currentUser: "+currentUser);
             messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.MessageStatus.NOT_SENT));
         }
     }
@@ -159,7 +158,6 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void displayMessages(List<MessageResult> messages) {
-        Logger.d("Init messages list");
         messagesAdapter.setMessages(messages);
     }
 
@@ -172,6 +170,11 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     public void updateDeliveryStatus(MessageResult messageResult) {
         messagesAdapter.updateMessage(messageResult);
+    }
+
+    @Override
+    public void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+        messagesAdapter.updateDeliveryStatus(deliveryReceiptId, messageStatus);
     }
 
     @Override
@@ -188,6 +191,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void onMessageReceived(MessageResult messageResult) {
+        super.onMessageReceived(messageResult);
         if(messageResult.getChatId().equals(chatId)) {
             messagesAdapter.addMessage(messageResult);
             messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
@@ -197,11 +201,20 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void onChatStateReceived(String from, ChatState chatState) {
+        super.onChatStateReceived(from, chatState);
         if(from.equals(chatId)) {
             if(chatState == ChatState.composing)
                 updatePresence("Typing...");
             else
                 messagePresenter.getPresence(from);
+        }
+    }
+
+    @Override
+    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+        super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
+        if(this.chatId.equals(chatId)) {
+            updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }
     }
 }

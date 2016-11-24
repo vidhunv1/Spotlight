@@ -60,7 +60,7 @@
                 android:layout_toRightOf="@+id/imageView">
 
                 <TextView
-                    android:id="@+id/tv_messageitem_time"
+                    android:id="@+id/tv_messageitem_deliverystatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="5dp"

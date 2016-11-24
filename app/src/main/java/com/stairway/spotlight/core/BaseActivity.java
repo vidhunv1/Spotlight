@@ -56,6 +56,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
                     String from = intent.getStringExtra(XmppService.XMPP_RESULT_FROM);
                     ChatState chatState = (ChatState) intent.getSerializableExtra(XmppService.XMPP_RESULT_STATE);
                     onChatStateReceived(from, chatState);
+                } else if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_RECEIPT)) {
+                    String chatId = intent.getStringExtra(XmppService.XMPP_RESULT_CHAT_ID);
+                    String deliveryReceiptId = intent.getStringExtra(XmppService.XMPP_RESULT_RECEIPT_ID);
+                    MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(intent.getStringExtra(XmppService.XMPP_RESULT_MSG_STATUS));
+                    onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
                 }
             }
         };
@@ -74,6 +79,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         onApplicationToForeground();
         IntentFilter filter = new IntentFilter(XmppService.XMPP_ACTION_RCV_STATE);
         filter.addAction(XmppService.XMPP_ACTION_RCV_MSG);
+        filter.addAction(XmppService.XMPP_ACTION_RCV_RECEIPT);
         LocalBroadcastManager.getInstance(this).registerReceiver((receiver), filter);
         super.onStart();
     }
@@ -161,6 +167,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     }
 
     public void onChatStateReceived(String from, ChatState chatState) { Logger.d("chatState: "+chatState.name()+", from "+from);}
+
+    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) { Logger.d("MessageStatusReceived: "+deliveryReceiptId);}
 
     protected abstract void injectComponent(ComponentContainer componentContainer);
 }
