@@ -84,7 +84,6 @@ public class MessagePresenter implements MessageContract.Presenter {
                                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
                                     @Override
                                     public void onResult(MessageResult result) {
-                                        Logger.d("Message send: "+result.toString());
                                         messageView.updateDeliveryStatus(result);
                                     }
                                 });

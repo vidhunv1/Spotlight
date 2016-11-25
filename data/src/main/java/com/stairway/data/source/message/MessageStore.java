@@ -65,10 +65,9 @@ public class MessageStore {
                     MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
                     msg.setReceiptId(receiptId);
-                    Logger.d("[MessageStore] Message:"+msg.toString());
                     result.add(msg);
 
-                    // Update message to seen
+                    // Update message to seen: move to useCase logic.
                     if(messageStatus.equals(MessageResult.MessageStatus.UNSEEN.name())) {
                         msg.setMessageStatus(MessageResult.MessageStatus.SEEN);
                         updateMessage(msg).subscribe(new Subscriber<MessageResult>() {
@@ -159,7 +158,7 @@ public class MessageStore {
         });
     }
 
-    public Observable<MessageResult> getUnsentMessages(String chatId) {q
+    public Observable<MessageResult> getUnsentMessages(String chatId) {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
 
@@ -181,6 +180,53 @@ public class MessageStore {
 
                 while(!cursor.isAfterLast()) {
 //                    String chat_id = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+
+                    MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
+
+                    MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
+                    msg.setMessageId(messageId);
+
+                    subscriber.onNext(msg);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+                subscriber.onCompleted();
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+    public Observable<MessageResult> getUnsentMessages() {
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
+
+            String[] selectionArgs = {MessageResult.MessageStatus.NOT_SENT.name()};
+            String[] columns = {
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT};
+
+            try{
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
+                cursor.moveToFirst();
+
+                while(!cursor.isAfterLast()) {
+                    String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                     String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
                     String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));

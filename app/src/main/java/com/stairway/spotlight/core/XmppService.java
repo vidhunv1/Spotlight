@@ -6,22 +6,17 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import com.stairway.data.manager.Logger;
 import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.message.MessageStore;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.ExtensionElement;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
-import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -54,8 +49,11 @@ public class XmppService extends Service {
 
     private String activity_name;
     private boolean isOnlineNotified = false;
-    private int retryInterval = 100;
+    private final int RETRY_OFFLINE = 1;
+    private final int RETRY_ONLINE = 1;
+    private int retryInterval = RETRY_OFFLINE; //seconds
     private MessageStore messageStore;
+    private MessageApi messageApi;
     private LocalBroadcastManager broadcaster;
 
     private Timer mTimer = null;
@@ -77,6 +75,7 @@ public class XmppService extends Service {
         broadcaster = LocalBroadcastManager.getInstance(this);
         activity_name = intent.getStringExtra(TAG_ACTIVITY_NAME);
         messageStore = new MessageStore();
+        messageApi = new MessageApi(XMPPManager.getConnection());
 
         try {
             xmppServiceCallback = (XmppServiceCallback) Class.forName(activity_name).newInstance();
@@ -184,18 +183,52 @@ public class XmppService extends Service {
 
     private boolean tryConnect(){
         try {
-            Logger.d("TryConnect");
             // TODO: BUGGY
             if(!XMPPManager.getConnection().isConnected()) {
                 XMPPManager.getConnection().connect().login();
             }
 
             if(!isOnlineNotified) {
+                retryInterval = RETRY_ONLINE;
                 xmppServiceCallback.networkOnline();
                 isOnlineNotified = true;
+
+                //send unsent messages
+                Logger.d("[XMPPService] sending unsentMsgs");
+                messageStore.getUnsentMessages().subscribe(new Subscriber<MessageResult>() {
+                    @Override
+                    public void onCompleted() {}
+                    @Override
+                    public void onError(Throwable e) {}
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        messageApi.sendMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+                            @Override
+                            public void onCompleted() {}
+                            @Override
+                            public void onError(Throwable e) {}
+
+                            @Override
+                            public void onNext(MessageResult messageResult) {
+                                messageStore.updateMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+                                    @Override
+                                    public void onCompleted() {}
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(MessageResult messageResult) {
+                                        broadcastDeliveryReceipt(messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
             return true;
         } catch (SmackException.ConnectionException e) {
+            retryInterval = RETRY_OFFLINE;
             xmppServiceCallback.networkOffline();
             isOnlineNotified = false;
             e.printStackTrace();

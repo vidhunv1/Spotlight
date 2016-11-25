@@ -168,7 +168,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
 
     public void onChatStateReceived(String from, ChatState chatState) { Logger.d("chatState: "+chatState.name()+", from "+from);}
 
-    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) { Logger.d("MessageStatusReceived: "+deliveryReceiptId);}
+    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {}
 
     protected abstract void injectComponent(ComponentContainer componentContainer);
 }

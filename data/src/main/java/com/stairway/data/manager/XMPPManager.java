@@ -19,7 +19,7 @@ public class XMPPManager implements Serializable{
     private static String userName;
     private static String password = "spotlight";
 
-    private static AbstractXMPPConnection connection = null;
+    private static XMPPTCPConnection connection = null;
 
     public String getChatId() {
         return userName;
@@ -39,6 +39,8 @@ public class XMPPManager implements Serializable{
         config.setSendPresence(true);
 
         connection = new XMPPTCPConnection(config.build());
+        connection.setUseStreamManagement(true);
+        connection.setUseStreamManagementResumption(true);
         XMPPTCPConnection.setUseStreamManagementDefault(true);
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
     }
@@ -51,8 +53,8 @@ public class XMPPManager implements Serializable{
         return jid.split("@")[0];
     }
 
-    public static AbstractXMPPConnection getConnection(){
-            return connection;
+    public static XMPPTCPConnection getConnection(){
+        return connection;
     }
 
     public boolean isConnected() {

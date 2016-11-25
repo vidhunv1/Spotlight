@@ -34,8 +34,8 @@ public class DataModule {
 
     @Provides
     @UserSessionScope
-    public MessageApi messageApi(XMPPManager xmppManager) {
-        return new MessageApi(xmppManager);
+    public MessageApi messageApi() {
+        return new MessageApi(XMPPManager.getConnection());
     }
 
     @Provides

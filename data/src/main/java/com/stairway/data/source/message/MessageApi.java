@@ -21,6 +21,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smack.sm.StreamManagementException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.iqlast.LastActivityManager;
@@ -34,13 +36,13 @@ import rx.Subscriber;
 /**
  * Created by vidhun on 06/08/16.
  */
-public class    MessageApi {
-    private AbstractXMPPConnection connection;
-    public MessageApi(XMPPManager connection) {
-        this.connection = connection.getConnection();
+public class MessageApi {
+    private XMPPTCPConnection connection;
+    public MessageApi(XMPPTCPConnection connection) {
+        this.connection = connection;
     }
 
-    public Observable<MessageResult> sendMessage(MessageResult message) {
+    public Observable<MessageResult> sendMessage(MessageResult message){
         Logger.d("Sending message"+message.getMessage()+" to "+message.getChatId());
 
         Observable<MessageResult> sendMessage = Observable.create(subscriber -> {
@@ -153,7 +155,7 @@ public class    MessageApi {
         });
     }
 
-    private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber) {
+    private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber){
 
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
         Chat newChat = chatManager.createChat(XMPPManager.getJidFromUserName(message.getChatId()));
@@ -167,12 +169,21 @@ public class    MessageApi {
             newChat.sendMessage(sendMessage);
 
             //Acknowledgement
-            message.setMessageStatus(MessageResult.MessageStatus.SENT);
-            subscriber.onNext(message);
+            if(connection.isSmEnabled()) {
+                connection.addStanzaIdAcknowledgedListener(sendMessage.getStanzaId(), packet -> {
+                    message.setMessageStatus(MessageResult.MessageStatus.SENT);
+                    subscriber.onNext(message);
+                });
+            }
         } catch (SmackException.NotConnectedException e) {
             message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
             subscriber.onNext(message);
             Logger.e("XMPP error: "+e);
+        }
+        catch (StreamManagementException.StreamManagementNotEnabledException e) {
+            message.setMessageStatus(MessageResult.MessageStatus.SENT);
+            subscriber.onNext(message);
+            Logger.e("Stream management not enabled");
         }
     }
 }
