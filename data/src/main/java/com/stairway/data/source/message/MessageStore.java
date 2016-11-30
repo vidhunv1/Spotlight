@@ -31,7 +31,6 @@ public class MessageStore {
     Get messages with chatId.
      */
     public Observable<List<MessageResult>> getMessages(String chatId) {
-        Logger.d("[MsgStore]GetMessages");
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             List<MessageResult> result = new ArrayList<>();
@@ -49,7 +48,6 @@ public class MessageStore {
 
             try{
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-                Logger.d("[MESSAGE STORE]: QUERY"+MessagesContract.SQL_SELECT_MESSAGES+", chatid="+chatId);
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {
@@ -204,8 +202,26 @@ public class MessageStore {
             ContentValues values = new ContentValues();
             values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageStatus.name());
 
+            String notFilter;
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT)
+                notFilter = "AND "+MessagesContract.COLUMN_MESSAGE_STATUS
+                        +" NOT IN ('"
+                        + MessageResult.MessageStatus.DELIVERED+"' , '"
+                        +MessageResult.MessageStatus.READ+"' , '"
+                        +MessageResult.MessageStatus.SENT+"')";
+            else if(messageStatus == MessageResult.MessageStatus.SENT)
+                notFilter = "AND "+MessagesContract.COLUMN_MESSAGE_STATUS
+                        +" NOT IN ('"
+                        + MessageResult.MessageStatus.DELIVERED+"' , '"
+                        +MessageResult.MessageStatus.READ+"')";
+            else if(messageStatus == MessageResult.MessageStatus.DELIVERED)
+                notFilter = "AND "+MessagesContract.COLUMN_MESSAGE_STATUS
+                        +" NOT IN ('"
+                        +MessageResult.MessageStatus.READ+"')";
+            else
+                notFilter = "";
             db.update(MessagesContract.TABLE_NAME, values,
-                    MessagesContract.COLUMN_RECEIPT_ID+"='"+receiptId+"' AND "+MessagesContract.COLUMN_CHAT_ID+"='"+chatId+"'", null);
+                    MessagesContract.COLUMN_RECEIPT_ID+"='"+receiptId+"' AND "+MessagesContract.COLUMN_CHAT_ID+"='"+chatId+"' "+notFilter, null);
             subscriber.onNext(true);
             subscriber.onCompleted();
             databaseManager.closeConnection();
@@ -231,7 +247,8 @@ public class MessageStore {
                 values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageStatus.name());
 
                 db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_ROW_ID+" <= "+messageId+" AND "
-                        +MessagesContract.COLUMN_CHAT_ID+"= '"+chatId+"'", null);
+                        +MessagesContract.COLUMN_CHAT_ID+"= '"+chatId+"' AND "
+                        +MessagesContract.COLUMN_FROM_ID+" NOT IN ('"+chatId+"')", null);
 
                 subscriber.onNext(true);
                 subscriber.onCompleted();
@@ -282,7 +299,7 @@ public class MessageStore {
                 subscriber.onCompleted();
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                Logger.e("MessageStore sqlite error: getunsentmessages(chatid) - "+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -329,7 +346,7 @@ public class MessageStore {
                 subscriber.onCompleted();
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                Logger.e("MessageStore sqlite error: getUnsentMessages()-"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -392,7 +409,7 @@ public class MessageStore {
                 subscriber.onNext(result);
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                Logger.e("MessageStore sqlite error: - getChatList"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();

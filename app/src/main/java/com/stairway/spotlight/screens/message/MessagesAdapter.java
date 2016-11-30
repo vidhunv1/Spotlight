@@ -74,9 +74,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
                 if (messageStatus == MessageResult.MessageStatus.DELIVERED)
                     if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
                         return;
-                m.setMessageStatus(messageStatus);
-                messageList.set(i, m);
-                this.notifyItemChanged(i);
+
+                if(!m.getChatId().equals(m.getFromId())) {
+                    m.setMessageStatus(messageStatus);
+                    messageList.set(i, m);
+                    this.notifyItemChanged(i);
+                }
             }
         }
     }
