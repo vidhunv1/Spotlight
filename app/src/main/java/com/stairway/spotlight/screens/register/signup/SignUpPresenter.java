@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.register.signup;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.models.StatusResponse;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 

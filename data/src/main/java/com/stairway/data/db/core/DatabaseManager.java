@@ -1,9 +1,9 @@
-package com.stairway.data.local.core;
+package com.stairway.data.db.core;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

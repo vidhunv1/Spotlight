@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 
 import java.util.ArrayList;
@@ -33,7 +33,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void newChatMessage(ChatListItemModel chatListItemModel){
-        for (int i = 0; i < chatList.size(); i++) {
+        int i;
+        for (i = 0; i < chatList.size(); i++) {
             if(chatListItemModel.getChatId().equals(chatList.get(i).getChatId())){
                 chatListItemModel.setNotificationCount(chatListItemModel.getNotificationCount() + chatList.get(i).getNotificationCount());
 
@@ -48,6 +49,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
                 break;
             }
+        }
+        if(i==chatList.size()) {
+            chatList.add(0, chatListItemModel);
+            notifyItemChanged(0);
         }
         notifyDataSetChanged();
     }

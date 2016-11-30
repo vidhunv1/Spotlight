@@ -1,47 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:paddingBottom="0dp"
-android:paddingLeft="0dp"
-android:paddingRight="0dp"
-android:paddingTop="0dp"
-tools:context="com.stairway.spotlight.screens.welcome.WelcomeActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:text="Welcome to iMessage"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/welcome_welcome"
-        android:id="@+id/tv_welcome_welcome"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="270dp"
-        android:textSize="33dp" />
-
-    <TextView
-        android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:text="@string/welcome_tag"
         android:id="@+id/textView"
-        android:layout_below="@+id/tv_welcome_welcome"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="110dp"
-        android:textSize="16dp"
-        android:textAlignment="center"
-        />
+        android:gravity="center_horizontal"
+        android:textSize="28sp"
+        android:layout_marginTop="246.95dp"
+        android:textColor="#FF000000" />
+
+    <TextView
+        android:text="iMessage connects you with things that matter the most"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
+        android:layout_marginTop="16.7dp"
+        android:textColor="#ff000000" />
 
     <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="186dp"
-        android:layout_height="50dp"
-        android:text="@string/welcome_button_signup"
+        android:text="Get Started"
+        android:layout_width="130dp"
+        android:layout_height="36dp"
         android:id="@+id/btn_welcome_signup"
-        android:layout_below="@+id/textView"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        android:background="#26353B"
-        android:textColor="#ffffff" />
+        android:layout_marginTop="60.7dp"
+        android:textColor="#ffffffff"
+        android:background="#ff000000" />
 
-</RelativeLayout>
+    <TextView
+        android:text="By tapping Get Started, you agree to our Terms of service and  Privacy Policy"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView4"
+        android:textSize="12sp"
+        android:textAlignment="center"
+        android:layout_marginTop="132.95dp"
+        android:textColor="#ff000000" />
 
+</LinearLayout>

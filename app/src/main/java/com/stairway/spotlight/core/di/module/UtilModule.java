@@ -3,7 +3,7 @@ package com.stairway.spotlight.core.di.module;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.stairway.data.local.GenericCache;
+import com.stairway.data.db.GenericCache;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
 

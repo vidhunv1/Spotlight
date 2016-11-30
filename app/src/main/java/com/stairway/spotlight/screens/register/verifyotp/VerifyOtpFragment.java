@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;

@@ -1,4 +1,4 @@
-package com.stairway.data.manager;
+package com.stairway.data.config;
 
 import timber.log.Timber;
 

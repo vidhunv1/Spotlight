@@ -1,14 +1,13 @@
 package com.stairway.data.source.user;
 
-import com.stairway.data.manager.ApiManager;
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.ApiManager;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.models.User;
 import com.stairway.data.source.user.models.UserRequest;
 import com.stairway.data.source.user.models.StatusResponse;
 import com.stairway.data.source.user.models.UserResponse;
 
 import rx.Observable;
-import rx.Subscriber;
 
 /**
  * Created by vidhun on 19/07/16.

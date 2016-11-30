@@ -1,24 +1,17 @@
 package com.stairway.data.source.message;
 
-import android.util.Log;
+import com.stairway.data.config.Logger;
+import com.stairway.data.config.XMPPManager;
+import com.stairway.data.xmpp.ReadReceiptExtension;
 
-import com.stairway.data.manager.Logger;
-import com.stairway.data.manager.XMPPManager;
-
-import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.sm.StreamManagementException;
@@ -155,6 +148,27 @@ public class MessageApi {
         });
     }
 
+    public Observable<Boolean> sendReadReceipt(MessageResult messageResult){
+        return Observable.create(subscriber -> {
+            Message message = new Message(XMPPManager.getJidFromUserName(messageResult.getChatId()));
+            ReadReceiptExtension read = new ReadReceiptExtension(messageResult.getReceiptId());
+            message.addExtension(read);
+            try {
+                if(messageResult.getReceiptId()==null && !messageResult.getReceiptId().isEmpty()) {
+                    Logger.e("receipt id not found");
+                    subscriber.onError(new IllegalArgumentException("receipt id not found"));
+                } else {
+                    XMPPManager.getConnection().sendStanza(message);
+                    subscriber.onNext(true);
+                    subscriber.onCompleted();
+                }
+            } catch (SmackException.NotConnectedException e) {
+                subscriber.onError(e);
+                e.printStackTrace();
+            }
+        });
+    }
+
     private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber){
 
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
@@ -163,7 +177,6 @@ public class MessageApi {
         try {
             Message sendMessage = new Message(XMPPManager.getJidFromUserName(message.getChatId()));
             deliveryReceiptId = DeliveryReceiptRequest.addTo(sendMessage);
-
             message.setReceiptId(deliveryReceiptId);
             sendMessage.addBody("en", message.getMessage());
             newChat.sendMessage(sendMessage);

@@ -1,23 +1,15 @@
 package com.stairway.spotlight.core;
 
-import android.app.IntentService;
-import android.app.Service;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserAuthApi;
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.data.source.user.UserSessionStore;
 import com.stairway.data.source.user.models.User;
 import com.stairway.data.source.user.models.UserResponse;
 
-import java.io.IOException;
-
-import rx.Observable;
 import rx.Subscriber;
 
 import static com.stairway.data.source.user.UserSessionStore.KEY_ACCESS_TOKEN;

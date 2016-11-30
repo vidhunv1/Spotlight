@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 
 import java.util.ArrayList;

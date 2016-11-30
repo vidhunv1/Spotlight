@@ -2,7 +2,7 @@ package com.stairway.spotlight.core.di.module;
 
 import android.content.Context;
 
-import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.user.UserSessionStore;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.contacts.ContactsContent;

@@ -4,18 +4,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.stairway.data.local.core.SQLiteContract;
-import com.stairway.data.manager.Logger;
-import com.stairway.data.source.message.MessageResult;
+import com.stairway.data.config.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

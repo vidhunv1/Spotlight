@@ -1,15 +1,17 @@
-package com.stairway.data.manager;
+package com.stairway.data.config;
 
 import android.os.AsyncTask;
-import org.jivesoftware.smack.AbstractXMPPConnection;
+
+import com.stairway.data.xmpp.ReadReceiptExtension;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -43,6 +45,8 @@ public class XMPPManager implements Serializable{
         connection.setUseStreamManagementResumption(true);
         XMPPTCPConnection.setUseStreamManagementDefault(true);
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
+        DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection()).setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
+        ProviderManager.addExtensionProvider(ReadReceiptExtension.ELEMENT, ReadReceiptExtension.NAMESPACE, new ReadReceiptExtension.Provider());
     }
 
     public static String getJidFromUserName(String userName) {

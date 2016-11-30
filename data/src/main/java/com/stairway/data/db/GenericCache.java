@@ -1,12 +1,12 @@
-package com.stairway.data.local;
+package com.stairway.data.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
-import com.stairway.data.local.core.DatabaseManager;
-import com.stairway.data.manager.Logger;
-import com.stairway.data.local.core.SQLiteContract;
+import com.stairway.data.db.core.DatabaseManager;
+import com.stairway.data.config.Logger;
+import com.stairway.data.db.core.SQLiteContract;
 
 import java.util.HashMap;
 import java.util.Map;

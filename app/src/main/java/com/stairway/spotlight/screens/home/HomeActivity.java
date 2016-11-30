@@ -22,8 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.stairway.data.manager.Logger;
-import com.stairway.data.source.message.MessageApi;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;

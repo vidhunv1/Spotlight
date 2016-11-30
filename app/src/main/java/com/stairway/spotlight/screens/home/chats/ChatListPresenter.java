@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.home.chats;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 import java.util.List;
 import rx.Subscription;

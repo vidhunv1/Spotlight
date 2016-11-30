@@ -24,7 +24,8 @@ public interface MessageContract {
         void loadMessages(String chatId);
         void sendMessage(MessageResult result);
         void sendChatState(String chatId, ChatState chatState);
-        void updateMessageSeen(MessageResult result);
+        void updateMessageRead(MessageResult result);
         void getPresence(String chatId);
+        void sendReadReceipt(String chatId);
     }
 }

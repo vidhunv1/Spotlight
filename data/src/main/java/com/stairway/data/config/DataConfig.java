@@ -1,4 +1,4 @@
-package com.stairway.data.manager;
+package com.stairway.data.config;
 
 /**
  * Created by vidhun on 04/11/16.

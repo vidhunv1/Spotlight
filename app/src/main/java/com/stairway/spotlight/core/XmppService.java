@@ -4,21 +4,22 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import com.stairway.data.manager.Logger;
-import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.config.Logger;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.message.MessageStore;
+import com.stairway.data.xmpp.ReadReceiptExtension;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.ExtensionElement;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 
-import java.io.Serializable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -102,11 +103,13 @@ public class XmppService extends Service {
             chat.addMessageListener((chat1, message) -> {
                 String participant = XMPPManager.getUserNameFromJid(chat.getParticipant());
                 String messageBody = null;
-                if(!message.getBodies().isEmpty())
+                if(!message.getBodies().isEmpty()) {
                     messageBody = message.getBodies().iterator().next().getMessage();
+                }
 
                 if(messageBody!=null && !messageBody.isEmpty()) {
                     MessageResult receivedMessage = new MessageResult(participant, participant, messageBody);
+                    receivedMessage.setReceiptId(message.getStanzaId());
                     receivedMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
                     messageStore.storeMessage(receivedMessage).subscribe(new Subscriber<MessageResult>() {
                         @Override
@@ -139,6 +142,27 @@ public class XmppService extends Service {
                                 broadcastTypingState(participant, ChatState.gone);
                                 break;
                         }
+                    } else if(message.getExtension(ReadReceiptExtension.NAMESPACE)!=null) {
+                        ExtensionElement readElement = message.getExtension(ReadReceiptExtension.NAMESPACE);
+                        ReadReceiptExtension readReceiptExtension = (ReadReceiptExtension)readElement;
+
+                        if(readReceiptExtension!=null) {
+                            broadcastDeliveryReceipt(participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
+
+                            messageStore.updateAllMessageStatus(readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ)
+                                .subscribe(new Subscriber<Boolean>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(Boolean aBoolean) {
+                                        // updated
+                                    }
+                                });
+                        }
                     }
                 }
             });
@@ -146,7 +170,6 @@ public class XmppService extends Service {
     }
 
     public void getDeliveryReceipts(){
-        DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection()).setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
         DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection())
                 .addReceiptReceivedListener((fromJid, toJid, deliveryReceiptId, stanza) -> {
                     String chatId = XMPPManager.getUserNameFromJid(fromJid);
@@ -187,44 +210,11 @@ public class XmppService extends Service {
             if(!XMPPManager.getConnection().isConnected()) {
                 XMPPManager.getConnection().connect().login();
             }
-
             if(!isOnlineNotified) {
                 retryInterval = RETRY_ONLINE;
                 xmppServiceCallback.networkOnline();
                 isOnlineNotified = true;
-
-                //send unsent messages
-                Logger.d("[XMPPService] sending unsentMsgs");
-                messageStore.getUnsentMessages().subscribe(new Subscriber<MessageResult>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {}
-                    @Override
-                    public void onNext(MessageResult messageResult) {
-                        messageApi.sendMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
-                            @Override
-                            public void onCompleted() {}
-                            @Override
-                            public void onError(Throwable e) {}
-
-                            @Override
-                            public void onNext(MessageResult messageResult) {
-                                messageStore.updateMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
-                                    @Override
-                                    public void onCompleted() {}
-                                    @Override
-                                    public void onError(Throwable e) {}
-
-                                    @Override
-                                    public void onNext(MessageResult messageResult) {
-                                        broadcastDeliveryReceipt(messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+                sendUnsentMessages();
             }
             return true;
         } catch (SmackException.ConnectionException e) {
@@ -241,6 +231,41 @@ public class XmppService extends Service {
             Logger.d(e.getMessage());
             return false;
         }
+    }
+
+    private void sendUnsentMessages(){
+        //send unsent messages
+        Logger.d("[XMPPService] sending unsentMsgs");
+        messageStore.getUnsentMessages().subscribe(new Subscriber<MessageResult>() {
+            @Override
+            public void onCompleted() {}
+            @Override
+            public void onError(Throwable e) {}
+            @Override
+            public void onNext(MessageResult messageResult) {
+                messageApi.sendMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+                    @Override
+                    public void onCompleted() {}
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        messageStore.updateMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+                            @Override
+                            public void onCompleted() {}
+                            @Override
+                            public void onError(Throwable e) {}
+
+                            @Override
+                            public void onNext(MessageResult messageResult) {
+                                broadcastDeliveryReceipt(messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private void broadcastReceivedMessage(MessageResult messageId) {

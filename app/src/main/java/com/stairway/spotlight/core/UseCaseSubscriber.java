@@ -1,8 +1,6 @@
 package com.stairway.spotlight.core;
 
-import android.view.*;
-
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 
 import rx.Subscriber;
 

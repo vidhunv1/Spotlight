@@ -1,35 +1,27 @@
 package com.stairway.spotlight.screens.message;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -108,6 +100,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         super.onResume();
         messagePresenter.attachView(this);
         messagePresenter.getPresence(chatId);
+        messagePresenter.sendReadReceipt(chatId);
     }
 
     @Override
@@ -195,7 +188,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         if(messageResult.getChatId().equals(chatId)) {
             messagesAdapter.addMessage(messageResult);
             messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
-            messagePresenter.updateMessageSeen(messageResult);
+            messagePresenter.updateMessageRead(messageResult);
         }
     }
 

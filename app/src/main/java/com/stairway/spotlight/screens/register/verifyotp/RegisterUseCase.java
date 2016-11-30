@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.UserSessionStore;

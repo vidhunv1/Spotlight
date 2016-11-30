@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.launcher;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.UserSessionStore;
 import com.stairway.data.source.user.UserAuthApi;

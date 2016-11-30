@@ -15,6 +15,7 @@ public class MessageResult implements Serializable {
     private MessageStatus messageStatus;
     private String messageId;
     private String receiptId;
+    private boolean isReceiptSent;
 
     public String getReceiptId() {
         return receiptId;

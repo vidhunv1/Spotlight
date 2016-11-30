@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 
 import rx.Observable;
 

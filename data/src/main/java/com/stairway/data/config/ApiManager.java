@@ -1,4 +1,4 @@
-package com.stairway.data.manager;
+package com.stairway.data.config;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

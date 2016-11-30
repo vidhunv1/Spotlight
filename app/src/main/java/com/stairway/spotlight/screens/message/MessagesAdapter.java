@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
 
@@ -58,15 +58,26 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
     public void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         // TODO: Might be inefficient
-        int position = 0;
-        for(MessageResult m: messageList) {
+        MessageResult m;
+        boolean isBeforeReceiptId = false;
+        for(int i=messageList.size()-1; i>=0; i--) {
+            m = messageList.get(i);
             if(m.getReceiptId()!=null && !m.getReceiptId().isEmpty() && m.getReceiptId().equals(deliveryReceiptId)) {
-                m.setMessageStatus(messageStatus);
-                messageList.set(position, m);
-                this.notifyItemChanged(position);
-                break;
+                isBeforeReceiptId = true;
             }
-            position++;
+            if(isBeforeReceiptId) {
+                if (m.getMessageStatus() == messageStatus)
+                    return;
+                if (messageStatus == MessageResult.MessageStatus.NOT_SENT)
+                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
+                        return;
+                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
+                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
+                        return;
+                m.setMessageStatus(messageStatus);
+                messageList.set(i, m);
+                this.notifyItemChanged(i);
+            }
         }
     }
 
@@ -108,8 +119,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-//        @Bind(R.id.tv_messageItem_contactName)
-//        TextView contactName;
 
         @Bind(R.id.tv_messageitem_message)
         TextView message;
@@ -117,18 +126,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         @Bind(R.id.tv_messageitem_deliverystatus)
         TextView deliveryStatus;
 
-//        @Bind(R.id.tv_messageitem_deliverystatus)
-//        TextView deliveryStatus;
-
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         public void renderItem(MessageResult messageResult) {
-
             message.setText(messageResult.getMessage().trim());
-//            time.setText(messageResult.getTime());
             Logger.d("MsgResult : "+messageResult.getMessageStatus().name());
             if(messageResult.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT)
                 deliveryStatus.setText("  X");

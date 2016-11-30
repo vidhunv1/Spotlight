@@ -4,7 +4,7 @@ import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.di.module.DataModule;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
-import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
 import com.stairway.spotlight.screens.home.contacts.di.ContactListViewComponent;

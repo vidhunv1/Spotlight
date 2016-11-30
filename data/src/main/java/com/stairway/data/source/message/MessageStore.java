@@ -3,11 +3,10 @@ package com.stairway.data.source.message;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 
-import com.stairway.data.local.core.DatabaseManager;
-import com.stairway.data.local.core.SQLiteContract.MessagesContract;
-import com.stairway.data.manager.Logger;
+import com.stairway.data.db.core.DatabaseManager;
+import com.stairway.data.db.core.SQLiteContract.MessagesContract;
+import com.stairway.data.config.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,6 +98,45 @@ public class MessageStore {
         });
     }
 
+    // Get the last message for which read receipt is not sent.
+    public Observable<MessageResult> getLastUnsentReceipt(String chatId) {
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+            String selection = MessagesContract.COLUMN_CHAT_ID + " = ? AND "+MessagesContract.COLUMN_IS_RECEIPT_SENT+" = ?";
+            String[] selectionArgs = {chatId, "0"};
+            String[] columns = {
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT,
+                    MessagesContract.COLUMN_RECEIPT_ID};
+
+            try{
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_ROW_ID+" DESC", "1");
+                cursor.moveToFirst();
+                String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                String messageStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
+                String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+                String receiptId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_RECEIPT_ID));
+
+                MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
+                msg.setMessageId(messageId);
+                msg.setReceiptId(receiptId);
+                subscriber.onNext(msg);
+
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }});
+        }
+
     public Observable<MessageResult> storeMessage(MessageResult messageResult){
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
@@ -145,16 +183,62 @@ public class MessageStore {
         });
     }
 
+    public Observable<MessageResult> updateReadReceiptSent(MessageResult messageResult){
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+            ContentValues values = new ContentValues();
+            if(messageResult.getReceiptId()!=null && !messageResult.getReceiptId().isEmpty()) {
+                values.put(MessagesContract.COLUMN_IS_RECEIPT_SENT, 1);
+                db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_RECEIPT_ID+"='"+messageResult.getReceiptId()+"'", null);
+                subscriber.onNext(messageResult);
+                subscriber.onCompleted();
+            } else
+                subscriber.onError(new IllegalArgumentException("Receipt Id not specified"));
+            databaseManager.closeConnection();
+        });
+    }
+
     public Observable<Boolean> updateMessageStatus(String chatId, String receiptId, MessageResult.MessageStatus messageStatus){
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
             values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageStatus.name());
 
-            db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_RECEIPT_ID+"='"+receiptId+"' AND "+MessagesContract.COLUMN_CHAT_ID+"='"+chatId+"'", null);
+            db.update(MessagesContract.TABLE_NAME, values,
+                    MessagesContract.COLUMN_RECEIPT_ID+"='"+receiptId+"' AND "+MessagesContract.COLUMN_CHAT_ID+"='"+chatId+"'", null);
             subscriber.onNext(true);
             subscriber.onCompleted();
             databaseManager.closeConnection();
+        });
+    }
+
+    //updates all messages to 'messageStatus' before 'receiptId' was received to MessageStatus.read:
+    public Observable<Boolean> updateAllMessageStatus(String receiptId, MessageResult.MessageStatus messageStatus) {
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = MessagesContract.COLUMN_RECEIPT_ID+"= ?";
+            String[] selectionArgs = {receiptId};
+            String[] columns = {MessagesContract.COLUMN_ROW_ID, MessagesContract.COLUMN_CHAT_ID};
+
+            try {
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                cursor.moveToFirst();
+                int messageId = cursor.getInt(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+
+                ContentValues values = new ContentValues();
+                values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageStatus.name());
+
+                db.update(MessagesContract.TABLE_NAME, values, MessagesContract.COLUMN_ROW_ID+" <= "+messageId+" AND "
+                        +MessagesContract.COLUMN_CHAT_ID+"= '"+chatId+"'", null);
+
+                subscriber.onNext(true);
+                subscriber.onCompleted();
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                subscriber.onError(e);
+            }
         });
     }
 

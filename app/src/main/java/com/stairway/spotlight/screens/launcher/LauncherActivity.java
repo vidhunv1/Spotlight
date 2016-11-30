@@ -3,11 +3,10 @@ package com.stairway.spotlight.screens.launcher;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.application.SpotlightApplication;
-import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;

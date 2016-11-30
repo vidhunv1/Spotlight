@@ -1,4 +1,4 @@
-package com.stairway.data.local.core;
+package com.stairway.data.db.core;
 
 /**
  * Created by vidhun on 05/07/16.
@@ -31,6 +31,7 @@ public abstract class SQLiteContract {
         public static final String COLUMN_MESSAGE_STATUS = "delivery_status";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_RECEIPT_ID = "receipt_id";
+        public static final String COLUMN_IS_RECEIPT_SENT = "is_receipt_sent";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_CHAT_ID + " INTEGER, " +
@@ -38,6 +39,7 @@ public abstract class SQLiteContract {
                 COLUMN_MESSAGE + " TEXT, " +
                 COLUMN_MESSAGE_STATUS + " INTEGER, " +
                 COLUMN_RECEIPT_ID + " TEXT, " +
+                COLUMN_IS_RECEIPT_SENT + " INTEGER DEFAULT 0, " +
                 COLUMN_CREATED_AT+ " DATETIME);";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

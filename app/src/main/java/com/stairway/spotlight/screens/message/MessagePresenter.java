@@ -1,9 +1,13 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.manager.Logger;
+import com.stairway.data.config.Logger;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageResult;
+import com.stairway.data.xmpp.ReadReceiptExtension;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.List;
@@ -23,19 +27,22 @@ public class MessagePresenter implements MessageContract.Presenter {
     private GetPresenceUseCase getPresenceUseCase;
     private UpdateMessageUseCase updateMessageUseCase;
     private SendChatStateUseCase sendChatStateUseCase;
+    private SendReadReceiptUseCase sendReadReceiptUseCase;
 
     public MessagePresenter(LoadMessagesUseCase messageUseCase,
                             StoreMessageUseCase storeMessageUseCase,
                             SendMessageUseCase sendMessageUseCase,
                             GetPresenceUseCase getPresenceUseCase,
                             UpdateMessageUseCase updateMessageUseCase,
-                            SendChatStateUseCase sendChatStateUseCase) {
+                            SendChatStateUseCase sendChatStateUseCase,
+                            SendReadReceiptUseCase sendReadReceiptUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
         this.getPresenceUseCase = getPresenceUseCase;
         this.updateMessageUseCase = updateMessageUseCase;
         this.sendChatStateUseCase = sendChatStateUseCase;
+        this.sendReadReceiptUseCase = sendReadReceiptUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -55,12 +62,18 @@ public class MessagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void updateMessageSeen(MessageResult result) {
+    public void updateMessageRead(MessageResult result) {
         result.setMessageStatus(MessageResult.MessageStatus.SEEN);
         Subscription subscription = updateMessageUseCase.execute(result).subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
             @Override
             public void onResult(MessageResult result) {
-                //Updated message to seen
+                // send read receipt
+                sendReadReceiptUseCase.execute(result).subscribe(new UseCaseSubscriber<Boolean>(messageView) {
+                    @Override
+                    public void onResult(Boolean result) {
+                        // is_receipt_sent updated if true
+                    }
+                });
             }
         });
         compositeSubscription.add(subscription);
@@ -121,6 +134,18 @@ public class MessagePresenter implements MessageContract.Presenter {
                 });
 
         compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void sendReadReceipt(String chatId) {
+        Subscription subscription = sendReadReceiptUseCase.execute(chatId)
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<Boolean>(messageView) {
+                    @Override
+                    public void onResult(Boolean result) {
+                        //sent read receipt
+                    }
+                });
     }
 
     @Override
