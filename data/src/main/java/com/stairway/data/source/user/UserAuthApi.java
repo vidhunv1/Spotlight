@@ -37,6 +37,7 @@ public class UserAuthApi {
     public Observable<UserResponse> verifyUser(String countryCode, String mobile, String verificationCode){
         UserEndpoint userEndpoint = ApiManager.getInstance().create(UserEndpoint.class);
         User user = new User(countryCode, mobile);
+        user.setUserTypeRegular();
         user.setVerificationCode(verificationCode);
 
         UserRequest verifyRequest = new UserRequest();

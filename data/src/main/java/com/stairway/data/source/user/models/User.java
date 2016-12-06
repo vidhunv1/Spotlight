@@ -13,6 +13,14 @@ public class User {
         this.countryCode = countryCode;
     }
 
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserTypeRegular() {
+        this.userType = "regular";
+    }
+
     public User() {
     }
 
@@ -40,6 +48,24 @@ public class User {
     @SerializedName("notification_token")
     @Expose
     private String notificationToken;
+    @SerializedName("user_type")
+    @Expose
+    private String userType;
+    @SerializedName("user_id")
+    @Expose
+    private String userId;
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getNotificationToken() {
         return notificationToken;
