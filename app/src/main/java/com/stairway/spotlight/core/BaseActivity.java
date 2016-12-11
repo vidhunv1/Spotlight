@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.stairway.data.manager.Logger;
-import com.stairway.data.manager.XMPPManager;
+import com.stairway.data.config.Logger;
+import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;

@@ -51,4 +51,26 @@ public abstract class SQLiteContract {
                 COLUMN_MESSAGE+", "+COLUMN_MESSAGE_STATUS+" FROM "+TABLE_NAME+" WHERE "+COLUMN_CHAT_ID+"=?;";
 
     }
+
+    public static final class ContactsContract {
+        public static final String TABLE_NAME = "contacts";
+
+        public static final String COLUMN_ROW_ID = "rowid";
+        public static final String COLUMN_CONTACT_ID = "contact_id";
+        public static final String COLUMN_PHONE_NUMBER = "phone_number";
+        public static final String COLUMN_COUNTRY_CODE = "country_code";
+        public static final String COLUMN_CONTACT_NAME = "contact_name";
+        public static final String COLUMN_IS_REGISTERED = "is_registered";
+        public static final String COLUMN_IS_ADDED = "is_added";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_CONTACT_ID + " INTEGER, " +
+                COLUMN_PHONE_NUMBER + " TEXT, " +
+                COLUMN_COUNTRY_CODE + " TEXT, " +
+                COLUMN_IS_ADDED + "INTEGER, " +
+                COLUMN_IS_REGISTERED + "INTEGER, "+
+                COLUMN_CONTACT_NAME + " TEXT); ";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
 }

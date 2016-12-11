@@ -9,6 +9,8 @@ import com.stairway.spotlight.core.di.module.UtilModule;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
 import com.stairway.spotlight.screens.launcher.di.LauncherComponent;
 import com.stairway.spotlight.screens.launcher.di.LauncherModule;
+import com.stairway.spotlight.screens.register.initialize.di.InitializeViewComponent;
+import com.stairway.spotlight.screens.register.initialize.di.InitializeViewModule;
 import com.stairway.spotlight.screens.register.signup.di.SignUpViewComponent;
 import com.stairway.spotlight.screens.register.signup.di.SignUpViewModule;
 import com.stairway.spotlight.screens.register.verifyotp.di.VerifyOtpViewComponent;
@@ -36,6 +38,5 @@ public interface AppComponent {
     UserSessionComponent plus(UserSessionModule userSessionModule); // ComponentContainer
     VerifyOtpViewComponent plus(VerifyOtpViewModule verifyOtpViewModule);
     SignUpViewComponent plus(SignUpViewModule signUpViewModule);
-
     // Test
 }

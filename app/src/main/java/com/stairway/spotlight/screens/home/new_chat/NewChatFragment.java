@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.contacts;
+package com.stairway.spotlight.screens.home.new_chat;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,7 +12,7 @@ import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.home.contacts.di.ContactListViewModule;
+import com.stairway.spotlight.screens.home.new_chat.di.NewChatViewModule;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.ArrayList;
@@ -26,27 +26,27 @@ import butterknife.ButterKnife;
 /**
  * Created by vidhun on 01/09/16.
  */
-public class ContactListFragment extends BaseFragment implements ContactListContract.View, ContactListAdapter.ContactClickListener{
+public class NewChatFragment extends BaseFragment implements NewChatContract.View, NewChatAdapter.ContactClickListener{
     @Bind(R.id.rv_contact_list)
     RecyclerView contactList;
 
     @Inject
-    ContactListPresenter contactListPresenter;
+    NewChatPresenter newChatPresenter;
 
-    ContactListAdapter contactListAdapter;
+    NewChatAdapter newChatAdapter;
 
-    public ContactListFragment() {
+    public NewChatFragment() {
     }
 
-    public static ContactListFragment getInstance() {
-        ContactListFragment contactListFragment = new ContactListFragment();
-        return contactListFragment;
+    public static NewChatFragment getInstance() {
+        NewChatFragment newChatFragment = new NewChatFragment();
+        return newChatFragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contactListAdapter = new ContactListAdapter(getActivity(), this, new ArrayList<>());
+        newChatAdapter = new NewChatAdapter(getActivity(), this, new ArrayList<>());
     }
 
     @Nullable
@@ -57,7 +57,7 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
 
         Logger.d("[ContactListFragment] onCreateView");
         contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        contactList.setAdapter(contactListAdapter);
+        contactList.setAdapter(newChatAdapter);
 
         return view;
     }
@@ -70,34 +70,34 @@ public class ContactListFragment extends BaseFragment implements ContactListCont
     @Override
     public void onResume() {
         super.onResume();
-        contactListPresenter.attachView(this);
-        contactListPresenter.initContactList();
+        newChatPresenter.attachView(this);
+        newChatPresenter.initContactList();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        contactListPresenter.detachView();
+        newChatPresenter.detachView();
     }
 
     @Override
-    public void displayContactList(ArrayList<ContactListItemModel> contactListItemModels) {
+    public void displayContactList(ArrayList<NewChatItemModel> newChatItemModels) {
         Logger.d("Display contact list");
     }
 
     @Override
-    public void addContact(ContactListItemModel contactListItemModel) {
-        contactListAdapter.addContact(contactListItemModel);
+    public void addContact(NewChatItemModel newChatItemModel) {
+        newChatAdapter.addContact(newChatItemModel);
     }
 
     @Override
-    public void addContacts(List<ContactListItemModel> contactListItemModel) {
-        contactListAdapter.addContacts(contactListItemModel);
+    public void addContacts(List<NewChatItemModel> newChatItemModel) {
+        newChatAdapter.addContacts(newChatItemModel);
     }
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new ContactListViewModule()).inject(this);
+        componentContainer.userSessionComponent().plus(new NewChatViewModule()).inject(this);
     }
 
     @Override

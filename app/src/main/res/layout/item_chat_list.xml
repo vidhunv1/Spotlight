@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:text="New Text"
                     android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="14sp"
+                    android:paddingRight="14dp"
                     android:textAlignment="viewEnd"
                     android:textSize="12sp"
                     android:textColor="#1da1f2"
@@ -67,9 +67,10 @@
                     android:textColor="#80000000"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
-                    android:paddingTop="1.1dp"
-                    android:paddingBottom="1.1dp"
-                    android:paddingRight="20dp"/>
+                    android:paddingTop="1.125dp"
+                    android:paddingBottom="1.125dp"
+                    android:paddingRight="20dp"
+                    android:layout_marginTop="2dp" />
 
             </LinearLayout>
         </LinearLayout>

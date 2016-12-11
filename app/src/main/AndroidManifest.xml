@@ -3,6 +3,7 @@
     package="com.stairway.spotlight">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -23,7 +24,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".screens.message.MessageActivity" android:icon="@drawable/default_profile_image"/>
-        <activity android:name=".screens.home.contacts.ContactListFragment" />
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"

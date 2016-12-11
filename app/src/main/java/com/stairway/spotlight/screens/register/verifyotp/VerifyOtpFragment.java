@@ -1,7 +1,14 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +19,13 @@ import android.widget.Toast;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.data.source.user.gson_models.User;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.di.component.UserSessionComponent;
 import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.screens.register.initialize.InitializeFragment;
 import com.stairway.spotlight.screens.register.verifyotp.di.VerifyOtpViewModule;
 
 import javax.inject.Inject;
@@ -104,11 +114,16 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     }
 
     @Override
-    public void navigateToHome(UserSessionResult userSessionResult) {
-        Logger.d("Navigate to home");
+    public void navigateToInitializeFragment(UserSessionResult userSessionResult) {
         componentContainer.initUserSession(userSessionResult);
-        startActivity(HomeActivity.callingIntent(getActivity()));
-        getActivity().finish();
+
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, InitializeFragment.getInstance());
+//      fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+        fragmentTransaction.commit();
+
+//        startActivity(HomeActivity.callingIntent(getActivity()));
+//        getActivity().finish();
     }
 
     @Override

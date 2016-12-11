@@ -1,98 +1,77 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFFFF"
     android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_keyboard"
+        android:id="@+id/ll_keyboard"
+        android:layout_height="48dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentBottom="true"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true">
 
-    <RelativeLayout
-        android:id="@+id/container"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFFFF"
-            android:id="@+id/ll_keyboard"
-            android:layout_alignParentBottom="true"
-            android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true">
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:id="@+id/et_sendmessage_message"
-                android:layout_gravity="center_horizontal"
-                android:background="@android:color/transparent"
-                android:hint="Type a message"
-                android:paddingLeft="8dp"
-                android:textSize="16dp"
-                android:textColorHint="#FFD9D9D9" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:paddingTop="6.25dp">
-
-                <ImageButton
-                    android:layout_width="72dp"
-                    android:layout_height="37dp"
-                    android:id="@+id/imageView2"
-                    android:src="@drawable/ic_keyboard_smiley"
-                    android:background="#FFFFFFFF"
-                    android:paddingBottom="9.75dp"
-                    android:paddingTop="6.25dp" />
-
-                <ImageButton
-                    android:layout_width="72dp"
-                    android:layout_height="37dp"
-                    android:id="@+id/imageView"
-                    android:background="#FFFFFFFF"
-                    android:paddingBottom="11.5dp"
-                    android:paddingTop="9.5dp"
-                    android:src="@drawable/ic_keyboard_camera" />
-
-                <ImageButton
-                    android:layout_width="72dp"
-                    android:layout_height="37dp"
-                    android:id="@+id/imageView4"
-                    android:background="#FFFFFFFF"
-                    android:paddingBottom="9.75dp"
-                    android:paddingTop="6.25dp"
-                    android:src="@drawable/ic_keyboard_audio" />
-
-                <ImageButton
-                    android:layout_width="72dp"
-                    android:layout_height="37dp"
-                    android:id="@+id/imageView3"
-                    android:background="#FFFFFFFF"
-                    android:paddingBottom="9.75dp"
-                    android:paddingTop="6.25dp"
-                    android:src="@drawable/ic_keyboard_gallery" />
-
-                <ImageButton
-                    android:layout_width="72dp"
-                    android:layout_height="37dp"
-                    android:paddingBottom="9.75dp"
-                    android:paddingTop="6.25dp"
-                    android:background="#FFFFFFFF"
-                    android:src="@drawable/ic_keyboard_plus"
-                    android:id="@+id/btn_sendMessage_send" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/rv_messageitem"
-            android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:layout_width="48dp"
             android:layout_height="match_parent"
-            android:background="#FFD9D9D9"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentTop="false"
-            android:layout_above="@id/ll_keyboard"
-            />
-    </RelativeLayout>
-</LinearLayout>
+            android:src="@drawable/ic_keyboard_smiley"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:paddingEnd="14dp"
+            android:paddingStart="14dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/imageButton" />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:id="@+id/et_sendmessage_message"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:hint="Type a message"
+            android:ems="10"
+            android:textSize="16dp"
+            android:textColorHint="#FFD9D9D9" />
+
+        <ImageButton
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_keyboard_plus"
+            android:paddingTop="17dp"
+            android:paddingBottom="17dp"
+            android:paddingEnd="14dp"
+            android:paddingStart="14dp"
+            android:id="@+id/imageButton3"
+            android:background="@android:color/transparent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_width="42dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_keyboard_audio"
+            android:id="@+id/btn_sendMessage_send"
+            android:background="@android:color/transparent"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rv_messageitem"
+        android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFFFF"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="false"
+        android:layout_above="@+id/ll_keyboard" />
+</RelativeLayout>

@@ -158,7 +158,7 @@ public class MessageStore {
         });
     }
 
-    public Observable<MessageResult> updateMessage(MessageResult messageResult){
+    public Observable<MessageResult> updateMessage(MessageResult messageResult) {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
@@ -375,7 +375,7 @@ public class MessageStore {
                         MessagesContract.COLUMN_ROW_ID+" DESC;", null);
                 cursor.moveToFirst();
 
-                while(!cursor.isAfterLast()) {
+                while(!cursor.isAfterLast() && cursor.getCount()>0) {
                     String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                     String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));

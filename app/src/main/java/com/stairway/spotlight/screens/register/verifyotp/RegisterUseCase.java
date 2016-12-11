@@ -4,7 +4,7 @@ import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.UserSessionStore;
-import com.stairway.data.source.user.models.UserResponse;
+import com.stairway.data.source.user.gson_models.UserResponse;
 
 import javax.inject.Inject;
 

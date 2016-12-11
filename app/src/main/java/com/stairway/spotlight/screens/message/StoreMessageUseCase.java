@@ -24,6 +24,7 @@ public class StoreMessageUseCase {
 
     public Observable<MessageResult> execute(MessageResult message) {
         Observable<MessageResult> storeMessage = Observable.create(subscriber -> {
+            message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
             messageStore.storeMessage(message).subscribe(new Subscriber<MessageResult>() {
                 @Override
                 public void onCompleted() {

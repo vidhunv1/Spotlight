@@ -57,7 +57,7 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.95dp">
+                android:layout_marginTop="2dp">
 
                 <TextView
                     android:layout_width="240dp"
@@ -67,12 +67,12 @@
                     android:textColor="#80000000"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
-                    android:paddingTop="1.1dp"
-                    android:paddingBottom="1.1dp" />
+                    android:paddingTop="1.125dp"
+                    android:paddingBottom="1.125dp" />
 
                 <TextView
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
+                    android:layout_width="20.75dp"
+                    android:layout_height="20.75dp"
                     tools:ignore="MissingPrefix"
                     fontPath="fonts/din_medium.otf"
                     android:text="1"
@@ -82,7 +82,7 @@
                     android:textSize="11sp"
                     android:textColor="#ffffff"
                     android:maxLines="1"
-                    android:background="@drawable/chat_notification_background" />
+                    android:background="@drawable/bg_chat_notification" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

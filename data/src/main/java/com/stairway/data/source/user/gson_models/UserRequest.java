@@ -1,4 +1,4 @@
-package com.stairway.data.source.user.models;
+package com.stairway.data.source.user.gson_models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,16 +8,16 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class UserRequest {
+    @SerializedName("user")
+    @Expose
+    private User user;
+
     public UserRequest(String countryCode, String mobile) {
         this.user = new User(countryCode, mobile);
     }
 
     public UserRequest(){
     }
-
-    @SerializedName("user")
-    @Expose
-    private User user;
 
     public User getUser() {
         return user;

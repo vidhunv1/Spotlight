@@ -7,8 +7,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserAuthApi;
-import com.stairway.data.source.user.models.User;
-import com.stairway.data.source.user.models.UserResponse;
+import com.stairway.data.source.user.gson_models.User;
+import com.stairway.data.source.user.gson_models.UserResponse;
 
 import rx.Subscriber;
 

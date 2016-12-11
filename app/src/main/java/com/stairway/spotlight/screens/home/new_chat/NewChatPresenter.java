@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.contacts;
+package com.stairway.spotlight.screens.home.new_chat;
 
 import com.stairway.data.config.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
@@ -11,18 +11,18 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by vidhun on 01/09/16.
  */
-public class ContactListPresenter implements ContactListContract.Presenter {
-    private ContactListContract.View contactsView;
-    private GetContactsUseCase getContactsUseCase;
+public class NewChatPresenter implements NewChatContract.Presenter {
+    private NewChatContract.View contactsView;
+    private GetNewChatsUseCase getNewChatsUseCase;
     private CompositeSubscription compositeSubscription;
 
-    public ContactListPresenter(GetContactsUseCase getContactsUseCase) {
-        this.getContactsUseCase = getContactsUseCase;
+    public NewChatPresenter(GetNewChatsUseCase getNewChatsUseCase) {
+        this.getNewChatsUseCase = getNewChatsUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void attachView(ContactListContract.View view) {
+    public void attachView(NewChatContract.View view) {
         this.contactsView = view;
     }
 
@@ -36,11 +36,11 @@ public class ContactListPresenter implements ContactListContract.Presenter {
     public void initContactList() {
         Logger.d("ContactsPresenter");
 
-        Subscription subscription = getContactsUseCase.execute()
+        Subscription subscription = getNewChatsUseCase.execute()
                 .observeOn(contactsView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<List<ContactListItemModel>>(contactsView) {
+                .subscribe(new UseCaseSubscriber<List<NewChatItemModel>>(contactsView) {
                     @Override
-                    public void onResult(List<ContactListItemModel> result) {
+                    public void onResult(List<NewChatItemModel> result) {
                         contactsView.addContacts(result);
                     }
                 });

@@ -1,18 +1,12 @@
 package com.stairway.spotlight.screens.home;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,14 +20,14 @@ import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.data.source.user.models.User;
-import com.stairway.data.source.user.models.UserResponse;
+import com.stairway.data.source.user.gson_models.User;
+import com.stairway.data.source.user.gson_models.UserResponse;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
-import com.stairway.spotlight.screens.home.contacts.ContactListFragment;
+import com.stairway.spotlight.screens.home.new_chat.NewChatFragment;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -50,7 +44,7 @@ public class HomeActivity extends BaseActivity
     ChatListFragment chatListFragment;
     private Toolbar toolbar;
     private static String TITLE_HOME = "Messages";
-    private static String TITLE_CONTACTS = "Contacts";
+    private static String TITLE_NEW_CHAT = "New Chat";
     private static String TITLE_PROFILE = "Profile";
 
     public static Intent callingIntent(Context context) {
@@ -69,12 +63,12 @@ public class HomeActivity extends BaseActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Permissions
-        int MyVersion = Build.VERSION.SDK_INT;
-        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            if (!checkIfAlreadyhavePermission()) {
-                requestForSpecificPermission();
-            }
-        }
+//        int MyVersion = Build.VERSION.SDK_INT;
+//        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+//            if (!checkIfAlreadyhavePermission()) {
+//                requestForSpecificPermission();
+//            }
+//        }
 
         setChatFragment();
 
@@ -171,12 +165,12 @@ public class HomeActivity extends BaseActivity
 
     private void setContactsFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, ContactListFragment.getInstance());
+        fragmentTransaction.replace(R.id.register_FragmentContainer, NewChatFragment.getInstance());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
         toggle.setDrawerIndicatorEnabled(false);
-        toolbar.setTitle(TITLE_CONTACTS);
+        toolbar.setTitle(TITLE_NEW_CHAT);
         fab.setVisibility(View.GONE);
         chatListFragment = null;
     }
@@ -205,32 +199,32 @@ public class HomeActivity extends BaseActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private boolean checkIfAlreadyhavePermission() {
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else
-            return false;
-    }
-
-    private void requestForSpecificPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 101:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //granted
-                } else {
-                    //not granted
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
+//    private boolean checkIfAlreadyhavePermission() {
+//        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+//        if (result == PackageManager.PERMISSION_GRANTED) {
+//            return true;
+//        } else
+//            return false;
+//    }
+//
+//    private void requestForSpecificPermission() {
+//        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
+//    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode) {
+//            case 101:
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    //granted
+//                } else {
+//                    //not granted
+//                }
+//                break;
+//            default:
+//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+//    }
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {

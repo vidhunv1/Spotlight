@@ -1,10 +1,13 @@
 package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
@@ -20,7 +23,7 @@ import butterknife.ButterKnife;
 /**
  * Created by vidhun on 07/08/16.
  */
-public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder>{
+public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     //TODO: Change to cursor recycler view adapter.
 
     private Context context;
@@ -61,19 +64,25 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         MessageResult m;
         boolean isBeforeReceiptId = false;
         for(int i=messageList.size()-1; i>=0; i--) {
+            if(messageStatus == MessageResult.MessageStatus.DELIVERED)
+                return;
             m = messageList.get(i);
             if(m.getReceiptId()!=null && !m.getReceiptId().isEmpty() && m.getReceiptId().equals(deliveryReceiptId)) {
                 isBeforeReceiptId = true;
             }
             if(isBeforeReceiptId) {
-                if (m.getMessageStatus() == messageStatus)
+                if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
                     return;
                 if (messageStatus == MessageResult.MessageStatus.NOT_SENT)
-                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
-                        return;
-                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
+                    return;
+//                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
+//                        return;
+//                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
+                if (messageStatus == MessageResult.MessageStatus.SENT)
                     if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
                         return;
+//                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
+//                        return;
 
                 if(!m.getChatId().equals(m.getFromId())) {
                     m.setMessageStatus(messageStatus);
@@ -85,68 +94,99 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     }
 
     @Override
-    public int getItemCount() {
-        return messageList.size();
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder viewHolder = null;
-        switch (viewType) {
-            case VIEW_TYPE_SEND:
-                View view1 = LayoutInflater
-                        .from(parent.getContext())
-                        .inflate(R.layout.item_message_receive, parent, false);
-                viewHolder = new ViewHolder(view1);
-                break;
-            case VIEW_TYPE_RECV:
-                View view2 = LayoutInflater
-                        .from(parent.getContext())
-                        .inflate(R.layout.item_message_send, parent, false);
-                viewHolder = new ViewHolder(view2);
-                break;
-        }
-        return viewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.renderItem(messageList.get(position));
-    }
-
-    @Override
     public int getItemViewType(int position) {
         if(messageList.get(position).getChatId().equals(messageList.get(position).getFromId()))
             return VIEW_TYPE_SEND;
         return VIEW_TYPE_RECV;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemCount() {
+        return messageList.size();
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        switch (viewType) {
+            case VIEW_TYPE_SEND:
+                View view1 = inflater.inflate(R.layout.item_message_receive, parent, false);
+                viewHolder = new ReceiveViewHolder(view1);
+                break;
+            case VIEW_TYPE_RECV:
+                View view2 = inflater.inflate(R.layout.item_message_send, parent, false);
+                viewHolder = new SendViewHolder(view2);
+                break;
+            default:
+                return null;
+        }
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_RECV:
+                SendViewHolder sendViewHolder = (SendViewHolder) holder;
+                sendViewHolder.renderItem(messageList.get(position));
+                break;
+            case VIEW_TYPE_SEND:
+                ReceiveViewHolder receiveViewHolder = (ReceiveViewHolder) holder;
+                if(position>0 && messageList.get(position-1).getChatId().equals(messageList.get(position-1).getFromId()))
+                    receiveViewHolder.renderItem(messageList.get(position), false);
+                else
+                    receiveViewHolder.renderItem(messageList.get(position), true);
+                break;
+        }
+    }
+
+    public class SendViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
         TextView message;
 
-        @Bind(R.id.tv_messageitem_deliverystatus)
-        TextView deliveryStatus;
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatus;
 
-        public ViewHolder(View itemView) {
+        public SendViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         public void renderItem(MessageResult messageResult) {
             message.setText(messageResult.getMessage().trim());
-            Logger.d("MsgResult : "+messageResult.getMessageStatus().name());
             if(messageResult.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT)
-                deliveryStatus.setText("  X");
-            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.SENT)
-                deliveryStatus.setText("  S");
-            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.DELIVERED)
-                deliveryStatus.setText("  D");
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
+            if(messageResult.getMessageStatus() == MessageResult.MessageStatus.SENT)
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
             else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.READ)
-                deliveryStatus.setText("  R");
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
+//            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.DELIVERED)
+        }
+    }
+
+    public class ReceiveViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.tv_messageitem_message)
+        TextView message;
+
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImage;
+
+        public ReceiveViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void renderItem(MessageResult messageResult, boolean displayProfileDP) {
+            message.setText(messageResult.getMessage().trim());
+
+            if(displayProfileDP)
+                profileImage.setImageAlpha(255);
             else
-                deliveryStatus.setText("");
+                profileImage.setImageAlpha(0);
         }
     }
 }

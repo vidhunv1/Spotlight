@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.register.signup;
 
 import com.stairway.data.source.user.UserAuthApi;
-import com.stairway.data.source.user.models.StatusResponse;
+import com.stairway.data.source.user.gson_models.StatusResponse;
 
 import javax.inject.Inject;
 

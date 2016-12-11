@@ -12,7 +12,7 @@ import com.stairway.data.config.Logger;
 public class SQLiteHelper extends SQLiteOpenHelper{
     private static final String TAG = "SQLiteHelper";
 
-    public static final int DATABASE_VERSION = 11;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "spotlight.db";
 
     public SQLiteHelper(Context context)
@@ -25,6 +25,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     {
         db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
         db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
     }
 
     @Override
@@ -32,6 +33,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     {
         db.execSQL(SQLiteContract.GenericCacheContract.SQL_DELETE_TABLE);
         db.execSQL(SQLiteContract.MessagesContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.ContactsContract.SQL_DELETE_TABLE);
         onCreate(db);
         Logger.d("Sqlite Cache database upgraded");
     }

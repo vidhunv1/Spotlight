@@ -9,7 +9,7 @@ import com.stairway.spotlight.core.BaseView;
  */
 public interface VerifyOtpContract {
     interface View extends BaseView {
-        void navigateToHome(UserSessionResult userSessionResult);
+        void navigateToInitializeFragment(UserSessionResult userSessionResult);
         void invalidOtpError();
     }
 

@@ -1,11 +1,10 @@
 package com.stairway.spotlight.application;
 
 import android.app.Application;
-import android.content.Context;
 
-
-import com.stairway.data.local.core.DatabaseManager;
-import com.stairway.data.manager.Logger;
+import com.facebook.stetho.Stetho;
+import com.stairway.data.config.Logger;
+import com.stairway.data.db.core.DatabaseManager;
 import com.stairway.spotlight.core.di.component.AppComponent;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.di.component.DaggerAppComponent;
@@ -14,7 +13,6 @@ import com.stairway.spotlight.core.di.module.DataModule;
 import com.stairway.spotlight.core.di.module.UtilModule;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by vidhun on 05/07/16.
@@ -32,23 +30,23 @@ public class SpotlightApplication extends Application {
 
 
         // Setting default font
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/din_regular.otf")
-                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
-                .build());
+//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+//                .setDefaultFontPath("fonts/din_regular.otf")
+//                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
+//                .build());
 
 
 
-//        if(com.stairway.spotlight.BuildConfig.DEBUG) {
-//            // Initialize facebook Stetho
-//            Stetho.initialize(
-//                    Stetho.newInitializerBuilder(this)
-//                            .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-//                            .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
-//                            .build());
+        if(com.stairway.spotlight.BuildConfig.DEBUG) {
+            // Initialize facebook Stetho
+            Stetho.initialize(
+                    Stetho.newInitializerBuilder(this)
+                            .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                            .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                            .build());
 
             Logger.init();
-//        }
+        }
 
     }
 

@@ -1,18 +1,18 @@
-package com.stairway.spotlight.screens.home.contacts;
+package com.stairway.spotlight.screens.home.new_chat;
 
 /**
  * Created by vidhun on 31/08/16.
  */
-public class ContactListItemModel {
+public class NewChatItemModel {
     private String contactName;
     private boolean inviteFlag;
     private String chatId;
     private String mobileNumber;
 
-    public ContactListItemModel() {
+    public NewChatItemModel() {
     }
 
-    public ContactListItemModel(String contactName, boolean inviteFlag, String chatId, String mobileNumber) {
+    public NewChatItemModel(String contactName, boolean inviteFlag, String chatId, String mobileNumber) {
         this.contactName = contactName;
         this.inviteFlag = inviteFlag;
         this.chatId = chatId;

@@ -2,6 +2,8 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,13 +85,12 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         messageItem.setAdapter(messagesAdapter);
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
+        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
         ab.setCustomView(R.layout.actionbar_message_name);
 
         View v =getSupportActionBar().getCustomView();
         presenceTextView = (TextView) v.findViewById(R.id.tv_message_presence);
-        ImageButton profileDP = (ImageButton) v.findViewById(R.id.actionbar_message_profile);
-        profileDP.setOnClickListener(v1 -> startActivity(UserProfileActivity.callingIntent(getBaseContext(), "12")));
         messagePresenter.attachView(this);
         Logger.d("ChatId: "+chatId+", CurrentUser:"+currentUser);
         messagePresenter.loadMessages(chatId);
@@ -141,7 +142,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
                 currentChatState = ChatState.composing;
             }
         } else {
-            sendImageButton.setImageResource(R.drawable.ic_keyboard_plus);
+            sendImageButton.setImageResource(R.drawable.ic_keyboard_audio);
             if(currentChatState != ChatState.paused) {
                 messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_PAUSED);
                 currentChatState = ChatState.paused;
@@ -156,6 +157,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     @Override
     public void addMessageToList(MessageResult message) {
+        Logger.i("Add message:"+message.toString());
         messagesAdapter.addMessage(message);
         messageItem.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
@@ -206,6 +208,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
+        Logger.d("Message Status:"+messageStatus.name());
         if(this.chatId.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }

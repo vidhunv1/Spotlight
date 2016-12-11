@@ -1,4 +1,4 @@
-package com.stairway.data.source.user.models;
+package com.stairway.data.source.user.gson_models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

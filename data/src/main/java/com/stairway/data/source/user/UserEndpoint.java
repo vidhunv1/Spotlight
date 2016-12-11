@@ -1,8 +1,8 @@
 package com.stairway.data.source.user;
 
-import com.stairway.data.source.user.models.UserRequest;
-import com.stairway.data.source.user.models.StatusResponse;
-import com.stairway.data.source.user.models.UserResponse;
+import com.stairway.data.source.user.gson_models.UserRequest;
+import com.stairway.data.source.user.gson_models.StatusResponse;
+import com.stairway.data.source.user.gson_models.UserResponse;
 
 import retrofit2.http.Body;
 import retrofit2.http.POST;

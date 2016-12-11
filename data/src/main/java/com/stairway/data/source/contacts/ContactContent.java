@@ -21,7 +21,7 @@ import rx.Observable;
 /**
  * Created by vidhun on 01/09/16.
  */
-public class ContactsContent {
+public class ContactContent {
     private static final String CONTACT_NAME = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY;
     private static final String CONTACT_NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
     private static final String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
@@ -29,7 +29,7 @@ public class ContactsContent {
 
     private Context context;
 
-    public ContactsContent(Context context) {
+    public ContactContent(Context context) {
         this.context = context;
     }
 
@@ -38,10 +38,10 @@ public class ContactsContent {
 
     Contacts are sorted in ASC.
      */
-    public Observable<List<ContactsResult>> getContacts() {
+    public Observable<List<ContactResult>> getContacts() {
         Logger.d("ContactsContent: ");
 
-        Observable<List<ContactsResult>> getContacts = Observable.create(
+        Observable<List<ContactResult>> getContacts = Observable.create(
                 subscriber -> {
                     PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
                     String defaultCountryIso = context.getResources().getConfiguration().locale.getCountry();
@@ -49,7 +49,7 @@ public class ContactsContent {
                     Phonenumber.PhoneNumber contactNumberFormat;
 
                     ContentResolver cr = context.getContentResolver();
-                    Set<ContactsResult> contactsResults = new HashSet<>();
+                    Set<ContactResult> contactResults = new HashSet<>();
                     try{
 
                         String sortOrder = CONTACT_NAME  + " COLLATE LOCALIZED ASC";
@@ -68,16 +68,21 @@ public class ContactsContent {
                                 while (pCur.moveToNext())
                                 {
                                     contactName = pCur.getString(pCur.getColumnIndex(CONTACT_NAME));
+                                    contactNumber = pCur.getString(pCur.getColumnIndex(CONTACT_NUMBER)).replaceAll("[^\\d-]", "");
+                                    Logger.d("name: "+contactName+", number:"+contactNumber);
 
-                                    contactNumber = pCur.getString(pCur.getColumnIndex(CONTACT_NUMBER));
+                                    if(contactNumber.length()<10)
+                                        continue;
+
                                     contactNumberFormat = phoneNumberUtil.parse(contactNumber, defaultCountryIso);
-
                                     if(phoneNumberUtil.isValidNumber(contactNumberFormat)) {
                                         String countryCode = Integer.toString(contactNumberFormat.getCountryCode());
                                         String mobileNumber = Long.toString(contactNumberFormat.getNationalNumber());
                                         contactNumberFormatted = contactNumberFormat.getCountryCode() + "-" + String.valueOf(contactNumberFormat.getNationalNumber());
 
-                                        contactsResults.add(new ContactsResult(contactNumberFormatted, countryCode, mobileNumber, contactName));
+                                        ContactResult contactResult = new ContactResult(contactNumberFormatted, countryCode, mobileNumber, contactName);
+
+                                        contactResults.add(contactResult);
                                     }
                                     break;
                                 }
@@ -86,11 +91,11 @@ public class ContactsContent {
                             cursor.moveToNext();
                         }
 
-                        List<ContactsResult> res= new ArrayList<ContactsResult>();
-                        res.addAll(contactsResults);
-                        Collections.sort(res, new Comparator<ContactsResult>() {
+                        List<ContactResult> res= new ArrayList<ContactResult>();
+                        res.addAll(contactResults);
+                        Collections.sort(res, new Comparator<ContactResult>() {
                             @Override
-                            public int compare(ContactsResult contactsResult, ContactsResult t1) {
+                            public int compare(ContactResult contactsResult, ContactResult t1) {
                                 return contactsResult.getDisplayName().compareTo(t1.getDisplayName());
                             }
                         });
