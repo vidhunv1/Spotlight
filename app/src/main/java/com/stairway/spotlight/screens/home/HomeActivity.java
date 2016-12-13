@@ -6,15 +6,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
@@ -33,6 +33,7 @@ import com.stairway.spotlight.screens.home.profile.ProfileFragment;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import rx.Subscriber;
+
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
 public class HomeActivity extends BaseActivity
@@ -61,14 +62,6 @@ public class HomeActivity extends BaseActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // Permissions
-//        int MyVersion = Build.VERSION.SDK_INT;
-//        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
-//            if (!checkIfAlreadyhavePermission()) {
-//                requestForSpecificPermission();
-//            }
-//        }
 
         setChatFragment();
 
@@ -198,33 +191,6 @@ public class HomeActivity extends BaseActivity
         toolbar.setTitle(TITLE_HOME);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
-//    private boolean checkIfAlreadyhavePermission() {
-//        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-//        if (result == PackageManager.PERMISSION_GRANTED) {
-//            return true;
-//        } else
-//            return false;
-//    }
-//
-//    private void requestForSpecificPermission() {
-//        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        switch (requestCode) {
-//            case 101:
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    //granted
-//                } else {
-//                    //not granted
-//                }
-//                break;
-//            default:
-//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        }
-//    }
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {

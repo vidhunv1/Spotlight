@@ -15,4 +15,11 @@ public class ContactResponse {
     public Contact getContact() {
         return contact;
     }
+
+    @Override
+    public String toString() {
+        return "ContactResponse{" +
+                "contact=" + contact +
+                '}';
+    }
 }

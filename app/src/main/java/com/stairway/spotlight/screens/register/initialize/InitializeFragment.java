@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
@@ -14,7 +16,10 @@ import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.register.initialize.di.InitializeViewModule;
 
 import javax.inject.Inject;
+
+import butterknife.Bind;
 import butterknife.ButterKnife;
+
 
 /**
  * Created by vidhun on 09/12/16.
@@ -22,6 +27,9 @@ import butterknife.ButterKnife;
 public class InitializeFragment extends BaseFragment implements InitializeContract.View{
     @Inject
     InitializePresenter initializePresenter;
+
+    @Bind(R.id.tv_fragment_initialize)
+    TextView initializeText;
 
     UserSessionResult userSession;
 
@@ -52,6 +60,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     public void onResume() {
         super.onResume();
         initializePresenter.attachView(this);
+        initializeText.setText("Initializing...");
         initializePresenter.syncContacts(userSession.getAccessToken());
     }
 
@@ -62,6 +71,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
 
     @Override
     public void navigateToHome() {
+        Logger.d("Navigate to home");
         startActivity(HomeActivity.callingIntent(getActivity()));
         getActivity().finish();
     }

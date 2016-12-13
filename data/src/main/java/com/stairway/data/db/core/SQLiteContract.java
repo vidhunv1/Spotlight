@@ -62,14 +62,17 @@ public abstract class SQLiteContract {
         public static final String COLUMN_CONTACT_NAME = "contact_name";
         public static final String COLUMN_IS_REGISTERED = "is_registered";
         public static final String COLUMN_IS_ADDED = "is_added";
+        public static final String COLUMN_USERNAME = "username";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_CONTACT_ID + " INTEGER, " +
                 COLUMN_PHONE_NUMBER + " TEXT, " +
                 COLUMN_COUNTRY_CODE + " TEXT, " +
-                COLUMN_IS_ADDED + "INTEGER, " +
-                COLUMN_IS_REGISTERED + "INTEGER, "+
-                COLUMN_CONTACT_NAME + " TEXT); ";
+                COLUMN_IS_ADDED + " INTEGER, " +
+                COLUMN_USERNAME + " TEXT, "+
+                COLUMN_IS_REGISTERED + " INTEGER, "+
+                COLUMN_CONTACT_NAME + " TEXT, " +
+                "UNIQUE("+COLUMN_CONTACT_ID+") ON CONFLICT REPLACE); ";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }

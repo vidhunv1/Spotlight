@@ -28,12 +28,13 @@ public class ContactStore {
     public Observable<ContactResult> storeContact(ContactResult contactResult){
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
-
             ContentValues values = new ContentValues();
             values.put(ContactsContract.COLUMN_CONTACT_ID, contactResult.getContactId());
             values.put(ContactsContract.COLUMN_CONTACT_NAME, contactResult.getDisplayName());
             values.put(ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
             values.put(ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
+            values.put(ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
+            values.put(ContactsContract.COLUMN_IS_REGISTERED, contactResult.isRegistered());
 
             long rowId = db.insert(ContactsContract.TABLE_NAME, null, values);
             subscriber.onNext(contactResult);
@@ -55,7 +56,8 @@ public class ContactStore {
                     ContactsContract.COLUMN_COUNTRY_CODE,
                     ContactsContract.COLUMN_PHONE_NUMBER,
                     ContactsContract.COLUMN_IS_ADDED,
-                    ContactsContract.COLUMN_IS_REGISTERED
+                    ContactsContract.COLUMN_IS_REGISTERED,
+                    ContactsContract.COLUMN_USERNAME
             };
 
             try {
@@ -67,12 +69,14 @@ public class ContactStore {
                     String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_NAME));
                     String countryCode = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_COUNTRY_CODE));
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_PHONE_NUMBER));
+                    String username = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USERNAME));
                     boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_REGISTERED)) == 1);
                     boolean isAdded = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_ADDED)) == 1);
 
                     ContactResult contactResult = new ContactResult(contactId, countryCode, phoneNumber, contactName);
                     contactResult.setAdded(isAdded);
                     contactResult.setRegistered(isRegistered);
+                    contactResult.setUsername(username);
                     result.add(contactResult);
 
                     cursor.moveToNext();
@@ -86,7 +90,6 @@ public class ContactStore {
                 Logger.e("ContactStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
-                subscriber.onCompleted();
             }
         });
     }

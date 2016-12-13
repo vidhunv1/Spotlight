@@ -68,8 +68,7 @@ public class ContactContent {
                                 while (pCur.moveToNext())
                                 {
                                     contactName = pCur.getString(pCur.getColumnIndex(CONTACT_NAME));
-                                    contactNumber = pCur.getString(pCur.getColumnIndex(CONTACT_NUMBER)).replaceAll("[^\\d-]", "");
-                                    Logger.d("name: "+contactName+", number:"+contactNumber);
+                                    contactNumber = pCur.getString(pCur.getColumnIndex(CONTACT_NUMBER));
 
                                     if(contactNumber.length()<10)
                                         continue;

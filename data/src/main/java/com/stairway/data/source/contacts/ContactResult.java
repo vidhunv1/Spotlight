@@ -8,6 +8,7 @@ public class ContactResult {
     private String phoneNumber;
     private String countryCode;
     private String contactName;
+    private String username;
     private boolean isRegistered;
     private boolean isAdded;
 
@@ -61,6 +62,14 @@ public class ContactResult {
         return phoneNumber;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getDisplayName() {
         return contactName;
     }
@@ -79,10 +88,14 @@ public class ContactResult {
 
     @Override
     public String toString() {
-        return "ContactsResult{" +
-                "contactId=" + contactId +
+        return "ContactResult{" +
+                "contactId='" + contactId + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", countryCode='" + countryCode + '\'' +
                 ", contactName='" + contactName + '\'' +
+                ", username='" + username + '\'' +
+                ", isRegistered=" + isRegistered +
+                ", isAdded=" + isAdded +
                 '}';
     }
 
