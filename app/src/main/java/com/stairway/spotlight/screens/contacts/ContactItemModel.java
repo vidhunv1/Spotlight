@@ -1,24 +1,33 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.contacts;
 
 /**
- * Created by vidhun on 31/08/16.
+ * Created by vidhun on 13/12/16.
  */
-public class NewChatItemModel {
+
+public class ContactItemModel {
     private String contactName;
     private boolean inviteFlag;
-    private String chatId;
     private String mobileNumber;
     private boolean isAdded;
     private boolean isRegistered;
+    private String userName;
 
-    public NewChatItemModel() {
+    public ContactItemModel() {
     }
 
-    public NewChatItemModel(String contactName, boolean inviteFlag, String chatId, String mobileNumber) {
+    public ContactItemModel(String contactName, boolean inviteFlag, String userName, String mobileNumber) {
         this.contactName = contactName;
         this.inviteFlag = inviteFlag;
-        this.chatId = chatId;
+        this.userName = userName;
         this.mobileNumber = mobileNumber;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public boolean isRegistered() {
@@ -45,10 +54,6 @@ public class NewChatItemModel {
         return inviteFlag;
     }
 
-    public String getChatId() {
-        return chatId;
-    }
-
     public void setContactName(String contactName) {
         this.contactName = contactName;
     }
@@ -57,9 +62,7 @@ public class NewChatItemModel {
         this.inviteFlag = inviteFlag;
     }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
-    }
+
 
     public String getMobileNumber() {
         return mobileNumber;
@@ -67,5 +70,17 @@ public class NewChatItemModel {
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "ContactItemModel{" +
+                "contactName='" + contactName + '\'' +
+                ", inviteFlag=" + inviteFlag +
+                ", mobileNumber='" + mobileNumber + '\'' +
+                ", isAdded=" + isAdded +
+                ", isRegistered=" + isRegistered +
+                ", userName='" + userName + '\'' +
+                '}';
     }
 }

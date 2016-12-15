@@ -22,11 +22,12 @@
         android:layout_height="wrap_content"
         android:paddingTop="21dp"
         android:textSize="16sp"
+        android:id="@+id/tv_profile_name"
         android:text="Ankit Nair"
         android:textColor="#000000"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_profile_mobile"
         android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

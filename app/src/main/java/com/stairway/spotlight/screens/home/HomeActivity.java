@@ -26,6 +26,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.screens.contacts.ContactsActivity;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
 import com.stairway.spotlight.screens.home.new_chat.NewChatFragment;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
@@ -66,7 +67,7 @@ public class HomeActivity extends BaseActivity
         setChatFragment();
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(view -> setContactsFragment());
+        fab.setOnClickListener(view -> setNewChatFragment());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -146,8 +147,7 @@ public class HomeActivity extends BaseActivity
         if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_contacts) {
-            setContactsFragment();
-
+            startActivity(ContactsActivity.callingIntent(this));
         } else if (id == R.id.nav_profile) {
             setProfileFragment();
         } else if (id == R.id.nav_manage) {
@@ -156,7 +156,7 @@ public class HomeActivity extends BaseActivity
         return true;
     }
 
-    private void setContactsFragment() {
+    private void setNewChatFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.register_FragmentContainer, NewChatFragment.getInstance());
         fragmentTransaction.addToBackStack(null);

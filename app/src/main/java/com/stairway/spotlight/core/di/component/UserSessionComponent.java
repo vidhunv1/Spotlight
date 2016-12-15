@@ -4,6 +4,8 @@ import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.config.XMPPManager;
+import com.stairway.spotlight.screens.contacts.di.ContactsViewComponent;
+import com.stairway.spotlight.screens.contacts.di.ContactsViewModule;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
 import com.stairway.spotlight.screens.home.new_chat.di.NewChatViewComponent;
@@ -28,5 +30,6 @@ public interface UserSessionComponent {
     ChatListViewComponent plus(ChatListViewModule chatListViewModule);
     MessageComponent plus(MessageModule messageModule);
     NewChatViewComponent plus(NewChatViewModule newChatViewModule);
+    ContactsViewComponent plus(ContactsViewModule contactsViewModule);
     InitializeViewComponent plus(InitializeViewModule initializeViewModule);
 }

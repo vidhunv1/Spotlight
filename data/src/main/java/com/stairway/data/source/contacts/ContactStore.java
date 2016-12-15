@@ -93,4 +93,17 @@ public class ContactStore {
             }
         });
     }
+
+    public Observable<ContactResult> update(ContactResult contactResult) {
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+            ContentValues values = new ContentValues();
+            if(contactResult.isAdded())
+                values.put(ContactsContract.COLUMN_IS_ADDED, 1);
+            db.update(ContactsContract.TABLE_NAME, values, ContactsContract.COLUMN_USERNAME+"='"+contactResult.getUsername()+"'", null);
+            subscriber.onNext(contactResult);
+            subscriber.onCompleted();
+            databaseManager.closeConnection();
+        });
+    }
 }

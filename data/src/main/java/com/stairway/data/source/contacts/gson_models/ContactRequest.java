@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class ContactRequest {
-    @SerializedName("contact")
+    @SerializedName("phone_contact")
     @Expose
     private Contact contact;
 

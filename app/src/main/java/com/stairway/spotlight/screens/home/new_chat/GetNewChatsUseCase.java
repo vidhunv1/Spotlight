@@ -2,6 +2,7 @@ package com.stairway.spotlight.screens.home.new_chat;
 
 import com.stairway.data.source.contacts.ContactContent;
 import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.data.source.contacts.ContactStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,44 +16,41 @@ import rx.Subscriber;
  * Created by vidhun on 01/09/16.
  */
 public class GetNewChatsUseCase {
-    private ContactContent contactContent;
+    private ContactStore contactStore;
 
     @Inject
-    public GetNewChatsUseCase(ContactContent contactContent) {
-        this.contactContent = contactContent;
+    public GetNewChatsUseCase(ContactStore contactStore) {
+        this.contactStore = contactStore;
     }
 
     public Observable<List<NewChatItemModel>> execute() {
-        Observable<List<NewChatItemModel>> getContacts = Observable.create(subscriber -> {
-            contactContent.getContacts()
-                    .subscribe(new Subscriber<List<ContactResult>>() {
-                        @Override
-                        public void onCompleted() {
-                        }
+        return Observable.create(subscriber -> {
+                contactStore.getContacts()
+                        .subscribe(new Subscriber<List<ContactResult>>() {
+                            @Override
+                            public void onCompleted() {}
+                            @Override
+                            public void onError(Throwable e) {}
 
-                        @Override
-                        public void onError(Throwable e) {
-                        }
+                            @Override
+                            public void onNext(List<ContactResult> contactsResults) {
+                                List<NewChatItemModel> newChatItemModels = new ArrayList<NewChatItemModel>(contactsResults.size());
+                                for(ContactResult contactsResult: contactsResults) {
+                                    NewChatItemModel newChatItemModel = new NewChatItemModel(
+                                            contactsResult.getDisplayName(),
+                                            false,
+                                            contactsResult.getContactId(),
+                                            contactsResult.getPhoneNumber());
+                                    newChatItemModel.setAdded(contactsResult.isAdded());
+                                    newChatItemModel.setRegistered(contactsResult.isRegistered());
 
-                        @Override
-                        public void onNext(List<ContactResult> contactsResults) {
-                            List<NewChatItemModel> newChatItemModels = new ArrayList<NewChatItemModel>(contactsResults.size());
-                            newChatItemModels.add(new NewChatItemModel("Vidhun Vinod", false, "91-9489339336", "91-9489339336"));
-                            newChatItemModels.add(new NewChatItemModel("Ankit Nair", false, "91-9843578487", "91-9843578487"));
-                            for(ContactResult contactsResult: contactsResults) {
-                                newChatItemModels.add(new NewChatItemModel(
-                                        contactsResult.getDisplayName(),
-                                        false,
-                                        contactsResult.getContactId(),
-                                        contactsResult.getPhoneNumber()
-                                ));
+                                    if(contactsResult.isRegistered() && contactsResult.isAdded())
+                                        newChatItemModels.add(newChatItemModel);
+                                }
+
+                                subscriber.onNext(newChatItemModels);
                             }
-
-                            subscriber.onNext(newChatItemModels);
-                        }
-                    });
+                        });
         });
-
-        return getContacts;
     }
 }
