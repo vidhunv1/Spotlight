@@ -43,9 +43,8 @@ public class GetContactsUseCase {
                             for(ContactResult contactsResult: contactResults) {
                                 ContactItemModel contactItemModel = new ContactItemModel(
                                         contactsResult.getDisplayName(),
-                                        false,
                                         contactsResult.getUsername(),
-                                        contactsResult.getPhoneNumber());
+                                        contactsResult.getUserId());
                                 contactItemModel.setAdded(contactsResult.isAdded());
                                 contactItemModel.setRegistered(contactsResult.isRegistered());
 

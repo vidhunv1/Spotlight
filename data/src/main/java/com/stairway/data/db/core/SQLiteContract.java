@@ -18,7 +18,6 @@ public abstract class SQLiteContract {
 
         public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " where key = ?";
-        public static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE_NAME;
     }
 
     public static final class MessagesContract {
@@ -44,12 +43,6 @@ public abstract class SQLiteContract {
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-        public static final String SQL_INSERT_MESSAGE = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?)";
-        public static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE_NAME;
-
-        public static final String SQL_SELECT_MESSAGES = "SELECT "+COLUMN_CHAT_ID+", "+COLUMN_FROM_ID+", "+", "+COLUMN_RECEIPT_ID+", "+
-                COLUMN_MESSAGE+", "+COLUMN_MESSAGE_STATUS+" FROM "+TABLE_NAME+" WHERE "+COLUMN_CHAT_ID+"=?;";
-
     }
 
     public static final class ContactsContract {
@@ -63,6 +56,7 @@ public abstract class SQLiteContract {
         public static final String COLUMN_IS_REGISTERED = "is_registered";
         public static final String COLUMN_IS_ADDED = "is_added";
         public static final String COLUMN_USERNAME = "username";
+        public static final String COLUMN_USER_ID = "user_id";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_CONTACT_ID + " INTEGER, " +
@@ -70,6 +64,7 @@ public abstract class SQLiteContract {
                 COLUMN_COUNTRY_CODE + " TEXT, " +
                 COLUMN_IS_ADDED + " INTEGER, " +
                 COLUMN_USERNAME + " TEXT, "+
+                COLUMN_USER_ID + " TEXT, "+
                 COLUMN_IS_REGISTERED + " INTEGER, "+
                 COLUMN_CONTACT_NAME + " TEXT, " +
                 "UNIQUE("+COLUMN_CONTACT_ID+") ON CONFLICT REPLACE); ";

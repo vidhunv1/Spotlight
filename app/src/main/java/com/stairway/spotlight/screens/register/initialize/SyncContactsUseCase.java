@@ -33,7 +33,7 @@ public class SyncContactsUseCase {
     }
 
     public Observable<Boolean> execute(String authToken) {
-        Observable<Boolean> sync = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             contactContent.getContacts()
                     .subscribe(new Subscriber<List<ContactResult>>() {
                         @Override
@@ -60,6 +60,7 @@ public class SyncContactsUseCase {
                                             Contact contact = contactResponse.getContact();
                                             ContactResult contactResult = new ContactResult(contact.getId(), contact.getCountryCode(), contact.getPhone(), contact.getName());
                                             contactResult.setUsername(contact.getUsername());
+                                            contactResult.setUserId(contact.getUserId());
                                             contactResult.setRegistered(contact.isRegistered());
 
                                             contactStore.storeContact(contactResult)
@@ -77,6 +78,5 @@ public class SyncContactsUseCase {
                         }
                     });
         });
-        return sync;
     }
 }

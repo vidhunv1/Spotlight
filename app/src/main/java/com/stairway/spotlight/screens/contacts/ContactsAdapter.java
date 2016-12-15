@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.contacts;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +8,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,10 +29,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<ContactItemModel> addedUsers;
     private List<ContactItemModel> notAddedUsers;
 
-    private Context context;
-
-    public ContactsAdapter(Context context, ContactsAdapter.ContactClickListener contactClickListener, ContactsAdapter.ContactAddClickListener contactAddClickListener) {
-        this.context = context;
+    public ContactsAdapter(ContactsAdapter.ContactClickListener contactClickListener, ContactsAdapter.ContactAddClickListener contactAddClickListener) {
         this.contactClickListener = contactClickListener;
         this.contactAddClickListener = contactAddClickListener;
         this.addedUsers = new ArrayList<>();
@@ -66,11 +60,16 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             }
         }
-        for(int i=0;i<addedUsers.size() && addContact!=null;i++) {
-            if(addContact.getContactName().compareTo(addedUsers.get(i).getContactName()) <=0) {
-                addedUsers.add(i, addContact);
-                this.notifyItemInserted(i);
-                break;
+        if(addedUsers.size()==0) {
+            addedUsers.add(0, addContact);
+            this.notifyItemInserted(0);
+        } else {
+            for(int i=0;i<addedUsers.size();i++) {
+                if (addContact.getContactName().compareTo(addedUsers.get(i).getContactName()) <= 0) {
+                    addedUsers.add(i, addContact);
+                    this.notifyItemInserted(i);
+                    break;
+                }
             }
         }
     }
@@ -106,7 +105,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Logger.d("position: "+position+", added: "+addedUsers.size()+", notAdded: "+notAddedUsers.size());
         switch (holder.getItemViewType()) {
             case VIEW_ADDED:
                 ContactViewHolder contactViewHolder = (ContactViewHolder)holder;
@@ -146,7 +144,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void renderItem(ContactItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-            status.setText(contactItem.getMobileNumber());
+            status.setText("@"+contactItem.getUserId());
 
             contactName.setTag(contactItem.getUserName());
         }
@@ -183,7 +181,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void renderItem(ContactItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-            status.setText(contactItem.getMobileNumber());
+            status.setText("@"+contactItem.getUserId());
             profileImage.setImageResource(R.drawable.default_profile_image);
 
             contactName.setTag(contactItem.getUserName());

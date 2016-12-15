@@ -34,6 +34,7 @@ public class ContactStore {
             values.put(ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
             values.put(ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
             values.put(ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
+            values.put(ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
             values.put(ContactsContract.COLUMN_IS_REGISTERED, contactResult.isRegistered());
 
             long rowId = db.insert(ContactsContract.TABLE_NAME, null, values);
@@ -57,7 +58,8 @@ public class ContactStore {
                     ContactsContract.COLUMN_PHONE_NUMBER,
                     ContactsContract.COLUMN_IS_ADDED,
                     ContactsContract.COLUMN_IS_REGISTERED,
-                    ContactsContract.COLUMN_USERNAME
+                    ContactsContract.COLUMN_USERNAME,
+                    ContactsContract.COLUMN_USER_ID
             };
 
             try {
@@ -70,6 +72,7 @@ public class ContactStore {
                     String countryCode = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_COUNTRY_CODE));
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USERNAME));
+                    String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
                     boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_REGISTERED)) == 1);
                     boolean isAdded = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_ADDED)) == 1);
 
@@ -77,6 +80,7 @@ public class ContactStore {
                     contactResult.setAdded(isAdded);
                     contactResult.setRegistered(isRegistered);
                     contactResult.setUsername(username);
+                    contactResult.setUserId(userId);
                     result.add(contactResult);
 
                     cursor.moveToNext();

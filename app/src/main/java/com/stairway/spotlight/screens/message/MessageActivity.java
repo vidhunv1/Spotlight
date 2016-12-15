@@ -54,14 +54,14 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
     private ChatState currentChatState;
 
-    private static String KEY_USER_ID = "USERID";
+    private static String KEY_USER_NAME = "USERNAME";
     private String chatId; // contact user, mobile
     private String currentUser; // this user, mobile
     private MessagesAdapter messagesAdapter;
 
-    public static Intent callingIntent(Context context, String userId) {
+    public static Intent callingIntent(Context context, String userName) {
         Intent intent = new Intent(context, MessageActivity.class);
-        intent.putExtra(KEY_USER_ID, userId);
+        intent.putExtra(KEY_USER_NAME, userName);
 
         return intent;
     }
@@ -71,10 +71,10 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
         super.onCreate(savedInstanceState);
         currentChatState = ChatState.inactive;
         Intent receivedIntent = getIntent();
-        if(!receivedIntent.hasExtra(KEY_USER_ID))
+        if(!receivedIntent.hasExtra(KEY_USER_NAME))
             return;
 
-        chatId = receivedIntent.getStringExtra(KEY_USER_ID);
+        chatId = receivedIntent.getStringExtra(KEY_USER_NAME);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
 
@@ -181,7 +181,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
-        currentUser = componentContainer.userSessionComponent().getUserSession().getChatId();
+        currentUser = componentContainer.userSessionComponent().getUserSession().getUserName();
     }
 
     @Override

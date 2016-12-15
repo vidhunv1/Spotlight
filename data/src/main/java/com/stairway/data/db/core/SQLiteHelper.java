@@ -12,7 +12,7 @@ import com.stairway.data.config.Logger;
 public class SQLiteHelper extends SQLiteOpenHelper{
     private static final String TAG = "SQLiteHelper";
 
-    public static final int DATABASE_VERSION = 27;
+    public static final int DATABASE_VERSION = 28;
     public static final String DATABASE_NAME = "spotlight.db";
 
     public SQLiteHelper(Context context)

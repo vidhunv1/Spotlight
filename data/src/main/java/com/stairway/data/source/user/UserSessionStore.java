@@ -16,13 +16,13 @@ public class UserSessionStore {
     private static SharedPreferences prefs;
     private Context context;
 
-    public static String KEY_USER_ID = "SESSION_USER_NAME";
+    public static String KEY_USER_NAME = "SESSION_USER_NAME";
+    public static String KEY_USER_ID = "SESSION_USER_ID";
     public static String  KEY_ACCESS_TOKEN = "SESSION_ACCESS_TOKEN";
     public static String  KEY_COUNTRY_CODE = "SESSION_COUNTRY_CODE";
     public static String  KEY_PHONE = "SESSION_PHONE";
     public static String KEY_REFRESH_TOKEN = "SESSION_REFRESH_TOKEN";
     public static String KEY_EXPIRY = "SESSION_EXPIRY";
-    public static String KEY_CHAT_ID = "SESSION_CHAT_ID";
 
     public UserSessionStore(Context context) {
         // TODO: Storing tokens in sharedpreference: right approach?
@@ -42,11 +42,11 @@ public class UserSessionStore {
     * */
 
     public Observable<Boolean> putUserSession(UserSessionResult userSessionResult) {
-        Observable<Boolean> putObservable = Observable.create( subscriber -> {
+        return Observable.create( subscriber -> {
             final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
 
             if(userSessionResult.getUserName()!=null || !userSessionResult.getUserName().isEmpty())
-                editor.putString(KEY_USER_ID, userSessionResult.getUserName());
+                editor.putString(KEY_USER_NAME, userSessionResult.getUserName());
             if(userSessionResult.getAccessToken()!=null && !userSessionResult.getAccessToken().isEmpty())
                 editor.putString(KEY_ACCESS_TOKEN, userSessionResult.getAccessToken());
             if(userSessionResult.getRefreshToken()!=null && !userSessionResult.getRefreshToken().isEmpty())
@@ -57,14 +57,13 @@ public class UserSessionStore {
                 editor.putString(KEY_PHONE, userSessionResult.getPhone());
             if(userSessionResult.getExpiry()!=null || !userSessionResult.getExpiry().isEmpty())
                 editor.putString(KEY_EXPIRY, userSessionResult.getExpiry());
-            if(userSessionResult.getChatId()!=null || !userSessionResult.getChatId().isEmpty())
-                editor.putString(KEY_CHAT_ID, userSessionResult.getChatId());
+            if(userSessionResult.getUserId()!=null || !userSessionResult.getUserId().isEmpty())
+                editor.putString(KEY_USER_ID, userSessionResult.getUserId());
             editor.commit();
             Logger.d("[PutUserSession]"+userSessionResult.toString());
             subscriber.onNext(true);
             subscriber.onCompleted();
         });
-        return putObservable;
     }
 
     /*
@@ -76,33 +75,31 @@ public class UserSessionStore {
     public Observable<UserSessionResult> getUserSession() {
         Logger.d("GETUSERSESSION from Store");
 
-        Observable<UserSessionResult> getSessionObservable = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
 
             try {
                 prefs = getSharedPreferences(context);
-                String userId = prefs.getString(KEY_USER_ID, "");
+                String userName = prefs.getString(KEY_USER_NAME, "");
                 String accessToken = prefs.getString(KEY_ACCESS_TOKEN, "");
                 String refreshToken = prefs.getString(KEY_REFRESH_TOKEN, "");
                 String phone = prefs.getString(KEY_PHONE, "");
                 String countryCode = prefs.getString(KEY_COUNTRY_CODE, "");
                 String expiry = prefs.getString(KEY_EXPIRY, "");
-                String chatId = prefs.getString(KEY_CHAT_ID, "");
+                String userId = prefs.getString(KEY_USER_ID, "");
 
-                if(userId == null || userId.isEmpty()) {
+                if(userName.isEmpty()) {
                     Logger.d("UserSession not available");
-
                     //TODO: Wrap Throwable to include custom error code(User Unregistered)
                     subscriber.onError(new Throwable("User Not Logged in"));
                 } else {
-                    UserSessionResult userSessionResult = new UserSessionResult(userId);
+                    UserSessionResult userSessionResult = new UserSessionResult(userName);
                     userSessionResult.setAccessToken(accessToken);
                     userSessionResult.setCountryCode(countryCode);
                     userSessionResult.setPhone(phone);
                     userSessionResult.setRefreshToken(refreshToken);
                     userSessionResult.setExpiry(expiry);
-                    userSessionResult.setChatId(chatId);
+                    userSessionResult.setUserId(userId);
                     subscriber.onNext(userSessionResult);
-                    Logger.v("Got UserSession, store: ["+accessToken+", "+refreshToken+", "+userId+"]");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,6 +108,5 @@ public class UserSessionStore {
                 subscriber.onError(e);
             }
         });
-        return getSessionObservable;
     }
 }

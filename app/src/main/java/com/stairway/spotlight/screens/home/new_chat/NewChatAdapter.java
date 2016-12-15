@@ -22,21 +22,17 @@ import butterknife.ButterKnife;
  */
 public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ContactClickListener contactClickListener;
-    private Context context;
     private List<Object> itemList;
-    private final int SEARCH=0, CONTACT=1, INVITE=2;
+    private final int CONTACT=1;
 
-    public NewChatAdapter(Context context, ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
+    public NewChatAdapter(ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
         this.contactClickListener = contactClickListener;
-        this.context = context;
         this.itemList = new ArrayList<>();
-//        this.itemList.add("Search");
         this.itemList.addAll(contacts);
     }
 
     public void setContacts(List<NewChatItemModel> contacts) {
         this.itemList.clear();
-//        this.itemList.add("Search");
         this.itemList.addAll(contacts);
         this.notifyItemRangeInserted(0, itemList.size() - 1);
     }
@@ -54,10 +50,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-//        if(itemList.get(position) instanceof String) {
-//            return SEARCH;
-//        }
-        if(itemList.get(position) instanceof NewChatItemModel && !((NewChatItemModel) itemList.get(position)).getInviteFlag())
+        if(itemList.get(position) instanceof NewChatItemModel)
             return CONTACT;
         return -1;
     }
@@ -68,18 +61,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
-//            case SEARCH:
-//                View searchView = inflater.inflate(R.layout.item_contact_search, parent, false);
-//                viewHolder = new SearchViewHolder(searchView);
-//                break;
             case CONTACT:
                 View contactView = inflater.inflate(R.layout.item_contact_list, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
-//            case INVITE:
-//                View inviteView = inflater.inflate(R.layout.item_contact_list_invite, parent, false);
-//                viewHolder = new InviteViewHolder(inviteView);
-//                break;
             default:
                 return null;
         }
@@ -89,18 +74,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
-//            case SEARCH:
-//                SearchViewHolder sVH = (SearchViewHolder) holder;
-//                sVH.renderItem();
-//                break;
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem((NewChatItemModel) itemList.get(position));
                 break;
-//            case INVITE:
-//                InviteViewHolder iVH = (InviteViewHolder) holder;
-//                iVH.renderItem((ContactListItemModel) itemList.get(position));
-//                break;
             default:
                 break;
         }
@@ -136,70 +113,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void renderItem(NewChatItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-            status.setText(contactItem.getMobileNumber());
+            status.setText("@"+contactItem.getUserId());
             profileImage.setImageResource(R.drawable.default_profile_image);
 
-            contactName.setTag(contactItem.getChatId());
+            contactName.setTag(contactItem.getUserName());
         }
     }
 
     public interface ContactClickListener {
         void onContactItemClicked(String userId);
     }
-
-//    public class InviteViewHolder extends RecyclerView.ViewHolder {
-//        @Bind(R.id.ll_contactItem_content)
-//        LinearLayout contactListContent;
-
-//        @Bind(R.id.btn_contactItem_invite)
-//        Button inviteButton;
-
-//        @Bind(R.id.tv_contactItem_contactName)
-//        TextView contactName;
-//
-//        @Bind(R.id.tv_contactItem_number)
-//        TextView number;
-//
-//        @Bind(R.id.iv_contactItem_profileImage)
-//        ImageView profileImage;
-//
-//        public InviteViewHolder(View itemView) {
-//            super(itemView);
-//            ButterKnife.bind(this, itemView);
-//
-//        }
-//        public void renderItem(ContactListItemModel contactItem) {
-//            contactName.setText(contactItem.getContactName());
-//            number.setText(contactItem.getMobileNumber());
-//            profileImage.setImageResource(R.drawable.default_profile_image);
-//            Logger.d("Invite flag"+contactItem.getInviteFlag());
-//
-//            contactName.setTag(contactItem.getChatId());
-//        }
-//    }
-
-//    public class SearchViewHolder extends RecyclerView.ViewHolder {
-//        @Bind(R.id.ll_contactItem_Search)
-//        LinearLayout contactSearch;
-//
-//        @Bind(R.id.tv_contactItem_search)
-//        TextView search;
-//
-//        public SearchViewHolder(View itemView) {
-//            super(itemView);
-//            ButterKnife.bind(this, itemView);
-//
-//            contactSearch.setOnClickListener(view -> {
-//                if(searchClickListener != null)
-//                    searchClickListener.onContactItemClicked();
-//            });
-//        }
-//
-//        public void renderItem() {
-//        }
-//    }
-//
-//    public interface SearchClickListener {
-//        void onContactItemClicked();
-//    }
 }

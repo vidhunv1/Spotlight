@@ -48,7 +48,7 @@ public class RegisterUseCase {
                         userSessionResult.setPhone(verifyResponse.getUser().getPhone());
                         userSessionResult.setCountryCode(verifyResponse.getUser().getCountryCode());
                         userSessionResult.setExpiry(verifyResponse.getExpiry());
-                        userSessionResult.setChatId(verifyResponse.getUser().getPhoneFormatted());
+                        userSessionResult.setUserId(verifyResponse.getUser().getUserId());
 
                         storeToken(userSessionResult);
                         subscriber.onNext(userSessionResult);

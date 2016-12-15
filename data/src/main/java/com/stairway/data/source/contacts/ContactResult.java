@@ -11,6 +11,7 @@ public class ContactResult {
     private String username;
     private boolean isRegistered;
     private boolean isAdded;
+    private String userId;
 
     public ContactResult(String contactId, String countryCode, String phoneNumber, String displayName) {
         this.contactId = contactId;
@@ -20,6 +21,14 @@ public class ContactResult {
     }
 
     public ContactResult() {
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public boolean isRegistered() {

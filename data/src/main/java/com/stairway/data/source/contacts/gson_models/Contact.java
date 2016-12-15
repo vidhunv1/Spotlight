@@ -21,6 +21,8 @@ public class Contact {
     boolean isRegistered;
     @SerializedName("username")
     String username;
+    @SerializedName("user_id")
+    String userId;
     @SerializedName("id")
     String id;
 
@@ -28,6 +30,14 @@ public class Contact {
         this.phone = phone;
         this.countryCode = countryCode;
         this.name = name;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getId() {

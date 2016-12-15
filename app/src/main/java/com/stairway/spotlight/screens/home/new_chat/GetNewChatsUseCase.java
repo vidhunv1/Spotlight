@@ -38,11 +38,8 @@ public class GetNewChatsUseCase {
                                 for(ContactResult contactsResult: contactsResults) {
                                     NewChatItemModel newChatItemModel = new NewChatItemModel(
                                             contactsResult.getDisplayName(),
-                                            false,
-                                            contactsResult.getContactId(),
-                                            contactsResult.getPhoneNumber());
-                                    newChatItemModel.setAdded(contactsResult.isAdded());
-                                    newChatItemModel.setRegistered(contactsResult.isRegistered());
+                                            contactsResult.getUsername(),
+                                            contactsResult.getUserId());
 
                                     if(contactsResult.isRegistered() && contactsResult.isAdded())
                                         newChatItemModels.add(newChatItemModel);

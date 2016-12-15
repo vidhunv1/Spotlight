@@ -10,17 +10,17 @@ public class UserSessionResult {
     private String countryCode;
     private String phone;
     private String expiry;
-    private String chatId;
+    private String userId;
 
     public UserSessionResult() {
     }
 
-    public String getChatId() {
-        return chatId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getExpiry() {
@@ -84,7 +84,6 @@ public class UserSessionResult {
                 ", countryCode='" + countryCode + '\'' +
                 ", phone='" + phone + '\'' +
                 ", expiry='" + expiry + '\'' +
-                ", chatId='" + chatId + '\'' +
                 '}';
     }
 }

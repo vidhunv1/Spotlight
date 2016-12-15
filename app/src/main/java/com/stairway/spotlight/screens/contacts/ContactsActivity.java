@@ -44,7 +44,7 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
         setContentView(R.layout.activity_contacts);
         ButterKnife.bind(this);
         contactsPresenter.attachView(this);
-        contactsAdapter = new ContactsAdapter(this, this, this);
+        contactsAdapter = new ContactsAdapter(this, this);
         contactList.setLayoutManager(new LinearLayoutManager(this));
         contactList.setAdapter(contactsAdapter);
         contactsPresenter.loadContacts();
