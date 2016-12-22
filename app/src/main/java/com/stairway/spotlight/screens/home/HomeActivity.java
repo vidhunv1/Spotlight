@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -30,8 +31,12 @@ import com.stairway.spotlight.screens.contacts.ContactsActivity;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
 import com.stairway.spotlight.screens.home.new_chat.NewChatFragment;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
+import com.stairway.spotlight.screens.search.SearchFragment;
+import com.stairway.spotlight.screens.search.SearchActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
+
+import java.util.List;
 
 import rx.Subscriber;
 
@@ -44,10 +49,15 @@ public class HomeActivity extends BaseActivity
     UserAuthApi userAuthApi;
     UserSessionResult userSession;
     ChatListFragment chatListFragment;
+    ProfileFragment profileFragment;
+    NewChatFragment newChatFragment;
+    SearchFragment searchFragment;
+
     private Toolbar toolbar;
     private static String TITLE_HOME = "Messages";
     private static String TITLE_NEW_CHAT = "New Chat";
     private static String TITLE_PROFILE = "Profile";
+    private final String FRAGMENT_CHAT = "CHAT_FRAGMENT", FRAGMENT_PROFILE = "PROFILE_FRAGMENT", FRAGMENT_NEW_CHAT = "NEW_CHAT_FRAGMENT", FRAGMENT_SEARCH = "SEARCH_FRAGMENT";
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -62,8 +72,6 @@ public class HomeActivity extends BaseActivity
         setContentView(R.layout.activity_home_drawer);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         setChatFragment();
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -77,8 +85,127 @@ public class HomeActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        uploadFCMToken();
+    }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            toggle.setDrawerIndicatorEnabled(true);
+            fab.setVisibility(View.VISIBLE);
+            toolbar.setTitle(TITLE_HOME);
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_activity_drawer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if(id == R.id.action_search) {
+            startActivity(SearchActivity.callingIntent(this));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        int id = item.getItemId();
+        if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_contacts) {
+            startActivity(ContactsActivity.callingIntent(this));
+        } else if (id == R.id.nav_profile) {
+            setProfileFragment();
+        } else if (id == R.id.nav_manage) {
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void setNewChatFragment() {
+        if(newChatFragment == null)
+            newChatFragment = NewChatFragment.getInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, newChatFragment, FRAGMENT_NEW_CHAT);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+        toggle.setDrawerIndicatorEnabled(false);
+        toolbar.setTitle(TITLE_NEW_CHAT);
+        fab.setVisibility(View.GONE);
+        chatListFragment = null;
+    }
+
+    private void setProfileFragment() {
+        if(profileFragment == null)
+            profileFragment = ProfileFragment.getInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, profileFragment, FRAGMENT_PROFILE);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+        toggle.setDrawerIndicatorEnabled(false);
+        toolbar.setTitle(TITLE_PROFILE);
+        fab.setVisibility(View.GONE);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void setChatFragment() {
+        if(chatListFragment == null)
+            chatListFragment = ChatListFragment.getInstance();
+        setSupportActionBar(toolbar);
+        chatListFragment = ChatListFragment.getInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment, FRAGMENT_CHAT);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        toolbar.setTitle(TITLE_HOME);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void setSearchFragment() {
+        if(searchFragment == null)
+            searchFragment = SearchFragment.getInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_FragmentContainer, searchFragment, FRAGMENT_SEARCH);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void injectComponent(ComponentContainer componentContainer) {
+        userSession = componentContainer.userSessionComponent().getUserSession();
+    }
+
+    @Override
+    public void onMessageReceived(MessageResult messageId) {
+        if(getVisibleFragmentTag().equals(FRAGMENT_CHAT))
+            chatListFragment.addNewMessage(messageId);
+    }
+
+    @Override
+    public void onChatStateReceived(String from, ChatState chatState) {
+        if(getVisibleFragmentTag().equals(FRAGMENT_CHAT))
+            chatListFragment.showChatState(from, chatState);
+    }
+
+    private void uploadFCMToken() {
         //Upload to token to server if FCM token not updated
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
             String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
             Logger.d("[HomeActivity] FCM TOKEN:"+fcmToken);
@@ -100,113 +227,15 @@ public class HomeActivity extends BaseActivity
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            toggle.setDrawerIndicatorEnabled(true);
-            fab.setVisibility(View.VISIBLE);
-            toolbar.setTitle(TITLE_HOME);
-            super.onBackPressed();
+    public String getVisibleFragmentTag(){
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        List<android.support.v4.app.Fragment> fragments = fragmentManager.getFragments();
+        if(fragments != null){
+            for(android.support.v4.app.Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment.getTag();
+            }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home_activity_drawer, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home) {
-            Logger.d("[HomeActivity] backPressed");
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_settings) {
-
-        } else if (id == R.id.nav_contacts) {
-            startActivity(ContactsActivity.callingIntent(this));
-        } else if (id == R.id.nav_profile) {
-            setProfileFragment();
-        } else if (id == R.id.nav_manage) {
-        }
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void setNewChatFragment() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, NewChatFragment.getInstance());
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-        toggle.setDrawerIndicatorEnabled(false);
-        toolbar.setTitle(TITLE_NEW_CHAT);
-        fab.setVisibility(View.GONE);
-        chatListFragment = null;
-    }
-
-    private void setProfileFragment() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, ProfileFragment.getInstance());
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-        toggle.setDrawerIndicatorEnabled(false);
-        toolbar.setTitle(TITLE_PROFILE);
-        fab.setVisibility(View.GONE);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        chatListFragment = null;
-    }
-
-    private void setChatFragment() {
-        setSupportActionBar(toolbar);
-        chatListFragment = ChatListFragment.getInstance();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-        toolbar.setTitle(TITLE_HOME);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        userSession = componentContainer.userSessionComponent().getUserSession();
-    }
-
-    @Override
-    public void onMessageReceived(MessageResult messageId) {
-        if(chatListFragment!=null) {
-            chatListFragment.addNewMessage(messageId);
-        }
-    }
-
-    @Override
-    public void onChatStateReceived(String from, ChatState chatState) {
-        if(chatListFragment!=null)
-            chatListFragment.showChatState(from, chatState);
+        return null;
     }
 }

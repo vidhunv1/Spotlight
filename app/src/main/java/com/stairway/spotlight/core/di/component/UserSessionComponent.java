@@ -14,6 +14,8 @@ import com.stairway.spotlight.screens.message.di.MessageComponent;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.register.initialize.di.InitializeViewComponent;
 import com.stairway.spotlight.screens.register.initialize.di.InitializeViewModule;
+import com.stairway.spotlight.screens.search.di.SearchViewComponent;
+import com.stairway.spotlight.screens.search.di.SearchViewModule;
 
 import dagger.Subcomponent;
 
@@ -32,4 +34,5 @@ public interface UserSessionComponent {
     NewChatViewComponent plus(NewChatViewModule newChatViewModule);
     ContactsViewComponent plus(ContactsViewModule contactsViewModule);
     InitializeViewComponent plus(InitializeViewModule initializeViewModule);
+    SearchViewComponent plus(SearchViewModule searchViewModule);
 }

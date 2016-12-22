@@ -46,7 +46,7 @@ public class NewChatFragment extends BaseFragment implements NewChatContract.Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        newChatAdapter = new NewChatAdapter(getActivity(), this, new ArrayList<>());
+        newChatAdapter = new NewChatAdapter(this, new ArrayList<>());
     }
 
     @Nullable

@@ -24,7 +24,7 @@ public class GetChatsUseCase {
                     .subscribe(new Subscriber<List<MessageResult>>() {
                         @Override
                         public void onCompleted() {
-
+                            subscriber.onCompleted();
                         }
 
                         @Override
@@ -44,6 +44,7 @@ public class GetChatsUseCase {
                                         messageResult.getUnSeenCount()));
                             }
                             subscriber.onNext(chatListItemModels);
+                            subscriber.onCompleted();
                         }
                     });
         });
