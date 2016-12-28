@@ -1,9 +1,18 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFFFF"
-    android:orientation="vertical">
+    android:background="#FFFFFFFF">
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rv_messageitem"
+        android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFFFF"
+        android:paddingTop="3dp"
+        android:paddingBottom="56dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"
@@ -13,9 +22,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:layout_alignParentBottom="true"
-        android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:layout_gravity="bottom">
 
         <ImageButton
             android:layout_width="48dp"
@@ -65,15 +73,5 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rv_messageitem"
-        android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFFFFFFF"
-        android:paddingTop="3dp"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentTop="false"
-        android:layout_above="@+id/ll_keyboard" />
 
-</RelativeLayout>
+</FrameLayout>

@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 /**
  * Created by vidhun on 01/09/16.
@@ -54,6 +55,7 @@ public class NewChatFragment extends BaseFragment implements NewChatContract.Vie
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         ButterKnife.bind(this, view);
+        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         Logger.d("[ContactListFragment] onCreateView");
         contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
