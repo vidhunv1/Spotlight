@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 public class ChatListFragment extends BaseFragment implements ChatListContract.View, ChatListAdapter.ChatClickListener{
 
@@ -51,6 +52,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
         ButterKnife.bind(this, view);
+        OverScrollDecoratorHelper.setUpOverScroll(chatList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         Logger.v("[ChatListFragment] onCreateView");
         return view;

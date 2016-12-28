@@ -71,7 +71,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFFFF"
+        android:paddingTop="3dp"
         android:layout_alignParentLeft="false"
         android:layout_alignParentTop="false"
         android:layout_above="@+id/ll_keyboard" />
+
 </RelativeLayout>

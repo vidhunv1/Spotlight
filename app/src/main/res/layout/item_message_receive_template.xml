@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="3dp">
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/default_profile_image"
+        android:id="@+id/iv_profileImage"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="12dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="258dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/iv_profileImage"
+        android:layout_toEndOf="@+id/iv_profileImage"
+        android:layout_marginLeft="12dp"
+        android:background="@drawable/bg_msg_receive">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="135dp"
+            app:srcCompat="@android:drawable/arrow_down_float"
+            android:id="@+id/iv_rcv_template_image" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="12dp"
+            android:paddingLeft="12dp"
+            android:paddingTop="6.75dp"
+            android:paddingBottom="7.75dp">
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_rcv_template_title" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_rcv_template_subtitle"
+                android:layout_marginTop="4dp"
+                android:textSize="12sp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_rcv_template_url"
+                android:layout_marginTop="4dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right">
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:id="@+id/tv_rcv_button1"
+                android:gravity="center_vertical"
+                android:paddingRight="12dp"
+                android:paddingLeft="12dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:id="@+id/tv_rcv_button2"
+                android:gravity="center_vertical"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:id="@+id/tv_rcv_button3"
+                android:gravity="center_vertical"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

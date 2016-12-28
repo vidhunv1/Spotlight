@@ -22,6 +22,7 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.config.XMPPManager;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
+import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
@@ -33,8 +34,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
-public class MessageActivity extends BaseActivity implements MessageContract.View {
+public class MessageActivity extends BaseActivity
+        implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener{
     @Inject
     public XMPPManager connection;
 
@@ -80,9 +83,10 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this);
+        messagesAdapter = new MessagesAdapter(this, this, this);
         messageItem.setLayoutManager(linearLayoutManager);
         messageItem.setAdapter(messagesAdapter);
+        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         android.support.v7.app.ActionBar ab = getSupportActionBar();
         ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -128,7 +132,9 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
 
         if(message.length()>=1) {
             messageBox.setText("");
-            messagePresenter.sendMessage(new MessageResult(chatId, currentUser, message, MessageResult.MessageStatus.NOT_SENT));
+            MessageResult msg = new MessageResult(chatId, currentUser, message);
+            msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+            messagePresenter.sendMessage(msg);
         }
     }
 
@@ -153,6 +159,7 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     @Override
     public void displayMessages(List<MessageResult> messages) {
         messagesAdapter.setMessages(messages);
+        messageItem.scrollToPosition(messages.size()-1);
     }
 
     @Override
@@ -176,6 +183,19 @@ public class MessageActivity extends BaseActivity implements MessageContract.Vie
     public void updatePresence(String presence) {
         Logger.d("Presence: "+presence);
         presenceTextView.setText(presence);
+    }
+
+
+    @Override
+    public void sendPostbackMessage(String message) {
+        MessageResult msg = new MessageResult(chatId, currentUser, message);
+        msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+        messagePresenter.sendMessage(msg);
+    }
+
+    @Override
+    public void urlButtonClicked(String url) {
+        startActivity(WebViewActivity.callingIntent(this, url));
     }
 
     @Override

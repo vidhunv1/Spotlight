@@ -22,13 +22,16 @@ import butterknife.ButterKnife;
 public class ContactSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ContactsModel> itemList;
     private ContactClickListener contactClickListener;
+    private String searchQuery;
 
     public ContactSearchAdapter(ContactClickListener contactClickListener) {
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
+        this.searchQuery = "";
     }
 
-    public void setContacts(List<ContactsModel> itemList) {
+    public void setContacts(String searchQuery, List<ContactsModel> itemList) {
+        this.searchQuery = searchQuery;
         this.itemList.clear();
         this.itemList.addAll(itemList);
         notifyDataSetChanged();
@@ -48,7 +51,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ContactViewHolder contactViewHolder = (ContactViewHolder) holder;
-        contactViewHolder.renderItem(itemList.get(position));
+        contactViewHolder.renderItem(itemList.get(position), searchQuery);
     }
 
     @Override
@@ -76,7 +79,9 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
             });
         }
 
-        public void renderItem(ContactsModel contactItem) {
+        public void renderItem(ContactsModel contactItem, String searchQuery) {
+            int queryPosStart = contactItem.getContactName().indexOf(searchQuery);
+            int queryPosEnd = queryPosStart+searchQuery.length();
             contactName.setText(contactItem.getContactName());
             status.setText("@"+contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());

@@ -11,14 +11,17 @@ import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.core.lib.MessageParser;
+import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context context;
     private List<ChatListItemModel> chatList;
     private List<ChatListItemModel> temp;
@@ -228,7 +231,17 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void renderItem(ChatListItemModel chatListItem) {
             contactName.setText(chatListItem.getChatName());
-            lastMessage.setText(chatListItem.getLastMessage());
+
+            try {
+                MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
+                Object messageObject = messageParser.parseMessage();
+                if(messageParser.getMessageType() == MessageParser.MessageType.template) {
+                    TemplateMessage msg = (TemplateMessage)messageObject;
+                    lastMessage.setText(msg.getTitle());
+                }
+            } catch(ParseException e) {
+                lastMessage.setText(chatListItem.getLastMessage());
+            }
             time.setText(chatListItem.getTime());
             profileImage.setImageResource(R.drawable.default_profile_image);
 

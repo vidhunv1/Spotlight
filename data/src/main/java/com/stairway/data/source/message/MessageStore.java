@@ -59,7 +59,9 @@ public class MessageStore {
                     String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
                     String receiptId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_RECEIPT_ID));
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
+                    MessageResult msg = new MessageResult(chatId, fromId, message);
+                    msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
+                    msg.setTime(getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
                     msg.setReceiptId(receiptId);
                     result.add(msg);
@@ -121,7 +123,9 @@ public class MessageStore {
                 String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
                 String receiptId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_RECEIPT_ID));
 
-                MessageResult msg = new MessageResult(chatId, fromId, message, MessageResult.MessageStatus.valueOf(messageStatus),getFormattedTime(time, "hh:mm"));
+                MessageResult msg = new MessageResult(chatId, fromId, message);
+                msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
+                msg.setTime(getFormattedTime(time, "hh:mm"));
                 msg.setMessageId(messageId);
                 msg.setReceiptId(receiptId);
                 subscriber.onNext(msg);
@@ -289,7 +293,9 @@ public class MessageStore {
 
                     MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
+                    MessageResult msg = new MessageResult(chatId, fromId, message);
+                    msg.setMessageStatus(deliveryStatus);
+                    msg.setTime(getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
 
                     subscriber.onNext(msg);
@@ -336,7 +342,9 @@ public class MessageStore {
 
                     MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, deliveryStatus, getFormattedTime(time, "hh:mm"));
+                    MessageResult msg = new MessageResult(chatId, fromId, message);
+                    msg.setMessageStatus(deliveryStatus);
+                    msg.setTime(getFormattedTime(time, "hh:mm"));
                     msg.setMessageId(messageId);
 
                     subscriber.onNext(msg);
@@ -397,7 +405,9 @@ public class MessageStore {
 
                     MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(delivery);
 
-                    MessageResult msg = new MessageResult(chatId, fromId, message, messageStatus, getFormattedTime(time, "hh:mm"));
+                    MessageResult msg = new MessageResult(chatId, fromId, message);
+                    msg.setMessageStatus(messageStatus);
+                    msg.setTime(getFormattedTime(time, "hh:mm"));
                     msg.setUnSeenCount(unSeenCount);
                     msg.setMessageId(messageId);
 

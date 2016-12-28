@@ -1,9 +1,6 @@
 package com.stairway.data.source.message;
 
-import android.os.Parcelable;
-
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by vidhun on 06/08/16.
@@ -16,33 +13,15 @@ public class MessageResult implements Serializable {
     private String messageId;
     private String receiptId;
     private boolean isReceiptSent;
-
-    public String getReceiptId() {
-        return receiptId;
-    }
-
-    public void setReceiptId(String receiptId) {
-        this.receiptId = receiptId;
-    }
-
     private String time;
     private String name;
     private int unSeenCount;
-
-    public int getUnSeenCount() {
-        return unSeenCount;
-    }
-
-    public void setUnSeenCount(int unSeenCount) {
-        this.unSeenCount = unSeenCount;
-    }
 
     public static enum MessageStatus {
         NOT_SENT,
         SENT,
         DELIVERED,
         READ,
-
         // Self
         SEEN,
         UNSEEN
@@ -54,27 +33,28 @@ public class MessageResult implements Serializable {
         this.fromId = fromId;
     }
 
+    public String getReceiptId() {
+        return receiptId;
+    }
+
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
+    }
+
+    public int getUnSeenCount() {
+        return unSeenCount;
+    }
+
+    public void setUnSeenCount(int unSeenCount) {
+        this.unSeenCount = unSeenCount;
+    }
+
     public String getTime() {
         return time;
     }
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public MessageResult(String chatId, String fromId, String message, MessageStatus messageStatus, String time) {
-        this.chatId = chatId;
-        this.messageStatus = messageStatus;
-        this.fromId = fromId;
-        this.message = message;
-        this.time = time;
-    }
-
-    public MessageResult(String chatId, String fromId, String message, MessageStatus messageStatus) {
-        this.chatId = chatId;
-        this.messageStatus = messageStatus;
-        this.fromId = fromId;
-        this.message = message;
     }
 
     public String getMessageId() {

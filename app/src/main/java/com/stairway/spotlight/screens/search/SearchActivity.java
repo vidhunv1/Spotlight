@@ -29,8 +29,8 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Bind(R.id.rv_contact_list)
     RecyclerView contactsSearchList;
 
-//    @Bind(R.id.rv_chat_list)
 //    RecyclerView messagesSearchList;
+//    @Bind(R.id.rv_chat_list)
 
     @Inject
     SearchPresenter searchPresenter;
@@ -75,13 +75,11 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Override
     public void displayContacts(String searchQuery, List<ContactsModel> contactsModels) {
         Logger.d("DisplayContacts: "+searchQuery+", "+contactsModels.size());
-        contactSearchAdapter.setContacts(contactsModels);
+        contactSearchAdapter.setContacts(searchQuery, contactsModels);
     }
 
     @Override
-    public void displayMessages(String searchQuery, List<MessagesModel> messagesModels) {
-        //TODO
-    }
+    public void displayMessages(String searchQuery, List<MessagesModel> messagesModels) {}
 
     @OnTextChanged(R.id.actionbar_search)
     public void onSearchTextChanged() {
