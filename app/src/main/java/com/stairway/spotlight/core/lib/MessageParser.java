@@ -15,6 +15,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,13 +35,15 @@ public class MessageParser {
     public static final String TAG_TEMPLATE = "template";
     public static final String TAG_BUTTON = "button";
     public static final String TAG_CAROUSEL = "carousel";
+    public static final String TAG_QUICK_REPLIES = "replies";
 
     public static final String ATTRIBUTE_VIDEO_URL = "url"; // required
     public static final String ATTRIBUTE_AUDIO_URL = "url"; // required
     public static final String ATTRIBUTE_LOCATION_LATITUDE = "latitude"; //required
     public static final String ATTRIBUTE_LOCATION_LONGITUDE = "longitude"; //required
     public static final String ATTRIBUTE_TEMPLATE_TYPE = "type"; //reqruied
-    public static final String ATTRIBUTE_TEMPLATE_TITLE = "title"; //reqruied
+    public static final String ATTRIBUTE_TEMPLATE_TITLE = "title";
+    public static final String ATTRIBUTE_TEMPLATE_TEXT = "text";
     public static final String ATTRIBUTE_TEMPLATE_IMAGE = "image"; //opt
     public static final String ATTRIBUTE_TEMPLATE_DEFAULT_ACTION = "default_action"; //opt
     public static final String ATTRIBUTE_TEMPLATE_SUBTITLE = "subtitle"; //opt
@@ -52,7 +56,7 @@ public class MessageParser {
     public static final String VALUE_TEMPLATE_TYPE_GENERIC = "generic";
     public static final String VALUE_TEMPLATE_TYPE_BUTTON = "button";
 
-    public static enum MessageType {
+    public enum MessageType {
         text,
         video,
         audio,
@@ -71,7 +75,7 @@ public class MessageParser {
         return messageType;
     }
 
-    public Object parseMessage() throws ParseException{
+    public Object parseMessage() throws ParseException {
         if(messageXml.isEmpty() || messageXml==null)
             throw new IllegalStateException("MessageXml is null");
         if(!messageXml.startsWith("<"+TAG_HEAD+">")) {
@@ -91,7 +95,6 @@ public class MessageParser {
                 String parent = doc.getDocumentElement().getTagName();
                 if(parent.equals(TAG_HEAD)) {
                     NodeList messageList = doc.getElementsByTagName(TAG_HEAD).item(0).getChildNodes();
-                    System.out.println(messageList.getLength());
                     for (int i = 0; i < messageList.getLength(); i++) {
                         Node node = messageList.item(i);
                         if(node.getNodeName().equals(TAG_TEXT)) {
@@ -109,8 +112,9 @@ public class MessageParser {
                         } else if(node.getNodeName().equals(TAG_TEMPLATE)) {
                             this.messageType = MessageType.template;
                             return parseTemplate(node);
-                        } else
-                            throw new ParseException("Malformed xml: "+parent,0);
+                        } else {
+                            throw new ParseException("Malformed xml :" + parent, 116);
+                        }
                     }
                 } else {
                     throw new ParseException("Malformed xml: "+parent,0);
@@ -124,8 +128,43 @@ public class MessageParser {
         return null;
     }
 
+    public List<String> parseQuickReplies() throws ParseException{
+        if(messageXml.isEmpty() || messageXml==null)
+            throw new IllegalStateException("MessageXml is null");
+        List<String> replies = new ArrayList<>();
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(messageXml));
+            try {
+                Document doc = documentBuilder.parse(is);
+
+                String parent = doc.getDocumentElement().getTagName();
+                if(parent.equals(TAG_HEAD)) {
+                    NodeList messageList = doc.getElementsByTagName(TAG_QUICK_REPLIES).item(0).getChildNodes();
+                    for (int i = 0; i < messageList.getLength(); i++) {
+                        Node node = messageList.item(i);
+                        if(node.getNodeName().equals(TAG_TEXT)) {
+                            replies.add(parseText(node).getText());
+                            }
+                        }
+                    }
+            } catch (Exception e) {
+                throw new ParseException("Malformed xml",0);
+            }
+        } catch (ParserConfigurationException e1) {
+            throw new ParseException("Malformed xml",0);
+        }
+        return replies;
+    }
+
     private TextMessage parseText(Node node) {
-        return new TextMessage(node.getTextContent());
+        if(node.getTextContent()!=null)
+            return new TextMessage(node.getTextContent());
+        return null;
     }
 
     private VideoMessage parseVideo(Node node) throws ParseException{
@@ -161,16 +200,20 @@ public class MessageParser {
         NamedNodeMap attributes = node.getAttributes();
         TemplateMessage templateMessage;
 
-        if(attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TYPE)==null || attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TITLE)==null)
-            throw new ParseException("Malformed xml: type and title are required",0);
+        if(attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TYPE)==null)
+            throw new ParseException("Malformed xml: type",0);
         String type = attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TYPE).getTextContent();
 
         switch (type) {
             case VALUE_TEMPLATE_TYPE_GENERIC:
+                if(attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TITLE) == null)
+                    throw new ParseException("Title is required", 0);
                 templateMessage = new TemplateMessage(TemplateMessage.TemplateType.generic, attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TITLE).getTextContent());
                 break;
             case VALUE_TEMPLATE_TYPE_BUTTON:
-                templateMessage = new TemplateMessage(TemplateMessage.TemplateType.button, attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TITLE).getTextContent());
+                if(attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TEXT) == null)
+                    throw new ParseException("Text is required", 0);
+                templateMessage = new TemplateMessage(TemplateMessage.TemplateType.button, attributes.getNamedItem(ATTRIBUTE_TEMPLATE_TEXT).getTextContent());
                 break;
             default:
                 throw new ParseException("Malformed xml: type and title are required", 0);

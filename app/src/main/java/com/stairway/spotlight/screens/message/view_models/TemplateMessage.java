@@ -11,6 +11,7 @@ public class TemplateMessage {
     private String image;
     private String defaultAction;
     private String title;
+    private String text;
     private String subtitle;
     private String url;
     private TemplateType type;
@@ -20,8 +21,11 @@ public class TemplateMessage {
         button
     }
 
-    public TemplateMessage(TemplateType type, String title) {
-        this.title = title;
+    public TemplateMessage(TemplateType type, String msg) {
+        if(type == TemplateType.generic)
+            this.title = msg;
+        else if(type == TemplateType.button)
+            this.text = msg;
         this.type = type;
         this.buttons = new ArrayList<>();
     }
@@ -80,5 +84,13 @@ public class TemplateMessage {
 
     public void addButton(TemplateButton button) {
         this.buttons.add(button);
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

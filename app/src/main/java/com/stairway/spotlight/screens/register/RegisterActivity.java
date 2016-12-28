@@ -57,10 +57,7 @@ public class RegisterActivity extends AppCompatActivity implements BaseFragment.
 
     private boolean checkIfAlreadyhavePermission() {
         int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else
-            return false;
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestForSpecificPermission() {

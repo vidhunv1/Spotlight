@@ -29,11 +29,11 @@ public class XMPPManager implements Serializable{
 
     public XMPPManager(String userName, String pass) {
         XMPPTCPConnectionConfiguration.Builder config;
-        this.userName = userName;
+        XMPPManager.userName = userName;
 
         config = XMPPTCPConnectionConfiguration.builder();
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setUsernameAndPassword(this.userName, password);
+        config.setUsernameAndPassword(XMPPManager.userName, password);
         config.setHost(DataConfig.XMPP_HOST);
         config.setPort(DataConfig.XMPP_PORT);
         config.setServiceName(DataConfig.XMPP_SERVICE_NAME);

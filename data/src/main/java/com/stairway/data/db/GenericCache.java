@@ -93,9 +93,7 @@ public class GenericCache {
                 }
         );
 
-        if(memoryStore.get(key) == value)
-            return true;
-        return false;
+        return memoryStore.get(key) == value;
     }
 
     public String get(String key) {

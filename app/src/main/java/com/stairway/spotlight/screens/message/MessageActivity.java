@@ -37,7 +37,7 @@ import butterknife.OnTextChanged;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 public class MessageActivity extends BaseActivity
-        implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener{
+        implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
     @Inject
     public XMPPManager connection;
 
@@ -83,7 +83,7 @@ public class MessageActivity extends BaseActivity
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, this, this);
+        messagesAdapter = new MessagesAdapter(this, this, this, this);
         messageItem.setLayoutManager(linearLayoutManager);
         messageItem.setAdapter(messagesAdapter);
         OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
@@ -196,6 +196,13 @@ public class MessageActivity extends BaseActivity
     @Override
     public void urlButtonClicked(String url) {
         startActivity(WebViewActivity.callingIntent(this, url));
+    }
+
+    @Override
+    public void onQuickReplyClicked(String text) {
+        MessageResult msg = new MessageResult(chatId, currentUser, text);
+        msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+        messagePresenter.sendMessage(msg);
     }
 
     @Override

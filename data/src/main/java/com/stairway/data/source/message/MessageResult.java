@@ -17,7 +17,7 @@ public class MessageResult implements Serializable {
     private String name;
     private int unSeenCount;
 
-    public static enum MessageStatus {
+    public enum MessageStatus {
         NOT_SENT,
         SENT,
         DELIVERED,
