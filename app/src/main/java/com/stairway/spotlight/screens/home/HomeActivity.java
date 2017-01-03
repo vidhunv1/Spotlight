@@ -19,7 +19,7 @@ import android.view.View;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.user.UserAuthApi;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.gson_models.User;
 import com.stairway.data.source.user.gson_models.UserResponse;
@@ -35,7 +35,6 @@ import com.stairway.spotlight.screens.search.SearchFragment;
 import com.stairway.spotlight.screens.search.SearchActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
-
 import java.util.List;
 
 import rx.Subscriber;
@@ -46,7 +45,7 @@ public class HomeActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ActionBarDrawerToggle toggle;
     private FloatingActionButton fab;
-    UserAuthApi userAuthApi;
+    UserApi userApi;
     UserSessionResult userSession;
     ChatListFragment chatListFragment;
     ProfileFragment profileFragment;
@@ -211,8 +210,8 @@ public class HomeActivity extends BaseActivity
             Logger.d("[HomeActivity] FCM TOKEN:"+fcmToken);
             User updateUser = new User();
             updateUser.setNotificationToken(fcmToken);
-            userAuthApi = new UserAuthApi();
-            userAuthApi.updateUser(updateUser, userSession.getAccessToken()).subscribe(new Subscriber<UserResponse>() {
+            userApi = new UserApi();
+            userApi.updateUser(updateUser, userSession.getAccessToken()).subscribe(new Subscriber<UserResponse>() {
                 @Override
                 public void onCompleted() {}
                 @Override

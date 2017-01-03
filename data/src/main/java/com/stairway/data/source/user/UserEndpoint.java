@@ -4,9 +4,12 @@ import com.stairway.data.source.user.gson_models.UserRequest;
 import com.stairway.data.source.user.gson_models.StatusResponse;
 import com.stairway.data.source.user.gson_models.UserResponse;
 
+import okhttp3.MultipartBody;
 import retrofit2.http.Body;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import rx.Observable;
 
 /**
@@ -20,7 +23,11 @@ public interface UserEndpoint {
     @POST("users/verify")
     Observable<UserResponse> verifyUser(@Body UserRequest userRequest);
 
-    @PUT("users/")
+    @PUT("users")
     Observable<UserResponse> updateUser(@Body UserRequest userRequest);
+
+    @Multipart
+    @PUT("users")
+    Observable<UserResponse> uploadProfileDP(@Part MultipartBody.Part profileDP);
 
 }

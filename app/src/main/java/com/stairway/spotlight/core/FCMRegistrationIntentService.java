@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserAuthApi;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.gson_models.User;
 import com.stairway.data.source.user.gson_models.UserResponse;
 
@@ -20,7 +20,7 @@ import static com.stairway.data.source.user.UserSessionStore.KEY_ACCESS_TOKEN;
 public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
     public static final String SENT_TOKEN_TO_SERVER = "FCM_IS_TOKEN_SENT";
     public static final String FCM_TOKEN = "FCM_TOKEN";
-    UserAuthApi userAuthApi;
+    UserApi userApi;
 
     public FCMRegistrationIntentService() {
     }
@@ -47,7 +47,7 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
         User updateUser = new User();
         updateUser.setNotificationToken(token);
 
-        userAuthApi.updateUser(updateUser, accessToken).subscribe(new Subscriber<UserResponse>() {
+        userApi.updateUser(updateUser, accessToken).subscribe(new Subscriber<UserResponse>() {
             @Override
             public void onCompleted() {}
 

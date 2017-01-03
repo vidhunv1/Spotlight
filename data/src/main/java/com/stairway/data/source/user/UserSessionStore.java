@@ -23,6 +23,7 @@ public class UserSessionStore {
     public static String  KEY_PHONE = "SESSION_PHONE";
     public static String KEY_REFRESH_TOKEN = "SESSION_REFRESH_TOKEN";
     public static String KEY_EXPIRY = "SESSION_EXPIRY";
+    public static String KEY_PROFILE_DP = "SESSION_PROFILE_DP";
 
     public UserSessionStore(Context context) {
         // TODO: Storing tokens in sharedpreference: right approach?
@@ -45,20 +46,22 @@ public class UserSessionStore {
         return Observable.create( subscriber -> {
             final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
 
-            if(userSessionResult.getUserName()!=null || !userSessionResult.getUserName().isEmpty())
+            if(userSessionResult.getUserName()!=null && !userSessionResult.getUserName().isEmpty())
                 editor.putString(KEY_USER_NAME, userSessionResult.getUserName());
             if(userSessionResult.getAccessToken()!=null && !userSessionResult.getAccessToken().isEmpty())
                 editor.putString(KEY_ACCESS_TOKEN, userSessionResult.getAccessToken());
             if(userSessionResult.getRefreshToken()!=null && !userSessionResult.getRefreshToken().isEmpty())
                 editor.putString(KEY_REFRESH_TOKEN, userSessionResult.getRefreshToken());
-            if(userSessionResult.getCountryCode()!=null || !userSessionResult.getCountryCode().isEmpty())
+            if(userSessionResult.getCountryCode()!=null && !userSessionResult.getCountryCode().isEmpty())
                 editor.putString(KEY_COUNTRY_CODE, userSessionResult.getCountryCode());
-            if(userSessionResult.getPhone()!=null || !userSessionResult.getPhone().isEmpty())
+            if(userSessionResult.getPhone()!=null && !userSessionResult.getPhone().isEmpty())
                 editor.putString(KEY_PHONE, userSessionResult.getPhone());
-            if(userSessionResult.getExpiry()!=null || !userSessionResult.getExpiry().isEmpty())
+            if(userSessionResult.getExpiry()!=null && !userSessionResult.getExpiry().isEmpty())
                 editor.putString(KEY_EXPIRY, userSessionResult.getExpiry());
-            if(userSessionResult.getUserId()!=null || !userSessionResult.getUserId().isEmpty())
+            if(userSessionResult.getUserId()!=null && !userSessionResult.getUserId().isEmpty())
                 editor.putString(KEY_USER_ID, userSessionResult.getUserId());
+            if(userSessionResult.getProfileDP()!=null && !userSessionResult.getProfileDP().isEmpty())
+                editor.putString(KEY_PROFILE_DP, userSessionResult.getProfileDP());
             editor.commit();
             Logger.d("[PutUserSession]"+userSessionResult.toString());
             subscriber.onNext(true);
@@ -86,6 +89,7 @@ public class UserSessionStore {
                 String countryCode = prefs.getString(KEY_COUNTRY_CODE, "");
                 String expiry = prefs.getString(KEY_EXPIRY, "");
                 String userId = prefs.getString(KEY_USER_ID, "");
+                String profileDP = prefs.getString(KEY_PROFILE_DP, "");
 
                 if(userName.isEmpty()) {
                     Logger.d("UserSession not available");
@@ -99,6 +103,7 @@ public class UserSessionStore {
                     userSessionResult.setRefreshToken(refreshToken);
                     userSessionResult.setExpiry(expiry);
                     userSessionResult.setUserId(userId);
+                    userSessionResult.setProfileDP(profileDP);
                     subscriber.onNext(userSessionResult);
                 }
             } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
 import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserAuthApi;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.UserSessionStore;
 import com.stairway.data.source.user.gson_models.UserResponse;
@@ -18,17 +18,17 @@ import rx.schedulers.Schedulers;
  */
 public class RegisterUseCase {
     private UserSessionStore userSessionStore;
-    private UserAuthApi userAuthApi;
+    private UserApi userApi;
 
     @Inject
-    public RegisterUseCase(UserAuthApi userAuthApi, UserSessionStore userSessionStore) {
-        this.userAuthApi = userAuthApi;
+    public RegisterUseCase(UserApi userApi, UserSessionStore userSessionStore) {
+        this.userApi = userApi;
         this.userSessionStore = userSessionStore;
     }
 
     public Observable<UserSessionResult> execute(String countryCode, String mobile, String otp) {
         Observable<UserSessionResult> register = Observable.create( subscriber -> {
-            userAuthApi.verifyUser(countryCode, mobile, otp).subscribe(new Subscriber<UserResponse>() {
+            userApi.verifyUser(countryCode, mobile, otp).subscribe(new Subscriber<UserResponse>() {
                 @Override
                 public void onCompleted() {
                     if(!subscriber.isUnsubscribed())
@@ -49,6 +49,7 @@ public class RegisterUseCase {
                         userSessionResult.setCountryCode(verifyResponse.getUser().getCountryCode());
                         userSessionResult.setExpiry(verifyResponse.getExpiry());
                         userSessionResult.setUserId(verifyResponse.getUser().getUserId());
+                        userSessionResult.setProfileDP(verifyResponse.getUser().getProfileDP());
 
                         storeToken(userSessionResult);
                         subscriber.onNext(userSessionResult);
@@ -56,7 +57,6 @@ public class RegisterUseCase {
                 }
             });
         });
-
         return register.subscribeOn(Schedulers.newThread());
     }
 

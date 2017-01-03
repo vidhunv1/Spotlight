@@ -6,8 +6,8 @@ import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.contacts.ContactApi;
 import com.stairway.data.source.contacts.ContactContent;
 import com.stairway.data.source.contacts.ContactStore;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.UserSessionStore;
-import com.stairway.data.source.user.UserAuthApi;
 import com.stairway.data.source.message.MessageApi;
 import com.stairway.data.source.message.MessageStore;
 import com.stairway.spotlight.core.di.scope.ApplicationScope;
@@ -29,8 +29,8 @@ public class DataModule {
 
     @Provides
     @ApplicationScope
-    public UserAuthApi userSessionApi() {
-        return new UserAuthApi();
+    public UserApi userSessionApi() {
+        return new UserApi();
     }
 
     @Provides

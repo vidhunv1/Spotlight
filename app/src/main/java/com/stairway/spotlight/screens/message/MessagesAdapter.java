@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
@@ -335,6 +336,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 subtitle.setText(templateMessage.getSubtitle());
             if(!templateMessage.getUrl().isEmpty() && templateMessage.getUrl()!=null)
                 url.setText(templateMessage.getUrl());
+            if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
+                Glide.with(context).load(templateMessage.getImage()).into(templateImage);
+
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {
                 Logger.d(button.toString());

@@ -1,9 +1,9 @@
 package com.stairway.spotlight.screens.launcher;
 
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.UserSessionStore;
-import com.stairway.data.source.user.UserAuthApi;
 
 import javax.inject.Inject;
 
@@ -17,11 +17,11 @@ import rx.schedulers.Schedulers;
  */
 public class UserSessionUseCase {
     private UserSessionStore userSessionStore;
-    private UserAuthApi userAuthApi;
+    private UserApi userApi;
 
     @Inject
-    public UserSessionUseCase(UserAuthApi userAuthApi, UserSessionStore userSessionStore) {
-        this.userAuthApi = userAuthApi;
+    public UserSessionUseCase(UserApi userApi, UserSessionStore userSessionStore) {
+        this.userApi = userApi;
         this.userSessionStore = userSessionStore;
     }
 
@@ -62,7 +62,7 @@ public class UserSessionUseCase {
         Authenticate access token and check if valid. Update with new token if expired.
     */
     private void authenticate(UserSessionResult userSessionResult, final Subscriber<? super UserSessionResult> subscriber) {
-        Observable<Boolean> isAuthenticated = userAuthApi.authenticate(userSessionResult)
+        Observable<Boolean> isAuthenticated = userApi.authenticate(userSessionResult)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
 
@@ -96,7 +96,7 @@ public class UserSessionUseCase {
     Refresh access token with new token and update UserSessionStore with new access token.
      */
     private void refreshtoken(UserSessionResult userSessionResult, final Subscriber<? super UserSessionResult> subscriber) {
-        Observable<UserSessionResult> refreshToken = userAuthApi.refreshToken(userSessionResult)
+        Observable<UserSessionResult> refreshToken = userApi.refreshToken(userSessionResult)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
 

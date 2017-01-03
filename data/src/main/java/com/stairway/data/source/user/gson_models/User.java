@@ -54,6 +54,17 @@ public class User {
     @SerializedName("user_id")
     @Expose
     private String userId;
+    @SerializedName("profile_dp")
+    @Expose
+    private String profileDP;
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
+    }
 
     public void setUserType(String userType) {
         this.userType = userType;

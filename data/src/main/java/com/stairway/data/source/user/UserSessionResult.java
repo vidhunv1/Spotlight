@@ -11,8 +11,17 @@ public class UserSessionResult {
     private String phone;
     private String expiry;
     private String userId;
+    private String profileDP;
 
     public UserSessionResult() {
+    }
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
     }
 
     public String getUserId() {
@@ -78,12 +87,14 @@ public class UserSessionResult {
     @Override
     public String toString() {
         return "UserSessionResult{" +
-                "userId='" + userName + '\'' +
+                "userName='" + userName + '\'' +
                 ", accessToken='" + accessToken + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 ", countryCode='" + countryCode + '\'' +
                 ", phone='" + phone + '\'' +
                 ", expiry='" + expiry + '\'' +
+                ", userId='" + userId + '\'' +
+                ", profileDP='" + profileDP + '\'' +
                 '}';
     }
 }

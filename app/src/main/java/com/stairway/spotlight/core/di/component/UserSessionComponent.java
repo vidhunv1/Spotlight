@@ -10,6 +10,8 @@ import com.stairway.spotlight.screens.home.chats.di.ChatListViewComponent;
 import com.stairway.spotlight.screens.home.chats.di.ChatListViewModule;
 import com.stairway.spotlight.screens.home.new_chat.di.NewChatViewComponent;
 import com.stairway.spotlight.screens.home.new_chat.di.NewChatViewModule;
+import com.stairway.spotlight.screens.home.profile.di.ProfileViewComponent;
+import com.stairway.spotlight.screens.home.profile.di.ProfileViewModule;
 import com.stairway.spotlight.screens.message.di.MessageComponent;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.register.initialize.di.InitializeViewComponent;
@@ -35,4 +37,5 @@ public interface UserSessionComponent {
     ContactsViewComponent plus(ContactsViewModule contactsViewModule);
     InitializeViewComponent plus(InitializeViewModule initializeViewModule);
     SearchViewComponent plus(SearchViewModule searchViewModule);
+    ProfileViewComponent plus(ProfileViewModule profileViewModule);
 }

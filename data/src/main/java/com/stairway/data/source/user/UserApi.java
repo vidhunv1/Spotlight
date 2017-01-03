@@ -7,12 +7,17 @@ import com.stairway.data.source.user.gson_models.UserRequest;
 import com.stairway.data.source.user.gson_models.StatusResponse;
 import com.stairway.data.source.user.gson_models.UserResponse;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 
 /**
  * Created by vidhun on 19/07/16.
  */
-public class UserAuthApi {
+public class UserApi {
 
     public Observable<Boolean> authenticate(UserSessionResult userSessionResult) {
         // TODO: Implement strategy for token based authentication
@@ -54,5 +59,14 @@ public class UserAuthApi {
         userRequest.setUser(user);
         Observable<UserResponse> updatedUser = userEndpoint.updateUser(userRequest);
         return updatedUser;
+    }
+
+    public Observable<UserResponse> uploadProfileDP(File imageFile, String fileName, String authToken) {
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile);
+        MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("profile_dp", fileName, requestBody);
+
+        UserEndpoint userEndpoint = ApiManager.getInstance(authToken).create(UserEndpoint.class);
+        Observable<UserResponse> profileDp = userEndpoint.uploadProfileDP(imageFileBody);
+        return profileDp;
     }
 }
