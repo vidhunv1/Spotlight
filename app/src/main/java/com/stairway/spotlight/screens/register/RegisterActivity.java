@@ -56,12 +56,21 @@ public class RegisterActivity extends AppCompatActivity implements BaseFragment.
     }
 
     private boolean checkIfAlreadyhavePermission() {
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        return result == PackageManager.PERMISSION_GRANTED;
+        int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
+        int result3 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int result4 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = PackageManager.PERMISSION_GRANTED;
+
+        return result1 == permission && result2 == permission && result3 == permission && result4 == permission;
     }
 
     private void requestForSpecificPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 101);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS,
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
     }
 
     @Override

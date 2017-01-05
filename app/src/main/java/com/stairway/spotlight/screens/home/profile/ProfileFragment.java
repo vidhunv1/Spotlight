@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscriber;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -93,7 +92,6 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
 
     @OnClick(R.id.iv_profileImage)
     public void onProfileClicked() {
-        Logger.d("Profile clicked");
         CharSequence options[] = new CharSequence[] {"Camera", "Gallery"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -132,7 +130,6 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data!=null) {
-            Logger.d("Request_gallery");
             Uri selectedImage = data.getData();
             Logger.d(selectedImage.toString());
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
@@ -147,9 +144,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
             presenter.uploadProfileDP(new File(picturePath), userSession);
 
         } else if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
-            Logger.d("Request_Camera");
             if(currentPhotoPath!=null) {
-                Logger.d("Srtting "+currentPhotoPath);
                 setProfileDP(new File(currentPhotoPath));
                 presenter.uploadProfileDP(new File(currentPhotoPath), userSession);
                 galleryAddPic(currentPhotoPath);
@@ -164,7 +159,6 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
         StringSignature signature = new StringSignature(String.valueOf(millis));
         Glide.with(this).load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.default_profile_image_qr)
                 .skipMemoryCache(true)
                 .signature(signature)
                 .into(profileImage);
@@ -175,15 +169,14 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
         Logger.d("set dp:"+url);
         Glide.with(this).load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.default_profile_image_qr)
                 .skipMemoryCache(true)
                 .into(profileImage);
     }
 
     @Override
     public void setProfileDP(File file) {
-        Logger.d("set dp:"+file.getName());
-        Glide.with(this).load(file).skipMemoryCache(true).into(profileImage);
+        Uri uri = Uri.fromFile(file);
+        profileImage.setImageURI(uri);
     }
 
     private void galleryAddPic(String path) {
