@@ -13,6 +13,7 @@ import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.lib.MessageParser;
 import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
+import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -188,7 +189,22 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void renderItem(ChatListItemModel chatListItem) {
             contactName.setText(chatListItem.getChatName());
-            lastMessage.setText(chatListItem.getLastMessage());
+
+            try {
+                MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
+                Object messageObject = messageParser.parseMessage();
+
+                if(messageParser.getMessageType() == MessageParser.MessageType.template) {
+                    TemplateMessage msg = (TemplateMessage)messageObject;
+                    lastMessage.setText(msg.getDisplayMessage());
+                } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
+                    TextMessage msg = (TextMessage)messageObject;
+                    lastMessage.setText(msg.getDisplayMessage());
+                }
+            } catch(ParseException e) {
+                lastMessage.setText(chatListItem.getLastMessage());
+            }
+
             time.setText(chatListItem.getTime());
             profileImage.setImageResource(R.drawable.default_profile_image);
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
@@ -231,13 +247,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             try {
                 MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
                 Object messageObject = messageParser.parseMessage();
+
                 if(messageParser.getMessageType() == MessageParser.MessageType.template) {
                     TemplateMessage msg = (TemplateMessage)messageObject;
-                    lastMessage.setText(msg.getTitle());
+                    lastMessage.setText(msg.getDisplayMessage());
+                } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
+                    TextMessage msg = (TextMessage)messageObject;
+                    lastMessage.setText(msg.getDisplayMessage());
                 }
             } catch(ParseException e) {
                 lastMessage.setText(chatListItem.getLastMessage());
             }
+
             time.setText(chatListItem.getTime());
             profileImage.setImageResource(R.drawable.default_profile_image);
 

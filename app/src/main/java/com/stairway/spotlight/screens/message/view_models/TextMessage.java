@@ -20,6 +20,10 @@ public class TextMessage{
         this.text = text;
     }
 
+    public String getDisplayMessage() {
+        return this.text;
+    }
+
     public String toXML() {
         if(this.text!=null || !this.text.isEmpty()) {
             return openTag(TAG_HEAD_SHORT) + openTag(TAG_TEXT) + this.text + closeTag(TAG_TEXT) + closeTag(TAG_HEAD_SHORT);

@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/background_default</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_back_button</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

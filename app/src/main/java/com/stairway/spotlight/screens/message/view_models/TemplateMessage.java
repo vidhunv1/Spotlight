@@ -7,7 +7,7 @@ import java.util.List;
  * Created by vidhun on 25/12/16.
  */
 
-public class TemplateMessage {
+public class TemplateMessage{
     private String image;
     private String defaultAction;
     private String title;
@@ -92,5 +92,14 @@ public class TemplateMessage {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getDisplayMessage() {
+        if(this.title!=null && !this.title.isEmpty())
+            return this.title;
+        else if(this.text!=null && !this.text.isEmpty())
+            return this.text;
+        else
+            return "Template";
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,6 +52,8 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
         getSupportActionBar().setCustomView(R.layout.actionbar_search);
+        getSupportActionBar().setElevation(0);
+
         ButterKnife.bind(this);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         searchPresenter.attachView(this);
