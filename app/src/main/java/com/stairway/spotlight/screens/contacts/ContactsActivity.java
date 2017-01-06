@@ -78,7 +78,7 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
 
     @Override
     public void onContactAddClicked(String userName) {
-        Logger.d("Add Clicked: "+userName);
+        Logger.d(this, "Add Clicked: "+userName);
         contactsPresenter.addContact(userName);
     }
 

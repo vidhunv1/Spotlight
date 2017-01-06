@@ -33,7 +33,7 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
             String token = instanceId.getToken();
             sharedPreferences.edit().putString(FCM_TOKEN, token).apply();
             sendTokenToServer(token);
-            Logger.d("FCM token refresh: "+token);
+            Logger.d(this, "FCM token refresh: "+token);
         } catch (Exception e) {
             e.printStackTrace();
             sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();

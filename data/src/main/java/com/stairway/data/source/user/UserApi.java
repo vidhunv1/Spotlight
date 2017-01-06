@@ -26,7 +26,7 @@ public class UserApi {
 
     public Observable<UserSessionResult> refreshToken(UserSessionResult userSessionResult) {
         // TODO: Refresh token and return.
-        Logger.v("Refresh User Session Token");
+        Logger.v(this, "Refresh User Session Token");
         String newAccessToken = "spotlight";
         userSessionResult.setAccessToken(newAccessToken);
         return Observable.just(userSessionResult);

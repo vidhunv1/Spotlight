@@ -78,13 +78,13 @@ public class RegisterUseCase {
 
             @Override
             public void onError(Throwable e) {
-                Logger.e("Error storing new Token to UserSessionStore");
+                Logger.e(this, "Error storing new Token to UserSessionStore");
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
                 if(aBoolean)
-                    Logger.d("Stored new Session token to UserSessionStore");
+                    Logger.d(this, "Stored new Session token to UserSessionStore");
             }
         });
     }

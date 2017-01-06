@@ -72,7 +72,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, view);
-        Logger.d(userSession.toString());
+        Logger.d(this, userSession.toString());
 
         return view;
     }
@@ -106,7 +106,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
                     try {
                         photoFile = ImageUtils.createImageFile(getActivity());
                     } catch (IOException ex) {
-                        Logger.d("Error creating image file.");
+                        Logger.d(this, "Error creating image file.");
                     }
                     if (photoFile != null) {
                         Uri photoURI = FileProvider.getUriForFile(this.getActivity(), "com.stairway.spotlight.fileprovider", photoFile);
@@ -131,7 +131,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data!=null) {
             Uri selectedImage = data.getData();
-            Logger.d(selectedImage.toString());
+            Logger.d(this, selectedImage.toString());
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
             Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
@@ -154,7 +154,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
 
     @Override
     public void updateProfileDP(String url) {
-        Logger.d("update dp: "+url);
+        Logger.d(this, "update dp: "+url);
         long millis = System.currentTimeMillis() / (24 * 60 * 60 * 1000);
         StringSignature signature = new StringSignature(String.valueOf(millis));
         Glide.with(this).load(url)
@@ -166,7 +166,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
 
     @Override
     public void setProfileDP(String url) {
-        Logger.d("set dp:"+url);
+        Logger.d(this, "set dp:"+url);
         Glide.with(this).load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .skipMemoryCache(true)

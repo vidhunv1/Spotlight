@@ -35,11 +35,8 @@ public class SendMessageUseCase {
                                                 public void onCompleted() {
                                                     subscriber.onCompleted();
                                                 }
-
                                                 @Override
-                                                public void onError(Throwable e) {
-
-                                                }
+                                                public void onError(Throwable e) {}
 
                                                 @Override
                                                 public void onNext(MessageResult sentMessageResult) {

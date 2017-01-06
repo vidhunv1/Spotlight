@@ -73,11 +73,11 @@ public class MessageStore {
                             @Override
                             public void onCompleted() {}
                             @Override
-                            public void onError(Throwable e) {Logger.e(e.getMessage());}
+                            public void onError(Throwable e) {Logger.e(this, e.getMessage());}
 
                             @Override
                             public void onNext(MessageResult messageResult) {
-                                Logger.d("Changed message to seen");
+                                Logger.d(this, "Changed message to seen");
                             }
                         });
                     }
@@ -90,7 +90,7 @@ public class MessageStore {
 
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error"+e.getMessage());
+                Logger.e(this, "MessageStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -132,7 +132,7 @@ public class MessageStore {
 
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: "+e.getMessage());
+                Logger.e(this, "MessageStore sqlite error: "+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -305,7 +305,7 @@ public class MessageStore {
                 subscriber.onCompleted();
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: getunsentmessages(chatid) - "+e.getMessage());
+                Logger.e(this, "MessageStore sqlite error: getunsentmessages(chatid) - "+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -354,7 +354,7 @@ public class MessageStore {
                 subscriber.onCompleted();
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: getUnsentMessages()-"+e.getMessage());
+                Logger.e(this, "MessageStore sqlite error: getUnsentMessages()-"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -401,7 +401,7 @@ public class MessageStore {
                         unSeenCursor.moveToFirst();
                         unSeenCount = unSeenCursor.getInt(unSeenCursor.getColumnIndex(COLUMN_UNSEEN_COUNT));
                     }
-                    Logger.d("Notification count"+unSeenCount);
+                    Logger.d(this, "Notification count"+unSeenCount);
 
                     MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(delivery);
 
@@ -419,7 +419,7 @@ public class MessageStore {
                 subscriber.onNext(result);
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("MessageStore sqlite error: - getChatList"+e.getMessage());
+                Logger.e(this, "sqlite error: - getChatList"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -441,7 +441,7 @@ public class MessageStore {
             Date fullDate = formatterFrom.parse(time);
             return formatterTo.format(fullDate);
         } catch (ParseException e) {
-            Logger.e("Error parsing DateTime");
+            Logger.e(this, "Error parsing DateTime");
             return "";
         }
     }

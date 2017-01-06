@@ -28,14 +28,14 @@ public class DatabaseManager {
     {
         instance = new DatabaseManager();
         sqliteHelper = new SQLiteHelper(context);
-        Logger.d("DatabaseManager initialized");
+        Logger.d(new DatabaseManager(), "DatabaseManager initialized");
     }
 
     public static synchronized DatabaseManager getInstance()
     {
         if(instance == null)
         {
-            Logger.e("DatabaseManager not initialized");
+            Logger.e(new DatabaseManager(), "DatabaseManager not initialized");
             throw new IllegalStateException("DatabaseManager not initialized");
         }
         return instance;

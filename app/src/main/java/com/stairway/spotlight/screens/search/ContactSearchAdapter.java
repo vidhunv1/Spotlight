@@ -35,7 +35,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.itemList.clear();
         this.itemList.addAll(itemList);
         notifyDataSetChanged();
-        Logger.d("ContactSearchAdapter");
+        Logger.d(this, "ContactSearchAdapter");
     }
 
     @Override

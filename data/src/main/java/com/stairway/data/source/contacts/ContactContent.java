@@ -39,7 +39,6 @@ public class ContactContent {
     Contacts are sorted in ASC.
      */
     public Observable<List<ContactResult>> getContacts() {
-        Logger.d("ContactsContent: ");
 
         Observable<List<ContactResult>> getContacts = Observable.create(
                 subscriber -> {
@@ -56,7 +55,7 @@ public class ContactContent {
                         Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, sortOrder);
                         Cursor pCur;
 
-                        Logger.d("CURSOR: "+cursor.getCount());
+                        Logger.d(this, "CURSOR: "+cursor.getCount());
 
                         cursor.moveToFirst();
                         while(!cursor.isAfterLast()) {
@@ -105,7 +104,7 @@ public class ContactContent {
                         subscriber.onCompleted();
 
                     } catch (Exception e) {
-                        Logger.e("ContactsContent sqlite error"+e.getMessage());
+                        Logger.e(this, "sqlite error"+e.getMessage());
                         subscriber.onError(e);
                         subscriber.onCompleted();
                     }

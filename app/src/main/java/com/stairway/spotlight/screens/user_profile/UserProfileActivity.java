@@ -43,7 +43,7 @@ public class UserProfileActivity extends BaseActivity {
 
     @OnClick(R.id.iv_userprofile_dp)
     public void onProfileClicked() {
-        Logger.d("Profile clicked");
+        Logger.d(this, "Profile clicked");
         Intent loadIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -56,7 +56,7 @@ public class UserProfileActivity extends BaseActivity {
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
-            Logger.d(selectedImage.toString());
+            Logger.d(this, selectedImage.toString());
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
             Cursor cursor = getContentResolver().query(selectedImage,

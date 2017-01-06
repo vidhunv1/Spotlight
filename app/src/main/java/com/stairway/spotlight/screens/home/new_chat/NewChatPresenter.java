@@ -34,8 +34,6 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
     @Override
     public void initContactList() {
-        Logger.d("ContactsPresenter");
-
         Subscription subscription = getNewChatsUseCase.execute()
                 .observeOn(contactsView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<List<NewChatItemModel>>(contactsView) {

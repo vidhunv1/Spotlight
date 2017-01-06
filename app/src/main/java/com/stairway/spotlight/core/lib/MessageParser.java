@@ -1,6 +1,5 @@
 package com.stairway.spotlight.core.lib;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.screens.message.view_models.AudioMessage;
 import com.stairway.spotlight.screens.message.view_models.LocationMessage;
 import com.stairway.spotlight.screens.message.view_models.TemplateButton;
@@ -22,42 +21,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import static com.stairway.spotlight.core.lib.MessageXML.*;
+
 /**
  * Created by vidhun on 25/12/16.
  */
 //TODO: ugly code!! change it soon
 public class MessageParser {
-    public static final String TAG_HEAD = "message";
-    public static final String TAG_TEXT = "text";
-    public static final String TAG_VIDEO = "video";
-    public static final String TAG_LOCATION = "location";
-    public static final String TAG_AUDIO = "audio";
-    public static final String TAG_TEMPLATE = "template";
-    public static final String TAG_BUTTON = "button";
-    public static final String TAG_CAROUSEL = "carousel";
-    public static final String TAG_QUICK_REPLIES = "replies";
-
-    public static final String ATTRIBUTE_VIDEO_URL = "url"; // required
-    public static final String ATTRIBUTE_AUDIO_URL = "url"; // required
-    public static final String ATTRIBUTE_LOCATION_LATITUDE = "latitude"; //required
-    public static final String ATTRIBUTE_LOCATION_LONGITUDE = "longitude"; //required
-    public static final String ATTRIBUTE_TEMPLATE_TYPE = "type"; //reqruied
-    public static final String ATTRIBUTE_TEMPLATE_TITLE = "title";
-    public static final String ATTRIBUTE_TEMPLATE_TEXT = "text";
-    public static final String ATTRIBUTE_TEMPLATE_IMAGE = "image"; //opt
-    public static final String ATTRIBUTE_TEMPLATE_DEFAULT_ACTION = "default_action"; //opt
-    public static final String ATTRIBUTE_TEMPLATE_SUBTITLE = "subtitle"; //opt
-    public static final String ATTRIBUTE_TEMPLATE_URL = "url"; //opt
-    public static final String ATTRIBUTE_BUTTON_TYPE = "type"; // required
-    public static final String ATTRIBUTE_BUTTON_TITLE = "type"; // required
-    public static final String ATTRIBUTE_BUTTON_URL = "url";
-    public static final String ATTRIBUTE_BUTTON_PAYLOAD = "payload";
-
-    public static final String VALUE_TEMPLATE_TYPE_GENERIC = "generic";
-    public static final String VALUE_TEMPLATE_TYPE_BUTTON = "button";
 
     public enum MessageType {
         text,
+        image,
         video,
         audio,
         location,
@@ -78,13 +52,13 @@ public class MessageParser {
     public Object parseMessage() throws ParseException {
         if(messageXml.isEmpty() || messageXml==null)
             throw new IllegalStateException("MessageXml is null");
-        if(!messageXml.startsWith("<"+TAG_HEAD+">")) {
+        if(!(messageXml.startsWith(openTag(TAG_HEAD)) || messageXml.startsWith(openTag(TAG_HEAD_SHORT)))) {
             this.messageType = MessageType.text;
             return new TextMessage(messageXml);
         }
 
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = null;
+        DocumentBuilder documentBuilder;
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
             InputSource is = new InputSource();
@@ -93,13 +67,21 @@ public class MessageParser {
                 Document doc = documentBuilder.parse(is);
 
                 String parent = doc.getDocumentElement().getTagName();
-                if(parent.equals(TAG_HEAD)) {
-                    NodeList messageList = doc.getElementsByTagName(TAG_HEAD).item(0).getChildNodes();
+                if(parent.equals(TAG_HEAD_SHORT) || parent.equals(TAG_HEAD)) {
+                    NodeList messageList = null;
+                    if(parent.equals(TAG_HEAD_SHORT))
+                        messageList = doc.getElementsByTagName(TAG_HEAD_SHORT).item(0).getChildNodes();
+                    else if(parent.equals(TAG_HEAD))
+                        messageList = doc.getElementsByTagName(TAG_HEAD).item(0).getChildNodes();
+
                     for (int i = 0; i < messageList.getLength(); i++) {
                         Node node = messageList.item(i);
                         if(node.getNodeName().equals(TAG_TEXT)) {
                             this.messageType = MessageType.text;
                             return parseText(node);
+                        } else if (node.getNodeName().equals(TAG_IMAGE)){
+                            this.messageType = MessageType.image;
+                            return parseImage(node);
                         } else if(node.getNodeName().equals(TAG_VIDEO)) {
                             this.messageType = MessageType.video;
                             return parseVideo(node);
@@ -165,6 +147,14 @@ public class MessageParser {
         if(node.getTextContent()!=null)
             return new TextMessage(node.getTextContent());
         return null;
+    }
+
+    private VideoMessage parseImage(Node node) throws ParseException{
+        NamedNodeMap attributes = node.getAttributes();
+        if(attributes.getNamedItem(ATTRIBUTE_IMAGE_URL)==null)
+            throw new ParseException("Malformed xml: image url is required",0);
+
+        return new VideoMessage(attributes.getNamedItem(ATTRIBUTE_VIDEO_URL).getTextContent());
     }
 
     private VideoMessage parseVideo(Node node) throws ParseException{

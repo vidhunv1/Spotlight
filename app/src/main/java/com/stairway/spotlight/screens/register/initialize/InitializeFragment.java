@@ -71,7 +71,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
 
     @Override
     public void navigateToHome() {
-        Logger.d("Navigate to home");
+        Logger.d(this, "Navigate to home");
         startActivity(HomeActivity.callingIntent(getActivity()));
         getActivity().finish();
     }

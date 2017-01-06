@@ -82,8 +82,14 @@ public class HomeActivity extends BaseActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.getHeaderView(0).setOnClickListener(v -> {
+            setProfileFragment();
+            drawer.closeDrawer(GravityCompat.START);
+        });
         uploadFCMToken();
     }
 
@@ -127,8 +133,6 @@ public class HomeActivity extends BaseActivity
         if (id == R.id.nav_settings) {
         } else if (id == R.id.nav_contacts) {
             startActivity(ContactsActivity.callingIntent(this));
-        } else if (id == R.id.nav_profile) {
-            setProfileFragment();
         } else if (id == R.id.nav_manage) {
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -207,7 +211,7 @@ public class HomeActivity extends BaseActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
             String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
-            Logger.d("[HomeActivity] FCM TOKEN:"+fcmToken);
+            Logger.d(this, "FCM TOKEN:"+fcmToken);
             User updateUser = new User();
             updateUser.setNotificationToken(fcmToken);
             userApi = new UserApi();
@@ -216,7 +220,7 @@ public class HomeActivity extends BaseActivity
                 public void onCompleted() {}
                 @Override
                 public void onError(Throwable e) {
-                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
                 }
                 @Override
                 public void onNext(UserResponse userResponse) {

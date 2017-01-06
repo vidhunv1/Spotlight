@@ -30,7 +30,7 @@ public class GenericCache {
         databaseManager = DatabaseManager.getInstance();
         memoryStore = new HashMap<>();
 
-        Logger.v("SQLite GenericCache initialized");
+        Logger.v(this, "SQLite GenericCache initialized");
     }
 
     public static GenericCache getInstance() {
@@ -43,7 +43,7 @@ public class GenericCache {
     public boolean put(final String key, final String value) {
 
         Observable<Object> putObservable= Observable.create( (subscriber) -> {
-                Logger.v("GeneticCache.put() on thread = " + Thread.currentThread().getName());
+                Logger.v(this, "GeneticCache.put() on thread = " + Thread.currentThread().getName());
 
                 SQLiteDatabase db = databaseManager.openConnection();
                 db.beginTransactionNonExclusive();
@@ -78,12 +78,12 @@ public class GenericCache {
                     @Override
                     public void onCompleted() {
                         memoryStore.put(key,value);
-                        Logger.d(">>> Insert: "+ key + " = "+value);
+                        Logger.d(this, ">>> Insert: "+ key + " = "+value);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Logger.e(">>> ! Insert failed: "+ key + " = "+value+", error: "+e.getMessage());
+                        Logger.e(this, ">>> ! Insert failed: "+ key + " = "+value+", error: "+e.getMessage());
                     }
 
                     @Override
@@ -93,7 +93,7 @@ public class GenericCache {
                 }
         );
 
-        return memoryStore.get(key) == value;
+        return memoryStore.get(key).equals(value);
     }
 
     public String get(String key) {
@@ -118,7 +118,7 @@ public class GenericCache {
                 }
                 catch (Exception e)
                 {
-                    Logger.d("<<< ! Unable to find '" + key + "' in cache");
+                    Logger.d(this, "<<< ! Unable to find '" + key + "' in cache");
                 }
 
                 cursor.close();
@@ -126,11 +126,11 @@ public class GenericCache {
             }
             catch (Exception e)
             {
-                Logger.e("<<< ! Error while reading key = " + key + " from cache [" + e
+                Logger.e(this, "<<< ! Error while reading key = " + key + " from cache [" + e
                         .getMessage() + "]");
             }
         }
-        Logger.v("<<< key ="+value);
+        Logger.v(this, "<<< key ="+value);
         return value;
     }
 
@@ -141,7 +141,7 @@ public class GenericCache {
                 .create( (subscriber) -> {
                         synchronized (TAG)
                         {
-                            Logger.v("GeneticCache.remove() on thread = " + Thread.currentThread()
+                            Logger.v(this, "GeneticCache.remove() on thread = " + Thread.currentThread()
                                     .getName());
 
                             SQLiteDatabase db = databaseManager.openConnection();
@@ -167,13 +167,13 @@ public class GenericCache {
                     @Override
                     public void onCompleted()
                     {
-                        Logger.d("<<-  [Deleted] " + key);
+                        Logger.d(this, "<<-  [Deleted] " + key);
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-                        Logger.e("<<- ! Delete failed: key = " + key + " [" + e.getMessage() + "]");
+                        Logger.e(this, "<<- ! Delete failed: key = " + key + " [" + e.getMessage() + "]");
                     }
 
                     @Override

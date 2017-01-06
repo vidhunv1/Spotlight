@@ -83,16 +83,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void resetChatState(String fromId){
         ChatListItemModel tempItem, item;
-        Logger.d("Temp len: "+temp.size());
         for (int i = 0; i < chatList.size() ; i++) {
             item = chatList.get(i);
             if (fromId.equals(item.getChatId())) {
-                Logger.d("fromId.equals(item.getChatId())");
                 for (int j = 0; j < temp.size(); j++) {
                     tempItem = temp.get(j);
                     if(fromId.equals(tempItem.getChatId())) {
-                        Logger.d("fromId.equals(tempItem.getChatId())");
-                        Logger.d("TempItem: "+tempItem);
                         chatList.set(i, tempItem);
                         notifyItemChanged(i);
                         temp.remove(j);

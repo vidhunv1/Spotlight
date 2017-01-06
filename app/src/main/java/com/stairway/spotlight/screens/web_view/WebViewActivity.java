@@ -39,7 +39,7 @@ public class WebViewActivity extends BaseActivity {
 
         ButterKnife.bind(this);
 
-        Logger.d("Loading Url:"+receivedIntent.getStringExtra(KEY_WEB_URL));
+        Logger.d(this, "Loading Url:"+receivedIntent.getStringExtra(KEY_WEB_URL));
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl(receivedIntent.getStringExtra(KEY_WEB_URL));
     }

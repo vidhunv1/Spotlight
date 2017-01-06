@@ -105,6 +105,14 @@ public class MessageResult implements Serializable {
         this.name = name;
     }
 
+    public boolean isMe() {
+        if(this.chatId!=null && !this.chatId.isEmpty())
+            if(this.fromId!=null && !this.fromId.isEmpty())
+                if(!this.chatId.equals(this.fromId))
+                    return true;
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Message: "+message+", DS: "+messageStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId+", time"+getTime();

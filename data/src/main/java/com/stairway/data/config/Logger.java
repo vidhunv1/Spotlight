@@ -17,41 +17,40 @@ public class Logger {
     private static void initTimber() {
         Timber.plant(new Timber.DebugTree());
         isTimberInitialized = true;
-        i("[ APPLICATION STARTED ]");
     }
 
-    public static void i(String message) {
+    public static void i(Object o, String message) {
         if (isTimberInitialized)
-            Timber.i(message);
+            Timber.i("["+o.getClass().getSimpleName()+"] "+message);
     }
 
-    public static void d(String message) {
+    public static void d(Object o, String message) {
         if (isTimberInitialized)
-            Timber.d(message);
+            Timber.d("["+o.getClass().getSimpleName()+"] "+message);
     }
 
-    public static void w(String message) {
+    public static void w(Object o, String message) {
         if (isTimberInitialized)
-            Timber.w(message);
+            Timber.w("["+o.getClass().getSimpleName()+"] "+message);
     }
 
-    public static void w(String message, String desc) {
+    public static void w(Object o, String message, String desc) {
         if (isTimberInitialized)
-            Timber.w(message, desc);
+            Timber.w("["+o.getClass().getSimpleName()+"] "+message, desc);
     }
 
-    public static void e(String message) {
+    public static void e(Object o, String message) {
         if (isTimberInitialized)
-            Timber.e(message);
+            Timber.e("["+o.getClass().getSimpleName()+"] "+message);
     }
 
-    public static void v(String message) {
+    public static void v(Object o, String message) {
         if (isTimberInitialized)
-            Timber.v(message);
+            Timber.v("["+o.getClass().getSimpleName()+"] "+message);
     }
 
-    public static void v(String message, Throwable e) {
+    public static void v(Object o, String message, Throwable e) {
         if (isTimberInitialized)
-            Timber.v(message, e);
+            Timber.v("["+o.getClass().getSimpleName()+"] "+message, e);
     }
 }

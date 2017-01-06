@@ -45,7 +45,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.d("SearchActivity");
+        Logger.d(this, "SearchActivity");
         setContentView(R.layout.activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -74,7 +74,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void displayContacts(String searchQuery, List<ContactsModel> contactsModels) {
-        Logger.d("DisplayContacts: "+searchQuery+", "+contactsModels.size());
+        Logger.d(this, "DisplayContacts: "+searchQuery+", "+contactsModels.size());
         contactSearchAdapter.setContacts(searchQuery, contactsModels);
     }
 
@@ -83,7 +83,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @OnTextChanged(R.id.actionbar_search)
     public void onSearchTextChanged() {
-        Logger.d("Seach: "+searchText.getText());
+        Logger.d(this, "Seach: "+searchText.getText());
         searchPresenter.searchContacts(searchText.getText()+"");
     }
 

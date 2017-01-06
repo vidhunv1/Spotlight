@@ -91,7 +91,7 @@ public class ContactStore {
 
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("ContactStore sqlite error"+e.getMessage());
+                Logger.e(this, "ContactStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
             }
@@ -99,7 +99,7 @@ public class ContactStore {
     }
 
     public Observable<List<ContactResult>> getContacts(String name) {
-        Logger.d(name+" contactStore");
+        Logger.d(this, name+" contactStore");
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             List<ContactResult> result = new ArrayList<>();
@@ -128,7 +128,7 @@ public class ContactStore {
             try {
                 Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
                 cursor.moveToFirst();
-                Logger.d("count ");
+                Logger.d(this, "count ");
 
                 while (!cursor.isAfterLast()) {
                     String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_ID));
@@ -147,7 +147,7 @@ public class ContactStore {
                     contactResult.setUserId(userId);
                     result.add(contactResult);
 
-                    Logger.d("Contacts like: "+contactResult.toString());
+                    Logger.d(this, "Contacts like: "+contactResult.toString());
 
                     cursor.moveToNext();
                 }
@@ -157,7 +157,7 @@ public class ContactStore {
 
                 databaseManager.closeConnection();
             } catch (Exception e) {
-                Logger.e("ContactStore sqlite error"+e.getMessage());
+                Logger.e(this, "ContactStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);
             }

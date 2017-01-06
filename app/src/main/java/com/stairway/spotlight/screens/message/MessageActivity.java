@@ -21,6 +21,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.config.XMPPManager;
 import com.stairway.spotlight.screens.message.di.MessageModule;
+import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
@@ -96,7 +97,7 @@ public class MessageActivity extends BaseActivity
         View v =getSupportActionBar().getCustomView();
         presenceTextView = (TextView) v.findViewById(R.id.tv_message_presence);
         messagePresenter.attachView(this);
-        Logger.d("ChatId: "+chatId+", CurrentUser:"+currentUser);
+        Logger.d(this, "ChatId: "+chatId+", CurrentUser:"+currentUser);
         messagePresenter.loadMessages(chatId);
     }
 
@@ -126,15 +127,15 @@ public class MessageActivity extends BaseActivity
         return true;
     }
 
+    // send text message
     @OnClick(R.id.btn_sendMessage_send)
     public void onSendClicked() {
         String message = messageBox.getText().toString().trim();
 
         if(message.length()>=1) {
             messageBox.setText("");
-            MessageResult msg = new MessageResult(chatId, currentUser, message);
-            msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-            messagePresenter.sendMessage(msg);
+            TextMessage textMessage = new TextMessage(message);
+            messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
         }
     }
 
@@ -164,7 +165,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void addMessageToList(MessageResult message) {
-        Logger.i("Add message:"+message.toString());
+        Logger.i(this, "Add message:"+message.toString());
         messagesAdapter.addMessage(message);
         messageItem.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
@@ -181,16 +182,15 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void updatePresence(String presence) {
-        Logger.d("Presence: "+presence);
+        Logger.d(this, "Presence: "+presence);
         presenceTextView.setText(presence);
     }
 
 
     @Override
     public void sendPostbackMessage(String message) {
-        MessageResult msg = new MessageResult(chatId, currentUser, message);
-        msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-        messagePresenter.sendMessage(msg);
+        TextMessage textMessage = new TextMessage(message);
+        messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
     }
 
     @Override
@@ -200,9 +200,8 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onQuickReplyClicked(String text) {
-        MessageResult msg = new MessageResult(chatId, currentUser, text);
-        msg.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-        messagePresenter.sendMessage(msg);
+        TextMessage textMessage = new TextMessage(text);
+        messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
     }
 
     @Override
@@ -235,7 +234,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
-        Logger.d("Message Status:"+messageStatus.name());
+        Logger.d(this, "Message Status:"+messageStatus.name());
         if(this.chatId.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }

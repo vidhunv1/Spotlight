@@ -54,7 +54,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
         ButterKnife.bind(this, view);
         OverScrollDecoratorHelper.setUpOverScroll(chatList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
-        Logger.v("[ChatListFragment] onCreateView");
+        Logger.v(this, " onCreateView");
         return view;
     }
 
@@ -69,7 +69,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     @Override
     public void onResume() {
         super.onResume();
-        Logger.v("[ChatListFragment] onResume");
+        Logger.v(this, " onResume");
         presenter.attachView(this);
         presenter.initChatList();
     }
@@ -104,7 +104,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     public void addNewMessage(MessageResult messageResult) {
         ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(),1);
         chatListAdapter.newChatMessage(item);
-        Logger.d("new notification: "+item);
+        Logger.d(this, "new notification: "+item);
     }
 
     @Override

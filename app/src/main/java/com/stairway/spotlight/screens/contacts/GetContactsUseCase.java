@@ -25,7 +25,7 @@ public class GetContactsUseCase {
     }
 
     public Observable<List<ContactItemModel>> execute() {
-        Logger.d("GetContactsUseCase");
+        Logger.d(this, "GetContactsUseCase");
         return Observable.create(subscriber -> {
             contactStore.getContacts()
                     .subscribe(new Subscriber<List<ContactResult>>() {

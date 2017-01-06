@@ -44,20 +44,20 @@ public abstract class UseCaseSubscriber<T> extends Subscriber<T>
 
     public void onNetworkError()
     {
-        Logger.v("NETWORK ERROR");
+        Logger.v(this, "NETWORK ERROR");
 
         // TODO: Handle Network error.
     }
 
     public void onServerError() {
-        Logger.v("Server error");
+        Logger.v(this, "Server error");
 
         // TODO: Handle server error.
     }
 
     public void sessionExpired()
     {
-        Logger.v("Session expired.");
+        Logger.v(this, "Session expired.");
 
         // TODO: Handle session error
     }

@@ -57,7 +57,7 @@ public class NewChatFragment extends BaseFragment implements NewChatContract.Vie
         ButterKnife.bind(this, view);
         OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
-        Logger.d("[ContactListFragment] onCreateView");
+        Logger.d(this, " onCreateView");
         contactList.setLayoutManager(new LinearLayoutManager(getActivity()));
         contactList.setAdapter(newChatAdapter);
 
@@ -84,7 +84,7 @@ public class NewChatFragment extends BaseFragment implements NewChatContract.Vie
 
     @Override
     public void displayContactList(ArrayList<NewChatItemModel> newChatItemModels) {
-        Logger.d("Display contact list");
+        Logger.d(this, "Display contact list");
     }
 
     @Override

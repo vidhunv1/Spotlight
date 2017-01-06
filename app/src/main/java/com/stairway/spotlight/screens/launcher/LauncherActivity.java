@@ -33,8 +33,6 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         componentContainer = ((SpotlightApplication) getApplication()).getComponentContainer();
         componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
 
-        Logger.v("[Launcher Activity]");
-
         ButterKnife.bind(this);
 
     }

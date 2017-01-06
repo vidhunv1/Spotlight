@@ -5,6 +5,7 @@ import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.xmpp.ReadReceiptExtension;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Message;
@@ -48,7 +49,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     @Override
     public void loadMessages(String chatId) {
-        Logger.d("[MessagePresenter]Loading chat messages: "+chatId);
+        Logger.d(this, "Loading chat messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
@@ -80,7 +81,9 @@ public class MessagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void sendMessage(MessageResult result) {
+    public void sendTextMessage(String toId, String fromId, TextMessage message) {
+        MessageResult result = new MessageResult(toId, fromId, message.toXML());
+        result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
 
         Subscription subscription = storeMessageUseCase.execute(result)
                 .observeOn(messageView.getUiScheduler())
@@ -115,7 +118,7 @@ public class MessagePresenter implements MessageContract.Presenter {
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
                     public void onResult(String result) {
-                        Logger.d("ChatState: "+result);
+                        Logger.d(this, "ChatState: "+result);
                     }
                 });
 

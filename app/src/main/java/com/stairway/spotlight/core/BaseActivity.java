@@ -50,7 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             public void onReceive(Context context, Intent intent) {
                 if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_MSG)) {
                     MessageResult s = (MessageResult) intent.getSerializableExtra(XmppService.XMPP_RESULT_MESSAGE);
-                    Logger.d("Message received: "+s);
+                    Logger.d(this, "Message received: "+s);
                     onMessageReceived(s);
                 } else if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_STATE)) {
                     String from = intent.getStringExtra(XmppService.XMPP_RESULT_FROM);
@@ -127,12 +127,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
 
     @Override
     public void networkOnline() {
-        Logger.d("HAS INTERNET CONNECTION");
+        Logger.d(this, "HAS INTERNET CONNECTION");
     }
 
     @Override
     public void networkOffline() {
-        Logger.d("HAS NO INTERNET CONNECTION");
+        Logger.d(this, "HAS NO INTERNET CONNECTION");
     }
 
     public void onApplicationToBackground() {
@@ -163,10 +163,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
     }
 
     public void onMessageReceived(MessageResult messageId){
-        Logger.d("MessageId "+messageId);
+        Logger.d(this, "MessageId "+messageId);
     }
 
-    public void onChatStateReceived(String from, ChatState chatState) { Logger.d("chatState: "+chatState.name()+", from "+from);}
+    public void onChatStateReceived(String from, ChatState chatState) { Logger.d(this, "chatState: "+chatState.name()+", from "+from);}
 
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {}
 

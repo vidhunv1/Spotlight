@@ -24,7 +24,7 @@ public class SearchPresenter implements SearchContract.Presenter {
 
     @Override
     public void searchContacts(String name) {
-        Logger.d("SearchContacts presenter");
+        Logger.d(this, "SearchContacts presenter");
         Subscription subscription = searchContactsUseCase.execute(name)
                 .subscribe(new UseCaseSubscriber<List<ContactsModel>>(searchView) {
                     @Override

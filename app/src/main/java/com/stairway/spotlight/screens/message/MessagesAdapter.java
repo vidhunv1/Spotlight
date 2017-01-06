@@ -82,7 +82,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(quickReplies.size()>=1)
                 this.notifyItemInserted(messageList.size());
         } catch (ParseException e) {
-            Logger.d("Parse exception");
+            Logger.d(this, "Parse exception");
         }
     }
 
@@ -140,16 +140,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemViewType(int position) {
         if(position == messageList.size())
             return VIEW_TYPE_QUICK_REPLIES;
+
         MessageParser messageParser = new MessageParser(messageList.get(position).getMessage());
         boolean isParseError = false;
         try {
             messageObjects.put(position, messageParser.parseMessage());
         } catch (ParseException e) {
             e.printStackTrace();
-            Logger.e("ParseException Error parsing XML.");
+            Logger.e(this, "ParseException Error parsing XML.");
             isParseError = true;
         }
-        if(messageList.get(position).getChatId().equals(messageList.get(position).getFromId())) {
+        if(messageList.get(position).isMe()) {
+            if(messageParser.getMessageType() == MessageParser.MessageType.text)
+                return VIEW_TYPE_SEND_TEXT;
+            else
+                Logger.e(this, messageParser.getMessageType().name()+" is not supported for send");
+        } else {
             if (messageParser.getMessageType() == MessageParser.MessageType.template) {
                 TemplateMessage templateMessage = (TemplateMessage) messageObjects.get(position);
 
@@ -160,13 +166,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             else if(messageParser.getMessageType() == MessageParser.MessageType.text || isParseError)
                 return VIEW_TYPE_RECV_TEXT;
-//            else
-//                Logger.e(messageParser.getMessageType().name()+" is not supported for receive");
-        } else {
-            if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                return VIEW_TYPE_SEND_TEXT;
-            else
-                Logger.e(messageParser.getMessageType().name()+" is not supported for send");
         }
         return -1;
     }
@@ -215,14 +214,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SEND_TEXT:
                 SendTextViewHolder sendViewHolder = (SendTextViewHolder) holder;
-                sendViewHolder.renderItem(messageList.get(position));
+                TextMessage textMessage =(TextMessage)messageObjects.get(position);
+                if(textMessage==null || textMessage.getText()==null) {
+                    textMessage = new TextMessage(messageList.get(position).getMessage());
+                    Logger.d(this, "Text message null");
+                }
+                Logger.d(this, "Send text: "+textMessage.getText());
+                sendViewHolder.renderItem(textMessage, messageList.get(position).getMessageStatus());
                 break;
             case VIEW_TYPE_RECV_TEXT:
                 ReceiveTextViewHolder receiveViewHolder = (ReceiveTextViewHolder) holder;
-                TextMessage textMessage =(TextMessage)messageObjects.get(position);
-                if(textMessage==null || textMessage.getText()==null)
-                    textMessage = new TextMessage(messageList.get(position).getMessage());
-                receiveViewHolder.renderItem(textMessage, hasProfileDP(position));
+                TextMessage textMessage1 =(TextMessage)messageObjects.get(position);
+                if(textMessage1==null || textMessage1.getText()==null)
+                    textMessage1 = new TextMessage(messageList.get(position).getMessage());
+                receiveViewHolder.renderItem(textMessage1, hasProfileDP(position));
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_GENERIC:
                 ReceiveTemplateGenericViewHolder receiveTemplateViewHolder = (ReceiveTemplateGenericViewHolder) holder;
@@ -268,13 +273,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(MessageResult messageResult) {
-            message.setText(messageResult.getMessage().trim());
-            if(messageResult.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT)
+        public void renderItem(TextMessage textMessage, MessageResult.MessageStatus messageStatus) {
+            Logger.d(this, "text: "+textMessage.getText());
+            message.setText(textMessage.getText());
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT)
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
-            if(messageResult.getMessageStatus() == MessageResult.MessageStatus.SENT)
+            if(messageStatus == MessageResult.MessageStatus.SENT)
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
-            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.READ)
+            else if(messageStatus == MessageResult.MessageStatus.READ)
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
 //            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.DELIVERED)
         }
@@ -341,7 +347,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {
-                Logger.d(button.toString());
+                Logger.d(this, button.toString());
                 if(i==0)
                     if (!button.getTitle().isEmpty()) {
                         button1.setVisibility(View.VISIBLE);
@@ -420,7 +426,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //TODO: Dont repeat yourself
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {
-                Logger.d(button.toString());
+                Logger.d(this, button.toString());
                 if(i==0)
                     if (!button.getTitle().isEmpty()) {
                         button1.setVisibility(View.VISIBLE);

@@ -73,5 +73,11 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fl_attach_files"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"/>
 
 </FrameLayout>

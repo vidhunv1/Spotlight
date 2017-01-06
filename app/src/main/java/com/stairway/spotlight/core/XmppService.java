@@ -228,14 +228,14 @@ public class XmppService extends Service {
         } catch (SmackException.AlreadyLoggedInException e) {
             return true;
         } catch (Exception e) {
-            Logger.d(e.getMessage());
+            Logger.e(this, e.getMessage());
             return false;
         }
     }
 
     private void sendUnsentMessages(){
         //send unsent messages
-        Logger.d("[XMPPService] sending unsentMsgs");
+        Logger.d(this, " sending unsentMsgs");
         messageStore.getUnsentMessages().subscribe(new Subscriber<MessageResult>() {
             @Override
             public void onCompleted() {}

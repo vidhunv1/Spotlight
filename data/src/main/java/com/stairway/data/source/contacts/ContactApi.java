@@ -23,7 +23,7 @@ public class ContactApi {
     }
 
     public void get(List<ContactResult> contactResults, int pos, Subscriber<? super ContactResponse> subscriber, ContactEndpoint contactEndpoint){
-        Logger.d(pos+"/"+contactResults.size());
+        Logger.d(this, pos+"/"+contactResults.size());
         ContactResult contactResult = contactResults.get(pos);
         contactEndpoint.createContact(new ContactRequest(contactResult.getPhoneNumber(), contactResult.getCountryCode(), contactResult.getDisplayName()))
             .subscribe(new Subscriber<ContactResponse>() {

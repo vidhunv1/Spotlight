@@ -63,7 +63,7 @@ public class UserSessionStore {
             if(userSessionResult.getProfileDP()!=null && !userSessionResult.getProfileDP().isEmpty())
                 editor.putString(KEY_PROFILE_DP, userSessionResult.getProfileDP());
             editor.commit();
-            Logger.d("[PutUserSession]"+userSessionResult.toString());
+            Logger.d(this, " PutUserSession"+userSessionResult.toString());
             subscriber.onNext(true);
             subscriber.onCompleted();
         });
@@ -76,7 +76,7 @@ public class UserSessionStore {
     * */
 
     public Observable<UserSessionResult> getUserSession() {
-        Logger.d("GETUSERSESSION from Store");
+        Logger.d(this, "GETUSERSESSION from Store");
 
         return Observable.create(subscriber -> {
 
@@ -92,7 +92,7 @@ public class UserSessionStore {
                 String profileDP = prefs.getString(KEY_PROFILE_DP, "");
 
                 if(userName.isEmpty()) {
-                    Logger.d("UserSession not available");
+                    Logger.d(this, "UserSession not available");
                     //TODO: Wrap Throwable to include custom error code(User Unregistered)
                     subscriber.onError(new Throwable("User Not Logged in"));
                 } else {
@@ -108,7 +108,7 @@ public class UserSessionStore {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Logger.e("Error getting UserSession from SharedPreferences: "+e.getMessage());
+                Logger.e(this, "Error getting UserSession from SharedPreferences: "+e.getMessage());
 
                 subscriber.onError(e);
             }

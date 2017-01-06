@@ -31,7 +31,7 @@ public class ChatListPresenter implements ChatListContract.Presenter {
 
     @Override
     public void initChatList() {
-        Logger.v("[ChatListPresenter] initChatList");
+        Logger.v(this, " initChatList");
         Subscription subscription = getChatsUseCase.execute()
                 .observeOn(contactsView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<List<ChatListItemModel>>(contactsView) {

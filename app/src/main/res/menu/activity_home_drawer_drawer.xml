@@ -3,10 +3,6 @@
 
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_profile_tab"
-            android:title="Profile" />
-        <item
             android:id="@+id/nav_contacts"
             android:icon="@drawable/ic_contacts_tab"
             android:title="Contacts" />
@@ -16,7 +12,7 @@
             android:title="Settings" />
         <item
             android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_help_faq_icon"
             android:title="Help and Feedback" />
     </group>
 

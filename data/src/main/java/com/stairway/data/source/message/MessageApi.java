@@ -36,23 +36,23 @@ public class MessageApi {
     }
 
     public Observable<MessageResult> sendMessage(MessageResult message){
-        Logger.d("Sending message"+message.getMessage()+" to "+message.getChatId());
+        Logger.d(this, "Sending message"+message.getMessage()+" to "+message.getChatId());
 
         Observable<MessageResult> sendMessage = Observable.create(subscriber -> {
             String recipient = XMPPManager.getJidFromUserName(message.getChatId());
 
             if(!connection.isAuthenticated()) {
-                Logger.v("XMPP Not connected");
+                Logger.v(this, "XMPP Not connected");
 
                 connection.addConnectionListener(new ConnectionListener() {
                     @Override
                     public void connected(XMPPConnection connection) {
-                        Logger.v("Connected XMPP...");
+                        Logger.v(this, "Connected XMPP...");
                     }
 
                     @Override
                     public void authenticated(XMPPConnection connection, boolean resumed) {
-                        Logger.v("Authenticated?"+connection.isAuthenticated());
+                        Logger.v(this, "Authenticated?"+connection.isAuthenticated());
                         sendMessageXMPP(message, subscriber);
                     }
 
@@ -64,13 +64,13 @@ public class MessageApi {
                     public void reconnectionSuccessful() {}
                     @Override
                     public void reconnectingIn(int seconds) {
-                        Logger.v("Reconnecting in"+seconds);
+                        Logger.v(this, "Reconnecting in"+seconds);
                     }
                     @Override
                     public void reconnectionFailed(Exception e) {}
                 });
             } else {
-                Logger.v("XMPP connected");
+                Logger.v(this, "XMPP connected");
                 sendMessageXMPP(message, subscriber);
             }
         });
@@ -96,7 +96,7 @@ public class MessageApi {
                 public void entriesDeleted(Collection<String> addresses) {}
 
                 public void presenceChanged(Presence presence) {
-                    Logger.d("Presence received"+presence.getFrom()+", "+presence.getType());
+                    Logger.d(this, "Presence received"+presence.getFrom()+", "+presence.getType());
                     if(presence.getFrom().split("/")[0].equals(jid))
                         subscriber.onNext(presence.getType());
                 }
@@ -108,7 +108,7 @@ public class MessageApi {
 
     // userId: 91-9999999999
     public Observable<Long> getLastActivity(String userId) {
-        Logger.d("Getting last activity");
+        Logger.d(this, "Getting last activity");
         String jid = XMPPManager.getJidFromUserName(userId);
         Observable<Long> getLastActivity = Observable.create(subscriber -> {
             LastActivityManager activity = LastActivityManager.getInstanceFor(connection);
@@ -155,7 +155,7 @@ public class MessageApi {
             message.addExtension(read);
             try {
                 if(messageResult.getReceiptId()==null && !messageResult.getReceiptId().isEmpty()) {
-                    Logger.e("receipt id not found");
+                    Logger.e(this, "receipt id not found");
                     subscriber.onError(new IllegalArgumentException("receipt id not found"));
                 } else {
                     XMPPManager.getConnection().sendStanza(message);
@@ -191,12 +191,12 @@ public class MessageApi {
         } catch (SmackException.NotConnectedException e) {
             message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
             subscriber.onNext(message);
-            Logger.e("XMPP error: "+e);
+            Logger.e(this, "XMPP error: "+e);
         }
         catch (StreamManagementException.StreamManagementNotEnabledException e) {
             message.setMessageStatus(MessageResult.MessageStatus.SENT);
             subscriber.onNext(message);
-            Logger.e("Stream management not enabled");
+            Logger.e(this, "Stream management not enabled");
         }
     }
 }

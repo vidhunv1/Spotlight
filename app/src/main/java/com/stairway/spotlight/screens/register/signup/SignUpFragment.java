@@ -94,8 +94,8 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
         String countryCode = countryCodeSpinner.getSelectedItem().toString().substring(countryCodeStart, countrCodeEnd);
         String mobileNumber = mobileEditText.getText().toString();
 
-        Logger.d("Country Code  = "+countryCode);
-        Logger.d("Mobile Number = "+mobileNumber);
+        Logger.d(this, "Country Code  = "+countryCode);
+        Logger.d(this, "Mobile Number = "+mobileNumber);
 
         if(mobileEditText.getText().toString().length()>=10) {
             signUpPresenter.createUser(countryCode, mobileNumber);

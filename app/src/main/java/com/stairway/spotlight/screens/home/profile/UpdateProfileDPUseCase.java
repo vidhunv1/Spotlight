@@ -47,7 +47,7 @@ public class UpdateProfileDPUseCase {
                 @Override
                 public void onError(Throwable e) {
                     e.printStackTrace();
-                    Logger.d(e.getMessage());
+                    Logger.d(this, e.getMessage());
                 }
                 @Override
                 public void onNext(UserResponse userResponse) {
@@ -74,13 +74,13 @@ public class UpdateProfileDPUseCase {
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
-                Logger.e("Error storing new Token to UserSessionStore");
+                Logger.e(this, "Error storing new Token to UserSessionStore");
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
                 if(aBoolean)
-                    Logger.d("Stored new Session token to UserSessionStore");
+                    Logger.d(this, "Stored new Session token to UserSessionStore");
             }
         });
     }

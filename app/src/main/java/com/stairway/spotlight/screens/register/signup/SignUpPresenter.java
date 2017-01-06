@@ -23,20 +23,19 @@ public class SignUpPresenter implements SignUpContract.Presenter {
 
     @Override
     public void createUser(String countryCode, String phone) {
-        Logger.d("[SignUpPresenter]");
         Subscription subscription = createUserUseCase.execute(countryCode, phone)
                 .observeOn(signUpView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<StatusResponse>(signUpView) {
                     @Override
                     public void onResult(StatusResponse result) {
-                        Logger.d("[SignUpPresenter] gotresutl"+result);
+                        Logger.d(this, " gotresutl"+result);
                         signUpView.navigateToVerifyOtp(countryCode, phone);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        Logger.d("[SignUpPresenter] goterror"+e.getMessage());
+                        Logger.d(this, " goterror"+e.getMessage());
                     }
                 });
         compositeSubscription.add(subscription);
