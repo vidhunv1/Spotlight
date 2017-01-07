@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.register.initialize;
 
-import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactApi;
 import com.stairway.data.source.contacts.ContactContent;
 import com.stairway.data.source.contacts.ContactResult;
@@ -8,7 +7,6 @@ import com.stairway.data.source.contacts.ContactStore;
 import com.stairway.data.source.contacts.gson_models.Contact;
 import com.stairway.data.source.contacts.gson_models.ContactResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -62,6 +60,8 @@ public class SyncContactsUseCase {
                                             contactResult.setUsername(contact.getUsername());
                                             contactResult.setUserId(contact.getUserId());
                                             contactResult.setRegistered(contact.isRegistered());
+                                            if(contact.isRegistered())
+                                                contactResult.setAdded(true);
 
                                             contactStore.storeContact(contactResult)
                                                     .subscribe(new Subscriber<ContactResult>() {

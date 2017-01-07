@@ -19,19 +19,20 @@
             android:paddingBottom="10.75dp"/>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ll_contactItem_content"
             android:gravity="center_vertical">
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/ll_contactItem_content"
+                android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="190dp"
+                    android:layout_width="167dp"
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
                     fontPath="fonts/din_medium.otf"
@@ -41,27 +42,30 @@
                     android:id="@+id/tv_contactItem_contactName"
                     android:maxWidth="190dp" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1.95dp">
-
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="106dp"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:maxLines="1"
                     android:textColor="#80000000"
-                    android:id="@+id/tv_contactItem_status"
+                    android:id="@+id/tv_contactItem_contactId"
                     android:text="message"
                     android:paddingRight="20dp"
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
+
+            <Button
+                android:text="ADD"
+                android:layout_width="64dp"
+                android:layout_height="26.5dp"
+                android:id="@+id/btn_add"
+                android:layout_marginLeft="15dp"
+                android:textColor="#ffffffff"
+                android:background="#ff000000" />
+
         </LinearLayout>
+
     </LinearLayout>
 
     <View
@@ -69,7 +73,6 @@
         android:layout_height="0.5dp"
         android:layout_marginLeft="82dp"
         android:layout_marginRight="12dp"
-        android:id="@+id/view_contactItem_divider"
         android:background="@android:color/darker_gray"/>
 
 </LinearLayout>

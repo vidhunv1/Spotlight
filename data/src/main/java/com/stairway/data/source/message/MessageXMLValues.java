@@ -1,10 +1,10 @@
-package com.stairway.spotlight.core.lib;
+package com.stairway.data.source.message;
 
 /**
  * Created by vidhun on 06/01/17.
  */
 
-public class MessageXML {
+public class MessageXMLValues {
     public static final String TAG_HEAD = "message";
     public static final String TAG_HEAD_SHORT = "m";
 

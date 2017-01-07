@@ -71,6 +71,9 @@ dependencies {
     // Experiment recyclerview overscroll
     compile 'me.everything:overscroll-decor-android:1.0.4'
 
+    //stetho
+    compile 'com.facebook.stetho:stetho:1.4.2'
+
     testCompile 'junit:junit:4.12'
     apt 'com.google.dagger:dagger-compiler:2.2'
 

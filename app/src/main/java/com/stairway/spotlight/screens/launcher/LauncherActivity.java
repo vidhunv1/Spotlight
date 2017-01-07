@@ -34,7 +34,6 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
 
         ButterKnife.bind(this);
-
     }
 
     @Override

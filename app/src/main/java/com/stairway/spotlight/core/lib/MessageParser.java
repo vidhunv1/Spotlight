@@ -21,7 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import static com.stairway.spotlight.core.lib.MessageXML.*;
+import static com.stairway.data.source.message.MessageXMLValues.*;
 
 /**
  * Created by vidhun on 25/12/16.

@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.search;
 
+import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
@@ -11,11 +12,12 @@ import java.util.List;
 
 public interface SearchContract {
     interface View extends BaseView {
-        void displayContacts(String searchQuery, List<ContactsModel> contactsModels);
-        void displayMessages(String searchQuery, List<MessagesModel> messagesModels);
+        void displaySearch(SearchModel searchModel);
+        void navigateToAddContact(ContactResult contactResult);
+        void showFindContactError();
     }
     interface Presenter extends BasePresenter<SearchContract.View> {
-        void searchContacts(String name);
-        void searchMessages(String message);
+        void search(String query);
+        void findContact(String userName, String authToken);
     }
 }

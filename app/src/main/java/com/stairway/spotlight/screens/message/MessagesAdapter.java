@@ -243,16 +243,16 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
+    class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.rv_quick_replies)
         RecyclerView quickRepliesListView;
 
-        public QuickRepliesViewHolder(View itemView) {
+        QuickRepliesViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(List<String> quickReplies) {
+        void renderItem(List<String> quickReplies) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             quickRepliesListView.setLayoutManager(layoutManager);
             quickRepliesListView.setAdapter(new QuickRepliesAdapter(quickReplyClickListener, quickReplies));
@@ -260,7 +260,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class SendTextViewHolder extends RecyclerView.ViewHolder {
+    class SendTextViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
         TextView message;
@@ -268,12 +268,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_delivery_status)
         ImageView deliveryStatus;
 
-        public SendTextViewHolder(View itemView) {
+        SendTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(TextMessage textMessage, MessageResult.MessageStatus messageStatus) {
+        void renderItem(TextMessage textMessage, MessageResult.MessageStatus messageStatus) {
             Logger.d(this, "text: "+textMessage.getText());
             message.setText(textMessage.getText());
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT)
@@ -286,7 +286,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
+    class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
         TextView message;
@@ -294,12 +294,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_profileImage)
         ImageView profileImage;
 
-        public ReceiveTextViewHolder(View itemView) {
+        ReceiveTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(TextMessage textMessage, boolean displayProfileDP) {
+        void renderItem(TextMessage textMessage, boolean displayProfileDP) {
             message.setText(textMessage.getText().trim());
 
             if(displayProfileDP)
@@ -309,7 +309,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class ReceiveTemplateGenericViewHolder extends RecyclerView.ViewHolder {
+    class ReceiveTemplateGenericViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.iv_rcv_template_image)
         ImageView templateImage;
@@ -328,12 +328,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_profileImage)
         ImageView profileImage;
 
-        public ReceiveTemplateGenericViewHolder(View itemView) {
+        ReceiveTemplateGenericViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(TemplateMessage templateMessage, boolean displayProfileDP) {
+        void renderItem(TemplateMessage templateMessage, boolean displayProfileDP) {
             button1.setVisibility(View.GONE);
             button2.setVisibility(View.GONE);
             button3.setVisibility(View.GONE);
@@ -393,7 +393,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class ReceiveTemplateButtonViewHolder extends RecyclerView.ViewHolder {
+    class ReceiveTemplateButtonViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_rcv_button1)
         TextView button1;
         @Bind(R.id.tv_rcv_button2)
@@ -407,12 +407,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.ll_rcv_template_buttons)
         LinearLayout buttonLayout;
 
-        public ReceiveTemplateButtonViewHolder(View itemView) {
+        ReceiveTemplateButtonViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(TemplateMessage templateMessage, boolean displayDP) {
+        void renderItem(TemplateMessage templateMessage, boolean displayDP) {
             button1.setVisibility(View.GONE);
             button2.setVisibility(View.GONE);
             button3.setVisibility(View.GONE);
@@ -472,11 +472,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public interface PostbackClickListener {
+    interface PostbackClickListener {
         void sendPostbackMessage(String message);
     }
 
-    public interface UrlClickListener {
+    interface UrlClickListener {
         void urlButtonClicked(String url);
     }
 }

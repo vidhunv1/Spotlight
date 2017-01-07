@@ -6,10 +6,12 @@ import com.stairway.data.source.user.gson_models.UserResponse;
 
 import okhttp3.MultipartBody;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import rx.Observable;
 
 /**
@@ -30,4 +32,6 @@ public interface UserEndpoint {
     @PUT("users")
     Observable<UserResponse> uploadProfileDP(@Part MultipartBody.Part profileDP);
 
+    @GET("users/{username}")
+    Observable<UserResponse> findUser(@Path("username") String userName);
 }

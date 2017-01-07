@@ -4,43 +4,49 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.EditText;
+
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.screens.add_contact.AddUserActivity;
 import com.stairway.spotlight.screens.search.di.SearchViewModule;
-import java.util.List;
+
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 
-public class SearchActivity extends BaseActivity implements SearchContract.View, ContactSearchAdapter.ContactClickListener {
+public class SearchActivity extends BaseActivity implements SearchContract.View,
+        SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener {
+
     @Bind(R.id.actionbar_search)
     EditText searchText;
 
     @Bind(R.id.rv_contact_list)
     RecyclerView contactsSearchList;
 
-//    RecyclerView messagesSearchList;
-//    @Bind(R.id.rv_chat_list)
-
     @Inject
     SearchPresenter searchPresenter;
 
-    private ContactSearchAdapter contactSearchAdapter;
+    private UserSessionResult userSession;
+
+    private SearchAdapter searchAdapter;
 
     public static Intent callingIntent(Context context) {
-        Intent intent = new Intent(context, SearchActivity.class);
-        return intent;
+        return new Intent(context, SearchActivity.class);
     }
 
     @Override
@@ -58,11 +64,11 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         searchPresenter.attachView(this);
         searchPresenter.attachView(this);
-//        messagesSearchList.setLayoutManager(new LinearLayoutManager(this));
-        contactSearchAdapter = new ContactSearchAdapter(this);
+        searchAdapter = new SearchAdapter(this, this, this);
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
-        contactsSearchList.setAdapter(contactSearchAdapter);
+        contactsSearchList.setAdapter(searchAdapter);
+//        displaySearch(new SearchModel("", new ArrayList<>(0), new ArrayList<>(0)));
     }
 
     @Override
@@ -76,27 +82,45 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     }
 
     @Override
-    public void displayContacts(String searchQuery, List<ContactsModel> contactsModels) {
-        Logger.d(this, "DisplayContacts: "+searchQuery+", "+contactsModels.size());
-        contactSearchAdapter.setContacts(searchQuery, contactsModels);
+    public void displaySearch(SearchModel searchModel) {
+        searchAdapter.displaySearch(searchModel);
     }
-
-    @Override
-    public void displayMessages(String searchQuery, List<MessagesModel> messagesModels) {}
 
     @OnTextChanged(R.id.actionbar_search)
     public void onSearchTextChanged() {
-        Logger.d(this, "Seach: "+searchText.getText());
-        searchPresenter.searchContacts(searchText.getText()+"");
+        searchPresenter.search(searchText.getText()+"");
     }
 
     @Override
-    public void onContactItemClicked(String userId) {
+    public void onContactItemClicked(String userId) {}
 
+    @Override
+    public void onMessageItemClicked(String userId) {}
+
+    @Override
+    public void onFindContactItemClicked(String userName) {
+        // get username details from searchAdapter. ie. call presenter.
+        searchPresenter.findContact(userName, userSession.getAccessToken());
+    }
+
+    @Override
+    public void showFindContactError() {
+//        Toast.makeText(this, "No user found", Toast.LENGTH_SHORT);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getBaseContext());
+        builder.setMessage("No User found");
+        builder.setCancelable(true);
+
+        builder.show();
+    }
+
+    @Override
+    public void navigateToAddContact(ContactResult contactResult) {
+        startActivity(AddUserActivity.callingIntent(this, contactResult));
     }
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         componentContainer.userSessionComponent().plus(new SearchViewModule()).inject(this);
+        userSession = componentContainer.userSessionComponent().getUserSession();
     }
 }

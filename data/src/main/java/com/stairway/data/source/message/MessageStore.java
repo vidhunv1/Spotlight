@@ -98,6 +98,65 @@ public class MessageStore {
         });
     }
 
+    public Observable<List<MessageResult>> searchMessages(String message) {
+        return Observable.create(subscriber -> {
+            List<MessageResult> result = new ArrayList<>();
+            if(message.length()==0) {
+                subscriber.onNext(result);
+                subscriber.onCompleted();
+            }
+            String textSearch = "<"+MessageXMLValues.TAG_TEXT+">"+ "%"+message+"%" +"</"+MessageXMLValues.TAG_TEXT+">";
+            String search1 = "<"+MessageXMLValues.TAG_HEAD+">" +textSearch+ "</"+MessageXMLValues.TAG_HEAD+">";
+            String search2 = "<"+MessageXMLValues.TAG_HEAD_SHORT+">" +textSearch+ "</"+MessageXMLValues.TAG_HEAD_SHORT+">";
+
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = MessagesContract.COLUMN_MESSAGE + " LIKE ? OR "+MessagesContract.COLUMN_MESSAGE+" LIKE ? ";
+            String[] selectionArgs = {search1, search2};
+            String[] columns = {
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT,
+                    MessagesContract.COLUMN_RECEIPT_ID};
+
+            try{
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                cursor.moveToFirst();
+
+                while(!cursor.isAfterLast()) {
+                    String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String m = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String messageStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+                    String receiptId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_RECEIPT_ID));
+
+                    MessageResult msg = new MessageResult(chatId, fromId, m);
+                    msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
+                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setMessageId(messageId);
+                    msg.setReceiptId(receiptId);
+                    result.add(msg);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+                subscriber.onNext(result);
+                subscriber.onCompleted();
+
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e(this, "MessageStore sqlite error"+e.getMessage());
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
     // Get the last message for which read receipt is not sent.
     public Observable<MessageResult> getLastUnsentReceipt(String chatId) {
         return Observable.create(subscriber -> {

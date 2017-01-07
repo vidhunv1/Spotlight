@@ -1,5 +1,7 @@
 package com.stairway.spotlight.screens.search;
 
+import com.stairway.data.source.message.MessageResult;
+
 import java.util.List;
 
 /**
@@ -39,5 +41,18 @@ public class SearchModel {
 
     public void setMessagesModelList(List<MessagesModel> messagesModelList) {
         this.messagesModelList = messagesModelList;
+    }
+
+    @Override
+    public String toString() {
+        String out = "Search: "+searchTerm+"\n";
+        out = out + "Messages: \n";
+        for (MessagesModel messages : messagesModelList)
+            out = out + messages.toString();
+        out = out + "\n Contacts: \n";
+        for(ContactsModel contact : contactsModelList)
+            out = out + contact.toString();
+
+        return out;
     }
 }

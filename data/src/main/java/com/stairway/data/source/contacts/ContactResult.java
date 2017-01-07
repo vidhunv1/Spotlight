@@ -1,9 +1,11 @@
 package com.stairway.data.source.contacts;
 
+import java.io.Serializable;
+
 /**
  * Created by vidhun on 01/09/16.
  */
-public class ContactResult {
+public class ContactResult implements Serializable{
     private String contactId;
     private String phoneNumber;
     private String countryCode;

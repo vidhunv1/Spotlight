@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:clickable="true"
+    android:id="@+id/ll_chatItem_content"
+    android:gravity="center_vertical"
+    android:background="?android:selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="190dp"
+            tools:ignore="MissingPrefix"
+            android:layout_height="wrap_content"
+            fontPath="fonts/din_medium.otf"
+            android:text="Name"
+            android:textColor="#F2000000"
+            android:textSize="17sp"
+            android:id="@+id/tv_searchMessage_contactName"
+            android:maxWidth="190dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/tv_searchMessage_time"
+            android:paddingRight="14dp"
+            android:textAlignment="viewEnd"
+            android:textSize="12sp"
+            android:textColor="#1da1f2"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:textColor="#80000000"
+        android:id="@+id/tv_searchMessage_message"
+        android:text="message"
+        android:paddingTop="1.125dp"
+        android:paddingBottom="1.125dp"
+        android:paddingRight="20dp"
+        android:layout_marginTop="2dp" />
+
+</LinearLayout>

@@ -1,9 +1,8 @@
 package com.stairway.spotlight.screens.search;
 
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
-
-import java.util.List;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -15,21 +14,23 @@ import rx.subscriptions.CompositeSubscription;
 public class SearchPresenter implements SearchContract.Presenter {
     private CompositeSubscription compositeSubscription;
     private SearchContract.View searchView;
-    private SearchContactsUseCase searchContactsUseCase;
+    private SearchUseCase searchUseCase;
+    private FindUserUseCase findUserUseCase;
 
-    public SearchPresenter(SearchContactsUseCase searchContactsUseCase) {
-        this.searchContactsUseCase = searchContactsUseCase;
+    public SearchPresenter(SearchUseCase searchUseCase, FindUserUseCase findUserUseCase) {
+        this.searchUseCase = searchUseCase;
+        this.findUserUseCase = findUserUseCase;
         compositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void searchContacts(String name) {
+    public void search(String query) {
         Logger.d(this, "SearchContacts presenter");
-        Subscription subscription = searchContactsUseCase.execute(name)
-                .subscribe(new UseCaseSubscriber<List<ContactsModel>>(searchView) {
+        Subscription subscription = searchUseCase.execute(query)
+                .subscribe(new UseCaseSubscriber<SearchModel>(searchView) {
                     @Override
-                    public void onResult(List<ContactsModel> result) {
-                        searchView.displayContacts(name, result);
+                    public void onResult(SearchModel searchModel) {
+                        searchView.displaySearch(searchModel);
                     }
                 });
 
@@ -37,8 +38,21 @@ public class SearchPresenter implements SearchContract.Presenter {
     }
 
     @Override
-    public void searchMessages(String message) {
-        //TODO
+    public void findContact(String userName, String accessToken) {
+        Subscription subscription = findUserUseCase.execute(userName, accessToken)
+                .subscribe(new UseCaseSubscriber<ContactResult>(searchView) {
+                    @Override
+                    public void onResult(ContactResult result) {
+                        searchView.navigateToAddContact(result);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.d(this,e.getMessage());
+                        searchView.showFindContactError();
+                    }
+                });
+        compositeSubscription.add(subscription);
     }
 
     @Override

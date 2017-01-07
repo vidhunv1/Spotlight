@@ -69,4 +69,9 @@ public class UserApi {
         Observable<UserResponse> profileDp = userEndpoint.uploadProfileDP(imageFileBody);
         return profileDp;
     }
+
+    public Observable<UserResponse> findUser(String userName, String authToken) {
+        UserEndpoint userEndpoint = ApiManager.getInstance(authToken).create(UserEndpoint.class);
+        return userEndpoint.findUser(userName);
+    }
 }

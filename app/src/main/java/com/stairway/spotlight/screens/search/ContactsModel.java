@@ -38,4 +38,13 @@ public class ContactsModel {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    @Override
+    public String toString() {
+        return "ContactsModel{" +
+                "contactName='" + contactName + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
 }

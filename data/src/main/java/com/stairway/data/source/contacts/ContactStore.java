@@ -36,6 +36,7 @@ public class ContactStore {
             values.put(ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
             values.put(ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
             values.put(ContactsContract.COLUMN_IS_REGISTERED, contactResult.isRegistered());
+            values.put(ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
 
             long rowId = db.insert(ContactsContract.TABLE_NAME, null, values);
             subscriber.onNext(contactResult);
@@ -101,19 +102,15 @@ public class ContactStore {
     public Observable<List<ContactResult>> getContacts(String name) {
         Logger.d(this, name+" contactStore");
         return Observable.create(subscriber -> {
-            SQLiteDatabase db = databaseManager.openConnection();
             List<ContactResult> result = new ArrayList<>();
-
-            String selection = ContactsContract.COLUMN_CONTACT_NAME + " LIKE ? OR "+ContactsContract.COLUMN_CONTACT_NAME+" LIKE ? ";
-            String[] selectionArgs = new String[2];
             if(name.length()==0) {
                 subscriber.onNext(result);
                 subscriber.onCompleted();
             }
-            else {
-                selectionArgs[0] = name + "%";
-                selectionArgs[1] = "% "+name+"%";
-            }
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = ContactsContract.COLUMN_CONTACT_NAME + " LIKE ? OR "+ContactsContract.COLUMN_CONTACT_NAME+" LIKE ? ";
+            String[] selectionArgs = {name+"%", "% "+name+"%"};
             String[] columns = {
                     ContactsContract.COLUMN_CONTACT_ID,
                     ContactsContract.COLUMN_CONTACT_NAME,

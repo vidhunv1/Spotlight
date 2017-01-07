@@ -4,7 +4,7 @@ package com.stairway.spotlight.screens.message.view_models;
  * Created by vidhun on 26/12/16.
  */
 
-import static com.stairway.spotlight.core.lib.MessageXML.*;
+import static com.stairway.data.source.message.MessageXMLValues.*;
 public class TextMessage{
     private String text;
 

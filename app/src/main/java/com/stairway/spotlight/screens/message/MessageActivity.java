@@ -20,6 +20,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.config.XMPPManager;
+import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
@@ -119,6 +120,14 @@ public class MessageActivity extends BaseActivity
     protected void onStop() {
         super.onStop();
         messagePresenter.detachView();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(this.isTaskRoot())
+            super.onBackPressed();
+        else
+            startActivity(HomeActivity.callingIntent(this));
     }
 
     @Override
