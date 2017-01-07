@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.lib.MessageParser;
 import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
@@ -121,11 +120,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         switch (viewType) {
             case VIEW_WITH_NOTIFICATION:
-                View notificationView = inflater.inflate(R.layout.item_chat_list_notification, parent, false);
+                View notificationView = inflater.inflate(R.layout.item_chat_notification, parent, false);
                 viewHolder = new NotificationViewHolder(notificationView);
                 break;
             case VIEW_WITHOUT_NOTIFICATION:
-                View withoutNotificationView = inflater.inflate(R.layout.item_chat_list, parent, false);
+                View withoutNotificationView = inflater.inflate(R.layout.item_chat, parent, false);
                 viewHolder = new WithoutNotificationViewHolder(withoutNotificationView);
                 break;
             default:

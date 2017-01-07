@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.home.new_chat;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +61,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (viewType) {
             case CONTACT:
-                View contactView = inflater.inflate(R.layout.item_contact_list, parent, false);
+                View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
             default:

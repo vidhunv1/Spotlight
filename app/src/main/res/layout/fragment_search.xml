@@ -20,7 +20,7 @@
         android:layout_marginRight="0dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".screens.home.chats.ChatListFragment"
-        tools:listitem="@layout/item_contact_list" />
+        tools:listitem="@layout/item_contact" />
 
     <TextView
         android:text="TextView"
@@ -39,5 +39,5 @@
         android:layout_marginRight="0dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".screens.home.chats.ChatListFragment"
-        tools:listitem="@layout/item_chat_list" />
+        tools:listitem="@layout/item_chat" />
 </LinearLayout>

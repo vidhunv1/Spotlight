@@ -14,5 +14,5 @@
         android:layout_marginRight="0dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".screens.home.chats.ChatListFragment"
-        tools:listitem="@layout/item_contact_list" />
+        tools:listitem="@layout/item_contact" />
 </LinearLayout>

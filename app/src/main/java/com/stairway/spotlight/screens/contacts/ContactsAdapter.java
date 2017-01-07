@@ -89,11 +89,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         switch (viewType) {
             case VIEW_NOT_ADDED:
-                View contactAddView = inflater.inflate(R.layout.item_contact_list_add, parent, false);
+                View contactAddView = inflater.inflate(R.layout.item_contact_add, parent, false);
                 viewHolder = new ContactAddViewHolder(contactAddView);
                 break;
             case VIEW_ADDED:
-                View contactView = inflater.inflate(R.layout.item_contact_list, parent, false);
+                View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactViewHolder(contactView);
                 break;
             default:

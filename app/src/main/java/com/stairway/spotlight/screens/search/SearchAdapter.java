@@ -44,12 +44,12 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.notifyDataSetChanged();
     }
 
-    private int getCategoryContactPos() {
+    private int getCategoryContactPos() { // VIEW_TYPE_CATEGORY_CONTACTS
         if(searchList.getContactsModelList().size()>0)
             return 0;
         return -1;
     }
-    private int getCategoryMessagePos() {
+    private int getCategoryMessagePos() { // VIEW_TYPE_CATEGORY_MESSAGES
         if(searchList.getMessagesModelList().size()>0) {
             if (getCategoryContactPos() >= 0)
                 return searchList.getContactsModelList().size() + 1;
@@ -58,7 +58,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
         return -1;
     }
-    private int getFindContactPos() {
+    private int getFindContactPos() { // VIEW_TYPE_FIND
         if(getCategoryMessagePos()>=0 && getCategoryContactPos()>=0)
             return searchList.getMessagesModelList().size() +  searchList.getContactsModelList().size() + 2;
         if(getCategoryContactPos()>=0)
@@ -79,7 +79,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new MessageViewHolder(messageView);
                 break;
             case VIEW_TYPE_CONTACT:
-                View contactView = inflater.inflate(R.layout.item_contact_list, parent, false);
+                View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactViewHolder(contactView);
                 break;
             case VIEW_TYPE_CATEGORY_CONTACTS:
@@ -91,7 +91,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new CategoryViewHolder(categoryView1);
                 break;
             case VIEW_TYPE_FIND:
-                View contactView1 = inflater.inflate(R.layout.item_contact_list, parent, false);
+                View contactView1 = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactViewHolder(contactView1);
                 break;
             default:
