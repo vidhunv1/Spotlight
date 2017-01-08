@@ -2,10 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:clickable="true"
-    android:background="?android:selectableItemBackground">
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="82dp"
+        android:layout_marginRight="12dp"
+        android:id="@+id/view_contactItem_divider"
+        android:background="@android:color/darker_gray"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +20,7 @@
         <ImageView
             android:layout_width="82dp"
             android:layout_height="73.5dp"
-            android:id="@+id/iv_chatItem_profileImage"
+            android:id="@+id/iv_contactItem_profileImage"
             android:paddingRight="14dp"
             android:paddingLeft="14dp"
             android:paddingTop="10.75dp"
@@ -25,7 +30,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ll_chatItem_content"
+            android:id="@+id/ll_contactItem_content"
             android:gravity="center_vertical">
 
             <LinearLayout
@@ -41,19 +46,9 @@
                     android:text="Name"
                     android:textColor="#F2000000"
                     android:textSize="17sp"
-                    android:id="@+id/tv_chatItem_contactName"
+                    android:id="@+id/tv_contactItem_contactName"
                     android:maxWidth="190dp" />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="New Text"
-                    android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="14dp"
-                    android:textAlignment="viewEnd"
-                    android:textSize="12sp"
-                    android:textColor="#1da1f2"
-                    android:layout_gravity="center_vertical" />
             </LinearLayout>
 
             <LinearLayout
@@ -68,22 +63,13 @@
                     android:textSize="15sp"
                     android:maxLines="1"
                     android:textColor="#80000000"
-                    android:id="@+id/tv_chatItem_message"
+                    android:id="@+id/tv_contactItem_status"
                     android:text="message"
-                    android:paddingTop="1.125dp"
-                    android:paddingBottom="1.125dp"
                     android:paddingRight="20dp"
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="0.1dp"
-        android:layout_marginLeft="82dp"
-        android:layout_marginRight="12dp"
-        android:background="@android:color/darker_gray"/>
 
 </LinearLayout>

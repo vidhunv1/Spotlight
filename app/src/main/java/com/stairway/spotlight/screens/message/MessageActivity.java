@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -55,7 +57,8 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.btn_sendMessage_send)
     ImageButton sendImageButton;
 
-    TextView presenceTextView;
+    @Bind(R.id.tb_message)
+    Toolbar toolbar;
 
     private ChatState currentChatState;
 
@@ -90,20 +93,20 @@ public class MessageActivity extends BaseActivity
         messageItem.setAdapter(messagesAdapter);
         OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
-        android.support.v7.app.ActionBar ab = getSupportActionBar();
-        ab.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-        ab.setCustomView(R.layout.actionbar_message_name);
+        TextView title = (TextView) toolbar.findViewById(R.id.tb_message_title);
+        title.setText("Airtel");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        View v =getSupportActionBar().getCustomView();
-        presenceTextView = (TextView) v.findViewById(R.id.tv_message_presence);
         messagePresenter.attachView(this);
         Logger.d(this, "ChatId: "+chatId+", CurrentUser:"+currentUser);
         messagePresenter.loadMessages(chatId);
     }
 
     @Override
-    protected void onResume() {
+        protected void onResume() {
         super.onResume();
         messagePresenter.attachView(this);
         messagePresenter.getPresence(chatId);
@@ -134,6 +137,17 @@ public class MessageActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.messages_action_bar, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if((item.getItemId() == android.R.id.home)) {
+            if(this.isTaskRoot())
+                super.onBackPressed();
+            else
+                startActivity(HomeActivity.callingIntent(this));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     // send text message
@@ -192,7 +206,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void updatePresence(String presence) {
         Logger.d(this, "Presence: "+presence);
-        presenceTextView.setText(presence);
+//        presenceTextView.setText(presence);
     }
 
 

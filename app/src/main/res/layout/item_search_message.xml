@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="true"
-    android:clickable="true"
-    android:id="@+id/ll_chatItem_content"
-    android:gravity="center_vertical"
-    android:background="?android:selectableItemBackground">
+    android:id="@+id/ll_searchMessage_content"
+    android:paddingLeft="14dp"
+    android:paddingRight="14dp"
+    android:paddingTop="10.75dp"
+    android:paddingBottom="10.75dp">
 
     <LinearLayout
         android:orientation="horizontal"

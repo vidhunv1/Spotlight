@@ -1,6 +1,5 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.new_chat;
 
-import com.stairway.data.source.contacts.ContactContent;
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.data.source.contacts.ContactStore;
 

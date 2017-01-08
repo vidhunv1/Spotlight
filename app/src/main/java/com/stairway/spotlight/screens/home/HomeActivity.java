@@ -29,7 +29,7 @@ import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.contacts.ContactsActivity;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
-import com.stairway.spotlight.screens.home.new_chat.NewChatFragment;
+import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.home.profile.ProfileFragment;
 import com.stairway.spotlight.screens.search.SearchFragment;
 import com.stairway.spotlight.screens.search.SearchActivity;
@@ -37,6 +37,8 @@ import com.stairway.spotlight.screens.search.SearchActivity;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Subscriber;
 
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
@@ -44,19 +46,24 @@ import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKE
 public class HomeActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ActionBarDrawerToggle toggle;
-    private FloatingActionButton fab;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+
+    @Bind(R.id.drawer_layout)
+    DrawerLayout drawer;
+
+    @Bind(R.id.nav_view)
+    NavigationView navigationView;
+
     UserApi userApi;
     UserSessionResult userSession;
     ChatListFragment chatListFragment;
     ProfileFragment profileFragment;
-    NewChatFragment newChatFragment;
     SearchFragment searchFragment;
 
+    final String FRAGMENT_CHAT = "CHAT_FRAGMENT";
+
     private Toolbar toolbar;
-    private static String TITLE_HOME = "Messages";
-    private static String TITLE_NEW_CHAT = "New Chat";
-    private static String TITLE_PROFILE = "Profile";
-    private final String FRAGMENT_CHAT = "CHAT_FRAGMENT", FRAGMENT_PROFILE = "PROFILE_FRAGMENT", FRAGMENT_NEW_CHAT = "NEW_CHAT_FRAGMENT", FRAGMENT_SEARCH = "SEARCH_FRAGMENT";
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -68,22 +75,21 @@ public class HomeActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawer_menu);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_drawer_menu);
+
+        ButterKnife.bind(this);
+
+        toolbar = (Toolbar) findViewById(R.id.tb_home);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         setChatFragment();
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(view -> setNewChatFragment());
+        fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this)));
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.getHeaderView(0).setOnClickListener(v -> {
@@ -95,20 +101,19 @@ public class HomeActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             toggle.setDrawerIndicatorEnabled(true);
             fab.setVisibility(View.VISIBLE);
-            toolbar.setTitle(TITLE_HOME);
+            setChatFragment();
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_activity_drawer, menu);
+        getMenuInflater().inflate(R.menu.home_activity, menu);
         return true;
     }
 
@@ -128,32 +133,44 @@ public class HomeActivity extends BaseActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         int id = item.getItemId();
-        if (id == R.id.nav_settings) {
-        } else if (id == R.id.nav_contacts) {
-            startActivity(ContactsActivity.callingIntent(this));
-        } else if (id == R.id.nav_manage) {
+        switch(id) {
+            case R.id.nav_settings:
+                break;
+            case R.id.nav_contacts:
+                startActivity(ContactsActivity.callingIntent(this));
+                break;
+            case R.id.nav_manage:
+                break;
+            case android.R.id.home:
+                onBackPressed();
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void setNewChatFragment() {
-        if(newChatFragment == null)
-            newChatFragment = NewChatFragment.getInstance();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, newChatFragment, FRAGMENT_NEW_CHAT);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-        toggle.setDrawerIndicatorEnabled(false);
-        toolbar.setTitle(TITLE_NEW_CHAT);
-        fab.setVisibility(View.GONE);
-        chatListFragment = null;
-    }
+//    private void setNewChatFragment() {
+//        String FRAGMENT_NEW_CHAT = "NEW_CHAT_FRAGMENT";
+//        String TITLE_NEW_CHAT = "New Chat";
+//
+//        if(newChatFragment == null)
+//            newChatFragment = NewChatFragment.getInstance();
+//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.register_FragmentContainer, newChatFragment, FRAGMENT_NEW_CHAT);
+//        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.commit();
+//
+//        toggle.setDrawerIndicatorEnabled(false);
+//        getSupportActionBar().setTitle(TITLE_NEW_CHAT);
+//        fab.setVisibility(View.GONE);
+//        chatListFragment = null;
+//    }
 
     private void setProfileFragment() {
+        String FRAGMENT_PROFILE = "PROFILE_FRAGMENT";
+        String TITLE_PROFILE = "Profile";
+
         if(profileFragment == null)
             profileFragment = ProfileFragment.getInstance();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -162,12 +179,14 @@ public class HomeActivity extends BaseActivity
         fragmentTransaction.commit();
 
         toggle.setDrawerIndicatorEnabled(false);
-        toolbar.setTitle(TITLE_PROFILE);
+        getSupportActionBar().setTitle(TITLE_PROFILE);
         fab.setVisibility(View.GONE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setChatFragment() {
+        String TITLE_HOME = "  Messages";
+
         if(chatListFragment == null)
             chatListFragment = ChatListFragment.getInstance();
         setSupportActionBar(toolbar);
@@ -176,7 +195,7 @@ public class HomeActivity extends BaseActivity
         fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment, FRAGMENT_CHAT);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        toolbar.setTitle(TITLE_HOME);
+        getSupportActionBar().setTitle(TITLE_HOME);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -184,6 +203,7 @@ public class HomeActivity extends BaseActivity
         if(searchFragment == null)
             searchFragment = SearchFragment.getInstance();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        String FRAGMENT_SEARCH = "SEARCH_FRAGMENT";
         fragmentTransaction.replace(R.id.register_FragmentContainer, searchFragment, FRAGMENT_SEARCH);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

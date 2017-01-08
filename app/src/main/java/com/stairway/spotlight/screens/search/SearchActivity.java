@@ -9,9 +9,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
@@ -32,14 +36,15 @@ import butterknife.OnTextChanged;
 public class SearchActivity extends BaseActivity implements SearchContract.View,
         SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener {
 
-    @Bind(R.id.actionbar_search)
-    EditText searchText;
-
     @Bind(R.id.rv_contact_list)
     RecyclerView contactsSearchList;
 
+    @Bind(R.id.tb_search)
+    Toolbar toolbar;
+
     @Inject
     SearchPresenter searchPresenter;
+
 
     private UserSessionResult userSession;
 
@@ -54,14 +59,27 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         super.onCreate(savedInstanceState);
         Logger.d(this, "SearchActivity");
         setContentView(R.layout.activity_search);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-        getSupportActionBar().setCustomView(R.layout.actionbar_search);
-        getSupportActionBar().setElevation(0);
-
         ButterKnife.bind(this);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        EditText searchQuery = (EditText) toolbar.findViewById(R.id.et_search);
+        searchQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchPresenter.search(s.toString());
+            }
+
+        });
+
         searchPresenter.attachView(this);
         searchPresenter.attachView(this);
         searchAdapter = new SearchAdapter(this, this, this);
@@ -84,11 +102,6 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Override
     public void displaySearch(SearchModel searchModel) {
         searchAdapter.displaySearch(searchModel);
-    }
-
-    @OnTextChanged(R.id.actionbar_search)
-    public void onSearchTextChanged() {
-        searchPresenter.search(searchText.getText()+"");
     }
 
     @Override

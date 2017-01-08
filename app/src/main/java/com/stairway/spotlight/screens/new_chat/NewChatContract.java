@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.new_chat;
 
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
@@ -11,9 +11,8 @@ import java.util.List;
  */
 public class NewChatContract {
     interface View extends BaseView {
-        void displayContactList(ArrayList<NewChatItemModel> newChatItemModels);
-        void addContact(NewChatItemModel newChatItemModel);
-        void addContacts(List<NewChatItemModel> newChatItemModel);
+        void displayContact(NewChatItemModel newChatItemModel);
+        void displayContacts(List<NewChatItemModel> newChatItemModel);
     }
 
     interface Presenter extends BasePresenter<NewChatContract.View> {

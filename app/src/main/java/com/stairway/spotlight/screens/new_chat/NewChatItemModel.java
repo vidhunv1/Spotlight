@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.new_chat;
 
 /**
  * Created by vidhun on 31/08/16.
@@ -40,5 +40,14 @@ public class NewChatItemModel {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "NewChatItemModel{" +
+                "contactName='" + contactName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userId='" + userId + '\'' +
+                '}';
     }
 }

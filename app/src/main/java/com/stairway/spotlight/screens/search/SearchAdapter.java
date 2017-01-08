@@ -91,7 +91,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new CategoryViewHolder(categoryView1);
                 break;
             case VIEW_TYPE_FIND:
-                View contactView1 = inflater.inflate(R.layout.item_contact, parent, false);
+                View contactView1 = inflater.inflate(R.layout.item_search_contact, parent, false);
                 viewHolder = new ContactViewHolder(contactView1);
                 break;
             default:
@@ -200,7 +200,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.ll_chatItem_content)
+        @Bind(R.id.ll_searchMessage_content)
         LinearLayout messagesLayout;
 
         @Bind(R.id.tv_searchMessage_contactName)

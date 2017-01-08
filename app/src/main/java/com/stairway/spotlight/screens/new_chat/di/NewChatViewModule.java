@@ -1,8 +1,8 @@
-package com.stairway.spotlight.screens.home.new_chat.di;
+package com.stairway.spotlight.screens.new_chat.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.new_chat.NewChatPresenter;
-import com.stairway.spotlight.screens.home.new_chat.GetNewChatsUseCase;
+import com.stairway.spotlight.screens.new_chat.NewChatPresenter;
+import com.stairway.spotlight.screens.new_chat.GetNewChatsUseCase;
 
 import dagger.Module;
 import dagger.Provides;

@@ -75,10 +75,12 @@
         <activity android:name=".screens.contacts.ContactsActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
-            android:label="@string/title_activity_home_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".screens.search.SearchActivity"
+            android:label="SearchActivity" />
+        <activity
+            android:name=".screens.new_chat.NewChatActivity"
             android:label="SearchActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
         <activity android:name=".screens.add_contact.AddUserActivity"></activity>

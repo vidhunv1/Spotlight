@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.new_chat;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 
 import java.util.ArrayList;
@@ -21,8 +22,10 @@ import butterknife.ButterKnife;
  */
 public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ContactClickListener contactClickListener;
-    private List<Object> itemList;
+    private List<NewChatItemModel> itemList;
     private final int CONTACT=1;
+
+    private List<Integer> filteredList;
 
     public NewChatAdapter(ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
         this.contactClickListener = contactClickListener;
@@ -47,11 +50,21 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.notifyItemRangeChanged(position, itemList.size());
     }
 
+    public void filterList(String query) {
+        filteredList = new ArrayList<>();
+
+        for (NewChatItemModel newChatItemModel : itemList)
+            if(newChatItemModel.getContactName().toLowerCase().matches(query+".*") || newChatItemModel.getContactName().matches(".* "+query+".*")) {
+                filteredList.add(itemList.indexOf(newChatItemModel));
+                Logger.d(this, "Filtering: "+newChatItemModel.toString()+" at "+itemList.indexOf(newChatItemModel));
+            }
+
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if(itemList.get(position) instanceof NewChatItemModel)
-            return CONTACT;
-        return -1;
+        return CONTACT;
     }
 
     @Override
@@ -71,11 +84,15 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
+        int position = vPos;
+        if(filteredList!=null)
+            position = filteredList.get(vPos);
+
         switch (holder.getItemViewType()) {
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
-                cVH.renderItem((NewChatItemModel) itemList.get(position));
+                cVH.renderItem(itemList.get(position));
                 break;
             default:
                 break;
@@ -84,6 +101,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
+        if(filteredList!=null)
+            return filteredList.size();
         return itemList.size();
     }
 

@@ -1,6 +1,5 @@
-package com.stairway.spotlight.screens.home.new_chat;
+package com.stairway.spotlight.screens.new_chat;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                 .subscribe(new UseCaseSubscriber<List<NewChatItemModel>>(contactsView) {
                     @Override
                     public void onResult(List<NewChatItemModel> result) {
-                        contactsView.addContacts(result);
+                        contactsView.displayContacts(result);
                     }
                 });
 
