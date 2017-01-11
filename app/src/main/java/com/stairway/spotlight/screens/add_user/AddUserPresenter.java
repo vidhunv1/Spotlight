@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.add_contact;
+package com.stairway.spotlight.screens.add_user;
 
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;

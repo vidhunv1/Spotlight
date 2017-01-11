@@ -81,9 +81,12 @@
             android:label="SearchActivity" />
         <activity
             android:name=".screens.new_chat.NewChatActivity"
-            android:label="SearchActivity" />
+            android:label="NewChatActivity" />
+        <activity
+            android:name=".screens.my_profile.ProfileActivity"
+            android:label="ProfileActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
-        <activity android:name=".screens.add_contact.AddUserActivity"></activity>
+        <activity android:name=".screens.add_user.AddUserActivity"></activity>
     </application>
 
 </manifest>

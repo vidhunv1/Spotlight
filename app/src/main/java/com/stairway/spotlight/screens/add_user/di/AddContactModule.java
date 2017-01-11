@@ -1,8 +1,8 @@
-package com.stairway.spotlight.screens.add_contact.di;
+package com.stairway.spotlight.screens.add_user.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.add_contact.AddUserPresenter;
-import com.stairway.spotlight.screens.add_contact.AddUserUseCase;
+import com.stairway.spotlight.screens.add_user.AddUserPresenter;
+import com.stairway.spotlight.screens.add_user.AddUserUseCase;
 
 import dagger.Module;
 import dagger.Provides;

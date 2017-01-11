@@ -1,8 +1,8 @@
-package com.stairway.spotlight.screens.home.profile.di;
+package com.stairway.spotlight.screens.my_profile.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.profile.ProfilePresenter;
-import com.stairway.spotlight.screens.home.profile.UpdateProfileDPUseCase;
+import com.stairway.spotlight.screens.my_profile.ProfilePresenter;
+import com.stairway.spotlight.screens.my_profile.UpdateProfileDPUseCase;
 
 import dagger.Module;
 import dagger.Provides;

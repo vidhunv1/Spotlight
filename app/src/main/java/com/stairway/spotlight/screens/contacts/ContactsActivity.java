@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
@@ -13,6 +16,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.contacts.di.ContactsViewModule;
+import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.ArrayList;
@@ -27,13 +31,15 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 public class ContactsActivity extends BaseActivity implements ContactsContract.View,
         ContactsAdapter.ContactClickListener, ContactsAdapter.ContactAddClickListener{
     private ContactsAdapter contactsAdapter;
-    private final String TITLE_CONTACTS = "Contacts";
 
     @Inject
     ContactsPresenter contactsPresenter;
 
     @Bind(R.id.rv_contact_list)
     RecyclerView contactList;
+
+    @Bind(R.id.tb_contacts)
+    Toolbar toolbar;
 
     public static Intent callingIntent(Context context) {
         return new Intent(context, ContactsActivity.class);
@@ -51,8 +57,19 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
         contactList.setAdapter(contactsAdapter);
         contactsPresenter.loadContacts();
 
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(TITLE_CONTACTS);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if((item.getItemId() == android.R.id.home)) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

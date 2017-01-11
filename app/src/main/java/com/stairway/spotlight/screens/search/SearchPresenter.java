@@ -38,8 +38,8 @@ public class SearchPresenter implements SearchContract.Presenter {
     }
 
     @Override
-    public void findContact(String userName, String accessToken) {
-        Subscription subscription = findUserUseCase.execute(userName, accessToken)
+    public void findContact(String userId, String accessToken) {
+        Subscription subscription = findUserUseCase.execute(userId, accessToken)
                 .subscribe(new UseCaseSubscriber<ContactResult>(searchView) {
                     @Override
                     public void onResult(ContactResult result) {
@@ -48,8 +48,9 @@ public class SearchPresenter implements SearchContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
+                        //TODO: display error in view
+                        Logger.d(this, "No contact found with id: "+userId);
                         Logger.d(this,e.getMessage());
-                        searchView.showFindContactError();
                     }
                 });
         compositeSubscription.add(subscription);

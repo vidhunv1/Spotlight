@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.profile;
+package com.stairway.spotlight.screens.my_profile;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserApi;

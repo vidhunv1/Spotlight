@@ -1,6 +1,9 @@
 package com.stairway.spotlight.screens.search;
 
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.data.source.contacts.ContactStore;
+import com.stairway.data.source.contacts.gson_models.Contact;
 import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.gson_models.UserResponse;
 
@@ -15,19 +18,19 @@ import rx.Subscriber;
 
 public class FindUserUseCase {
     private UserApi userApi;
+    private ContactStore contactStore;
 
     @Inject
-    public FindUserUseCase(UserApi userApi) {
+    public FindUserUseCase(UserApi userApi, ContactStore contactStore) {
         this.userApi = userApi;
+        this.contactStore = contactStore;
     }
 
     public Observable<ContactResult> execute(String userName, String authToken) {
         return Observable.create(subscriber -> {
             userApi.findUser(userName, authToken).subscribe(new Subscriber<UserResponse>() {
                 @Override
-                public void onCompleted() {
-
-                }
+                public void onCompleted() {}
 
                 @Override
                 public void onError(Throwable e) {
@@ -38,14 +41,25 @@ public class FindUserUseCase {
                 public void onNext(UserResponse userResponse) {
                     userResponse.getUser();
                     ContactResult contactResult = new ContactResult();
-                    contactResult.setAdded(true);
                     contactResult.setRegistered(true);
                     contactResult.setUserId(userResponse.getUser().getUserId());
                     contactResult.setUsername(userResponse.getUser().getUsername());
                     contactResult.setDisplayName(userResponse.getUser().getName());
 
-                    subscriber.onNext(contactResult);
-                    subscriber.onCompleted();
+                    contactStore.getContactByUserId(contactResult.getUserId()).subscribe(new Subscriber<ContactResult>() {
+                        @Override
+                        public void onCompleted() {}
+                        @Override
+                        public void onError(Throwable e) {}
+
+                        @Override
+                        public void onNext(ContactResult res) {
+                            contactResult.setAdded(res.isAdded());
+
+                            subscriber.onNext(contactResult);
+                            subscriber.onCompleted();
+                        }
+                    });
                 }
             });
         });

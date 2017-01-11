@@ -60,13 +60,17 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message)
     Toolbar toolbar;
 
+    @Bind(R.id.tb_message_title)
+    TextView title;
+
     private ChatState currentChatState;
 
-    private static String KEY_USER_NAME = "USERNAME";
+    private static final String KEY_USER_NAME = "USERNAME";
     private String chatId; // contact user, mobile
     private String currentUser; // this user, mobile
     private MessagesAdapter messagesAdapter;
 
+    // userName: id for ejabberd xmpp. userId: id set by user:
     public static Intent callingIntent(Context context, String userName) {
         Intent intent = new Intent(context, MessageActivity.class);
         intent.putExtra(KEY_USER_NAME, userName);
@@ -93,8 +97,6 @@ public class MessageActivity extends BaseActivity
         messageItem.setAdapter(messagesAdapter);
         OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
-        TextView title = (TextView) toolbar.findViewById(R.id.tb_message_title);
-        title.setText("Airtel");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -102,6 +104,7 @@ public class MessageActivity extends BaseActivity
 
         messagePresenter.attachView(this);
         Logger.d(this, "ChatId: "+chatId+", CurrentUser:"+currentUser);
+        messagePresenter.getName(chatId);
         messagePresenter.loadMessages(chatId);
     }
 
@@ -125,13 +128,13 @@ public class MessageActivity extends BaseActivity
         messagePresenter.detachView();
     }
 
-    @Override
-    public void onBackPressed() {
-        if(this.isTaskRoot())
-            super.onBackPressed();
-        else
-            startActivity(HomeActivity.callingIntent(this));
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if(this.isTaskRoot())
+//            super.onBackPressed();
+//        else
+//            startActivity(HomeActivity.callingIntent(this));
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,10 +145,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if((item.getItemId() == android.R.id.home)) {
-            if(this.isTaskRoot())
-                super.onBackPressed();
-            else
-                startActivity(HomeActivity.callingIntent(this));
+            super.onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -194,6 +194,12 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
+    public void setName(String name) {
+        Logger.d(this, "Setting name:");
+        title.setText(name);
+    }
+
+    @Override
     public void updateDeliveryStatus(MessageResult messageResult) {
         messagesAdapter.updateMessage(messageResult);
     }
@@ -228,12 +234,6 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
-        currentUser = componentContainer.userSessionComponent().getUserSession().getUserName();
-    }
-
-    @Override
     public void onMessageReceived(MessageResult messageResult) {
         super.onMessageReceived(messageResult);
         if(messageResult.getChatId().equals(chatId)) {
@@ -261,5 +261,12 @@ public class MessageActivity extends BaseActivity
         if(this.chatId.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }
+    }
+
+
+    @Override
+    protected void injectComponent(ComponentContainer componentContainer) {
+        componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
+        currentUser = componentContainer.userSessionComponent().getUserSession().getUserName();
     }
 }

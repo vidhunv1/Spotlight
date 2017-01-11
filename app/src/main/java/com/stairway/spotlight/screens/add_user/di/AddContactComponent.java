@@ -1,7 +1,7 @@
-package com.stairway.spotlight.screens.add_contact.di;
+package com.stairway.spotlight.screens.add_user.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.add_contact.AddUserActivity;
+import com.stairway.spotlight.screens.add_user.AddUserActivity;
 
 import dagger.Subcomponent;
 

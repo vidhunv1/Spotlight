@@ -1,17 +1,21 @@
-package com.stairway.spotlight.screens.add_contact;
+package com.stairway.spotlight.screens.add_user;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.add_contact.di.AddContactModule;
+import com.stairway.spotlight.screens.add_user.di.AddContactModule;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import javax.inject.Inject;
@@ -36,6 +40,12 @@ public class AddUserActivity extends BaseActivity implements AddUserContract.Vie
     @Bind(R.id.iv_contactItem_profileImage)
     ImageView profileImage;
 
+    @Bind(R.id.tb_add_user)
+    Toolbar toolbar;
+
+    @Bind(R.id.ll_contact_content)
+    LinearLayout contactContent;
+
     private ContactResult contact;
 
     private static String KEY_CONTACT = "CONTACT";
@@ -53,12 +63,33 @@ public class AddUserActivity extends BaseActivity implements AddUserContract.Vie
         if(!receivedIntent.hasExtra(KEY_CONTACT))
             return;
         contact = (ContactResult) receivedIntent.getSerializableExtra(KEY_CONTACT);
-        setContentView(R.layout.activity_add_contact);
+        setContentView(R.layout.activity_add_user);
         ButterKnife.bind(this);
 
         contactName.setText(contact.getContactName());
         contactId.setText("@"+contact.getUserId());
         profileImage.setImageResource(R.drawable.default_profile_image);
+
+        if(contact.isAdded()) {
+            addButton.setVisibility(View.GONE);
+            contactContent.setOnClickListener(v -> {
+                navigateToMessage(contact.getUsername());
+            });
+        }
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if((item.getItemId() == android.R.id.home)) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

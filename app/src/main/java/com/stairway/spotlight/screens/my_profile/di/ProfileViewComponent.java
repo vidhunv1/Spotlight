@@ -1,7 +1,7 @@
-package com.stairway.spotlight.screens.home.profile.di;
+package com.stairway.spotlight.screens.my_profile.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.profile.ProfileFragment;
+import com.stairway.spotlight.screens.my_profile.ProfileActivity;
 
 import dagger.Subcomponent;
 
@@ -12,5 +12,5 @@ import dagger.Subcomponent;
 @ViewScope
 @Subcomponent(modules = ProfileViewModule.class)
 public interface ProfileViewComponent {
-    void inject(ProfileFragment profileFragment);
+    void inject(ProfileActivity profileActivity);
 }

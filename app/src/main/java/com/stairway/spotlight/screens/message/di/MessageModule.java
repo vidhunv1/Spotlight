@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.message.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
+import com.stairway.spotlight.screens.message.GetNameUseCase;
 import com.stairway.spotlight.screens.message.GetPresenceUseCase;
 import com.stairway.spotlight.screens.message.LoadMessagesUseCase;
 import com.stairway.spotlight.screens.message.MessagePresenter;
@@ -26,9 +27,10 @@ public class MessageModule {
                                               GetPresenceUseCase getPresenceUseCase,
                                               UpdateMessageUseCase updateMessageUseCase,
                                               SendChatStateUseCase sendChatStateUseCase,
-                                              SendReadReceiptUseCase sendReadReceiptUseCase) {
-        if(loadMessagesUseCase ==null || storeMessageUseCase ==null || sendMessageUseCase == null || getPresenceUseCase==null || updateMessageUseCase==null || sendChatStateUseCase==null || sendReadReceiptUseCase==null)
+                                              SendReadReceiptUseCase sendReadReceiptUseCase,
+                                              GetNameUseCase getNameUseCase) {
+        if(loadMessagesUseCase ==null || storeMessageUseCase ==null || sendMessageUseCase == null || getPresenceUseCase==null || updateMessageUseCase==null || sendChatStateUseCase==null || sendReadReceiptUseCase==null || getNameUseCase==null)
             throw new IllegalStateException("UseCase is null");
-        return new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, getPresenceUseCase, updateMessageUseCase, sendChatStateUseCase, sendReadReceiptUseCase);
+        return new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, getPresenceUseCase, updateMessageUseCase, sendChatStateUseCase, sendReadReceiptUseCase, getNameUseCase);
     }
 }

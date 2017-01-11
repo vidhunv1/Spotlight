@@ -29,6 +29,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     private UpdateMessageUseCase updateMessageUseCase;
     private SendChatStateUseCase sendChatStateUseCase;
     private SendReadReceiptUseCase sendReadReceiptUseCase;
+    private GetNameUseCase getNameUseCase;
 
     public MessagePresenter(LoadMessagesUseCase messageUseCase,
                             StoreMessageUseCase storeMessageUseCase,
@@ -36,7 +37,8 @@ public class MessagePresenter implements MessageContract.Presenter {
                             GetPresenceUseCase getPresenceUseCase,
                             UpdateMessageUseCase updateMessageUseCase,
                             SendChatStateUseCase sendChatStateUseCase,
-                            SendReadReceiptUseCase sendReadReceiptUseCase) {
+                            SendReadReceiptUseCase sendReadReceiptUseCase,
+                            GetNameUseCase getNameUseCase) {
         this.getMessageUseCase = messageUseCase;
         this.storeMessageUseCase = storeMessageUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
@@ -44,7 +46,22 @@ public class MessagePresenter implements MessageContract.Presenter {
         this.updateMessageUseCase = updateMessageUseCase;
         this.sendChatStateUseCase = sendChatStateUseCase;
         this.sendReadReceiptUseCase = sendReadReceiptUseCase;
+        this.getNameUseCase = getNameUseCase;
         this.compositeSubscription = new CompositeSubscription();
+    }
+
+    @Override
+    public void getName(String username) {
+        Subscription subscription = getNameUseCase.execute(username)
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<String>(messageView) {
+                    @Override
+                    public void onResult(String result) {
+                        messageView.setName(result);
+                    }
+                });
+
+        compositeSubscription.add(subscription);
     }
 
     @Override

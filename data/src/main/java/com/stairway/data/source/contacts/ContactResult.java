@@ -107,6 +107,7 @@ public class ContactResult implements Serializable{
                 ", username='" + username + '\'' +
                 ", isRegistered=" + isRegistered +
                 ", isAdded=" + isAdded +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 

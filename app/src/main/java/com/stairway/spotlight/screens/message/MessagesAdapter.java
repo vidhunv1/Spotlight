@@ -219,7 +219,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     textMessage = new TextMessage(messageList.get(position).getMessage());
                     Logger.d(this, "Text message null");
                 }
-                Logger.d(this, "Send text: "+textMessage.getText());
                 sendViewHolder.renderItem(textMessage, messageList.get(position).getMessageStatus());
                 break;
             case VIEW_TYPE_RECV_TEXT:
@@ -274,7 +273,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         void renderItem(TextMessage textMessage, MessageResult.MessageStatus messageStatus) {
-            Logger.d(this, "text: "+textMessage.getText());
             message.setText(textMessage.getText());
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT)
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);

@@ -81,8 +81,8 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
     }
 
     @Override
-    public void onChatItemClicked(String userId) {
-        startActivity(MessageActivity.callingIntent(this.getActivity(), userId));
+    public void onChatItemClicked(String userName) {
+        startActivity(MessageActivity.callingIntent(this.getActivity(), userName));
     }
 
     @Override

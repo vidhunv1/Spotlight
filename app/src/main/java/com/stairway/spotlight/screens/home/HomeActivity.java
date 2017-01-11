@@ -30,7 +30,7 @@ import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.contacts.ContactsActivity;
 import com.stairway.spotlight.screens.home.chats.ChatListFragment;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
-import com.stairway.spotlight.screens.home.profile.ProfileFragment;
+import com.stairway.spotlight.screens.my_profile.ProfileActivity;
 import com.stairway.spotlight.screens.search.SearchFragment;
 import com.stairway.spotlight.screens.search.SearchActivity;
 
@@ -58,7 +58,6 @@ public class HomeActivity extends BaseActivity
     UserApi userApi;
     UserSessionResult userSession;
     ChatListFragment chatListFragment;
-    ProfileFragment profileFragment;
     SearchFragment searchFragment;
 
     final String FRAGMENT_CHAT = "CHAT_FRAGMENT";
@@ -75,7 +74,7 @@ public class HomeActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_drawer_menu);
+        setContentView(R.layout.activity_home);
 
         ButterKnife.bind(this);
 
@@ -84,7 +83,10 @@ public class HomeActivity extends BaseActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         setChatFragment();
 
-        fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this)));
+        fab.setOnClickListener(view -> {
+            Logger.d(this, "fab clicked");
+            startActivity(NewChatActivity.callingIntent(this));
+        });
 
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -93,7 +95,7 @@ public class HomeActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.getHeaderView(0).setOnClickListener(v -> {
-            setProfileFragment();
+            startActivity(ProfileActivity.callingIntent(this));
             drawer.closeDrawer(GravityCompat.START);
         });
         uploadFCMToken();
@@ -167,22 +169,22 @@ public class HomeActivity extends BaseActivity
 //        chatListFragment = null;
 //    }
 
-    private void setProfileFragment() {
-        String FRAGMENT_PROFILE = "PROFILE_FRAGMENT";
-        String TITLE_PROFILE = "Profile";
-
-        if(profileFragment == null)
-            profileFragment = ProfileFragment.getInstance();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, profileFragment, FRAGMENT_PROFILE);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-        toggle.setDrawerIndicatorEnabled(false);
-        getSupportActionBar().setTitle(TITLE_PROFILE);
-        fab.setVisibility(View.GONE);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
+//    private void setProfileFragment() {
+//        String FRAGMENT_PROFILE = "PROFILE_FRAGMENT";
+//        String TITLE_PROFILE = "Profile";
+//
+//        if(profileFragment == null)
+//            profileFragment = ProfileFragment.getInstance();
+//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.register_FragmentContainer, profileFragment, FRAGMENT_PROFILE);
+//        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.commit();
+//
+//        toggle.setDrawerIndicatorEnabled(false);
+//        getSupportActionBar().setTitle(TITLE_PROFILE);
+//        fab.setVisibility(View.GONE);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//    }
 
     private void setChatFragment() {
         String TITLE_HOME = "  Messages";
@@ -195,8 +197,6 @@ public class HomeActivity extends BaseActivity
         fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment, FRAGMENT_CHAT);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        getSupportActionBar().setTitle(TITLE_HOME);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setSearchFragment() {

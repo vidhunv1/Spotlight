@@ -1,20 +1,18 @@
-package com.stairway.spotlight.screens.home.profile;
+package com.stairway.spotlight.screens.my_profile;
 
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -22,10 +20,11 @@ import com.bumptech.glide.signature.StringSignature;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.core.BaseFragment;
+import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.lib.ImageUtils;
-import com.stairway.spotlight.screens.home.profile.di.ProfileViewModule;
+import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.screens.my_profile.di.ProfileViewModule;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,18 +35,22 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
- * Created by vidhun on 04/10/16.
+ * Created by vidhun on 08/01/17.
  */
-//TODO: Glide cache problems
-public class ProfileFragment extends BaseFragment implements ProfileContract.View{
+
+public class ProfileActivity extends BaseActivity implements ProfileContract.View {
     @Bind(R.id.iv_profileImage)
     ImageView profileImage;
 
     @Inject
     ProfilePresenter presenter;
+
+    @Bind(R.id.tb_profile)
+    Toolbar toolbar;
+
+    @Bind(R.id.tb_profile_title)
+    TextView title;
 
     private UserSessionResult userSession;
     private String currentPhotoPath;
@@ -55,26 +58,30 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
     private static final int REQUEST_GALLERY = 1;
     private static final int REQUEST_CAMERA = 2;
 
-    public ProfileFragment() {}
-
-    public static ProfileFragment getInstance() {
-        ProfileFragment profileFragment = new ProfileFragment();
-        return profileFragment;
+    public static Intent callingIntent(Context context) {
+        return new Intent(context, ProfileActivity.class);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);
+
+        ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        title.setText("  Profile");
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        ButterKnife.bind(this, view);
-        Logger.d(this, userSession.toString());
-
-        return view;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if((item.getItemId() == android.R.id.home)) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -94,22 +101,22 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
     public void onProfileClicked() {
         CharSequence options[] = new CharSequence[] {"Camera", "Gallery"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Profile Photo");
         builder.setItems(options, ((dialog, which) -> {
             if(which==0) {
                 // ** Load image from camera **
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                PackageManager pm = getActivity().getPackageManager();
-                if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+                PackageManager pm = this.getPackageManager();
+                if (cameraIntent.resolveActivity(this.getPackageManager()) != null && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
                     File photoFile = null;
                     try {
-                        photoFile = ImageUtils.createImageFile(getActivity());
+                        photoFile = ImageUtils.createImageFile(this);
                     } catch (IOException ex) {
                         Logger.d(this, "Error creating image file.");
                     }
                     if (photoFile != null) {
-                        Uri photoURI = FileProvider.getUriForFile(this.getActivity(), "com.stairway.spotlight.fileprovider", photoFile);
+                        Uri photoURI = FileProvider.getUriForFile(this, "com.stairway.spotlight.fileprovider", photoFile);
                         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         currentPhotoPath = photoFile.getAbsolutePath();
                         startActivityForResult(cameraIntent, REQUEST_CAMERA);
@@ -118,7 +125,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
             } else if(which==1) {
                 // ** Load image from gallery **
                 Intent loadIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
                 startActivityForResult(loadIntent, REQUEST_GALLERY);
             }
@@ -134,7 +141,7 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
             Logger.d(this, selectedImage.toString());
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
-            Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            Cursor cursor = this.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
@@ -184,12 +191,12 @@ public class ProfileFragment extends BaseFragment implements ProfileContract.Vie
         File f = new File(path);
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
-        this.getActivity().sendBroadcast(mediaScanIntent);
+        this.sendBroadcast(mediaScanIntent);
     }
-
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
         componentContainer.userSessionComponent().plus(new ProfileViewModule()).inject(this);
         userSession = componentContainer.userSessionComponent().getUserSession();
     }
+
 }

@@ -14,7 +14,6 @@ public interface SearchContract {
     interface View extends BaseView {
         void displaySearch(SearchModel searchModel);
         void navigateToAddContact(ContactResult contactResult);
-        void showFindContactError();
     }
     interface Presenter extends BasePresenter<SearchContract.View> {
         void search(String query);

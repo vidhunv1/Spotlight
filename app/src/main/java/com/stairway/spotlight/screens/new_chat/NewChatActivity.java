@@ -41,14 +41,14 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.tb_new_chat)
     Toolbar toolbar;
 
-    @Bind(R.id.tb_new_chat_title)
-    TextView title;
-
     @Bind(R.id.et_new_chat_search)
     EditText search;
 
     @Inject
     NewChatPresenter newChatPresenter;
+
+    @Bind(R.id.tv_new_chat_title)
+    TextView title;
 
     NewChatAdapter newChatAdapter;
     public static Intent callingIntent(Context context) {
@@ -65,7 +65,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        title.setText("  New Chat");
 
         newChatPresenter.attachView(this);
         newChatPresenter.initContactList();
@@ -74,6 +73,29 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         newChatAdapter = new NewChatAdapter(this, new ArrayList<>());
         contactList.setAdapter(newChatAdapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if((id == android.R.id.home)) {
+            super.onBackPressed();
+            return true;
+        } else if(id == R.id.action_search) {
+            title.setVisibility(View.GONE);
+            search.setVisibility(View.VISIBLE);
+            search.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.new_chat_activity, menu);
+        return true;
     }
 
     @Override
@@ -92,32 +114,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     @OnTextChanged(R.id.et_new_chat_search)
-    public void onSeachChanged() {
+    public void onSearchChanged() {
         newChatAdapter.filterList(search.getText().toString());
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if((item.getItemId() == android.R.id.home)) {
-            startActivity(HomeActivity.callingIntent(this));
-            return true;
-        } else if(id == R.id.action_search) {
-            title.setVisibility(View.GONE);
-            search.setVisibility(View.VISIBLE);
-            search.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.new_chat_activity, menu);
-        return true;
     }
 
     @Override

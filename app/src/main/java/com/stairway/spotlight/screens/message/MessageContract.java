@@ -19,9 +19,11 @@ public interface MessageContract {
         void updateDeliveryStatus(MessageResult messageResult);
         void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
         void updatePresence(String presence);
+        void setName(String name);
     }
 
     interface Presenter extends BasePresenter<MessageContract.View> {
+        void getName(String username);
         void loadMessages(String chatId);
         void sendTextMessage(String toId, String fromId, TextMessage message);
         void sendChatState(String chatId, ChatState chatState);
