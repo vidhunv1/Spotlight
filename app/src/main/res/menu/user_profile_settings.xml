@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="View Contact" android:id="@+id/view_contact" />
+    <item android:title="Chat Files" android:id="@+id/chat_files" />
+    <item android:title="Search" android:id="@+id/search" />
+    <item android:title="Mute" android:id="@+id/mute" />
+    <item android:title="More" android:id="@+id/more" />
+</menu>

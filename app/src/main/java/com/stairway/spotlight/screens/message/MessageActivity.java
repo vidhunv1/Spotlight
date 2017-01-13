@@ -2,16 +2,12 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -22,7 +18,6 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.config.XMPPManager;
-import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
@@ -66,8 +61,8 @@ public class MessageActivity extends BaseActivity
     private ChatState currentChatState;
 
     private static final String KEY_USER_NAME = "USERNAME";
-    private String chatId; // contact user, mobile
-    private String currentUser; // this user, mobile
+    private String chatId; // contact user
+    private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
 
     // userName: id for ejabberd xmpp. userId: id set by user:
@@ -138,14 +133,22 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.messages_action_bar, menu);
+        getMenuInflater().inflate(R.menu.messages_settings, menu);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if((item.getItemId() == android.R.id.home)) {
+        int id = item.getItemId();
+        if((id == android.R.id.home)) {
             super.onBackPressed();
+        } else if(id == R.id.view_contact) {
+            startActivity(UserProfileActivity.callingIntent(this, chatId));
+            this.overridePendingTransition(0, 0);
+        } else if(id == R.id.action_profile) {
+            startActivity(UserProfileActivity.callingIntent(this, chatId));
+            this.overridePendingTransition(0, 0);
         }
         return super.onOptionsItemSelected(item);
     }

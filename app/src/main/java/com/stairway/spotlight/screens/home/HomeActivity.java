@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,24 +28,27 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.contacts.ContactsActivity;
-import com.stairway.spotlight.screens.home.chats.ChatListFragment;
+import com.stairway.spotlight.screens.home.di.ChatListViewModule;
+import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.my_profile.ProfileActivity;
-import com.stairway.spotlight.screens.search.SearchFragment;
 import com.stairway.spotlight.screens.search.SearchActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import rx.Subscriber;
 
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
-public class HomeActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ChatListContract.View, ChatListAdapter.ChatClickListener {
     private ActionBarDrawerToggle toggle;
+
     @Bind(R.id.fab)
     FloatingActionButton fab;
 
@@ -55,15 +58,18 @@ public class HomeActivity extends BaseActivity
     @Bind(R.id.nav_view)
     NavigationView navigationView;
 
+    @Bind(R.id.rv_chat_list)
+    RecyclerView chatList;
+
+    @Inject
+    ChatListPresenter presenter;
+
     UserApi userApi;
     UserSessionResult userSession;
-    ChatListFragment chatListFragment;
-    SearchFragment searchFragment;
-
-    final String FRAGMENT_CHAT = "CHAT_FRAGMENT";
 
     private Toolbar toolbar;
 
+    private ChatListAdapter chatListAdapter;
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -81,12 +87,13 @@ public class HomeActivity extends BaseActivity
         toolbar = (Toolbar) findViewById(R.id.tb_home);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        setChatFragment();
 
-        fab.setOnClickListener(view -> {
-            Logger.d(this, "fab clicked");
-            startActivity(NewChatActivity.callingIntent(this));
-        });
+        chatList.setLayoutManager(new LinearLayoutManager(this));
+        OverScrollDecoratorHelper.setUpOverScroll(chatList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+
+//        setChatFragment();
+
+        fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this)));
 
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -102,13 +109,25 @@ public class HomeActivity extends BaseActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.attachView(this);
+        presenter.initChatList();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             toggle.setDrawerIndicatorEnabled(true);
             fab.setVisibility(View.VISIBLE);
-            setChatFragment();
+//            setChatFragment();
             super.onBackPressed();
         }
     }
@@ -132,7 +151,6 @@ public class HomeActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -152,6 +170,77 @@ public class HomeActivity extends BaseActivity
         return true;
     }
 
+    @Override
+    public void setDeliveryStatus(int status, int chatId) {}
+
+    @Override
+    public void displayChatList(List<ChatListItemModel> chats) {
+        chatListAdapter = new ChatListAdapter(this, chats, this);
+        chatList.setAdapter(chatListAdapter);
+    }
+
+    @Override
+    public void addNewMessage(MessageResult messageResult) {
+        ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(),1);
+        chatListAdapter.newChatMessage(item);
+        Logger.d(this, "new notification: "+item);
+    }
+
+    @Override
+    public void showChatState(String from, ChatState chatState) {
+        if(chatState == ChatState.composing)
+            chatListAdapter.setChatState(from, "Typing...");
+        else
+            chatListAdapter.resetChatState(from);
+    }
+
+    @Override
+    public void onChatItemClicked(String userName) {
+        startActivity(MessageActivity.callingIntent(this, userName));
+    }
+
+    @Override
+    protected void injectComponent(ComponentContainer componentContainer) {
+        componentContainer.userSessionComponent().plus(new ChatListViewModule()).inject(this);
+        userSession = componentContainer.userSessionComponent().getUserSession();
+    }
+
+    @Override
+    public void onMessageReceived(MessageResult messageId) {
+        addNewMessage(messageId);
+    }
+
+    @Override
+    public void onChatStateReceived(String from, ChatState chatState) {
+        showChatState(from, chatState);
+    }
+
+    private void uploadFCMToken() {
+        //Upload to token to server if FCM token not updated
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
+            String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
+            Logger.d(this, "FCM TOKEN:"+fcmToken);
+            User updateUser = new User();
+            updateUser.setNotificationToken(fcmToken);
+            userApi = new UserApi();
+            userApi.updateUser(updateUser, userSession.getAccessToken()).subscribe(new Subscriber<UserResponse>() {
+                @Override
+                public void onCompleted() {}
+                @Override
+                public void onError(Throwable e) {
+                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+                }
+                @Override
+                public void onNext(UserResponse userResponse) {
+                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+                }
+            });
+        }
+    }
+}
+
+//** as a fragment for Pager view.
 //    private void setNewChatFragment() {
 //        String FRAGMENT_NEW_CHAT = "NEW_CHAT_FRAGMENT";
 //        String TITLE_NEW_CHAT = "New Chat";
@@ -184,81 +273,17 @@ public class HomeActivity extends BaseActivity
 //        getSupportActionBar().setTitle(TITLE_PROFILE);
 //        fab.setVisibility(View.GONE);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//    } ** as a fragment..
+
+//    private void setChatFragment() {
+//        String TITLE_HOME = "  Messages";
+//
+//        if(chatListFragment == null)
+//            chatListFragment = ChatListFragment.getInstance();
+//        setSupportActionBar(toolbar);
+//        chatListFragment = ChatListFragment.getInstance();
+//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment, FRAGMENT_CHAT);
+//        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.commit();
 //    }
-
-    private void setChatFragment() {
-        String TITLE_HOME = "  Messages";
-
-        if(chatListFragment == null)
-            chatListFragment = ChatListFragment.getInstance();
-        setSupportActionBar(toolbar);
-        chatListFragment = ChatListFragment.getInstance();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_FragmentContainer, chatListFragment, FRAGMENT_CHAT);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-
-    private void setSearchFragment() {
-        if(searchFragment == null)
-            searchFragment = SearchFragment.getInstance();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        String FRAGMENT_SEARCH = "SEARCH_FRAGMENT";
-        fragmentTransaction.replace(R.id.register_FragmentContainer, searchFragment, FRAGMENT_SEARCH);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        userSession = componentContainer.userSessionComponent().getUserSession();
-    }
-
-    @Override
-    public void onMessageReceived(MessageResult messageId) {
-        if(getVisibleFragmentTag().equals(FRAGMENT_CHAT))
-            chatListFragment.addNewMessage(messageId);
-    }
-
-    @Override
-    public void onChatStateReceived(String from, ChatState chatState) {
-        if(getVisibleFragmentTag().equals(FRAGMENT_CHAT))
-            chatListFragment.showChatState(from, chatState);
-    }
-
-    private void uploadFCMToken() {
-        //Upload to token to server if FCM token not updated
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
-            String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
-            Logger.d(this, "FCM TOKEN:"+fcmToken);
-            User updateUser = new User();
-            updateUser.setNotificationToken(fcmToken);
-            userApi = new UserApi();
-            userApi.updateUser(updateUser, userSession.getAccessToken()).subscribe(new Subscriber<UserResponse>() {
-                @Override
-                public void onCompleted() {}
-                @Override
-                public void onError(Throwable e) {
-                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-                }
-                @Override
-                public void onNext(UserResponse userResponse) {
-                    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-                }
-            });
-        }
-    }
-
-    public String getVisibleFragmentTag(){
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        List<android.support.v4.app.Fragment> fragments = fragmentManager.getFragments();
-        if(fragments != null){
-            for(android.support.v4.app.Fragment fragment : fragments){
-                if(fragment != null && fragment.isVisible())
-                    return fragment.getTag();
-            }
-        }
-        return null;
-    }
-}

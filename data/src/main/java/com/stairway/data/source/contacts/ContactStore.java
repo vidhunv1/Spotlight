@@ -219,8 +219,6 @@ public class ContactStore {
                 contactResult.setUsername(username);
                 contactResult.setUserId(userId);
 
-                Logger.d(this, contactResult.toString());
-
                 cursor.close();
                 subscriber.onNext(contactResult);
                 subscriber.onCompleted();

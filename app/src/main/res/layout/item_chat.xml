@@ -13,13 +13,10 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="82dp"
-            android:layout_height="73.5dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:id="@+id/iv_chatItem_profileImage"
-            android:paddingRight="14dp"
-            android:paddingLeft="14dp"
-            android:paddingTop="10.75dp"
-            android:paddingBottom="10.75dp"/>
+            android:padding="10dp"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -37,9 +34,8 @@
                     android:layout_width="190dp"
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
-                    fontPath="fonts/din_medium.otf"
                     android:text="Name"
-                    android:textColor="#F2000000"
+                    android:textColor="#212121"
                     android:textSize="17sp"
                     android:id="@+id/tv_chatItem_contactName"
                     android:maxWidth="190dp" />
@@ -51,8 +47,8 @@
                     android:id="@+id/tv_chatItem_time"
                     android:paddingRight="14dp"
                     android:textAlignment="viewEnd"
-                    android:textSize="12sp"
-                    android:textColor="#1da1f2"
+                    android:textSize="14sp"
+                    android:textColor="#9a9a9a"
                     android:layout_gravity="center_vertical" />
             </LinearLayout>
 
@@ -65,9 +61,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="17sp"
                     android:maxLines="1"
-                    android:textColor="#80000000"
+                    android:textColor="#8f8f8f"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
                     android:paddingTop="1.125dp"
@@ -84,6 +80,6 @@
         android:layout_height="0.1dp"
         android:layout_marginLeft="82dp"
         android:layout_marginRight="12dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@color/divider"/>
 
 </LinearLayout>

@@ -1,7 +1,7 @@
-package com.stairway.spotlight.screens.home.chats.di;
+package com.stairway.spotlight.screens.home.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.home.chats.ChatListFragment;
+import com.stairway.spotlight.screens.home.HomeActivity;
 
 import dagger.Subcomponent;
 
@@ -11,5 +11,5 @@ import dagger.Subcomponent;
 @ViewScope
 @Subcomponent(modules = ChatListViewModule.class)
 public interface ChatListViewComponent {
-    void inject(ChatListFragment chatListFragment);
+    void inject(HomeActivity homeActivity);
 }

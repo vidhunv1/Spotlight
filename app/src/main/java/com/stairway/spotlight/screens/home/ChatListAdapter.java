@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.chats;
+package com.stairway.spotlight.screens.home;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

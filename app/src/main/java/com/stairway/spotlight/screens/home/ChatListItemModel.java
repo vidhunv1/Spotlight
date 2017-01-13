@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.chats;
+package com.stairway.spotlight.screens.home;
 
 /**
  * Created by vidhun on 14/07/16.

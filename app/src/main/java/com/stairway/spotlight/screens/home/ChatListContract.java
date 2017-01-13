@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.home.chats;
+package com.stairway.spotlight.screens.home;
 
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.core.BasePresenter;

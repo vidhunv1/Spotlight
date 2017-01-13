@@ -1,7 +1,11 @@
-package com.stairway.spotlight.screens.home.chats;
+package com.stairway.spotlight.screens.home;
 
 import com.stairway.data.config.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.screens.home.ChatListContract;
+import com.stairway.spotlight.screens.home.ChatListItemModel;
+import com.stairway.spotlight.screens.home.GetChatsUseCase;
+
 import java.util.List;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;

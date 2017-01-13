@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="3dp">
+    android:paddingTop="3dp">
 
     <ImageView
         android:layout_width="36dp"
@@ -17,17 +17,17 @@
         android:layout_marginLeft="12dp" />
 
     <LinearLayout
+        android:background="@drawable/bg_msg_receive_white"
         android:orientation="vertical"
         android:layout_width="258dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/iv_profileImage"
         android:layout_toEndOf="@+id/iv_profileImage"
-        android:layout_marginLeft="12dp"
-        android:background="@drawable/bg_msg_receive">
+        android:layout_marginLeft="12dp">
 
         <ImageView
-            android:layout_width="match_parent"
+            android:layout_width="258dp"
             android:layout_height="135dp"
             app:srcCompat="@android:drawable/arrow_down_float"
             android:id="@+id/iv_rcv_template_image" />
@@ -43,12 +43,15 @@
 
             <TextView
                 android:text="TextView"
+                android:textColor="#222222"
+                android:textSize="14sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_rcv_template_title" />
 
             <TextView
                 android:text="TextView"
+                android:textColor="#757575"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_rcv_template_subtitle"
@@ -57,6 +60,7 @@
 
             <TextView
                 android:text="TextView"
+                android:textColor="#ACACAC"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_rcv_template_url"
@@ -77,6 +81,9 @@
                 android:id="@+id/tv_rcv_button1"
                 android:gravity="center_vertical"
                 android:paddingRight="12dp"
+                android:textAllCaps="true"
+                android:textColor="@color/buttonText"
+                android:textSize="15sp"
                 android:paddingLeft="12dp" />
 
             <TextView
@@ -84,7 +91,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:id="@+id/tv_rcv_button2"
+                android:textColor="@color/buttonText"
                 android:gravity="center_vertical"
+                android:textAllCaps="true"
+                android:textSize="15sp"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp" />
 
@@ -92,8 +102,11 @@
                 android:text="TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
+                android:textAllCaps="true"
                 android:id="@+id/tv_rcv_button3"
                 android:gravity="center_vertical"
+                android:textColor="@color/buttonText"
+                android:textSize="15sp"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp" />
         </LinearLayout>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:id="@+id/relativeLayout"
-    android:layout_marginBottom="3dp">
+    android:paddingTop="3dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -23,10 +21,11 @@
         android:layout_marginRight="24dp">
 
         <TextView
-            android:text="FLE : À or a? g dasiudhasljkfnlkasnfklajs"
+            android:text="Hello"
             android:layout_width="wrap_content"
             android:id="@+id/tv_messageitem_message"
             android:textSize="16sp"
+            android:textColor="#ffffff"
             android:layout_height="wrap_content"
             android:maxWidth="234dp"
             android:layout_alignParentTop="true"
@@ -45,5 +44,4 @@
         android:layout_marginBottom="1dp"
         android:baselineAlignBottom="false"
         android:layout_alignParentTop="false" />
-
 </RelativeLayout>

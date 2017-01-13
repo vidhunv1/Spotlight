@@ -16,6 +16,7 @@ import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.lib.MessageParser;
+import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
 import com.stairway.spotlight.screens.message.view_models.TemplateButton;
 import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
@@ -114,12 +115,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     return;
                 if (messageStatus == MessageResult.MessageStatus.NOT_SENT)
                     return;
-//                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
-//                        return;
-//                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
                 if (messageStatus == MessageResult.MessageStatus.SENT)
                     if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
                         return;
+//                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
+//                        return;
+//                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
 //                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
 //                        return;
 
@@ -341,7 +342,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(!templateMessage.getUrl().isEmpty() && templateMessage.getUrl()!=null)
                 url.setText(templateMessage.getUrl());
             if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
-                Glide.with(context).load(templateMessage.getImage()).into(templateImage);
+                Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
 
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {

@@ -78,7 +78,6 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
         contactsSearchList.setAdapter(searchAdapter);
-//        displaySearch(new SearchModel("", new ArrayList<>(0), new ArrayList<>(0)));
     }
 
     @Override

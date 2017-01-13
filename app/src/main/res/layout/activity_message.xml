@@ -2,7 +2,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFDFDFD"
+    android:background="#FFFAFAFA"
     android:fitsSystemWindows="true">
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,17 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="56dp"
-        android:paddingBottom="56dp"/>
+        android:paddingBottom="54dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:background="@drawable/bg_keyboard"
         android:id="@+id/ll_keyboard"
-        android:layout_height="48dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="49dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
         android:focusableInTouchMode="true"
         android:layout_gravity="bottom">
 
@@ -28,10 +28,6 @@
             android:layout_width="48dp"
             android:layout_height="match_parent"
             android:src="@drawable/ic_keyboard_smiley"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp"
-            android:paddingEnd="14dp"
-            android:paddingStart="14dp"
             android:background="@android:color/transparent"
             android:id="@+id/imageButton" />
 
@@ -42,28 +38,21 @@
             android:layout_gravity="center_horizontal"
             android:background="@android:color/transparent"
             android:hint="Type a message"
-            android:ems="10"
-            android:textSize="16dp"
-            android:textColorHint="#FFD9D9D9" />
+            android:textSize="18dp"
+            android:cursorVisible="true"
+            android:focusable="true"
+            android:textColorHint="#FFADADAD" />
 
         <ImageButton
-            android:layout_width="42dp"
+            android:layout_width="48dp"
             android:layout_height="match_parent"
             android:src="@drawable/ic_keyboard_plus"
-            android:paddingTop="17dp"
-            android:paddingBottom="17dp"
-            android:paddingEnd="14dp"
-            android:paddingStart="14dp"
             android:id="@+id/imageButton3"
             android:background="@android:color/transparent"
             android:layout_weight="1" />
 
         <ImageButton
-            android:layout_width="42dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp"
-            android:paddingEnd="15dp"
-            android:paddingStart="15dp"
+            android:layout_width="48dp"
             android:layout_height="match_parent"
             android:src="@drawable/ic_keyboard_audio"
             android:id="@+id/btn_sendMessage_send"
@@ -77,35 +66,32 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_message"
-            android:layout_height="wrap_content"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
-            android:background="#ffffff">
-            <LinearLayout
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb_message"
+                android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/tb_ll_message">
-                <TextView
+                android:minHeight="?attr/actionBarSize"
+                android:background="@color/colorPrimary">
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textSize="18dp"
-                    android:textColor="#000000"
-                    android:layout_gravity="center"
-                    android:id="@+id/tb_message_title" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Last seen at 3:30 PM"
-                    android:textSize="15dp"
-                    android:textColor="#000000"
-                    android:layout_gravity="center"
-                    android:id="@+id/tb_subtitle" />
-            </LinearLayout>
-        </android.support.v7.widget.Toolbar>
+                    android:orientation="vertical"
+                    android:id="@+id/tb_ll_message">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name"
+                        android:textSize="19dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/textPrimaryLight"
+                        android:id="@+id/tb_message_title" />
+                </LinearLayout>
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
 
         <View
             android:layout_width="fill_parent"

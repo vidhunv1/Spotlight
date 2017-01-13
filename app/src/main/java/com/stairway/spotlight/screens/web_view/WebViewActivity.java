@@ -34,7 +34,6 @@ public class WebViewActivity extends BaseActivity {
         if(!receivedIntent.hasExtra(KEY_WEB_URL))
             return;
 
-        getSupportActionBar().hide();
         setContentView(R.layout.activity_web_view);
 
         ButterKnife.bind(this);

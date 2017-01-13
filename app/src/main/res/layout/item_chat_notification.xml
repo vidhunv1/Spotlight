@@ -14,12 +14,12 @@
 
         <ImageView
             android:layout_width="82dp"
-            android:layout_height="73.5dp"
+            android:layout_height="72.5dp"
             android:id="@+id/iv_chatItem_profileImage"
             android:paddingRight="14dp"
             android:paddingLeft="14dp"
-            android:paddingTop="10.75dp"
-            android:paddingBottom="10.75dp"/>
+            android:paddingTop="10.25dp"
+            android:paddingBottom="10.25dp"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -40,7 +40,7 @@
                     fontPath="fonts/din_medium.otf"
                     android:text="Name"
                     android:textColor="#F2000000"
-                    android:textSize="17sp"
+                    android:textSize="17.5sp"
                     android:id="@+id/tv_chatItem_contactName"
                     android:maxWidth="190dp" />
 
@@ -65,7 +65,7 @@
                 <TextView
                     android:layout_width="240dp"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="17sp"
                     android:maxLines="1"
                     android:textColor="#80000000"
                     android:id="@+id/tv_chatItem_message"

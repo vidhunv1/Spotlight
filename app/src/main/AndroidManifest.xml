@@ -41,7 +41,7 @@
         </activity>
         <activity
             android:name=".screens.message.MessageActivity"
-            android:icon="@drawable/default_profile_image" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"
