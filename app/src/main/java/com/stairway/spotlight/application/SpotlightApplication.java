@@ -28,14 +28,11 @@ public class SpotlightApplication extends Application {
         initDatabase();
         initDagger();
 
-
-        // Setting default font
+//         Setting default font
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//                .setDefaultFontPath("fonts/din_regular.otf")
+//                .setDefaultFontPath("fonts/rmedium.ttf")
 //                .setFontAttrId(com.stairway.spotlight.R.attr.fontPath)
 //                .build());
-
-
 
         if(com.stairway.spotlight.BuildConfig.DEBUG) {
             // Initialize facebook Stetho

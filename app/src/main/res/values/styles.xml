@@ -26,4 +26,12 @@
         <item name="color">#ffffff</item>
     </style>
 
+    <style name="FontRobotoBlack">
+        <item name="android:fontFamily">sans-serif-black</item>
+    </style>
+
+    <style name="FontRobotoMedium">
+        <item name="fontPath">fonts/roboto-medium.ttf</item>
+    </style>
+
 </resources>

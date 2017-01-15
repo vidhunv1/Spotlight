@@ -37,7 +37,6 @@
                     android:layout_width="190dp"
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
-                    fontPath="fonts/din_medium.otf"
                     android:text="Name"
                     android:textColor="#F2000000"
                     android:textSize="17.5sp"

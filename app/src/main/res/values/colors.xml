@@ -13,5 +13,5 @@
     <color name="textSecondary">#E3F2FD</color>
     <color name="colorAccent">#7f8c8d</color>
     <color name="background_default">#FFFFFF</color>
-    <color name="divider">#dedede</color>
+    <color name="divider">#dddddd</color>
 </resources>

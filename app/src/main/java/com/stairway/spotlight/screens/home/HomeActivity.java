@@ -146,6 +146,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
             return true;
         } else if(id == R.id.action_search) {
             startActivity(SearchActivity.callingIntent(this));
+            this.overridePendingTransition(0, 0);
             return true;
         }
         return super.onOptionsItemSelected(item);
