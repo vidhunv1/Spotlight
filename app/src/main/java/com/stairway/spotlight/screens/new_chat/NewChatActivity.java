@@ -8,15 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.di.NewChatViewModule;
 
@@ -28,7 +26,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 /**
  * Created by vidhun on 08/01/17.
@@ -50,6 +47,12 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.tv_new_chat_title)
     TextView title;
 
+    @Bind(R.id.tv_new_chat_subtitle)
+    TextView subtitle;
+
+    @Bind(R.id.ll_title)
+    LinearLayout titleContent;
+
     NewChatAdapter newChatAdapter;
     public static Intent callingIntent(Context context) {
         return new Intent(context, NewChatActivity.class);
@@ -70,7 +73,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         newChatPresenter.initContactList();
 
         contactList.setLayoutManager(new LinearLayoutManager(this));
-        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+//        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         newChatAdapter = new NewChatAdapter(this, new ArrayList<>());
         contactList.setAdapter(newChatAdapter);
     }
@@ -81,20 +84,21 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if((id == android.R.id.home)) {
             super.onBackPressed();
             return true;
-        } else if(id == R.id.action_search) {
-            title.setVisibility(View.GONE);
-            search.setVisibility(View.VISIBLE);
-            search.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
-            return true;
         }
+//        else if(id == R.id.action_search) {
+//            titleContent.setVisibility(View.GONE);
+//            search.setVisibility(View.VISIBLE);
+//            search.requestFocus();
+//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.new_chat_activity, menu);
+        getMenuInflater().inflate(R.menu.new_chat_toolbar, menu);
         return true;
     }
 
@@ -110,6 +114,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     public void displayContacts(List<NewChatItemModel> newChatItemModel) {
+        subtitle.setText(newChatItemModel.size()+" Contacts");
         newChatAdapter.addContacts(newChatItemModel);
     }
 

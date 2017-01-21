@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/ll_item_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusable="true"
@@ -50,7 +51,6 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="New Text"
                     android:id="@+id/tv_chatItem_time"
                     android:paddingRight="13dp"
                     android:paddingBottom="1dp"
@@ -63,7 +63,8 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -81,6 +82,7 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
+        android:id="@+id/view_contactItem_divider"
         android:layout_marginLeft="72dp"
         android:background="@color/divider"/>
 </LinearLayout>

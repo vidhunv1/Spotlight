@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/cl_home"
     android:fitsSystemWindows="true"
     tools:context="com.stairway.spotlight.screens.home.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="0dp"
         android:theme="@style/AppTheme.AppBarOverlay">
 
             <android.support.v7.widget.Toolbar
@@ -20,23 +22,40 @@
                 android:background="@color/colorPrimary">
                 <TextView
                     android:text="iChat"
-                    android:textSize="20.5dp"
+                    android:textSize="19.5dp"
+                    android:textStyle="bold"
                     android:textColor="@color/textPrimaryLight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/tv_home_title" />
+
+                <EditText
+                    android:visibility="gone"
+                    android:layout_width="298dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:id="@+id/et_search"
+                    android:hint="Search"
+                    android:textColorHint="#FFC9C9C9"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:textSize="16sp"
+                    android:textColor="@color/textPrimaryLight"
+                    android:textColorLink="@android:color/black" />
             </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/drawer_content" />
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16.5dp"
         app:fabSize="normal"
         android:src="@drawable/ic_new_message"
         app:backgroundTint="@color/colorPrimary"/>

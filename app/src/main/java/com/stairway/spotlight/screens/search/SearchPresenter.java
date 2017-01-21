@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.search;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.screens.home.FindUserUseCase;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -43,6 +44,7 @@ public class SearchPresenter implements SearchContract.Presenter {
                 .subscribe(new UseCaseSubscriber<ContactResult>(searchView) {
                     @Override
                     public void onResult(ContactResult result) {
+                        Logger.d(this, result.toString());
                         searchView.navigateToAddContact(result);
                     }
 

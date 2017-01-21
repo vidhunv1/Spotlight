@@ -10,7 +10,6 @@ public class Logger {
     private static boolean isTimberInitialized = false;
 
     public static void init() {
-
         initTimber();
     }
 

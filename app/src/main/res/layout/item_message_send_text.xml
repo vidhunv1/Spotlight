@@ -8,24 +8,23 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_msg_send"
-        android:id="@+id/rel"
+        android:id="@+id/rl_bubble"
         android:paddingTop="7.25dp"
         android:paddingBottom="7.25dp"
         android:maxWidth="258dp"
         android:paddingLeft="12dp"
-        android:paddingRight="12dp"
+        android:paddingRight="14dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="24dp">
+        android:layout_marginRight="26dp">
 
         <TextView
             android:text="Hello"
             android:layout_width="wrap_content"
             android:id="@+id/tv_messageitem_message"
             android:textSize="16sp"
-            android:textColor="#ffffff"
+            android:textColor="@color/textPrimaryLight"
             android:layout_height="wrap_content"
             android:maxWidth="234dp"
             android:layout_alignParentTop="true"

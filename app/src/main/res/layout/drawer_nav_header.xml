@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="18.5dp"
         android:text="vidhun vinod"
+        android:textStyle="bold"
         android:textColor="@color/textPrimaryLight"
         android:textSize="15sp" />
 
@@ -33,6 +34,6 @@
         android:layout_marginTop="2dp"
         android:textColor="@color/textSecondary"
         android:text="ID: SKJAJ232"
-        android:textSize="14dp"/>
+        android:textSize="13.5dp"/>
 
 </LinearLayout>

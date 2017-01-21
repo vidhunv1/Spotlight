@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="true"
-    android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/ll_item_chat_notification"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="?android:selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="82dp"
-            android:layout_height="72.5dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:id="@+id/iv_chatItem_profileImage"
-            android:paddingRight="14dp"
-            android:paddingLeft="14dp"
-            android:paddingTop="10.25dp"
-            android:paddingBottom="10.25dp"/>
+            android:src="@drawable/default_profile_image"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="9dp"
+            android:paddingRight="11dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:gravity="center_vertical">
+            android:paddingTop="11dp">
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp">
 
                 <TextView
                     android:layout_width="190dp"
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
                     android:text="Name"
-                    android:textColor="#F2000000"
-                    android:textSize="17.5sp"
+                    android:textColor="#212121"
+                    android:textSize="17sp"
+                    android:textAppearance="@style/FontRobotoMedium"
                     android:id="@+id/tv_chatItem_contactName"
                     android:maxWidth="190dp" />
 
                 <TextView
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="New Text"
                     android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="14sp"
+                    android:paddingRight="13dp"
+                    android:paddingBottom="1dp"
                     android:textAlignment="viewEnd"
-                    android:textSize="12sp"
-                    android:textColor="#1da1f2"
-                    android:layout_gravity="center_vertical" />
+                    android:textSize="13sp"
+                    android:textColor="@color/activeIndicator"
+                    android:layout_gravity="bottom" />
             </LinearLayout>
 
             <LinearLayout
@@ -62,24 +68,23 @@
                 android:layout_marginTop="2dp">
 
                 <TextView
-                    android:layout_width="240dp"
+                    android:layout_width="255dp"
                     android:layout_height="wrap_content"
-                    android:textSize="17sp"
+                    android:textSize="16sp"
                     android:maxLines="1"
-                    android:textColor="#80000000"
+                    android:textColor="#8f8f8f"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
-                    android:paddingTop="1.125dp"
-                    android:paddingBottom="1.125dp" />
+                    android:paddingTop="1dp"
+                    android:paddingRight="20dp" />
 
                 <TextView
                     android:layout_width="20.75dp"
                     android:layout_height="20.75dp"
                     tools:ignore="MissingPrefix"
-                    fontPath="fonts/din_medium.otf"
                     android:text="1"
                     android:gravity="center_vertical|center_horizontal"
-                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_vertical|right"
                     android:id="@+id/tv_chatlist_notification"
                     android:textSize="11sp"
                     android:textColor="#ffffff"
@@ -92,8 +97,6 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_marginLeft="82dp"
-        android:layout_marginRight="12dp"
-        android:background="@android:color/darker_gray"/>
-
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider"/>
 </LinearLayout>

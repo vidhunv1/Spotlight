@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/fl_added_contact"
+    android:gravity="center_horizontal|center_vertical"
+    android:background="#80000000">
+    <RelativeLayout
+        android:layout_width="305.5dp"
+        android:layout_height="203.5dp"
+        android:background="#ffffff">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="9dp"
+            android:layout_height="68dp"
+            android:id="@+id/iv_profileImage"
+            android:src="@drawable/default_profile_image" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:id="@+id/tv_add_result_message"
+            android:layout_below="@id/iv_profileImage"
+            android:text="Mukesh MK was added on iChat."/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Send Message"
+            android:id="@+id/btn_send_message"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:layout_gravity="bottom"
+            android:textSize="15sp"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -40,6 +40,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         for (i = 0; i < chatList.size(); i++) {
             if(chatListItemModel.getChatId().equals(chatList.get(i).getChatId())){
                 chatListItemModel.setNotificationCount(chatListItemModel.getNotificationCount() + chatList.get(i).getNotificationCount());
+                chatListItemModel.setChatName(chatList.get(i).getChatName());
 
                 if(i==0){
                     chatList.set(0, chatListItemModel);
@@ -158,7 +159,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public class NotificationViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.ll_chatItem_content)
+        @Bind(R.id.ll_item_chat_notification)
         LinearLayout chatListContent;
 
         @Bind(R.id.iv_chatItem_profileImage)
@@ -215,7 +216,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public class WithoutNotificationViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.ll_chatItem_content)
+        @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
 
         @Bind(R.id.iv_chatItem_profileImage)

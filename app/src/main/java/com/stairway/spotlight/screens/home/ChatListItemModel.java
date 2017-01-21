@@ -1,9 +1,13 @@
 package com.stairway.spotlight.screens.home;
 
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * Created by vidhun on 14/07/16.
  */
-public class ChatListItemModel {
+public class ChatListItemModel implements Serializable{
     private String chatId;
     private String chatName;
     private String lastMessage;

@@ -16,7 +16,8 @@
         android:layout_marginLeft="12dp" />
 
     <LinearLayout
-        android:background="@drawable/bg_msg_receive"
+        android:background="@drawable/bg_msg_receive_full"
+        android:id="@+id/ll_bubble"
         android:orientation="vertical"
         android:layout_width="258dp"
         android:layout_height="wrap_content"

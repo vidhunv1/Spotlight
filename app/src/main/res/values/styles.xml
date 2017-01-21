@@ -11,6 +11,7 @@
         <item name="android:windowBackground">@color/background_default</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_back_button</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="android:textColorHint">@color/textHintColor</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -18,16 +19,21 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.ActionBarWhite">
+        <item name="colorControlNormal">@color/colorPrimary</item>
+    </style>
+
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">#ffffff</item>
+    <style name="AppTheme.Drawer" parent="AppTheme.NoActionBar">
+        <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="FontRobotoBlack">
-        <item name="android:fontFamily">sans-serif-black</item>
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">#ffffff</item>
     </style>
 
     <style name="FontRobotoMedium">

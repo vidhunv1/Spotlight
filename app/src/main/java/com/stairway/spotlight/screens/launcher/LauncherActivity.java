@@ -1,7 +1,11 @@
 package com.stairway.spotlight.screens.launcher;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
@@ -32,6 +36,13 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         setContentView(R.layout.activity_launcher);
         componentContainer = ((SpotlightApplication) getApplication()).getComponentContainer();
         componentContainer.getAppComponent().plus(new LauncherModule(getApplicationContext())).inject(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.statusBar));
+        }
 
         ButterKnife.bind(this);
     }

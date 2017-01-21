@@ -75,8 +75,10 @@
         <activity android:name=".screens.contacts.ContactsActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
+            android:theme="@style/AppTheme.ActionBarWhite"
             android:name=".screens.search.SearchActivity"
             android:label="SearchActivity" />
         <activity

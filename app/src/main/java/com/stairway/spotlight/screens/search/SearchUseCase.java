@@ -55,8 +55,23 @@ public class SearchUseCase {
                                 public void onError(Throwable e) {}
                                 @Override
                                 public void onNext(List<MessageResult> messageResults) {
-                                    for (MessageResult messageResult : messageResults)
-                                        messagesModelList.add(new MessagesModel(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime()));
+                                    for (MessageResult messageResult : messageResults) {
+                                        if(messagesModelList.size()>0 && messageResult.getChatId().equals(messagesModelList.get(messagesModelList.size()-1).getContactName()))
+                                            messagesModelList.add(new MessagesModel(messageResult.getChatId(), messagesModelList.get(messagesModelList.size()-1).getContactName(), messageResult.getMessage(), messageResult.getTime()));
+                                        else
+                                            contactStore.getContactByUserName(messageResult.getChatId()).subscribe(new Subscriber<ContactResult>() {
+                                                @Override
+                                                public void onCompleted() {}
+                                                @Override
+                                                public void onError(Throwable e) {}
+
+                                                @Override
+                                                public void onNext(ContactResult contactResult) {
+                                                    Logger.d(this, contactResult.getDisplayName());
+                                                    messagesModelList.add(new MessagesModel(messageResult.getChatId(), contactResult.getDisplayName(), messageResult.getMessage(), messageResult.getTime()));
+                                                }
+                                            });
+                                    }
 
                                     SearchModel searchModel = new SearchModel(searchTerm, contactsModelList, messagesModelList);
                                     Logger.d(this, searchModel.toString());

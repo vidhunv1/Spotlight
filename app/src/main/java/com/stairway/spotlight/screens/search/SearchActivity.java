@@ -2,6 +2,8 @@ package com.stairway.spotlight.screens.search;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,31 +21,38 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.add_user.AddUserActivity;
+import com.stairway.spotlight.screens.home.ChatListAdapter;
+import com.stairway.spotlight.screens.home.ChatListItemModel;
+import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.search.di.SearchViewModule;
+
+import java.io.Serializable;
+import java.util.List;
 
 import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class SearchActivity extends BaseActivity implements SearchContract.View,
-        SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener {
+        SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener,
+        ChatListAdapter.ChatClickListener{
 
     @Bind(R.id.rv_contact_list)
     RecyclerView contactsSearchList;
-
     @Bind(R.id.tb_search)
     Toolbar toolbar;
-
     @Inject
     SearchPresenter searchPresenter;
 
-
     private UserSessionResult userSession;
-
     private SearchAdapter searchAdapter;
+    private boolean isAdapterSet = false;
+    private static final String KEY_CHATS = "CHATS";
 
-    public static Intent callingIntent(Context context) {
-        return new Intent(context, SearchActivity.class);
+    public static Intent callingIntent(Context context, List<ChatListItemModel> chatListItemModelList) {
+        Intent intent = new Intent(context, SearchActivity.class);
+        intent.putExtra(KEY_CHATS, (Serializable) chatListItemModelList);
+        return intent;
     }
 
     @Override
@@ -52,6 +61,11 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         Logger.d(this, "SearchActivity");
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
+
+        Intent i = getIntent();
+        List<ChatListItemModel> list = (List<ChatListItemModel>) i.getSerializableExtra(KEY_CHATS);
+        ChatListAdapter chatListAdapter = new ChatListAdapter(this, list, this);
+        contactsSearchList.setAdapter(chatListAdapter);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -67,24 +81,32 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchPresenter.search(s.toString());
+                if(s.length()==0) {
+                    contactsSearchList.setAdapter(chatListAdapter);
+                    isAdapterSet = false;
+                }
+                else {
+                    if(!isAdapterSet)
+                        contactsSearchList.setAdapter(searchAdapter);
+                    searchPresenter.search(s.toString());
+                    isAdapterSet = true;
+                }
             }
-
         });
 
         searchPresenter.attachView(this);
         searchPresenter.attachView(this);
-        searchAdapter = new SearchAdapter(this, this, this);
+        searchAdapter = new SearchAdapter(this, this, this, this);
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
-        contactsSearchList.setAdapter(searchAdapter);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                startActivity(HomeActivity.callingIntent(this));
+                this.overridePendingTransition(0,0);
                 return true;
         }
         return true;
@@ -100,6 +122,9 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void onMessageItemClicked(String userId) {}
+
+    @Override
+    public void onChatItemClicked(String userId) {}
 
     @Override
     public void onFindContactItemClicked(String userName) {

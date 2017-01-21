@@ -2,12 +2,14 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.data.config.XMPPManager;
+import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
@@ -90,7 +93,7 @@ public class MessageActivity extends BaseActivity
         messagesAdapter = new MessagesAdapter(this, this, this, this);
         messageItem.setLayoutManager(linearLayoutManager);
         messageItem.setAdapter(messagesAdapter);
-        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+//        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -123,13 +126,10 @@ public class MessageActivity extends BaseActivity
         messagePresenter.detachView();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if(this.isTaskRoot())
-//            super.onBackPressed();
-//        else
-//            startActivity(HomeActivity.callingIntent(this));
-//    }
+    @Override
+    public void onBackPressed() {
+        startActivity(HomeActivity.callingIntent(this));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,10 +146,11 @@ public class MessageActivity extends BaseActivity
         } else if(id == R.id.view_contact) {
             startActivity(UserProfileActivity.callingIntent(this, chatId));
             this.overridePendingTransition(0, 0);
-        } else if(id == R.id.action_profile) {
-            startActivity(UserProfileActivity.callingIntent(this, chatId));
-            this.overridePendingTransition(0, 0);
         }
+//        else if(id == R.id.action_profile) {
+//            startActivity(UserProfileActivity.callingIntent(this, chatId));
+//            this.overridePendingTransition(0, 0);
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -168,14 +169,16 @@ public class MessageActivity extends BaseActivity
     @OnTextChanged(R.id.et_sendmessage_message)
     public void onMessageChanged() {
         String message = messageBox.getText().toString().trim();
+
         if(message.length()>=1) {
+            sendImageButton.setVisibility(View.VISIBLE);
             sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
             if(currentChatState != ChatState.composing) {
                 messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_TYPING);
                 currentChatState = ChatState.composing;
             }
         } else {
-            sendImageButton.setImageResource(R.drawable.ic_keyboard_audio);
+            sendImageButton.setVisibility(View.GONE);
             if(currentChatState != ChatState.paused) {
                 messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_PAUSED);
                 currentChatState = ChatState.paused;
@@ -265,7 +268,6 @@ public class MessageActivity extends BaseActivity
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }
     }
-
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {

@@ -123,7 +123,7 @@ public class MessageStore {
                     MessagesContract.COLUMN_RECEIPT_ID};
 
             try{
-                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_CHAT_ID+" DESC");
                 cursor.moveToFirst();
 
                 while(!cursor.isAfterLast()) {

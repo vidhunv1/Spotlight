@@ -7,7 +7,4 @@ import rx.Scheduler;
  */
 public interface BaseView {
     Scheduler getUiScheduler();
-
-
-
 }

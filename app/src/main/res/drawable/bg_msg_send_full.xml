@@ -1,10 +1,10 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="#FFFFFFFF" />
+    <solid android:color="@color/sendMessageBubble" />
 
     <stroke
         android:width="0.33dp"
-        android:color="@color/sendMessageBubble" />
+        android:color="#D0D0D0" />
 
     <corners
         android:bottomLeftRadius="18dp"

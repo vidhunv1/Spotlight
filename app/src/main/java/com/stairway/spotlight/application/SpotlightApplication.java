@@ -19,7 +19,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  */
 public class SpotlightApplication extends Application {
     private ComponentContainer componentContainer;
-    private String netBaseUrl;
 
     @Override
     public void onCreate() {
@@ -44,7 +43,6 @@ public class SpotlightApplication extends Application {
 
             Logger.init();
         }
-
     }
 
     public void initDagger() {

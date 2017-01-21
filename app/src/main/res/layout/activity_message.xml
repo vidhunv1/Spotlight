@@ -10,35 +10,48 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="56dp"
-        android:paddingBottom="54dp"/>
+        android:paddingBottom="55dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_keyboard"
-        android:id="@+id/ll_keyboard"
-        android:layout_height="49dp"
+        android:orientation="vertical"
+        android:layout_height="47.5dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginBottom="0dp"
         android:focusableInTouchMode="true"
         android:layout_gravity="bottom">
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:background="#DADADA"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="47.5dp"
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:id="@+id/ll_keyboard">
 
         <ImageButton
+            android:layout_gravity="center_horizontal|center_vertical"
             android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_keyboard_smiley"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_keyboard_menu"
             android:background="@android:color/transparent"
             android:id="@+id/imageButton" />
 
         <EditText
-            android:layout_width="200dp"
+            android:layout_marginLeft="23.5dp"
+            android:layout_width="240.5dp"
             android:layout_height="match_parent"
             android:id="@+id/et_sendmessage_message"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/transparent"
-            android:hint="Type a message"
-            android:textSize="18dp"
+            android:hint="@string/keyboard_hint"
+            android:textColor="#000000"
+            android:paddingLeft="0.5dp"
+            android:textSize="16sp"
             android:cursorVisible="true"
             android:focusable="true"
             android:textColorHint="#FFADADAD" />
@@ -46,19 +59,11 @@
         <ImageButton
             android:layout_width="48dp"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_keyboard_plus"
-            android:id="@+id/imageButton3"
-            android:background="@android:color/transparent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_keyboard_audio"
             android:id="@+id/btn_sendMessage_send"
             android:background="@android:color/transparent"
             android:layout_weight="1" />
 
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -76,20 +81,14 @@
                 android:layout_width="match_parent"
                 android:minHeight="?attr/actionBarSize"
                 android:background="@color/colorPrimary">
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/tb_ll_message">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Name"
-                        android:textSize="19dp"
-                        android:textStyle="bold"
-                        android:textColor="@color/textPrimaryLight"
-                        android:id="@+id/tb_message_title" />
-                </LinearLayout>
+                    android:text="Name"
+                    android:textSize="19.5dp"
+                    android:textColor="@color/textPrimaryLight"
+                    android:textStyle="bold"
+                    android:id="@+id/tb_message_title" />
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
 
@@ -98,7 +97,5 @@
             android:layout_height="0.5dp"
             android:layout_gravity="top"
             android:background="#D6D6D6"/>
-
     </LinearLayout>
-
 </FrameLayout>

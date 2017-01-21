@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <group android:checkableBehavior="none" android:id="@+id/group1" >
-        <item
-            android:id="@+id/add_contact"
-            android:icon="@drawable/ic_contact_add"
-            android:title="Add Contact" />
-    </group>
-
     <group android:checkableBehavior="none" android:id="@+id/group2">
         <item
-            android:id="@+id/nav_contacts"
-            android:icon="@drawable/ic_contacts"
-            android:title="Contacts" />
+            android:id="@+id/nav_add_contact"
+            android:icon="@drawable/ic_contact_add"
+            android:title="Add Contacts" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
@@ -22,5 +14,4 @@
             android:icon="@drawable/ic_help"
             android:title="Help and Feedback" />
     </group>
-
 </menu>

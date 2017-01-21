@@ -50,7 +50,7 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         ButterKnife.bind(this);
-        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+//        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         contactsPresenter.attachView(this);
         contactsAdapter = new ContactsAdapter(this, this);
         contactList.setLayoutManager(new LinearLayoutManager(this));

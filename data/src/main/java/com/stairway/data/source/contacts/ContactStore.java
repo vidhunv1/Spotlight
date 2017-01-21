@@ -197,34 +197,35 @@ public class ContactStore {
 
             try {
                 Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-                cursor.moveToFirst();
 
-                if(cursor.getCount()==0) {
-                    subscriber.onNext(new ContactResult());
+                if(cursor.getCount()<=0) {
+                    subscriber.onNext(null);
+                    subscriber.onCompleted();
+                } else {
+                    cursor.moveToFirst();
+                    String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_ID));
+                    String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_NAME));
+                    String countryCode = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_COUNTRY_CODE));
+                    String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_PHONE_NUMBER));
+                    String username = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USERNAME));
+                    boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_REGISTERED)) == 1);
+                    boolean isAdded = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_ADDED)) == 1);
+                    //String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
+
+                    ContactResult contactResult = new ContactResult(contactId, countryCode, phoneNumber, contactName);
+                    contactResult.setAdded(isAdded);
+                    contactResult.setRegistered(isRegistered);
+                    contactResult.setUsername(username);
+                    contactResult.setUserId(userId);
+
+                    cursor.close();
+                    subscriber.onNext(contactResult);
                     subscriber.onCompleted();
                 }
 
-                String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_ID));
-                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_CONTACT_NAME));
-                String countryCode = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_COUNTRY_CODE));
-                String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_PHONE_NUMBER));
-                String username = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USERNAME));
-//                String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
-                boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_REGISTERED)) == 1);
-                boolean isAdded = (cursor.getInt(cursor.getColumnIndex(ContactsContract.COLUMN_IS_ADDED)) == 1);
-
-                ContactResult contactResult = new ContactResult(contactId, countryCode, phoneNumber, contactName);
-                contactResult.setAdded(isAdded);
-                contactResult.setRegistered(isRegistered);
-                contactResult.setUsername(username);
-                contactResult.setUserId(userId);
-
-                cursor.close();
-                subscriber.onNext(contactResult);
-                subscriber.onCompleted();
-
                 databaseManager.closeConnection();
             } catch (Exception e) {
+                e.printStackTrace();
                 Logger.e(this, "ContactStore sqlite error"+e.getMessage());
                 databaseManager.closeConnection();
                 subscriber.onError(e);

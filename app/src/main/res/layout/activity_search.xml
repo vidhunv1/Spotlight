@@ -3,6 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.design.widget.AppBarLayout
+        style="@style/AppTheme.ActionBarWhite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -11,8 +12,7 @@
             android:id="@+id/tb_search"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
-            android:background="@color/colorPrimary">
+            android:minHeight="?attr/actionBarSize">
 
             <EditText
                 android:layout_width="298dp"
@@ -23,7 +23,7 @@
                 android:textColorHint="#FFC9C9C9"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:textSize="16dp"
+                android:textSize="18dp"
                 android:textColor="@color/textPrimaryLight"
                 android:textColorLink="@android:color/black" />
         </android.support.v7.widget.Toolbar>

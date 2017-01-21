@@ -107,16 +107,16 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public class ContactsViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.ll_contactItem_content)
+        @Bind(R.id.ll_chatItem_content)
         LinearLayout contactListContent;
 
-        @Bind(R.id.iv_contactItem_profileImage)
+        @Bind(R.id.iv_chatItem_profileImage)
         ImageView profileImage;
 
-        @Bind(R.id.tv_contactItem_contactName)
+        @Bind(R.id.tv_chatItem_contactName)
         TextView contactName;
 
-        @Bind(R.id.tv_contactItem_status)
+        @Bind(R.id.tv_chatItem_message)
         TextView status;
 
         public ContactsViewHolder(View itemView) {
@@ -131,8 +131,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void renderItem(NewChatItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-            status.setText("@"+contactItem.getUserId());
-            profileImage.setImageResource(R.drawable.default_profile_image);
+            status.setText("ID:"+contactItem.getUserId());
 
             contactName.setTag(contactItem.getUserName());
         }

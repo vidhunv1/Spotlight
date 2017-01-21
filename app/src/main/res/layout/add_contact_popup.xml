@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/fl_add_contact"
+    android:fitsSystemWindows="true"
+    android:background="#80000000">
+
+    <RelativeLayout
+        android:layout_centerInParent="true"
+        android:layout_width="305.5dp"
+        android:layout_height="226dp"
+        android:background="#ffffff">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/ti_add_contact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:hint="Enter iChat ID"
+                android:backgroundTint="@color/colorPrimary"
+                android:id="@+id/et_add_contact"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_below="@id/ti_add_contact"
+            android:id="@+id/add_contact_message"
+            android:text="Enter someone's ID to find them on iChat."/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Add Contact"
+            android:textColor="#FFFFFF"
+            android:id="@+id/btn_add_contact"
+            android:textAllCaps="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:layout_gravity="bottom"
+            android:textSize="15sp"/>
+    </RelativeLayout>
+</RelativeLayout>

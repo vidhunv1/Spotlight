@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.search.di;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
-import com.stairway.spotlight.screens.search.FindUserUseCase;
+import com.stairway.spotlight.screens.home.FindUserUseCase;
 import com.stairway.spotlight.screens.search.SearchUseCase;
 import com.stairway.spotlight.screens.search.SearchPresenter;
 

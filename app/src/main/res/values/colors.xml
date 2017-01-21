@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--<color name="colorPrimary">#E53935</color>-->
-    <color name="colorPrimary">#0D47A1</color>
-    <color name="colorPrimaryLight">#2979FF</color>
-    <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="sendMessageBubble">#00BCD4</color>
+    <color name="receiveMessageBubble">#E5E5E5</color>
+    <color name="activeIndicator">#0084ff</color>
+    <color name="textHintColor">#9e9e9e</color>
+    <color name="colorPrimary">#00838F</color>
+    <color name="colorPrimaryDark">#006064</color>
     <color name="iconPrimary">#ffffff</color>
     <color name="drawerIcon">#7E7E7E</color>
     <color name="drawerText">#000000</color>
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textPrimaryDark">#060606</color>
-    <color name="buttonText">#2196F3</color>
-    <color name="textSecondary">#E3F2FD</color>
+    <color name="buttonText">#0084ff</color>
+    <color name="textSecondary">#ECEFF1</color>
     <color name="colorAccent">#7f8c8d</color>
     <color name="background_default">#FFFFFF</color>
     <color name="divider">#dddddd</color>
+    <color name="statusBar">#006064</color>
 </resources>

@@ -1,14 +1,9 @@
 <resources>
     <string name="app_name">Spotlight</string>
-    <string name="title_activity_home">CHAT</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_register">RegisterActivity</string>
-    <string name="welcome_welcome">Welcome</string>
-    <string name="welcome_tag">Stairway connects you with things that matter the most to you.</string>
     <string name="register_sign_up">Sign Up</string>
     <string name="register_enter_phone_number">Enter your phone number</string>
     <string name="register_select_country">Select Country</string>
-    <string name="welcome_button_signup">Sign up for Stairway</string>
     <string name="register_send_code">SEND CONFIRMATION CODE</string>
 
     <string-array name="register_country_codes">
@@ -23,13 +18,11 @@
 
     </string-array>
 
-    <string name="otp_enterotp">_\t_\t_\t_\t_\t_</string>
     <string name="otp_enter_otp">Enter the 6-digit OTP</string>
-    <string name="title_activity_home_drawer">HomeActivityDrawer</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="keyboard_hint">Write a message...</string>
 </resources>
