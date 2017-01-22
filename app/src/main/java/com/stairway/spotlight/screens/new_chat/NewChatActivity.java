@@ -73,7 +73,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         contactList.setLayoutManager(new LinearLayoutManager(this));
 //        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
-        newChatAdapter = new NewChatAdapter(this, new ArrayList<>());
+        newChatAdapter = new NewChatAdapter(this, this, new ArrayList<>());
         contactList.setAdapter(newChatAdapter);
     }
 

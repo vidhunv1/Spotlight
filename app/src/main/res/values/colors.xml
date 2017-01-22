@@ -17,4 +17,5 @@
     <color name="background_default">#FFFFFF</color>
     <color name="divider">#dddddd</color>
     <color name="statusBar">#006064</color>
+    <color name="searchHighlight">#32AFFF</color>
 </resources>

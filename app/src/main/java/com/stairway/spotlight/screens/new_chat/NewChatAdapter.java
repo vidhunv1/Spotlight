@@ -1,5 +1,7 @@
 package com.stairway.spotlight.screens.new_chat;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -8,14 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -27,12 +24,13 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
     private final int CATEGORY = 2;
-
+    private Context context;
 
     private List<Integer> filteredList;
     private String filterQuery;
 
-    public NewChatAdapter(ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
+    public NewChatAdapter(Context context, ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
+        this.context = context;
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
         filteredList = new ArrayList<>();
@@ -160,12 +158,15 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, String query) {
+            String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
+
             String contactNameLower = contactItem.getContactName().toLowerCase();
             int startPos = contactNameLower.indexOf(query);
             if(!query.isEmpty() && startPos>=0) {
                 String textHTML = contactItem.getContactName().substring(0,startPos)
-                        +"<font color=\"#32AFFF\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
+                        +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
                         +contactItem.getContactName().substring(startPos+query.length());
+
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
                 } else {
@@ -175,7 +176,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 contactName.setText(contactItem.getContactName());
                 status.setText("ID: " + contactItem.getUserId());
             }
-
             contactName.setTag(contactItem.getUserName());
         }
     }
@@ -190,7 +190,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void renderItem(int count) {
-            categoryName.setText("Contacts ("+count+")");
+            categoryName.setText("Contacts");
         }
     }
 
