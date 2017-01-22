@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 /**
@@ -38,24 +41,20 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.tb_new_chat)
     Toolbar toolbar;
 
-    @Bind(R.id.et_new_chat_search)
+    @Bind(R.id.et_new_chat_search1)
     EditText search;
+
+    @Bind(R.id.ib_search_clear)
+    ImageButton clearSearch;
 
     @Inject
     NewChatPresenter newChatPresenter;
 
-    @Bind(R.id.tv_new_chat_title)
-    TextView title;
-
-    @Bind(R.id.tv_new_chat_subtitle)
-    TextView subtitle;
-
-    @Bind(R.id.ll_title)
-    LinearLayout titleContent;
-
     NewChatAdapter newChatAdapter;
     public static Intent callingIntent(Context context) {
-        return new Intent(context, NewChatActivity.class);
+        Intent intent = new Intent(context, NewChatActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        return intent;
     }
 
     @Override
@@ -85,14 +84,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
             super.onBackPressed();
             return true;
         }
-//        else if(id == R.id.action_search) {
-//            titleContent.setVisibility(View.GONE);
-//            search.setVisibility(View.VISIBLE);
-//            search.requestFocus();
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
-//            return true;
-//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -114,13 +105,22 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     public void displayContacts(List<NewChatItemModel> newChatItemModel) {
-        subtitle.setText(newChatItemModel.size()+" Contacts");
         newChatAdapter.addContacts(newChatItemModel);
     }
 
-    @OnTextChanged(R.id.et_new_chat_search)
+    @OnTextChanged(R.id.et_new_chat_search1)
     public void onSearchChanged() {
         newChatAdapter.filterList(search.getText().toString());
+
+        if(search.getText().length()>=1)
+            clearSearch.setVisibility(View.VISIBLE);
+        else
+            clearSearch.setVisibility(View.INVISIBLE);
+    }
+
+    @OnClick(R.id.ib_search_clear)
+    public void onSearchClear() {
+        search.setText("");
     }
 
     @Override

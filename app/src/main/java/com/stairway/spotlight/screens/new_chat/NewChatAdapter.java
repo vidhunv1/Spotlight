@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.new_chat;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.Bind;
@@ -56,18 +58,25 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void filterList(String query) {
+        int modPos = 0, temp, item;
+
         filterQuery = query;
+        filteredList.clear();
         if(query.isEmpty()) {
-            filteredList.clear();
             notifyDataSetChanged();
             return;
         }
         for (NewChatItemModel newChatItemModel : itemList)
-            if(newChatItemModel.getContactName().toLowerCase().matches(query+".*") || newChatItemModel.getContactName().toLowerCase().matches(".* "+query+".*")) {
-                filteredList.add(itemList.indexOf(newChatItemModel));
-                Logger.d(this, "Filtering: "+newChatItemModel.toString()+" at "+itemList.indexOf(newChatItemModel));
-            }
+            if(newChatItemModel.getContactName().toLowerCase().contains(query)) {
+                item = itemList.indexOf(newChatItemModel);
+                filteredList.add(item);
 
+                if(newChatItemModel.getContactName().toLowerCase().startsWith(query)) {
+                    temp = filteredList.get(modPos);
+                    filteredList.set(modPos, item);
+                    filteredList.set(filteredList.size()-1, temp);
+                }
+            }
         notifyDataSetChanged();
     }
 
@@ -109,11 +118,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         switch (holder.getItemViewType()) {
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
-                cVH.renderItem(itemList.get(position));
+                cVH.renderItem(itemList.get(position), filterQuery);
                 break;
             case CATEGORY:
                 CategoryViewHolder catVH = (CategoryViewHolder) holder;
-                catVH.renderItem();
+                catVH.renderItem(itemList.size());
                 break;
             default:
                 break;
@@ -149,10 +158,23 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     contactClickListener.onContactItemClicked(contactName.getTag().toString());
             });
         }
-
-        void renderItem(NewChatItemModel contactItem) {
-            contactName.setText(contactItem.getContactName());
-            status.setText("ID: "+contactItem.getUserId());
+        @SuppressWarnings("deprecation")
+        void renderItem(NewChatItemModel contactItem, String query) {
+            String contactNameLower = contactItem.getContactName().toLowerCase();
+            int startPos = contactNameLower.indexOf(query);
+            if(!query.isEmpty() && startPos>=0) {
+                String textHTML = contactItem.getContactName().substring(0,startPos)
+                        +"<font color=\"#32AFFF\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
+                        +contactItem.getContactName().substring(startPos+query.length());
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
+                } else {
+                    contactName.setText(Html.fromHtml(textHTML));
+                }
+            } else {
+                contactName.setText(contactItem.getContactName());
+                status.setText("ID: " + contactItem.getUserId());
+            }
 
             contactName.setTag(contactItem.getUserName());
         }
@@ -167,8 +189,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem() {
-            categoryName.setText("Contacts");
+        public void renderItem(int count) {
+            categoryName.setText("Contacts ("+count+")");
         }
     }
 
