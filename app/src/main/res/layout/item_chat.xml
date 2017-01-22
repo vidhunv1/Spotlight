@@ -84,5 +84,5 @@
         android:layout_height="0.5dp"
         android:id="@+id/view_contactItem_divider"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider"/>
+        android:background="@color/divider" />
 </LinearLayout>

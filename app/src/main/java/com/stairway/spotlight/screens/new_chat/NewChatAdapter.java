@@ -23,38 +23,47 @@ import butterknife.ButterKnife;
 public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
-    private final int CONTACT=1;
+    private final int CONTACT  = 1;
+    private final int CATEGORY = 2;
+
 
     private List<Integer> filteredList;
+    private String filterQuery;
 
     public NewChatAdapter(ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
+        filteredList = new ArrayList<>();
+        filterQuery = "";
         this.itemList.addAll(contacts);
     }
 
     public void setContacts(List<NewChatItemModel> contacts) {
         this.itemList.clear();
         this.itemList.addAll(contacts);
-        this.notifyItemRangeInserted(0, itemList.size() - 1);
+        this.notifyItemRangeInserted(1, itemList.size());
     }
 
     public void addContact(NewChatItemModel contact) {
         itemList.add(contact);
-        this.notifyItemInserted(itemList.size()-1);
+        this.notifyItemInserted(itemList.size());
     }
 
     public void addContacts(List<NewChatItemModel> contacts) {
-        int position = itemList.size()-1;
+        int position = itemList.size();
         itemList.addAll(contacts);
-        this.notifyItemRangeChanged(position, itemList.size());
+        this.notifyItemRangeChanged(position, itemList.size()+1);
     }
 
     public void filterList(String query) {
-        filteredList = new ArrayList<>();
-
+        filterQuery = query;
+        if(query.isEmpty()) {
+            filteredList.clear();
+            notifyDataSetChanged();
+            return;
+        }
         for (NewChatItemModel newChatItemModel : itemList)
-            if(newChatItemModel.getContactName().toLowerCase().matches(query+".*") || newChatItemModel.getContactName().matches(".* "+query+".*")) {
+            if(newChatItemModel.getContactName().toLowerCase().matches(query+".*") || newChatItemModel.getContactName().toLowerCase().matches(".* "+query+".*")) {
                 filteredList.add(itemList.indexOf(newChatItemModel));
                 Logger.d(this, "Filtering: "+newChatItemModel.toString()+" at "+itemList.indexOf(newChatItemModel));
             }
@@ -64,6 +73,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
+        if(position==0  && filterQuery.isEmpty())
+            return CATEGORY;
         return CONTACT;
     }
 
@@ -77,6 +88,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
+            case CATEGORY:
+                View categoryView = inflater.inflate(R.layout.item_new_chat_category, parent, false);
+                viewHolder = new CategoryViewHolder(categoryView);
+                break;
             default:
                 return null;
         }
@@ -86,13 +101,19 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
         int position = vPos;
-        if(filteredList!=null)
+        if(!filterQuery.isEmpty())
             position = filteredList.get(vPos);
+        else
+            position = position - 1;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem(itemList.get(position));
+                break;
+            case CATEGORY:
+                CategoryViewHolder catVH = (CategoryViewHolder) holder;
+                catVH.renderItem();
                 break;
             default:
                 break;
@@ -101,12 +122,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        if(filteredList!=null)
+        if(!filterQuery.isEmpty())
             return filteredList.size();
-        return itemList.size();
+        return itemList.size() + 1;
     }
 
-    public class ContactsViewHolder extends RecyclerView.ViewHolder {
+    class ContactsViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.ll_chatItem_content)
         LinearLayout contactListContent;
 
@@ -119,7 +140,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.tv_chatItem_message)
         TextView status;
 
-        public ContactsViewHolder(View itemView) {
+        ContactsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -129,15 +150,29 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             });
         }
 
-        public void renderItem(NewChatItemModel contactItem) {
+        void renderItem(NewChatItemModel contactItem) {
             contactName.setText(contactItem.getContactName());
-            status.setText("ID:"+contactItem.getUserId());
+            status.setText("ID: "+contactItem.getUserId());
 
             contactName.setTag(contactItem.getUserName());
         }
     }
 
-    public interface ContactClickListener {
+    class CategoryViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_new_chat_category)
+        TextView categoryName;
+
+        public CategoryViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void renderItem() {
+            categoryName.setText("Contacts");
+        }
+    }
+
+    interface ContactClickListener {
         void onContactItemClicked(String userId);
     }
 }

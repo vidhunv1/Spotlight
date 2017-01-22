@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="sendMessageBubble">#00BCD4</color>
+    <color name="sendMessageBubble">#00838F</color>
     <color name="receiveMessageBubble">#E5E5E5</color>
     <color name="activeIndicator">#0084ff</color>
     <color name="textHintColor">#9e9e9e</color>

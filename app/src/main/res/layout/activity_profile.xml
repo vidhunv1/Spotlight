@@ -65,8 +65,7 @@
             android:layout_width="17dp"
             android:layout_height="17dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="30dp"
-            app:srcCompat="@drawable/ic_profile_tab" />
+            android:layout_marginLeft="30dp"/>
 
         <TextView
             android:id="@+id/textView34"

@@ -11,7 +11,6 @@
         android:layout_height="match_parent"
         android:focusable="true"
         android:clickable="true"
-        android:paddingLeft="7dp"
         android:background="?android:selectableItemBackground"
         android:orientation="horizontal">
 
@@ -20,39 +19,51 @@
             android:layout_height="72dp"
             android:id="@+id/iv_chatItem_profileImage"
             android:src="@drawable/default_profile_image"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="12dp"/>
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="9dp"
+            android:paddingRight="11dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:gravity="center_vertical">
+            android:paddingTop="11dp">
 
-            <TextView
-                android:layout_width="190dp"
-                tools:ignore="MissingPrefix"
-                android:layout_height="wrap_content"
-                android:text="Name"
-                android:textColor="#212121"
-                android:textSize="17sp"
-                android:textAppearance="@style/FontRobotoMedium"
-                android:id="@+id/tv_chatItem_contactName"
-                android:maxWidth="190dp" />
-
-            <TextView
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="190dp"
+                    tools:ignore="MissingPrefix"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="#212121"
+                    android:textSize="17sp"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:id="@+id/tv_chatItem_contactName"
+                    android:maxWidth="190dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:maxLines="1"
-                android:textColor="#8f8f8f"
-                android:id="@+id/tv_chatItem_message"
-                android:text="message"
-                android:paddingTop="1dp"
-                android:paddingRight="20dp" />
+                android:layout_marginTop="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:maxLines="1"
+                    android:textColor="#8f8f8f"
+                    android:id="@+id/tv_chatItem_message"
+                    android:text="message"
+                    android:paddingTop="1dp"
+                    android:paddingRight="20dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
     <View
@@ -60,5 +71,5 @@
         android:layout_height="0.5dp"
         android:id="@+id/view_contactItem_divider"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider"/>
+        android:background="@color/divider" />
 </LinearLayout>
