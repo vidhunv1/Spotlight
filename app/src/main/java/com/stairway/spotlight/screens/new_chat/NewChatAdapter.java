@@ -24,6 +24,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
     private final int CATEGORY = 2;
+    private final int NO_RESULT = 3;
     private Context context;
 
     private List<Integer> filteredList;
@@ -59,28 +60,34 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         int modPos = 0, temp, item;
 
         filterQuery = query;
+        String queryLower = filterQuery.toLowerCase();
+        String contactNameLower;
         filteredList.clear();
         if(query.isEmpty()) {
             notifyDataSetChanged();
             return;
         }
-        for (NewChatItemModel newChatItemModel : itemList)
-            if(newChatItemModel.getContactName().toLowerCase().contains(query)) {
+        for (NewChatItemModel newChatItemModel : itemList) {
+            contactNameLower = newChatItemModel.getContactName().toLowerCase();
+            if (contactNameLower.contains(queryLower)) {
                 item = itemList.indexOf(newChatItemModel);
                 filteredList.add(item);
 
-                if(newChatItemModel.getContactName().toLowerCase().startsWith(query)) {
+                if (contactNameLower.startsWith(queryLower)) {
                     temp = filteredList.get(modPos);
                     filteredList.set(modPos, item);
-                    filteredList.set(filteredList.size()-1, temp);
+                    filteredList.set(filteredList.size() - 1, temp);
                 }
             }
+        }
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(position==0  && filterQuery.isEmpty())
+        if(filteredList.size()==0 && !filterQuery.isEmpty())
+            return NO_RESULT;
+        if(position==0)
             return CATEGORY;
         return CONTACT;
     }
@@ -99,6 +106,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View categoryView = inflater.inflate(R.layout.item_new_chat_category, parent, false);
                 viewHolder = new CategoryViewHolder(categoryView);
                 break;
+            case NO_RESULT:
+                View noResultView = inflater.inflate(R.layout.item_no_result, parent, false);
+                viewHolder = new NoResultViewHolder(noResultView);
+                break;
             default:
                 return null;
         }
@@ -107,11 +118,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
-        int position = vPos;
-        if(!filterQuery.isEmpty())
-            position = filteredList.get(vPos);
+        int position;
+        if(!filterQuery.isEmpty() && vPos>0)
+            position = filteredList.get(vPos-1);
         else
-            position = position - 1;
+            position = vPos - 1;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
@@ -120,8 +131,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
             case CATEGORY:
                 CategoryViewHolder catVH = (CategoryViewHolder) holder;
-                catVH.renderItem(itemList.size());
+                if(filterQuery.length()>0)
+                    catVH.renderItem(filteredList.size(), filterQuery);
+                else
+                    catVH.renderItem(itemList.size(), filterQuery);
                 break;
+            case NO_RESULT:
+                NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
+                noResultViewHolder.renderItem(filterQuery);
             default:
                 break;
         }
@@ -129,8 +146,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        if(!filterQuery.isEmpty())
-            return filteredList.size();
+        if(!filterQuery.isEmpty()) {
+            if(filteredList.size()>0)
+                return filteredList.size() + 1;
+            return 1;
+        }
         return itemList.size() + 1;
     }
 
@@ -156,26 +176,31 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     contactClickListener.onContactItemClicked(contactName.getTag().toString());
             });
         }
+
         @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, String query) {
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
 
             String contactNameLower = contactItem.getContactName().toLowerCase();
-            int startPos = contactNameLower.indexOf(query);
+            int startPos = contactNameLower.indexOf(query.toLowerCase());
             if(!query.isEmpty() && startPos>=0) {
+                //color
                 String textHTML = contactItem.getContactName().substring(0,startPos)
                         +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
                         +contactItem.getContactName().substring(startPos+query.length());
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//                String textHTML = contactItem.getContactName().substring(0,startPos)
+//                        +"<b>"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</b>"
+//                        +contactItem.getContactName().substring(startPos+query.length());
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                     contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
-                } else {
+                else
                     contactName.setText(Html.fromHtml(textHTML));
-                }
-            } else {
+            } else
                 contactName.setText(contactItem.getContactName());
-                status.setText("ID: " + contactItem.getUserId());
-            }
+
+            status.setText("ID: " + contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());
         }
     }
@@ -184,13 +209,35 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.tv_new_chat_category)
         TextView categoryName;
 
+        @Bind(R.id.tv_new_chat_count)
+        TextView countText;
+
         public CategoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(int count) {
+        public void renderItem(int count, String filterQuery) {
             categoryName.setText("Contacts");
+
+            if(filterQuery.length()>0)
+                countText.setText(count+" Found");
+            else
+                countText.setText("");
+        }
+    }
+
+    class NoResultViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.no_result)
+        TextView noResult;
+
+        public NoResultViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void renderItem(String filterQuery) {
+            noResult.setText("No results found for '"+filterQuery+"'");
         }
     }
 

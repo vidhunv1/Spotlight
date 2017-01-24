@@ -14,50 +14,35 @@
             android:layout_width="match_parent"
             android:minHeight="?attr/actionBarSize"
             android:background="@color/colorPrimary">
-            <!--<EditText-->
-            <!--android:layout_width="298dp"-->
-            <!--android:layout_height="48dp"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--android:id="@+id/et_new_chat_search"-->
-            <!--android:hint="Type a name"-->
-            <!--android:textColorHint="#FFC9C9C9"-->
-            <!--android:textSize="16sp"-->
-            <!--android:textColor="@color/textPrimaryLight" />-->
-            <TextView
-                android:text="New Message"
-                android:textSize="19.5dp"
-                android:textStyle="bold"
-                android:textColor="@color/textPrimaryLight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_home_title" />
+            <EditText
+                android:layout_width="242dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:id="@+id/et_new_chat_search1"
+                android:hint="Type a name"
+                android:textColorHint="@color/colorPrimaryLight"
+                android:textSize="18sp"
+                android:textColor="@color/textPrimaryLight" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:orientation="horizontal" android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content">
         <EditText
             android:layout_width="326dp"
             android:layout_height="52dp"
             android:background="@android:color/transparent"
-            android:id="@+id/et_new_chat_search1"
-            android:hint="Search for someone"
-            android:drawableLeft="@drawable/ic_search_black"
+            android:id="@+id/et_new_chat_search"
+            android:hint="Name or iChat ID"
+            android:drawableLeft="@drawable/ic_search_dark"
             android:drawablePadding="24dp"
             android:paddingLeft="24dp"
             android:paddingRight="9dp"
-            android:textColorHint="#FFC9C9C9"
+            android:textColorHint="#FFAAAAAA"
             android:textSize="16sp"
             android:textColor="@color/textPrimaryDark" />
-        <ImageButton
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_close_black"
-            android:visibility="invisible"
-            android:id="@+id/ib_search_clear"
-            android:layout_gravity="center_vertical|right"
-            android:background="#00000000"/>
     </LinearLayout>
 
     <View

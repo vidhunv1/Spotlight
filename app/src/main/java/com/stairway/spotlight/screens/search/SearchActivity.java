@@ -12,7 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
@@ -32,17 +34,22 @@ import java.util.List;
 import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SearchActivity extends BaseActivity implements SearchContract.View,
         SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener,
-        ChatListAdapter.ChatClickListener{
+        ChatListAdapter.ChatClickListener {
 
     @Bind(R.id.rv_contact_list)
     RecyclerView contactsSearchList;
     @Bind(R.id.tb_search)
     Toolbar toolbar;
+    @Bind(R.id.ib_search_clear)
+    ImageButton clearSearch;
     @Inject
     SearchPresenter searchPresenter;
+
+    private EditText searchQuery;
 
     private UserSessionResult userSession;
     private SearchAdapter searchAdapter;
@@ -72,7 +79,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        EditText searchQuery = (EditText) toolbar.findViewById(R.id.et_search);
+        searchQuery = (EditText) toolbar.findViewById(R.id.et_search);
         searchQuery.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -84,8 +91,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
                 if(s.length()==0) {
                     contactsSearchList.setAdapter(chatListAdapter);
                     isAdapterSet = false;
-                }
-                else {
+                } else {
                     if(!isAdapterSet)
                         contactsSearchList.setAdapter(searchAdapter);
                     searchPresenter.search(s.toString());
@@ -110,6 +116,14 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
                 return true;
         }
         return true;
+    }
+
+    @OnClick(R.id.ib_search_clear)
+    public void onSearchClear() {
+        if(searchQuery.getText().length()>0)
+            searchQuery.setText("");
+        else
+            super.onBackPressed();
     }
 
     @Override

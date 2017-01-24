@@ -104,6 +104,7 @@ public class MessageStore {
             if(message.length()==0) {
                 subscriber.onNext(result);
                 subscriber.onCompleted();
+                return;
             }
             String textSearch = "<"+MessageXMLValues.TAG_TEXT+">"+ "%"+message+"%" +"</"+MessageXMLValues.TAG_TEXT+">";
             String search1 = "<"+MessageXMLValues.TAG_HEAD+">" +textSearch+ "</"+MessageXMLValues.TAG_HEAD+">";

@@ -226,7 +226,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		showSoftInput(enterId);
 
 		Button addButton = (Button) addContactPopupView.findViewById(R.id.btn_add_contact);
-		addButton.setOnClickListener(v -> presenter.addContact(enterId.getText().toString(), userSession.getAccessToken()));
+		addButton.setOnClickListener(v -> {
+			if(enterId.getText().length()>0)
+				presenter.addContact(enterId.getText().toString(), userSession.getAccessToken());
+		});
 	}
 
 

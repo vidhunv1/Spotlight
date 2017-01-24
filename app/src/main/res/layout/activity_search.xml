@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <android.support.design.widget.AppBarLayout
         style="@style/AppTheme.ActionBarWhite"
         android:layout_width="match_parent"
@@ -13,19 +14,32 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:minHeight="?attr/actionBarSize">
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal" android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="242dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:id="@+id/et_search"
+                    android:hint="Search"
+                    android:textColorHint="@color/colorPrimaryLight"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:textSize="18sp"
+                    android:textColor="@color/textPrimaryLight"
+                    android:textColorLink="@android:color/black" />
 
-            <EditText
-                android:layout_width="298dp"
-                android:layout_height="48dp"
-                android:background="@android:color/transparent"
-                android:id="@+id/et_search"
-                android:hint="Search"
-                android:textColorHint="#FFC9C9C9"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:textSize="18dp"
-                android:textColor="@color/textPrimaryLight"
-                android:textColorLink="@android:color/black" />
+                <ImageButton
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:paddingRight="12dp"
+                    android:paddingLeft="12dp"
+                    android:src="@drawable/ic_close_active"
+                    android:id="@+id/ib_search_clear"
+                    android:layout_gravity="center_vertical|right"
+                    android:background="#00000000"/>
+            </LinearLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

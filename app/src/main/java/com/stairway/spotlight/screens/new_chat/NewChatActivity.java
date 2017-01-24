@@ -44,9 +44,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.et_new_chat_search1)
     EditText search;
 
-    @Bind(R.id.ib_search_clear)
-    ImageButton clearSearch;
-
     @Inject
     NewChatPresenter newChatPresenter;
 
@@ -111,16 +108,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @OnTextChanged(R.id.et_new_chat_search1)
     public void onSearchChanged() {
         newChatAdapter.filterList(search.getText().toString());
-
-        if(search.getText().length()>=1)
-            clearSearch.setVisibility(View.VISIBLE);
-        else
-            clearSearch.setVisibility(View.INVISIBLE);
-    }
-
-    @OnClick(R.id.ib_search_clear)
-    public void onSearchClear() {
-        search.setText("");
     }
 
     @Override

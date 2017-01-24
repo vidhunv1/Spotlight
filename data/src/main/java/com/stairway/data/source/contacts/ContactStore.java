@@ -64,7 +64,7 @@ public class ContactStore {
             };
 
             try {
-                Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, ContactsContract.COLUMN_CONTACT_NAME+" ASC");
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {

@@ -4,16 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="8.5dp"
-    android:paddingLeft="15.5dp"
-    android:paddingTop="17.5dp"
+    android:paddingBottom="9dp"
+    android:paddingLeft="16dp"
+    android:paddingTop="17dp"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
         android:id="@+id/imageView23"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_weight="1"
         app:srcCompat="@drawable/default_profile_image" />
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="18.5dp"
         android:text="vidhun vinod"
-        android:textStyle="bold"
+        android:textAppearance="@style/FontRobotoMedium"
         android:textColor="@color/textPrimaryLight"
         android:textSize="15sp" />
 

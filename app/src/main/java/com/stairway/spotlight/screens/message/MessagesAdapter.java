@@ -147,7 +147,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return FULL;
         if(position!=0 && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
             return END;
-        if((position==0 || isMe==messageList.get(position-1).isMe()) && position!=messageList.size()-1)
+        if((position!=0 && isMe==messageList.get(position-1).isMe()) && position!=messageList.size()-1)
             return MIDDLE;
         if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe==messageList.get(position+1).isMe()))
             return START;
