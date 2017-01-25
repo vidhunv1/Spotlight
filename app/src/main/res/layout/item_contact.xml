@@ -29,14 +29,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:paddingTop="11dp">
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="190dp"
                 tools:ignore="MissingPrefix"
                 android:layout_height="wrap_content"
                 android:text="Name"
-                android:textColor="#212121"
+                android:textColor="#252525"
                 android:textSize="17sp"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:id="@+id/tv_chatItem_contactName"
@@ -45,14 +45,13 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp">
+                android:layout_height="wrap_content">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:maxLines="1"
-                    android:textColor="#a8a8a8"
+                    android:textColor="#A8A8A8"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
                     android:paddingTop="1dp"

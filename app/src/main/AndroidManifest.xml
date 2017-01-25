@@ -41,7 +41,8 @@
         </activity>
         <activity
             android:name=".screens.message.MessageActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".screens.register.RegisterActivity"
             android:label="@string/title_activity_register"

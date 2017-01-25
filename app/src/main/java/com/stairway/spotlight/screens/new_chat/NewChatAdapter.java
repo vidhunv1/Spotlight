@@ -185,13 +185,13 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             int startPos = contactNameLower.indexOf(query.toLowerCase());
             if(!query.isEmpty() && startPos>=0) {
                 //color
-                String textHTML = contactItem.getContactName().substring(0,startPos)
-                        +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
-                        +contactItem.getContactName().substring(startPos+query.length());
-
 //                String textHTML = contactItem.getContactName().substring(0,startPos)
-//                        +"<b>"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</b>"
+//                        +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
 //                        +contactItem.getContactName().substring(startPos+query.length());
+
+                String textHTML = contactItem.getContactName().substring(0,startPos)
+                        +"<b>"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</b>"
+                        +contactItem.getContactName().substring(startPos+query.length());
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                     contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
@@ -218,7 +218,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void renderItem(int count, String filterQuery) {
-            categoryName.setText("Contacts");
+            categoryName.setText("iChat Contacts");
 
             if(filterQuery.length()>0)
                 countText.setText(count+" Found");

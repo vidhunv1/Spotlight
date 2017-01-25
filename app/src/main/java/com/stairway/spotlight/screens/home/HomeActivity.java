@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.home;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,15 +18,19 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupWindow;
+import android.widget.FrameLayout;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
@@ -39,6 +43,8 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -216,19 +222,23 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		addContactPopupWindow.showAtLocation(homeLayout, Gravity.CENTER,0,0);
 		addContactPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
 
-		RelativeLayout outLayout = (RelativeLayout) addContactPopupView.findViewById(R.id.fl_add_contact);
+		FrameLayout outLayout = (FrameLayout) addContactPopupView.findViewById(R.id.fl_add_contact);
 		outLayout.setOnClickListener(v -> {
 			addContactPopupWindow.dismiss();
 			hideSoftInput();
 		});
+
 
 		EditText enterId = (EditText) addContactPopupView.findViewById(R.id.et_add_contact);
 		showSoftInput(enterId);
 
 		Button addButton = (Button) addContactPopupView.findViewById(R.id.btn_add_contact);
 		addButton.setOnClickListener(v -> {
-			if(enterId.getText().length()>0)
+			if(enterId.getText().length()>0) {
 				presenter.addContact(enterId.getText().toString(), userSession.getAccessToken());
+				ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
+				pb.setVisibility(View.VISIBLE);
+			}
 		});
 	}
 
@@ -274,10 +284,32 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void showInvalidIDError() {
 		if(addContactPopupWindow.isShowing()) {
-			TextInputLayout til = (TextInputLayout) addContactPopupView.findViewById(R.id.ti_add_contact);
-			til.setErrorEnabled(true);
-			til.setError("Please enter a valid ID.");
+			ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
+			pb.setVisibility(View.GONE);
+			showAlertDialog("Please enter a valid iChat ID.", R.layout.alert);
 		}
+	}
+
+	public void showAlertDialog(String message, int layout) {
+		//TODO: Something wrong. 16?
+		final int WIDTH = 294, HEIGHT = 98;
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		View dialogView = inflater.inflate(layout, null);
+
+		dialogBuilder.setView(dialogView);
+		AlertDialog alertDialog = dialogBuilder.create();
+		alertDialog.show();
+
+		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH+16, getResources().getDisplayMetrics());
+		int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT+16, getResources().getDisplayMetrics());
+		alertDialog.getWindow().setLayout(width, height);
+
+		TextView messageText = (TextView) dialogView.findViewById(R.id.tv_alert_message);
+		messageText.setText(message);
+		Button ok = (Button) dialogView.findViewById(R.id.btn_alert_ok);
+		ok.setOnClickListener(v -> alertDialog.dismiss());
 	}
 
 	@Override

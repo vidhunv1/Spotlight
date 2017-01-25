@@ -58,6 +58,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     public static Intent callingIntent(Context context, List<ChatListItemModel> chatListItemModelList) {
         Intent intent = new Intent(context, SearchActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.putExtra(KEY_CHATS, (Serializable) chatListItemModelList);
         return intent;
     }
@@ -111,11 +112,16 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                startActivity(HomeActivity.callingIntent(this));
-                this.overridePendingTransition(0,0);
+                onBackPressed();
                 return true;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(HomeActivity.callingIntent(this));
+        this.overridePendingTransition(0,0);
     }
 
     @OnClick(R.id.ib_search_clear)
@@ -123,7 +129,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         if(searchQuery.getText().length()>0)
             searchQuery.setText("");
         else
-            super.onBackPressed();
+            onBackPressed();
     }
 
     @Override

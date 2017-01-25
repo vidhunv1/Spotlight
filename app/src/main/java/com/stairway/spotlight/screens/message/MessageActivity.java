@@ -143,14 +143,15 @@ public class MessageActivity extends BaseActivity
         int id = item.getItemId();
         if((id == android.R.id.home)) {
             super.onBackPressed();
-        } else if(id == R.id.view_contact) {
-            startActivity(UserProfileActivity.callingIntent(this, chatId));
-            this.overridePendingTransition(0, 0);
         }
-//        else if(id == R.id.action_profile) {
+//        else if(id == R.id.view_contact) {
 //            startActivity(UserProfileActivity.callingIntent(this, chatId));
 //            this.overridePendingTransition(0, 0);
 //        }
+        else if(id == R.id.action_profile) {
+            startActivity(UserProfileActivity.callingIntent(this, chatId));
+            this.overridePendingTransition(0, 0);
+        }
         return super.onOptionsItemSelected(item);
     }
 
