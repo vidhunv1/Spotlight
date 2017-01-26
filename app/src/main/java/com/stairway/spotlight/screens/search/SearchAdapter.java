@@ -261,12 +261,11 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             name.setText(messagesModel.getContactName());
             time.setText(messagesModel.getTime());
-            MessageParser messageParser = new MessageParser(messagesModel.getMessage());
             try {
+                MessageParser messageParser = new MessageParser(messagesModel.getMessage());
                 TextMessage textMessage = new TextMessage("");
-                Object o = messageParser.parseMessage();
                 if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                    textMessage = (TextMessage)o;
+                    textMessage = (TextMessage)messageParser.getMessageObject();
 
                 String messageLower = textMessage.getText().toLowerCase();
                 int startPos = messageLower.indexOf(searchQuery.toLowerCase());

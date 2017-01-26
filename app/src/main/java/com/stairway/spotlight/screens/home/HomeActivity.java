@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -26,7 +27,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,6 +115,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
+		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
+		if (animator instanceof SimpleItemAnimator) {
+			((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+		}
 
 		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this)));
 
@@ -228,7 +233,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			hideSoftInput();
 		});
 
-
 		EditText enterId = (EditText) addContactPopupView.findViewById(R.id.et_add_contact);
 		showSoftInput(enterId);
 
@@ -240,6 +244,26 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				pb.setVisibility(View.VISIBLE);
 			}
 		});
+
+		// popup not working in older versions
+		if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
+			homeLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
+				public void onGlobalLayout(){
+					int heightDiff = homeLayout.getRootView().getHeight()- homeLayout.getHeight();
+					// IF height diff is more then 150, consider keyboard as visible.
+					Logger.d(this, "DIFF: "+heightDiff);
+					RelativeLayout content = (RelativeLayout) addContactPopupView.findViewById(R.id.rl_add_contact_content);
+					FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)content.getLayoutParams();
+					if(heightDiff>150) {
+						int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -110, getResources().getDisplayMetrics());
+						params.setMargins(0, px, 0, 0);
+						content.setLayoutParams(params);
+					} else {
+						params.setMargins(0, 0, 0, 0);
+						content.setLayoutParams(params);
+					}
+				}
+			});
 	}
 
 
@@ -331,9 +355,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void showChatState(String from, ChatState chatState) {
-		if(chatState == ChatState.composing)
+		if(chatState == ChatState.composing || chatState == ChatState.active)
 			chatListAdapter.setChatState(from, "Typing...");
-		else
+		if(chatState == ChatState.paused || chatState == ChatState.inactive)
 			chatListAdapter.resetChatState(from);
 	}
 
@@ -350,6 +374,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onMessageReceived(MessageResult messageId) {
+		Logger.d(this, "Message:::"+messageId);
 		addNewMessage(messageId);
 	}
 

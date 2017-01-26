@@ -58,7 +58,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatList.add(0, chatListItemModel);
             notifyItemChanged(0);
         }
-        notifyDataSetChanged();
     }
 
     public void setChatState(String fromId, String chatState){
@@ -192,13 +191,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             try {
                 MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
-                Object messageObject = messageParser.parseMessage();
 
                 if(messageParser.getMessageType() == MessageParser.MessageType.template) {
-                    TemplateMessage msg = (TemplateMessage)messageObject;
+                    TemplateMessage msg = (TemplateMessage)messageParser.getMessageObject();
                     lastMessage.setText(msg.getDisplayMessage());
                 } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
-                    TextMessage msg = (TextMessage)messageObject;
+                    TextMessage msg = (TextMessage)messageParser.getMessageObject();
                     lastMessage.setText(msg.getDisplayMessage());
                 }
             } catch(ParseException e) {
@@ -246,13 +244,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             try {
                 MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
-                Object messageObject = messageParser.parseMessage();
 
                 if(messageParser.getMessageType() == MessageParser.MessageType.template) {
-                    TemplateMessage msg = (TemplateMessage)messageObject;
+                    TemplateMessage msg = (TemplateMessage)messageParser.getMessageObject();
                     lastMessage.setText(msg.getDisplayMessage());
                 } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
-                    TextMessage msg = (TextMessage)messageObject;
+                    TextMessage msg = (TextMessage)messageParser.getMessageObject();
                     lastMessage.setText(msg.getDisplayMessage());
                 }
             } catch(ParseException e) {

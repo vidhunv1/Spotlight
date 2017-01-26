@@ -7,21 +7,22 @@
     android:paddingTop="3dp">
 
     <ImageView
+        android:layout_alignParentBottom="true"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@drawable/default_profile_image"
         android:id="@+id/iv_profileImage"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="12dp" />
 
     <LinearLayout
-        android:background="@drawable/bg_msg_receive_white"
+        android:background="@drawable/bg_template_full"
         android:orientation="vertical"
+        android:id="@+id/ll_bubble"
         android:layout_width="258dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/iv_profileImage"
         android:layout_toEndOf="@+id/iv_profileImage"
         android:layout_marginLeft="12dp">
@@ -110,7 +111,6 @@
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp" />
         </LinearLayout>
-
     </LinearLayout>
 
 </RelativeLayout>

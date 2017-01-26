@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_item_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="?android:selectableItemBackground"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="62dp"
+            android:id="@+id/iv_chatItem_profileImage"
+            android:src="@drawable/ic_group_add"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="12dp"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/ll_chatItem_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="295dp"
+                tools:ignore="MissingPrefix"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textColor="#212121"
+                android:textSize="17sp"
+                android:id="@+id/tv_chatItem_contactName"
+                android:maxWidth="190dp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

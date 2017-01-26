@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.home;
 
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.data.source.contacts.ContactStore;
 import com.stairway.data.source.message.MessageResult;
@@ -43,6 +44,7 @@ public class GetChatsUseCase {
                         public void onNext(List<MessageResult> messageResults) {
                             List<ChatListItemModel> chatListItemModels = new ArrayList<>(messageResults.size());
                             for (MessageResult messageResult : messageResults) {
+                                Logger.d(this, "MessageRslt: - "+messageResult.toString());
                                 contactStore.getContactByUserName(messageResult.getChatId()).subscribe(new Subscriber<ContactResult>() {
                                     @Override
                                     public void onCompleted() {}
@@ -51,10 +53,17 @@ public class GetChatsUseCase {
 
                                     @Override
                                     public void onNext(ContactResult contactResult) {
-                                        messageResult.setName(contactResult.getDisplayName());
+                                        String name;
+                                        if(contactResult!=null)
+                                            name = contactResult.getDisplayName();
+                                        else {
+                                            //TODO: get user details from server
+                                            name = messageResult.getChatId();
+                                        }
+
                                         chatListItemModels.add(new ChatListItemModel(
                                                 messageResult.getChatId(),
-                                                contactResult.getDisplayName(),
+                                                name,
                                                 messageResult.getMessage(),
                                                 messageResult.getTime(),
                                                 messageResult.getUnSeenCount()));

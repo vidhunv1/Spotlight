@@ -21,7 +21,7 @@
                 android:id="@+id/et_new_chat_search1"
                 android:hint="Type a name"
                 android:textColorHint="@color/colorPrimaryLight"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:textColor="@color/textPrimaryLight" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>

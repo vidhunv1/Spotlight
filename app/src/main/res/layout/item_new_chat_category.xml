@@ -2,22 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
     <TextView
-        android:text="ICHAT CONTACTS"
-        android:layout_marginLeft="9dp"
+        android:text="Contacts"
+        android:layout_marginLeft="7dp"
         android:textAllCaps="true"
-        android:paddingTop="10dp"
+        android:paddingTop="8.25dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:textColor="#F2546E7A"
+        android:textColor="#546e7a"
         android:textAppearance="@style/FontRobotoMedium"
         android:textSize="13sp"
         android:id="@+id/tv_new_chat_category" />
 
     <TextView
         android:layout_width="fill_parent"
-        android:paddingTop="10dp"
-        android:layout_marginRight="9dp"
+        android:paddingTop="8.25dp"
+        android:layout_marginRight="7dp"
         android:gravity="right"
         android:textColor="#8f8f8f"
         android:layout_height="wrap_content"

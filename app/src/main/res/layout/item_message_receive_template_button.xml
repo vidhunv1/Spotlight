@@ -6,94 +6,91 @@
     android:paddingTop="3dp">
 
     <ImageView
+        android:id="@+id/iv_profileImage"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:src="@drawable/default_profile_image"
-        android:id="@+id/iv_profileImage"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="12dp" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="12dp"
+        android:src="@drawable/default_profile_image" />
 
     <LinearLayout
-        android:background="@drawable/bg_msg_receive_full"
         android:id="@+id/ll_bubble"
-        android:orientation="vertical"
         android:layout_width="258dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/iv_profileImage"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="12dp"
         android:layout_toEndOf="@+id/iv_profileImage"
-        android:layout_marginLeft="12dp">
+        android:layout_toRightOf="@+id/iv_profileImage"
+        android:background="@drawable/bg_msg_receive_full"
+        android:orientation="vertical">
 
         <RelativeLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/iv_profileImage"
-            android:paddingTop="7.25dp"
-            android:paddingBottom="7.25dp"
             android:maxWidth="258dp"
+            android:paddingBottom="7.25dp"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
-            android:layout_width="wrap_content">
+            android:paddingTop="7.25dp">
 
             <TextView
                 android:id="@+id/tv_rcv_message"
-                android:text="FLE : À "
-                android:textColor="@color/textPrimaryDark"
                 android:layout_width="wrap_content"
-                android:textSize="16sp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:maxWidth="234dp" />
+                android:layout_alignParentTop="true"
+                android:maxWidth="234dp"
+                android:text="FLE : À "
+                android:textColor="@color/textPrimaryDark"
+                android:textSize="16sp" />
         </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/ll_rcv_template_buttons"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_receive_bottom"
-            android:gravity="right">
+            android:background="@drawable/bg_lower_template_bottom"
+            android:gravity="right"
+            android:orientation="horizontal">
 
             <TextView
-                android:text="TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
                 android:id="@+id/tv_rcv_button1"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
                 android:gravity="center_vertical"
-                android:textColor="@color/buttonText"
+                android:paddingLeft="33.5dp"
                 android:paddingRight="12dp"
+                android:text="TextView"
                 android:textAllCaps="true"
-                android:textSize="15dp"
-                android:paddingLeft="33.5dp" />
+                android:textColor="@color/buttonText"
+                android:textSize="15dp" />
 
             <TextView
-                android:text="TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
                 android:id="@+id/tv_rcv_button2"
-                android:gravity="center_vertical"
-                android:textAllCaps="true"
-                android:textColor="@color/buttonText"
-                android:textSize="15dp"
-                android:paddingLeft="33.5dp"
-                android:paddingRight="12dp" />
-
-            <TextView
-                android:text="TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
-                android:id="@+id/tv_rcv_button3"
-                android:textAllCaps="true"
-                android:textColor="@color/buttonText"
-                android:textSize="15dp"
                 android:gravity="center_vertical"
                 android:paddingLeft="33.5dp"
-                android:paddingRight="12dp" />
-        </LinearLayout>
+                android:paddingRight="12dp"
+                android:text="TextView"
+                android:textAllCaps="true"
+                android:textColor="@color/buttonText"
+                android:textSize="15dp" />
 
+            <TextView
+                android:id="@+id/tv_rcv_button3"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="33.5dp"
+                android:paddingRight="12dp"
+                android:text="TextView"
+                android:textAllCaps="true"
+                android:textColor="@color/buttonText"
+                android:textSize="15dp" />
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

@@ -7,8 +7,8 @@
         android:color="#e9e9e9" />
 
     <corners
-        android:bottomLeftRadius="18dp"
-        android:bottomRightRadius="18dp"
-        android:topLeftRadius="18dp"
-        android:topRightRadius="18dp" />
+        android:topLeftRadius="17dp"
+        android:topRightRadius="17dp"
+        android:bottomLeftRadius="17dp"
+        android:bottomRightRadius="17dp" />
 </shape>

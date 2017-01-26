@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,6 +93,10 @@ public class MessageActivity extends BaseActivity
         linearLayoutManager.setStackFromEnd(true);
         messagesAdapter = new MessagesAdapter(this, this, this, this);
         messageItem.setLayoutManager(linearLayoutManager);
+        RecyclerView.ItemAnimator animator = messageItem.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
         messageItem.setAdapter(messagesAdapter);
 //        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
@@ -144,14 +149,14 @@ public class MessageActivity extends BaseActivity
         if((id == android.R.id.home)) {
             super.onBackPressed();
         }
-//        else if(id == R.id.view_contact) {
-//            startActivity(UserProfileActivity.callingIntent(this, chatId));
-//            this.overridePendingTransition(0, 0);
-//        }
-        else if(id == R.id.action_profile) {
+        else if(id == R.id.view_contact) {
             startActivity(UserProfileActivity.callingIntent(this, chatId));
             this.overridePendingTransition(0, 0);
         }
+//        else if(id == R.id.action_profile) {
+//            startActivity(UserProfileActivity.callingIntent(this, chatId));
+//            this.overridePendingTransition(0, 0);
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -175,14 +180,14 @@ public class MessageActivity extends BaseActivity
             sendImageButton.setVisibility(View.VISIBLE);
             sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
             if(currentChatState != ChatState.composing) {
-                messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_TYPING);
+                messagePresenter.sendChatState(chatId, ChatState.composing);
                 currentChatState = ChatState.composing;
             }
         } else {
             sendImageButton.setVisibility(View.GONE);
-            if(currentChatState != ChatState.paused) {
-                messagePresenter.sendChatState(chatId, SendChatStateUseCase.CHAT_PAUSED);
-                currentChatState = ChatState.paused;
+            if(currentChatState != ChatState.gone) {
+                messagePresenter.sendChatState(chatId, ChatState.gone);
+                currentChatState = ChatState.gone;
             }
         }
     }

@@ -40,21 +40,28 @@ public class MessageParser {
 
     private String messageXml;
     private MessageType messageType;
+    private Object messageObject;
 
-    public MessageParser(String messageXml){
+    public MessageParser(String messageXml) throws ParseException{
         this.messageXml = messageXml;
+        parseMessage();
     }
 
-    public MessageType getMessageType() {
-        return messageType;
+    public MessageType getMessageType(){
+        return this.messageType;
     }
 
-    public Object parseMessage() throws ParseException {
+    public Object getMessageObject(){
+        return this.messageObject;
+    }
+
+    private void parseMessage() throws ParseException {
         if(messageXml.isEmpty() || messageXml==null)
             throw new IllegalStateException("MessageXml is null");
         if(!(messageXml.startsWith(openTag(TAG_HEAD)) || messageXml.startsWith(openTag(TAG_HEAD_SHORT)))) {
             this.messageType = MessageType.text;
-            return new TextMessage(messageXml);
+            this.messageObject = new TextMessage(messageXml);
+            return;
         }
 
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -78,22 +85,28 @@ public class MessageParser {
                         Node node = messageList.item(i);
                         if(node.getNodeName().equals(TAG_TEXT)) {
                             this.messageType = MessageType.text;
-                            return parseText(node);
+                            this.messageObject = parseText(node);
+                            return;
                         } else if (node.getNodeName().equals(TAG_IMAGE)){
                             this.messageType = MessageType.image;
-                            return parseImage(node);
+                            this.messageObject = parseImage(node);
+                            return;
                         } else if(node.getNodeName().equals(TAG_VIDEO)) {
                             this.messageType = MessageType.video;
-                            return parseVideo(node);
+                            this.messageObject = parseVideo(node);
+                            return;
                         }  else if(node.getNodeName().equals(TAG_LOCATION)) {
                             this.messageType = MessageType.location;
-                            return parseLocation(node);
+                            this.messageObject = parseLocation(node);
+                            return;
                         }  else if(node.getNodeName().equals(TAG_AUDIO)) {
                             this.messageType = MessageType.audio;
-                            return parseAudio(node);
+                            this.messageObject = parseAudio(node);
+                            return;
                         } else if(node.getNodeName().equals(TAG_TEMPLATE)) {
                             this.messageType = MessageType.template;
-                            return parseTemplate(node);
+                            this.messageObject = parseTemplate(node);
+                            return;
                         } else {
                             throw new ParseException("Malformed xml :" + parent, 116);
                         }
@@ -107,7 +120,6 @@ public class MessageParser {
         } catch (ParserConfigurationException e1) {
             throw new ParseException("Malformed xml",0);
         }
-        return null;
     }
 
     public List<String> parseQuickReplies() throws ParseException{

@@ -16,8 +16,6 @@ import rx.Subscriber;
 
 public class SendChatStateUseCase {
     private MessageApi messageApi;
-    public static ChatState CHAT_TYPING = ChatState.composing;
-    public static ChatState CHAT_PAUSED = ChatState.paused;
 
     @Inject
     public SendChatStateUseCase(MessageApi messageApi) {

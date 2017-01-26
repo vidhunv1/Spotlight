@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
@@ -21,11 +20,9 @@ import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
 import com.stairway.spotlight.screens.message.view_models.TemplateButton;
 import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
@@ -79,8 +76,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void setQuickReplies() {
-        MessageParser messageParser = new MessageParser(messageList.get(messageList.size()-1).getMessage());
         try {
+            MessageParser messageParser = new MessageParser(messageList.get(messageList.size()-1).getMessage());
             quickReplies = messageParser.parseQuickReplies();
             if(quickReplies.size()>=1)
                 this.notifyItemInserted(messageList.size());
@@ -159,31 +156,31 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(position == messageList.size())
             return VIEW_TYPE_QUICK_REPLIES;
 
-        MessageParser messageParser = new MessageParser(messageList.get(position).getMessage());
-        boolean isParseError = false;
         try {
-            messageObjects.put(position, messageParser.parseMessage());
+            MessageParser messageParser = new MessageParser(messageList.get(position).getMessage());
+            messageObjects.put(position, messageParser.getMessageObject());
+
+            if(messageList.get(position).isMe()) {
+                if(messageParser.getMessageType() == MessageParser.MessageType.text)
+                    return VIEW_TYPE_SEND_TEXT;
+                else
+                    Logger.e(this, messageParser.getMessageType().name()+" is not supported for send");
+            } else {
+                if (messageParser.getMessageType() == MessageParser.MessageType.template) {
+                    TemplateMessage templateMessage = (TemplateMessage) messageObjects.get(position);
+
+                    if(templateMessage.getType() == TemplateMessage.TemplateType.generic)
+                        return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
+                    else if(templateMessage.getType() == TemplateMessage.TemplateType.button)
+                        return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
+                }
+                else if(messageParser.getMessageType() == MessageParser.MessageType.text)
+                    return VIEW_TYPE_RECV_TEXT;
+            }
         } catch (ParseException e) {
             e.printStackTrace();
             Logger.e(this, "ParseException Error parsing XML.");
-            isParseError = true;
-        }
-        if(messageList.get(position).isMe()) {
-            if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                return VIEW_TYPE_SEND_TEXT;
-            else
-                Logger.e(this, messageParser.getMessageType().name()+" is not supported for send");
-        } else {
-            if (messageParser.getMessageType() == MessageParser.MessageType.template) {
-                TemplateMessage templateMessage = (TemplateMessage) messageObjects.get(position);
-
-                if(templateMessage.getType() == TemplateMessage.TemplateType.generic)
-                    return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
-                else if(templateMessage.getType() == TemplateMessage.TemplateType.button)
-                    return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
-            }
-            else if(messageParser.getMessageType() == MessageParser.MessageType.text || isParseError)
-                return VIEW_TYPE_RECV_TEXT;
+            return VIEW_TYPE_RECV_TEXT;
         }
         return -1;
     }
@@ -378,6 +375,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView button3;
         @Bind(R.id.iv_profileImage)
         ImageView profileImage;
+        @Bind(R.id.ll_bubble)
+        LinearLayout bubble;
 
         ReceiveTemplateGenericViewHolder(View itemView) {
             super(itemView);
@@ -385,6 +384,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         void renderItem(TemplateMessage templateMessage, boolean displayProfileDP, int bubbleType) {
+            switch (bubbleType) {
+                case 0:
+                    bubble.setBackgroundResource(R.drawable.bg_template_full);
+                    break;
+                case 1:
+                    bubble.setBackgroundResource(R.drawable.bg_template_top);
+                    break;
+                case 2:
+                    bubble.setBackgroundResource(R.drawable.bg_template_middle);
+                    break;
+                case 3:
+                    bubble.setBackgroundResource(R.drawable.bg_template_bottom);
+                    break;
+            }
+
             button1.setVisibility(View.GONE);
             button2.setVisibility(View.GONE);
             button3.setVisibility(View.GONE);
@@ -469,15 +483,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             switch (bubbleType) {
                 case 0:
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 1:
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_top);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 2:
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_middle);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 3:
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
             }
             button1.setVisibility(View.GONE);

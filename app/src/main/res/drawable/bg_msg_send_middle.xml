@@ -2,14 +2,10 @@
 
     <solid android:color="@color/sendMessageBubble" />
 
-    <stroke
-        android:width="0.33dp"
-        android:color="#D0D0D0" />
-
     <corners
-        android:bottomLeftRadius="18dp"
-        android:bottomRightRadius="3dp"
-        android:topLeftRadius="18dp"
-        android:topRightRadius="3dp" />
+        android:bottomLeftRadius="17dp"
+        android:bottomRightRadius="3.5dp"
+        android:topLeftRadius="17dp"
+        android:topRightRadius="3.5dp" />
 
 </shape>

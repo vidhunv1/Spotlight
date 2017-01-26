@@ -28,7 +28,7 @@
     <color name="drawerIcon">#7E7E7E</color>
 
     <color name="error">#C62828</color>
-    <color name="divider">#dddddd</color>
+    <color name="divider">#E0E0E0</color>
     <color name="colorAccent">#7f8c8d</color>
 
 </resources>
