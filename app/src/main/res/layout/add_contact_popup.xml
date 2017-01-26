@@ -21,7 +21,7 @@
             android:layout_marginLeft="25dp"
             android:layout_marginRight="25dp"
             android:textSize="18sp"
-            android:hint="Enter iChat ID"
+            android:hint="@string/add_contact_hint"
             android:backgroundTint="@color/colorPrimary"
             android:id="@+id/et_add_contact"/>
 
@@ -35,12 +35,12 @@
             android:layout_marginRight="25dp"
             android:layout_below="@id/et_add_contact"
             android:id="@+id/add_contact_message"
-            android:text="Enter someone's ID to find them on iChat."/>
+            android:text="@string/add_contact_subtitle"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Add Contact"
+            android:text="@string/add_contact_button"
             android:textColor="#FFFFFF"
             android:id="@+id/btn_add_contact"
             android:textAllCaps="true"

@@ -12,8 +12,6 @@ import com.stairway.spotlight.core.di.module.AppModule;
 import com.stairway.spotlight.core.di.module.DataModule;
 import com.stairway.spotlight.core.di.module.UtilModule;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-
 /**
  * Created by vidhun on 05/07/16.
  */

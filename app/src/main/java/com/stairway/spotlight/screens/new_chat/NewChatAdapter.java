@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,23 +39,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         filteredList = new ArrayList<>();
         filterQuery = "";
         this.itemList.addAll(contacts);
-    }
-
-    public void setContacts(List<NewChatItemModel> contacts) {
-        this.itemList.clear();
-        this.itemList.addAll(contacts);
-        this.notifyItemRangeInserted(1, itemList.size());
-    }
-
-    public void addContact(NewChatItemModel contact) {
-        itemList.add(contact);
-        this.notifyItemInserted(itemList.size());
-    }
-
-    public void addContacts(List<NewChatItemModel> contacts) {
-        int position = itemList.size();
-        itemList.addAll(contacts);
-        this.notifyItemRangeChanged(position, itemList.size()+1);
     }
 
     public void filterList(String query) {
@@ -87,7 +72,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if(filteredList.size()==0 && !filterQuery.isEmpty())
             return NO_RESULT;
-        if(position==0)
+        if(position==itemList.size() && filterQuery.isEmpty())
             return CATEGORY;
         return CONTACT;
     }
@@ -119,11 +104,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
         int position;
-        if(!filterQuery.isEmpty() && vPos>0)
-            position = filteredList.get(vPos-1);
+        if(!filterQuery.isEmpty() && filteredList.size()>0)
+            position = filteredList.get(vPos);
         else
-            position = vPos - 1;
+            position = vPos;
 
+        Logger.d(this, "Position: "+position+" vpos: "+vPos+" itemSize: "+itemList.size()+" itemViewType: "+holder.getItemViewType());
         switch (holder.getItemViewType()) {
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
@@ -131,10 +117,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
             case CATEGORY:
                 CategoryViewHolder catVH = (CategoryViewHolder) holder;
-                if(filterQuery.length()>0)
-                    catVH.renderItem(filteredList.size(), filterQuery);
-                else
-                    catVH.renderItem(itemList.size(), filterQuery);
+                catVH.renderItem(itemList.size(), filterQuery);
                 break;
             case NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
@@ -147,9 +130,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemCount() {
         if(!filterQuery.isEmpty()) {
-            if(filteredList.size()>0)
-                return filteredList.size() + 1;
-            return 1;
+            if(filteredList.size()==0)
+                return 1;
+            else
+                return filteredList.size();
         }
         return itemList.size() + 1;
     }
@@ -166,6 +150,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Bind(R.id.tv_chatItem_message)
         TextView status;
+
+        @Bind(R.id.view_contactItem_divider)
+        View divider;
 
         ContactsViewHolder(View itemView) {
             super(itemView);
@@ -209,21 +196,13 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.tv_new_chat_category)
         TextView categoryName;
 
-        @Bind(R.id.tv_new_chat_count)
-        TextView countText;
-
         public CategoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         public void renderItem(int count, String filterQuery) {
-            categoryName.setText("iChat Contacts");
-
-            if(filterQuery.length()>0)
-                countText.setText(count+" Found");
-            else
-                countText.setText("");
+            categoryName.setText(count+" contacts");
         }
     }
 

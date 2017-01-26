@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.di.NewChatViewModule;
 
@@ -70,14 +71,13 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         contactList.setLayoutManager(new LinearLayoutManager(this));
 //        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
-        newChatAdapter = new NewChatAdapter(this, this, new ArrayList<>());
-        contactList.setAdapter(newChatAdapter);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if((id == android.R.id.home)) {
+            AndroidUtils.hideSoftInput(this);
             super.onBackPressed();
             return true;
         }
@@ -96,13 +96,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     @Override
-    public void displayContact(NewChatItemModel newChatItemModel) {
-        newChatAdapter.addContact(newChatItemModel);
-    }
-
-    @Override
     public void displayContacts(List<NewChatItemModel> newChatItemModel) {
-        newChatAdapter.addContacts(newChatItemModel);
+        newChatAdapter = new NewChatAdapter(this, this, newChatItemModel);
+        contactList.setAdapter(newChatAdapter);
     }
 
     @OnTextChanged(R.id.et_new_chat_search1)

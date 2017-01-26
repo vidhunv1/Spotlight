@@ -49,6 +49,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.screens.home.di.HomeViewModule;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
@@ -230,11 +231,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		FrameLayout outLayout = (FrameLayout) addContactPopupView.findViewById(R.id.fl_add_contact);
 		outLayout.setOnClickListener(v -> {
 			addContactPopupWindow.dismiss();
-			hideSoftInput();
+			AndroidUtils.hideSoftInput(this);
 		});
 
 		EditText enterId = (EditText) addContactPopupView.findViewById(R.id.et_add_contact);
-		showSoftInput(enterId);
+		AndroidUtils.showSoftInput(this, enterId);
 
 		Button addButton = (Button) addContactPopupView.findViewById(R.id.btn_add_contact);
 		addButton.setOnClickListener(v -> {
@@ -270,7 +271,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
 		addContactPopupWindow.dismiss();
-		hideSoftInput();
+		AndroidUtils.hideSoftInput(this);
 
 		String message;
 		if(isExistingContact)
@@ -404,26 +405,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
 				}
 			});
-		}
-	}
-
-	private void showSoftInput(EditText editText) {
-		editText.setOnFocusChangeListener((v, hasFocus) -> {
-			if(hasFocus) {
-				InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-				inputMgr.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-			}
-		});
-		editText.requestFocus();
-	}
-
-	private void hideSoftInput() {
-		View view = this.getCurrentFocus();
-		view.clearFocus();
-		if (view != null) {
-			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
 }

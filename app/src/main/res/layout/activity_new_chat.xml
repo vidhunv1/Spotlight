@@ -19,31 +19,12 @@
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:id="@+id/et_new_chat_search1"
-                android:hint="Type a name"
-                android:textColorHint="@color/colorPrimaryLight"
-                android:textSize="17sp"
+                android:hint="@string/new_chat_search_hint"
+                android:textColorHint="#A4a7ae"
+                android:textSize="18sp"
                 android:textColor="@color/textPrimaryLight" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
-
-    <LinearLayout
-        android:orientation="horizontal" android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="wrap_content">
-        <EditText
-            android:layout_width="326dp"
-            android:layout_height="52dp"
-            android:background="@android:color/transparent"
-            android:id="@+id/et_new_chat_search"
-            android:hint="Name or iChat ID"
-            android:drawableLeft="@drawable/ic_search_dark"
-            android:drawablePadding="24dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="9dp"
-            android:textColorHint="#FFAAAAAA"
-            android:textSize="16sp"
-            android:textColor="@color/textPrimaryDark" />
-    </LinearLayout>
 
     <View
         android:layout_width="fill_parent"

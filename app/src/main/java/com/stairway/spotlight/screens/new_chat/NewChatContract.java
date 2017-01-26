@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class NewChatContract {
     interface View extends BaseView {
-        void displayContact(NewChatItemModel newChatItemModel);
         void displayContacts(List<NewChatItemModel> newChatItemModel);
     }
 

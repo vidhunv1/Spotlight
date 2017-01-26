@@ -19,23 +19,23 @@
             android:layout_height="72dp"
             android:id="@+id/iv_chatItem_profileImage"
             android:src="@drawable/default_profile_image"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:paddingLeft="9dp"
-            android:paddingRight="13dp"/>
+            android:paddingRight="11dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:gravity="center_vertical">
+            android:paddingTop="10.75dp">
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="3dp">
+                android:paddingBottom="4.25dp">
 
                 <TextView
                     android:layout_width="190dp"
@@ -56,7 +56,7 @@
                     android:paddingBottom="1dp"
                     android:textAlignment="viewEnd"
                     android:textSize="13sp"
-                    android:textColor="#bababa"
+                    android:textColor="#999999"
                     android:layout_gravity="bottom" />
             </LinearLayout>
 
@@ -72,7 +72,6 @@
                     android:textColor="#8f8f8f"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
-                    android:paddingTop="1dp"
                     android:paddingRight="20dp" />
             </LinearLayout>
         </LinearLayout>

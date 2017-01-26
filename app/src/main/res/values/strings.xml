@@ -1,10 +1,5 @@
 <resources>
-    <string name="app_name">Spotlight</string>
-    <string name="title_activity_register">RegisterActivity</string>
-    <string name="register_sign_up">Sign Up</string>
-    <string name="register_enter_phone_number">Enter your phone number</string>
-    <string name="register_select_country">Select Country</string>
-    <string name="register_send_code">SEND CONFIRMATION CODE</string>
+    <string name="app_name">iChat</string>
 
     <string-array name="register_country_codes">
         <item>India +91</item>
@@ -15,14 +10,28 @@
         <item>France +51</item>
         <item>Italy +12</item>
         <item>Malaysia +18</item>
-
     </string-array>
+
+    <!-- Register-->
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="register_sign_up">Sign Up</string>
+    <string name="register_enter_phone_number">Enter your phone number</string>
+    <string name="register_select_country">Select Country</string>
+    <string name="register_send_code">SEND CONFIRMATION CODE</string>
+
+    <!-- NewChat -->
+    <string name="new_chat_search_hint">Type a name</string>
+
+    <!-- AddContact -->
+    <string name="add_contact_hint">Enter iChat id</string>
+    <string name="add_contact_subtitle">Enter someone\'s ID to find them on iChat.</string>
+    <string name="add_contact_button">Add Contact</string>
 
     <string name="otp_enter_otp">Enter the 6-digit OTP</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="keyboard_hint">Write a message…</string>
+    <string name="search">Search</string>
 </resources>
