@@ -3,9 +3,9 @@
     <solid android:color="@color/sendMessageBubble" />
 
     <corners
-        android:bottomLeftRadius="17dp"
-        android:bottomRightRadius="3.5dp"
-        android:topLeftRadius="17dp"
-        android:topRightRadius="3.5dp" />
+        android:bottomLeftRadius="@dimen/bubble_full_corner_radius"
+        android:bottomRightRadius="@dimen/bubble_mid_corner_radius"
+        android:topLeftRadius="@dimen/bubble_full_corner_radius"
+        android:topRightRadius="@dimen/bubble_mid_corner_radius" />
 
 </shape>

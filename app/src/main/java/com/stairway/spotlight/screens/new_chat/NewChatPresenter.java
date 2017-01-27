@@ -5,6 +5,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import java.util.List;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -34,6 +35,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     @Override
     public void initContactList() {
         Subscription subscription = getNewChatsUseCase.execute()
+                .subscribeOn(Schedulers.io())
                 .observeOn(contactsView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<List<NewChatItemModel>>(contactsView) {
                     @Override

@@ -48,17 +48,15 @@
             android:background="@color/colorPrimary"
             android:layout_gravity="bottom"
             android:textSize="15sp"/>
-    </RelativeLayout>
 
-    <ProgressBar
-        android:layout_width="306dp"
-        android:layout_height="226dp"
-        android:paddingLeft="129dp"
-        android:paddingRight="129dp"
-        android:id="@+id/pb_add_contact"
-        android:visibility="gone"
-        android:paddingTop="89dp"
-        android:paddingBottom="89dp"
-        android:background="#FFFFFF"
-        android:layout_gravity="center_vertical|center_horizontal"/>
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/pb_add_contact"
+            android:paddingTop="89dp"
+            android:paddingBottom="89dp"
+            android:background="#FFFFFF"
+            android:visibility="gone"
+            android:layout_gravity="center_vertical|center_horizontal"/>
+    </RelativeLayout>
 </FrameLayout>

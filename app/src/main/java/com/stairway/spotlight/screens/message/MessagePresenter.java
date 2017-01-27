@@ -14,6 +14,7 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 import java.util.List;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -68,6 +69,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     public void loadMessages(String chatId) {
         Logger.d(this, "Loading chat messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
                     @Override
@@ -82,7 +84,10 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void updateMessageRead(MessageResult result) {
         result.setMessageStatus(MessageResult.MessageStatus.SEEN);
-        Subscription subscription = updateMessageUseCase.execute(result).subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
+        Subscription subscription = updateMessageUseCase.execute(result)
+                .subscribeOn(Schedulers.io())
+                .observeOn(messageView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
             @Override
             public void onResult(MessageResult result) {
                 // send read receipt
@@ -103,6 +108,7 @@ public class MessagePresenter implements MessageContract.Presenter {
         result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
 
         Subscription subscription = storeMessageUseCase.execute(result)
+                .subscribeOn(Schedulers.io())
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
                     @Override
@@ -131,6 +137,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void sendChatState(String chatId, ChatState chatState) {
         Subscription subscription = sendChatStateUseCase.execute(chatId, chatState)
+                .subscribeOn(Schedulers.io())
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
@@ -145,6 +152,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void getPresence(String chatId) {
         Subscription subscription = getPresenceUseCase.execute(chatId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
@@ -159,13 +167,16 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void sendReadReceipt(String chatId) {
         Subscription subscription = sendReadReceiptUseCase.execute(chatId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(messageView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<Boolean>(messageView) {
                     @Override
                     public void onResult(Boolean result) {
-                        //sent read receipt
+                        //sent read receipt. Add to cache to send later.
                     }
                 });
+
+        compositeSubscription.add(subscription);
     }
 
     @Override

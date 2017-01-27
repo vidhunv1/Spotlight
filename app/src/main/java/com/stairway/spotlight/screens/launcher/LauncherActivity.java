@@ -1,5 +1,7 @@
 package com.stairway.spotlight.screens.launcher;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -7,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.application.SpotlightApplication;
@@ -29,6 +30,12 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
     LauncherPresenter launcherPresenter;
 
     ComponentContainer componentContainer;
+
+    public static Intent callingIntent(Context context) {
+        Intent intent = new Intent(context, LauncherActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -19,8 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -51,6 +49,7 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.screens.home.di.HomeViewModule;
+import com.stairway.spotlight.screens.launcher.LauncherActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
@@ -100,8 +99,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	private ChatListAdapter chatListAdapter;
 	public static Intent callingIntent(Context context) {
 		Intent intent = new Intent(context, HomeActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
 		return intent;
 	}
 
@@ -141,12 +138,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 		navigationView.setNavigationItemSelectedListener(this);
 
-//		navigationView.getHeaderView(0).setOnClickListener(v -> {
-//			startActivity(ProfileActivity.callingIntent(this));
-//			drawer.closeDrawer(GravityCompat.START);
-//		});
 		uploadFCMToken();
 	}
+
+	/* Lifecycle */
 
 	@Override
 	protected void onResume() {
@@ -159,19 +154,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	protected void onPause() {
 		super.onPause();
 	}
+	/* Lifecycle */
 
-	@Override
-	public void onBackPressed() {
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START);
-		} else {
-			toggle.setDrawerIndicatorEnabled(true);
-			fab.setVisibility(View.VISIBLE);
-//            setChatFragment();
-			super.onBackPressed();
-		}
-	}
-
+	/* Menu options */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.home_toolbar, menu);
@@ -191,7 +176,83 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	/* Menu options */
 
+	/* Views */
+	@Override
+	public void setDeliveryStatus(int status, int chatId) {}
+
+	@Override
+	public void displayChatList(List<ChatListItemModel> chats) {
+		this.chats = chats;
+		chatListAdapter = new ChatListAdapter(this, chats, this);
+		chatList.setAdapter(chatListAdapter);
+	}
+
+	@Override
+	public void addNewMessage(MessageResult messageResult) {
+		ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
+		chatListAdapter.newChatMessage(item);
+		Logger.d(this, "new notification: "+item);
+	}
+
+	@Override
+	public void showChatState(String from, ChatState chatState) {
+		if(chatState == ChatState.composing || chatState == ChatState.active)
+			chatListAdapter.setChatState(from, "Typing...");
+		if(chatState == ChatState.paused || chatState == ChatState.inactive)
+			chatListAdapter.resetChatState(from);
+	}
+
+	@Override
+	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
+		addContactPopupWindow.dismiss();
+		AndroidUtils.hideSoftInput(this);
+
+		String message;
+		if(isExistingContact)
+			message = name+" is already in your contacts on iChat.";
+		else
+			message = name+" is added to your contacts on iChat.";
+
+		LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+		View addedContactView = inflater.inflate(R.layout.added_contact_popup, null);
+		PopupWindow addedPopupWindow = new PopupWindow(
+				addedContactView,
+				LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT,
+				true
+		);
+		if(Build.VERSION.SDK_INT>=21)
+			addedPopupWindow.setElevation(5.0f);
+		addedPopupWindow.showAtLocation(homeLayout, Gravity.CENTER,0,0);
+
+		RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
+		out.setOnClickListener(view -> {
+			addedPopupWindow.dismiss();
+		});
+
+		Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
+		sendMessage.setOnClickListener(v1 -> {
+			addedPopupWindow.dismiss();
+			startActivity(MessageActivity.callingIntent(this, username));
+		});
+
+		TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
+		resultMessage.setText(message);
+	}
+
+	@Override
+	public void showInvalidIDError() {
+		if(addContactPopupWindow.isShowing()) {
+			ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
+			pb.setVisibility(View.GONE);
+			showAlertDialog("Please enter a valid iChat ID.", R.layout.alert);
+		}
+	}
+	/* Views */
+
+	/* Events */
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
 		int id = item.getItemId();
@@ -203,7 +264,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				break;
 
 			case R.id.nav_add_contact:
-				showAddContactPopup();
+				new Handler().postDelayed(() -> showAddContactPopup(), 150);
 				break;
 			case android.R.id.home:
 				onBackPressed();
@@ -213,6 +274,37 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		return true;
 	}
 
+	@Override
+	public void onChatItemClicked(String userName) {
+		startActivity(MessageActivity.callingIntent(this, userName));
+	}
+
+	@Override
+	public void onMessageReceived(MessageResult messageId) {
+		Logger.d(this, "Message:::"+messageId);
+		addNewMessage(messageId);
+	}
+
+	@Override
+	public void onChatStateReceived(String from, ChatState chatState) {
+		showChatState(from, chatState);
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		} else {
+			toggle.setDrawerIndicatorEnabled(true);
+			fab.setVisibility(View.VISIBLE);
+//            setChatFragment();
+			super.onBackPressed();
+		}
+	}
+	/* Events */
+
+
+	/* Helpers */
 	private void showAddContactPopup() {
 		LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
 
@@ -267,54 +359,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			});
 	}
 
-
-	@Override
-	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
-		addContactPopupWindow.dismiss();
-		AndroidUtils.hideSoftInput(this);
-
-		String message;
-		if(isExistingContact)
-			message = name+" is already in your contacts on iChat.";
-		else
-			message = name+" is added to your contacts on iChat.";
-
-		LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View addedContactView = inflater.inflate(R.layout.added_contact_popup, null);
-		PopupWindow addedPopupWindow = new PopupWindow(
-				addedContactView,
-				LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT,
-				true
-		);
-		if(Build.VERSION.SDK_INT>=21)
-			addedPopupWindow.setElevation(5.0f);
-		addedPopupWindow.showAtLocation(homeLayout, Gravity.CENTER,0,0);
-
-		RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
-		out.setOnClickListener(view -> {
-			addedPopupWindow.dismiss();
-		});
-
-		Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
-		sendMessage.setOnClickListener(v1 -> {
-			addedPopupWindow.dismiss();
-			startActivity(MessageActivity.callingIntent(this, username));
-		});
-
-		TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
-		resultMessage.setText(message);
-	}
-
-	@Override
-	public void showInvalidIDError() {
-		if(addContactPopupWindow.isShowing()) {
-			ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
-			pb.setVisibility(View.GONE);
-			showAlertDialog("Please enter a valid iChat ID.", R.layout.alert);
-		}
-	}
-
 	public void showAlertDialog(String message, int layout) {
 		//TODO: Something wrong. 16?
 		final int WIDTH = 294, HEIGHT = 98;
@@ -335,53 +379,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		messageText.setText(message);
 		Button ok = (Button) dialogView.findViewById(R.id.btn_alert_ok);
 		ok.setOnClickListener(v -> alertDialog.dismiss());
-	}
-
-	@Override
-	public void setDeliveryStatus(int status, int chatId) {}
-
-	@Override
-	public void displayChatList(List<ChatListItemModel> chats) {
-		this.chats = chats;
-		chatListAdapter = new ChatListAdapter(this, chats, this);
-		chatList.setAdapter(chatListAdapter);
-		}
-
-	@Override
-	public void addNewMessage(MessageResult messageResult) {
-		ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
-		chatListAdapter.newChatMessage(item);
-		Logger.d(this, "new notification: "+item);
-	}
-
-	@Override
-	public void showChatState(String from, ChatState chatState) {
-		if(chatState == ChatState.composing || chatState == ChatState.active)
-			chatListAdapter.setChatState(from, "Typing...");
-		if(chatState == ChatState.paused || chatState == ChatState.inactive)
-			chatListAdapter.resetChatState(from);
-	}
-
-	@Override
-	public void onChatItemClicked(String userName) {
-		startActivity(MessageActivity.callingIntent(this, userName));
-	}
-
-	@Override
-	protected void injectComponent(ComponentContainer componentContainer) {
-		componentContainer.userSessionComponent().plus(new HomeViewModule()).inject(this);
-		userSession = componentContainer.userSessionComponent().getUserSession();
-	}
-
-	@Override
-	public void onMessageReceived(MessageResult messageId) {
-		Logger.d(this, "Message:::"+messageId);
-		addNewMessage(messageId);
-	}
-
-	@Override
-	public void onChatStateReceived(String from, ChatState chatState) {
-		showChatState(from, chatState);
 	}
 
 	private void uploadFCMToken() {
@@ -405,6 +402,18 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
 				}
 			});
+		}
+	}
+	/* Helpers */
+
+	@Override
+	protected void injectComponent(ComponentContainer componentContainer) {
+		if(componentContainer.userSessionComponent()==null) {
+			startActivity(LauncherActivity.callingIntent(this));
+			finish();
+		} else {
+			componentContainer.userSessionComponent().plus(new HomeViewModule()).inject(this);
+			userSession = componentContainer.userSessionComponent().getUserSession();
 		}
 	}
 }

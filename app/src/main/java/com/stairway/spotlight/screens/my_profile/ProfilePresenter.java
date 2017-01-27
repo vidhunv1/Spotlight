@@ -7,6 +7,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import java.io.File;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -26,6 +27,8 @@ public class ProfilePresenter implements ProfileContract.Presenter {
     @Override
     public void uploadProfileDP(File image, UserSessionResult userSession) {
         Subscription subscription = updateProfileDPUseCase.execute(image, userSession)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(profileView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<UserResponse>(profileView) {
                     @Override
                     public void onResult(UserResponse result) {

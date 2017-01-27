@@ -6,6 +6,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import com.stairway.spotlight.screens.home.FindUserUseCase;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -28,6 +29,8 @@ public class SearchPresenter implements SearchContract.Presenter {
     public void search(String query) {
         Logger.d(this, "SearchContacts presenter");
         Subscription subscription = searchUseCase.execute(query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(searchView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<SearchModel>(searchView) {
                     @Override
                     public void onResult(SearchModel searchModel) {
@@ -41,6 +44,8 @@ public class SearchPresenter implements SearchContract.Presenter {
     @Override
     public void findContact(String userId, String accessToken) {
         Subscription subscription = findUserUseCase.execute(userId, accessToken)
+                .subscribeOn(Schedulers.io())
+                .observeOn(searchView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<ContactResult>(searchView) {
                     @Override
                     public void onResult(ContactResult result) {

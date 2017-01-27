@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:maxLines="1"
-                    android:textColor="#A8A8A8"
+                    android:textColor="#8f8f8f"
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
                     android:paddingRight="20dp" />

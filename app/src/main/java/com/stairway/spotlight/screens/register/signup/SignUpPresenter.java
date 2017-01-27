@@ -5,6 +5,7 @@ import com.stairway.data.source.user.gson_models.StatusResponse;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -24,6 +25,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     @Override
     public void createUser(String countryCode, String phone) {
         Subscription subscription = createUserUseCase.execute(countryCode, phone)
+                .subscribeOn(Schedulers.io())
                 .observeOn(signUpView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<StatusResponse>(signUpView) {
                     @Override

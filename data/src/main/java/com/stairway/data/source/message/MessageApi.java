@@ -38,7 +38,7 @@ public class MessageApi {
     public Observable<MessageResult> sendMessage(MessageResult message){
         Logger.d(this, "Sending message"+message.getMessage()+" to "+message.getChatId());
 
-        Observable<MessageResult> sendMessage = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             String recipient = XMPPManager.getJidFromUserName(message.getChatId());
 
             if(!connection.isAuthenticated()) {
@@ -74,11 +74,8 @@ public class MessageApi {
                 sendMessageXMPP(message, subscriber);
             }
         });
-
-        return sendMessage;
     }
 
-    // userId: 91-9999999999
     public Observable<Presence.Type> getPresence(String userId) {
         String jid = XMPPManager.getJidFromUserName(userId);
         Observable<Presence.Type> getPresence;
@@ -106,11 +103,10 @@ public class MessageApi {
         return getPresence;
     }
 
-    // userId: 91-9999999999
     public Observable<Long> getLastActivity(String userId) {
         Logger.d(this, "Getting last activity");
         String jid = XMPPManager.getJidFromUserName(userId);
-        Observable<Long> getLastActivity = Observable.create(subscriber -> {
+        return Observable.create(subscriber -> {
             LastActivityManager activity = LastActivityManager.getInstanceFor(connection);
             try {
                 subscriber.onNext(activity.getLastActivity(jid).lastActivity);
@@ -126,7 +122,6 @@ public class MessageApi {
                 subscriber.onError(e);
             }
         });
-        return getLastActivity;
     }
 
     //Typing/stopped typing indicators

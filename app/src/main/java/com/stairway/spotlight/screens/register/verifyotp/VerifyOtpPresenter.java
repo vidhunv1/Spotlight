@@ -6,6 +6,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import com.stairway.spotlight.screens.register.initialize.SyncContactsUseCase;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -25,6 +26,7 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
     @Override
     public void registerUser(String countryCode, String mobile, String otp) {
         Subscription subscription = registerUseCase.execute(countryCode, mobile, otp)
+                .subscribeOn(Schedulers.io())
                 .observeOn(verifyOtpView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<UserSessionResult>(verifyOtpView) {
                     @Override

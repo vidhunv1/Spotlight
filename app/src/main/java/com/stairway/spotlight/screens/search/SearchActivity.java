@@ -22,7 +22,6 @@ import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.add_user.AddUserActivity;
 import com.stairway.spotlight.screens.home.ChatListAdapter;
 import com.stairway.spotlight.screens.home.ChatListItemModel;
 import com.stairway.spotlight.screens.home.HomeActivity;
@@ -102,7 +101,6 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         });
 
         searchPresenter.attachView(this);
-        searchPresenter.attachView(this);
         searchAdapter = new SearchAdapter(this, this, this, this);
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
@@ -154,7 +152,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void navigateToAddContact(ContactResult contactResult) {
-        startActivity(AddUserActivity.callingIntent(this, contactResult));
+//        startActivity(AddUserActivity.callingIntent(this, contactResult));
     }
 
     @Override

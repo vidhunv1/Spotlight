@@ -4,6 +4,7 @@ import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -25,6 +26,7 @@ public class LauncherPresenter implements LauncherContract.Presenter {
     @Override
     public void getUserSession() {
         Subscription subscription = userSessionUseCase.execute()
+                .subscribeOn(Schedulers.io())
                 .observeOn(launcherView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<UserSessionResult>(launcherView) {
                     @Override

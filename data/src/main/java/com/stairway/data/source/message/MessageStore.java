@@ -81,7 +81,6 @@ public class MessageStore {
                             }
                         });
                     }
-
                     cursor.moveToNext();
                 }
                 cursor.close();
@@ -126,7 +125,6 @@ public class MessageStore {
             try{
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_CHAT_ID+" DESC");
                 cursor.moveToFirst();
-
                 while(!cursor.isAfterLast()) {
                     String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
                     String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
@@ -151,6 +149,7 @@ public class MessageStore {
                 databaseManager.closeConnection();
             } catch (Exception e) {
                 Logger.e(this, "MessageStore sqlite error"+e.getMessage());
+                e.printStackTrace();
                 databaseManager.closeConnection();
                 subscriber.onError(e);
                 subscriber.onCompleted();
@@ -175,6 +174,11 @@ public class MessageStore {
 
             try{
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_ROW_ID+" DESC", "1");
+                if(cursor.getCount()<=0) {
+                    subscriber.onNext(null);
+                    subscriber.onCompleted();
+                    return;
+                }
                 cursor.moveToFirst();
                 String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
                 String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));

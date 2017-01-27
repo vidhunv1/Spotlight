@@ -30,7 +30,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 /**
  * Created by vidhun on 07/08/16.
  */
-public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //TODO: Change to cursor recycler view adapter.
 
     private Context context;
@@ -234,14 +234,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     textMessage = new TextMessage(messageList.get(position).getMessage());
                     Logger.d(this, "Text message null");
                 }
-                sendViewHolder.renderItem(textMessage, messageList.get(position).getMessageStatus(), bubbleType(position));
+                sendViewHolder.renderItem(textMessage, messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
                 break;
             case VIEW_TYPE_RECV_TEXT:
                 ReceiveTextViewHolder receiveViewHolder = (ReceiveTextViewHolder) holder;
                 TextMessage textMessage1 =(TextMessage)messageObjects.get(position);
                 if(textMessage1==null || textMessage1.getText()==null)
                     textMessage1 = new TextMessage(messageList.get(position).getMessage());
-                receiveViewHolder.renderItem(textMessage1, hasProfileDP(position), bubbleType(position));
+                receiveViewHolder.renderItem(textMessage1, messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_GENERIC:
                 ReceiveTemplateGenericViewHolder receiveTemplateViewHolder = (ReceiveTemplateGenericViewHolder) holder;
@@ -277,83 +277,152 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class SendTextViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
-        TextView message;
+        TextView messageView;
 
         @Bind(R.id.iv_delivery_status)
-        ImageView deliveryStatus;
+        ImageView deliveryStatusView;
 
         @Bind(R.id.rl_bubble)
-        RelativeLayout bubble;
+        RelativeLayout bubbleView;
+
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+
+//        @Bind(R.id.tv_messageitem_time)
+//        TextView timeView;
+//
+//        @Bind(R.id.tv_messageitem_status)
+//        TextView statusView;
 
         SendTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(TextMessage textMessage, MessageResult.MessageStatus messageStatus, int bubbleType) {
+        void renderItem(TextMessage textMessage, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
+            String deliveryStatus = "";
             switch (bubbleType) {
                 case 0:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_send_full);
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_full);
                     break;
                 case 1:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_send_top);
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_top);
                     break;
                 case 2:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_send_middle);
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_middle);
                     break;
                 case 3:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_send_bottom);
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_bottom);
                     break;
             }
-            message.setText(textMessage.getText());
-            if(messageStatus == MessageResult.MessageStatus.NOT_SENT)
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
-            if(messageStatus == MessageResult.MessageStatus.SENT)
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
-            else if(messageStatus == MessageResult.MessageStatus.READ)
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
-//            else if(messageResult.getMessageStatus() == MessageResult.MessageStatus.DELIVERED)
+            messageView.setText(textMessage.getText());
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
+                deliveryStatus = "PENDING";
+            }
+            else if(messageStatus == MessageResult.MessageStatus.SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
+                deliveryStatus = "SENT";
+            }
+            else if(messageStatus == MessageResult.MessageStatus.READ) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
+                deliveryStatus = "SEEN";
+            }
+            else if(messageStatus == MessageResult.MessageStatus.DELIVERED)
+                deliveryStatus = "DELIVERED";
+
+
+//            String finalDeliveryStatus = deliveryStatus;
+//            bubbleView.setOnClickListener(v -> {
+//                if(bubbleView.isPressed()) {
+//                    timeView.setVisibility(View.GONE);
+//                    statusView.setVisibility(View.GONE);
+//                    bubbleView.setPressed(false);
+//                } else {
+//                    timeView.setVisibility(View.VISIBLE);
+//                    statusView.setVisibility(View.VISIBLE);
+//                    timeView.setText(time);
+//                    statusView.setText(finalDeliveryStatus);
+//                    bubbleView.setPressed(true);
+//                }
+//            });
         }
     }
 
     class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
-        TextView message;
+        TextView messageView;
 
         @Bind(R.id.iv_profileImage)
-        ImageView profileImage;
+        ImageView profileImageView;
 
         @Bind(R.id.rl_bubble)
-        RelativeLayout bubble;
+        RelativeLayout bubbleView;
+
+        @Bind(R.id.rl_message_receive_text)
+        RelativeLayout bubbleLayout;
+
+//        @Bind(R.id.tv_messageitem_time)
+//        TextView timeView;
+//
+//        @Bind(R.id.tv_messageitem_status)
+//        TextView statusView;
 
         ReceiveTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(TextMessage textMessage, boolean displayProfileDP, int bubbleType) {
+        void renderItem(TextMessage textMessage, String time, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_full);
                     break;
                 case 1:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_receive_top);
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_top);
                     break;
                 case 2:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_receive_middle);
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_middle);
                     break;
                 case 3:
-                    bubble.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
                     break;
             }
 
-            message.setText(textMessage.getText().trim());
+            messageView.setText(textMessage.getText().trim());
+
+//            timeView.setText("2:30 A.M.");
+//            statusView.setText("SEEN");
+
+//            bubbleView.setOnClickListener(v -> {
+//                if(!bubbleView.isPressed()) {
+//                    Logger.d(this, "UNPRESS");
+//                    timeView.setVisibility(View.GONE);
+//                    statusView.setVisibility(View.GONE);
+//                    bubbleView.setPressed(false);
+//                } else {
+//                    Logger.d(this, "PRESS");
+//                    timeView.setVisibility(View.VISIBLE);
+//                    statusView.setVisibility(View.VISIBLE);
+//                    timeView.setText(time);
+//                    statusView.setText("SEEN");
+//                    bubbleView.setPressed(true);
+//                }
+//            });
 
             if(displayProfileDP)
-                profileImage.setImageAlpha(255);
+                profileImageView.setImageAlpha(255);
             else
-                profileImage.setImageAlpha(0);
+                profileImageView.setImageAlpha(0);
         }
     }
 
@@ -377,6 +446,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ImageView profileImage;
         @Bind(R.id.ll_bubble)
         LinearLayout bubble;
+        @Bind(R.id.rl_message_receive_generic)
+        RelativeLayout bubbleLayout;
 
         ReceiveTemplateGenericViewHolder(View itemView) {
             super(itemView);
@@ -386,15 +457,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(TemplateMessage templateMessage, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_template_full);
                     break;
                 case 1:
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_template_top);
                     break;
                 case 2:
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
                     break;
                 case 3:
+                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
                     break;
             }
@@ -473,6 +548,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         LinearLayout buttonLayout;
         @Bind(R.id.ll_bubble)
         LinearLayout bubble;
+        @Bind(R.id.message_receive_button)
+        RelativeLayout layout;
 
         ReceiveTemplateButtonViewHolder(View itemView) {
             super(itemView);
@@ -482,18 +559,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(TemplateMessage templateMessage, boolean displayDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_full);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 1:
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_top);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 2:
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_middle);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 3:
+                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;

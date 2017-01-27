@@ -3,9 +3,9 @@
     <solid android:color="@color/receiveMessageBubble" />
 
     <corners
-        android:bottomLeftRadius="3.5dp"
-        android:bottomRightRadius="17dp"
-        android:topLeftRadius="3.5dp"
-        android:topRightRadius="17dp" />
+        android:bottomLeftRadius="@dimen/bubble_mid_corner_radius"
+        android:bottomRightRadius="@dimen/bubble_full_corner_radius"
+        android:topLeftRadius="@dimen/bubble_mid_corner_radius"
+        android:topRightRadius="@dimen/bubble_full_corner_radius" />
 
 </shape>

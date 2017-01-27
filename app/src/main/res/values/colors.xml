@@ -2,7 +2,7 @@
 <resources>
 
     <!--App-->
-    <color name="colorPrimary">#494e5c</color>
+    <color name="colorPrimary">#00838F</color>
     <color name="colorPrimaryDark">#006064</color>
     <color name="colorPrimaryLight">#AED0D3</color>
     <color name="background_default">#FFFFFF</color>

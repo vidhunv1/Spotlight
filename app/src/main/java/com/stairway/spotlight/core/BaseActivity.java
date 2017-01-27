@@ -139,12 +139,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
 
     @Override
     public void networkOnline() {
-        Logger.d(this, "HAS INTERNET CONNECTION");
+//        Logger.d(this, "HAS INTERNET CONNECTION");
     }
 
     @Override
     public void networkOffline() {
-        Logger.d(this, "HAS NO INTERNET CONNECTION");
+//        Logger.d(this, "HAS NO INTERNET CONNECTION");
     }
 
     public void onApplicationToBackground() {

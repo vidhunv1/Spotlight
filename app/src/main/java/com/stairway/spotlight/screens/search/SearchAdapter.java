@@ -129,10 +129,10 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        if(searchList.getSearchTerm().length()>0 && searchList.getContactsModelList().size()==0 && searchList.getMessagesModelList().size()==0)
-            return 1;
         if(searchList == null || searchList.getSearchTerm().length()==0)
             return  0;
+        if(searchList.getSearchTerm().length()>0 && searchList.getContactsModelList().size()==0 && searchList.getMessagesModelList().size()==0)
+            return 1;
         if(searchList.getMessagesModelList().size()>0)
             return searchList.getContactsModelList().size() + searchList.getMessagesModelList().size() + 2;
         return searchList.getContactsModelList().size()+searchList.getMessagesModelList().size()+1;

@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.register.initialize;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -22,6 +23,7 @@ public class InitializePresenter implements InitializeContract.Presenter {
     @Override
     public void syncContacts(String authToken) {
         Subscription subscription = syncContactsUseCase.execute(authToken)
+                .subscribeOn(Schedulers.io())
                 .observeOn(initializeView.getUiScheduler())
                 .subscribe(new UseCaseSubscriber<Boolean>(initializeView) {
                     @Override
