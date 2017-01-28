@@ -9,6 +9,6 @@ import javax.inject.Scope;
  * Created by vidhun on 14/07/16.
  */
 @Scope
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.CLASS)
 public @interface ViewScope {
 }

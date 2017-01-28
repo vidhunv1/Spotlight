@@ -37,6 +37,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<MessageResult> messageList;
     private SparseArray<Object> messageObjects;
     private List<String> quickReplies;
+
     private final int VIEW_TYPE_SEND_TEXT = 0;
     private final int VIEW_TYPE_RECV_TEXT = 1;
     private final int VIEW_TYPE_RECV_TEMPLATE_GENERIC = 2;
@@ -589,7 +590,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(templateMessage.getButtons().size()>=3)
                 buttonLayout.setOrientation(LinearLayout.VERTICAL);
 
-            //TODO: Dont repeat yourself
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {
                 Logger.d(this, button.toString());

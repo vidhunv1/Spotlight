@@ -42,9 +42,6 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 public class MessageActivity extends BaseActivity
         implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
     @Inject
-    public XMPPManager connection;
-
-    @Inject
     MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem)

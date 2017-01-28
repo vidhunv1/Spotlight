@@ -12,6 +12,8 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_back_button</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:textColorHint">@color/textHintColor</item>
+        <item name="android:itemBackground">#FFFFFF</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
