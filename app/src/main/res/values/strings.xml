@@ -20,7 +20,7 @@
     <string name="register_send_code">SEND CONFIRMATION CODE</string>
 
     <!-- NewChat -->
-    <string name="new_chat_search_hint">Type a name</string>
+    <string name="new_chat_search_hint">Type a name or ID</string>
 
     <!-- AddContact -->
     <string name="add_contact_hint">Enter iChat id</string>

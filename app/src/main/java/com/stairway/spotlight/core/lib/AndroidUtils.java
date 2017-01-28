@@ -24,9 +24,9 @@ public abstract class AndroidUtils {
 
     public static void hideSoftInput(Activity activity) {
         View view = activity.getCurrentFocus();
-        view.clearFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(view!=null) {
+            view.clearFocus();
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }

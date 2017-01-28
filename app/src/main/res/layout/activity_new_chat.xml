@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/ll_new_chat">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,9 +21,19 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/et_new_chat_search1"
                 android:hint="@string/new_chat_search_hint"
-                android:textColorHint="#A4a7ae"
+                android:textColorHint="#cbd9d7"
                 android:textSize="18sp"
                 android:textColor="@color/textPrimaryLight" />
+
+            <TextView
+                android:text="Contacts"
+                android:textSize="19.5dp"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textColor="@color/textPrimaryLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:id="@+id/tv_new_chat_title" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

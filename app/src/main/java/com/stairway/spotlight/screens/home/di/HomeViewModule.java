@@ -15,9 +15,9 @@ import dagger.Provides;
 public class HomeViewModule {
     @Provides
     @ViewScope
-    public HomePresenter providesChatListPresenter(GetChatsUseCase getChatsUseCase, FindUserUseCase userUseCase) {
+    public HomePresenter providesChatListPresenter(GetChatsUseCase getChatsUseCase) {
         if(getChatsUseCase==null)
             throw new IllegalStateException("UseCase is null");
-        return new HomePresenter(getChatsUseCase, userUseCase);
+        return new HomePresenter(getChatsUseCase);
     }
 }

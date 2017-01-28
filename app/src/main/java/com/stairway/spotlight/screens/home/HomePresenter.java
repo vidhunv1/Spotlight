@@ -16,12 +16,10 @@ public class HomePresenter implements HomeContract.Presenter {
     private HomeContract.View contactsView;
     private CompositeSubscription compositeSubscription;
     private GetChatsUseCase getChatsUseCase;
-    private FindUserUseCase findUserUseCase;
 
-    public HomePresenter(GetChatsUseCase getChatsUseCase, FindUserUseCase findUserUseCase) {
+    public HomePresenter(GetChatsUseCase getChatsUseCase) {
         this.compositeSubscription = new CompositeSubscription();
         this.getChatsUseCase = getChatsUseCase;
-        this.findUserUseCase = findUserUseCase;
     }
 
     @Override
@@ -47,40 +45,6 @@ public class HomePresenter implements HomeContract.Presenter {
                     }
                 });
 
-        compositeSubscription.add(subscription);
-    }
-
-    @Override
-    public void addContact(String userId, String accessToken) {
-        Subscription subscription = findUserUseCase.executeLocal(userId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(contactsView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
-                    @Override
-                    public void onResult(ContactResult result) {
-                        if(result!=null)
-                            contactsView.showContactAddedSuccess(result.getDisplayName(), result.getUsername(), true);
-                        else {
-                            findUserUseCase.execute(userId, accessToken)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(contactsView.getUiScheduler())
-                                    .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
-                                        @Override
-                                        public void onResult(ContactResult result) {
-                                            contactsView.showContactAddedSuccess(result.getDisplayName(), result.getUsername(), false);
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable e) {
-                                            //TODO: display error in view
-                                            contactsView.showInvalidIDError();
-                                            Logger.d(this, "No contact found with id: "+userId);
-                                            Logger.d(this,e.getMessage());
-                                        }
-                                    });
-                        }
-                    }
-                });
         compositeSubscription.add(subscription);
     }
 }

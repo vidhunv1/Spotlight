@@ -303,19 +303,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             String deliveryStatus = "";
             switch (bubbleType) {
                 case 0:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_send_full);
                     break;
                 case 1:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_send_top);
                     break;
                 case 2:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_send_middle);
                     break;
                 case 3:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_send_bottom);
                     break;
             }
@@ -381,19 +381,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(TextMessage textMessage, String time, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_full);
                     break;
                 case 1:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_top);
                     break;
                 case 2:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_middle);
                     break;
                 case 3:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
                     break;
             }
@@ -457,19 +457,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(TemplateMessage templateMessage, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_full);
                     break;
                 case 1:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_top);
                     break;
                 case 2:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
                     break;
                 case 3:
-                    bubbleLayout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
                     break;
             }
@@ -559,22 +559,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(TemplateMessage templateMessage, boolean displayDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_full);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 1:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_top);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 2:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_middle);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 3:
-                    layout.setPadding(0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space), 0, 0);
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;

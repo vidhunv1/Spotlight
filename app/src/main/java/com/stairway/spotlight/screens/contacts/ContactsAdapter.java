@@ -126,10 +126,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.ll_contactItem_content)
         LinearLayout contactListContent;
 
-        @Bind(R.id.tv_contactItem_contactName)
+        @Bind(R.id.tv_chatItem_contactName)
         TextView contactName;
 
-        @Bind(R.id.tv_contactItem_status)
+        @Bind(R.id.tv_chatItem_message)
         TextView status;
 
         public ContactViewHolder(View itemView) {

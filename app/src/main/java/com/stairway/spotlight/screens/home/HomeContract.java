@@ -25,12 +25,9 @@ public interface HomeContract {
         void displayChatList(List<ChatListItemModel> chatList);
         void addNewMessage(MessageResult messageResult);
         void showChatState(String from, ChatState chatState);
-        void showContactAddedSuccess(String contactName, String username, boolean isExistingContact);
-        void showInvalidIDError();
     }
 
     interface Presenter extends BasePresenter<HomeContract.View> {
         void initChatList();
-        void addContact(String userId, String accessToken);
     }
 }

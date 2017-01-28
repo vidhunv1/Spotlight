@@ -1,6 +1,9 @@
 package com.stairway.spotlight.screens.new_chat;
 
+import com.stairway.data.config.Logger;
+import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.screens.home.FindUserUseCase;
 
 import java.util.List;
 
@@ -14,9 +17,11 @@ import rx.subscriptions.CompositeSubscription;
 public class NewChatPresenter implements NewChatContract.Presenter {
     private NewChatContract.View contactsView;
     private GetNewChatsUseCase getNewChatsUseCase;
+    private FindUserUseCase findUserUseCase;
     private CompositeSubscription compositeSubscription;
 
-    public NewChatPresenter(GetNewChatsUseCase getNewChatsUseCase) {
+    public NewChatPresenter(GetNewChatsUseCase getNewChatsUseCase, FindUserUseCase findUserUseCase) {
+        this.findUserUseCase = findUserUseCase;
         this.getNewChatsUseCase = getNewChatsUseCase;
         this.compositeSubscription = new CompositeSubscription();
     }
@@ -44,6 +49,40 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                     }
                 });
 
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void addContact(String userId, String accessToken) {
+        Subscription subscription = findUserUseCase.executeLocal(userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(contactsView.getUiScheduler())
+                .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
+                    @Override
+                    public void onResult(ContactResult result) {
+                        if(result!=null)
+                            contactsView.showContactAddedSuccess(result.getDisplayName(), result.getUsername(), true);
+                        else {
+                            findUserUseCase.execute(userId, accessToken)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(contactsView.getUiScheduler())
+                                    .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
+                                        @Override
+                                        public void onResult(ContactResult result) {
+                                            contactsView.showContactAddedSuccess(result.getDisplayName(), result.getUsername(), false);
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            //TODO: display error in view
+                                            contactsView.showInvalidIDError();
+                                            Logger.d(this, "No contact found with id: "+userId);
+                                            Logger.d(this,e.getMessage());
+                                        }
+                                    });
+                        }
+                    }
+                });
         compositeSubscription.add(subscription);
     }
 }

@@ -76,13 +76,14 @@
         <activity
             android:name=".screens.home.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
+            android:windowSoftInputMode="adjustNothing"/>
         <activity
             android:theme="@style/AppTheme.ActionBarWhite"
             android:name=".screens.search.SearchActivity"
             android:label="SearchActivity" />
         <activity
             android:name=".screens.new_chat.NewChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:label="NewChatActivity" />
         <activity
             android:name=".screens.my_profile.ProfileActivity"

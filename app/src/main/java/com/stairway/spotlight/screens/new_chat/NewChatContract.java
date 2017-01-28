@@ -12,9 +12,12 @@ import java.util.List;
 public class NewChatContract {
     interface View extends BaseView {
         void displayContacts(List<NewChatItemModel> newChatItemModel);
+        void showContactAddedSuccess(String contactName, String username, boolean isExistingContact);
+        void showInvalidIDError();
     }
 
     interface Presenter extends BasePresenter<NewChatContract.View> {
         void initContactList();
+        void addContact(String userId, String accessToken);
     }
 }

@@ -1,10 +1,13 @@
 package com.stairway.spotlight.screens.search;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,7 +47,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Bind(R.id.tb_search)
     Toolbar toolbar;
     @Bind(R.id.ib_search_clear)
-    ImageButton clearSearch;
+    ImageButton clearSearchView;
     @Inject
     SearchPresenter searchPresenter;
 
@@ -80,6 +83,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         searchQuery = (EditText) toolbar.findViewById(R.id.et_search);
+        Activity searchActivity = this;
         searchQuery.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -90,11 +94,13 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length()==0) {
                     contactsSearchList.setAdapter(chatListAdapter);
+                    clearSearchView.setImageDrawable(ContextCompat.getDrawable(searchActivity, R.drawable.ic_close_inactive));
                     isAdapterSet = false;
                 } else {
                     if(!isAdapterSet)
                         contactsSearchList.setAdapter(searchAdapter);
                     searchPresenter.search(s.toString());
+                    clearSearchView.setImageDrawable(ContextCompat.getDrawable(searchActivity, R.drawable.ic_close_active));
                     isAdapterSet = true;
                 }
             }
