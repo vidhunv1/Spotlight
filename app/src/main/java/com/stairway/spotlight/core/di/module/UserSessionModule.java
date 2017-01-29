@@ -1,6 +1,7 @@
 package com.stairway.spotlight.core.di.module;
 
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.config.XMPPManager;
 
@@ -12,21 +13,21 @@ import dagger.Provides;
  */
 @Module
 public class UserSessionModule {
-    private UserSessionResult userSessionResult;
-    public UserSessionModule(UserSessionResult userSessionResult) {
-        this.userSessionResult = userSessionResult;
+    private AccessToken accessToken;
+    public UserSessionModule(AccessToken accessToken) {
+        this.accessToken = accessToken;
     }
 
     @Provides
     @UserSessionScope
-    public UserSessionResult providesSession() {
-        return userSessionResult;
+    public AccessToken providesSession() {
+        return accessToken;
     }
 
     @Provides
     @UserSessionScope
     public XMPPManager providesXMPPConnection() {
-        XMPPManager connection = new XMPPManager(userSessionResult.getUserName(), userSessionResult.getAccessToken());
+        XMPPManager connection = new XMPPManager(accessToken.getUserName(), accessToken.getAccessToken());
         return connection;
     }
 

@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+
 import com.stairway.data.config.Logger;
 import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageApi;
@@ -14,7 +15,6 @@ import com.stairway.data.xmpp.ReadReceiptExtension;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.ExtensionElement;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
@@ -73,6 +73,8 @@ public class XmppService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        EventBus.getInstance().getBus().register(this);
+
         broadcaster = LocalBroadcastManager.getInstance(this);
         activity_name = intent.getStringExtra(TAG_ACTIVITY_NAME);
         messageStore = new MessageStore();
@@ -273,6 +275,9 @@ public class XmppService extends Service {
         if(messageId != null)
             intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
         broadcaster.sendBroadcast(intent);
+
+        Logger.d(this, "Emitting event");
+        EventBus.getInstance().getBus().post(messageId);
     }
 
     private void broadcastTypingState(String participant, ChatState state) {

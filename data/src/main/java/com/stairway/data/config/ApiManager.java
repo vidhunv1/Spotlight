@@ -13,7 +13,6 @@ import rx.schedulers.Schedulers;
  */
 
 public class ApiManager {
-
     public static Retrofit getInstance(){
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

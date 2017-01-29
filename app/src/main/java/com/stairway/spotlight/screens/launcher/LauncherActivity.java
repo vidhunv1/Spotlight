@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -20,6 +22,7 @@ import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import de.measite.minidns.record.A;
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -79,14 +82,14 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
     }
 
     @Override
-    public void updateSessionDetails(UserSessionResult userSessionResult) {
+    public void updateSessionDetails(AccessToken accessToken) {
         // Login details available.
-        componentContainer.initUserSession(userSessionResult);
+        componentContainer.initUserSession(accessToken);
     }
 
     @Override
     public void navigateToWelcomeActivity() {
-        // Login details not availble: register user.
+        Logger.d(this, "Navigate to welcome.");
         startActivity(WelcomeActivity.callingIntent(this));
         finish();
     }

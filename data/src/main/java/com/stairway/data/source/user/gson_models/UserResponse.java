@@ -3,6 +3,8 @@ package com.stairway.data.source.user.gson_models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 /**
  * Created by vidhun on 16/10/16.
  */
@@ -19,7 +21,7 @@ public class UserResponse {
     private String message;
     @SerializedName("expiry")
     @Expose
-    private String expiry;
+    private Date expiry;
     @SerializedName("access_token")
     @Expose
     private String accessToken;
@@ -48,11 +50,11 @@ public class UserResponse {
         this.message = message;
     }
 
-    public String getExpiry() {
+    public Date getExpiry() {
         return expiry;
     }
 
-    public void setExpiry(String expiry) {
+    public void setExpiry(Date expiry) {
         this.expiry = expiry;
     }
 

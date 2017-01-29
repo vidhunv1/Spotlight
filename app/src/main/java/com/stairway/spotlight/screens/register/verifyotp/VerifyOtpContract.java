@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
@@ -9,7 +10,7 @@ import com.stairway.spotlight.core.BaseView;
  */
 public interface VerifyOtpContract {
     interface View extends BaseView {
-        void navigateToInitializeFragment(UserSessionResult userSessionResult);
+        void navigateToInitializeFragment(AccessToken accessToken);
         void invalidOtpError();
     }
 

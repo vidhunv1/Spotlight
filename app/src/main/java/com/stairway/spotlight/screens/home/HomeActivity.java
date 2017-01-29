@@ -20,14 +20,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.squareup.otto.Subscribe;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
 import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.gson_models.User;
 import com.stairway.data.source.user.gson_models.UserResponse;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import android.widget.PopupWindow;
@@ -72,7 +76,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	HomePresenter presenter;
 
 	UserApi userApi;
-	UserSessionResult userSession;
+	AccessToken userSession;
 
 	private List<ChatListItemModel> chats;
 
@@ -88,6 +92,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		EventBus.getInstance().getBus().register(this);
 		setContentView(R.layout.activity_home);
 
 		ButterKnife.bind(this);
@@ -210,7 +215,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void onMessageReceived(MessageResult messageId) {
 		Logger.d(this, "Message:::"+messageId);
-		addNewMessage(messageId);
+//		addNewMessage(messageId);
+	}
+
+	@Subscribe public void onMessageReceive(MessageResult messageResult) {
+		Logger.d(this, "Message---"+messageResult);
+		ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
+		chatListAdapter.newChatMessage(item);
+//		this.addNewMessage(messageResult);
 	}
 
 	@Override

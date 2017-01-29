@@ -12,8 +12,6 @@ import com.stairway.data.source.user.gson_models.UserResponse;
 
 import rx.Subscriber;
 
-import static com.stairway.data.source.user.UserSessionStore.KEY_ACCESS_TOKEN;
-
 /**
  * Created by vidhun on 17/10/16.
  */
@@ -41,25 +39,25 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
     }
 
     public void sendTokenToServer(String token){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        String accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, "");
-        User updateUser = new User();
-        updateUser.setNotificationToken(token);
-
-        userApi.updateUser(updateUser, accessToken).subscribe(new Subscriber<UserResponse>() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {
-                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-            }
-
-            @Override
-            public void onNext(UserResponse userResponse) {
-                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-            }
-        });
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//
+//        String accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, "");
+//        User updateUser = new User();
+//        updateUser.setNotificationToken(token);
+//
+//        userApi.updateUser(updateUser, accessToken).subscribe(new Subscriber<UserResponse>() {
+//            @Override
+//            public void onCompleted() {}
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+//            }
+//
+//            @Override
+//            public void onNext(UserResponse userResponse) {
+//                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+//            }
+//        });
     }
 }

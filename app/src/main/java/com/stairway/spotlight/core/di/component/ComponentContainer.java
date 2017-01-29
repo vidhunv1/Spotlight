@@ -3,6 +3,7 @@ package com.stairway.spotlight.core.di.component;
 import android.content.Context;
 
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.screens.register.RegisterActivity;
 
@@ -25,8 +26,8 @@ public class ComponentContainer {
         return appComponent;
     }
 
-    public void initUserSession(UserSessionResult userSessionResult) {
-        userSessionComponent = getAppComponent().plus(new UserSessionModule(userSessionResult));
+    public void initUserSession(AccessToken accessToken) {
+        userSessionComponent = getAppComponent().plus(new UserSessionModule(accessToken));
     }
 
     public UserSessionComponent userSessionComponent() {

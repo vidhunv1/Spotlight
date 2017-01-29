@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -53,7 +54,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     private EditText searchQuery;
 
-    private UserSessionResult userSession;
+    private AccessToken userSession;
     private SearchAdapter searchAdapter;
     private boolean isAdapterSet = false;
     private static final String KEY_CHATS = "CHATS";

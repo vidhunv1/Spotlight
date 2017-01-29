@@ -1,9 +1,12 @@
 package com.stairway.spotlight.screens.launcher;
 
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
+import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -12,36 +15,20 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class LauncherPresenter implements LauncherContract.Presenter {
     private LauncherContract.View launcherView;
+    private AccessTokenManager accessTokenManager;
 
-    private CompositeSubscription compositeSubscription;
-
-    private UserSessionUseCase userSessionUseCase;
-
-    public LauncherPresenter(UserSessionUseCase userSessionUseCase) {
-        this.userSessionUseCase = userSessionUseCase;
-        this.compositeSubscription = new CompositeSubscription();
+    public LauncherPresenter() {
+        this.accessTokenManager = AccessTokenManager.getInstance();
     }
 
     // Get user session and update component with the session.
     @Override
     public void getUserSession() {
-        Subscription subscription = userSessionUseCase.execute()
-                .subscribeOn(Schedulers.io())
-                .observeOn(launcherView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<UserSessionResult>(launcherView) {
-                    @Override
-                    public void onResult(UserSessionResult result) {
-                        launcherView.updateSessionDetails(result);
-                        launcherView.navigateToHomeActivity();
-                    }
-
-                    @Override
-                    public void onSessionNotFound() {
-                        launcherView.navigateToWelcomeActivity();
-                    }
-                });
-
-        compositeSubscription.add(subscription);
+        if(accessTokenManager.hasAccessToken()) {
+            launcherView.navigateToHomeActivity();
+        } else {
+            launcherView.navigateToWelcomeActivity();
+        }
     }
 
     @Override
@@ -51,7 +38,6 @@ public class LauncherPresenter implements LauncherContract.Presenter {
 
     @Override
     public void detachView() {
-        compositeSubscription.clear();
         launcherView = null;
     }
 }

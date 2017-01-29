@@ -1,6 +1,7 @@
 package com.stairway.spotlight.core.di.component;
 
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.core.di.scope.UserSessionScope;
 import com.stairway.data.config.XMPPManager;
@@ -10,8 +11,6 @@ import com.stairway.spotlight.screens.home.di.HomeViewComponent;
 import com.stairway.spotlight.screens.home.di.HomeViewModule;
 import com.stairway.spotlight.screens.new_chat.di.NewChatViewComponent;
 import com.stairway.spotlight.screens.new_chat.di.NewChatViewModule;
-import com.stairway.spotlight.screens.my_profile.di.ProfileViewComponent;
-import com.stairway.spotlight.screens.my_profile.di.ProfileViewModule;
 import com.stairway.spotlight.screens.message.di.MessageComponent;
 import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.register.initialize.di.InitializeViewComponent;
@@ -27,7 +26,7 @@ import dagger.Subcomponent;
 @UserSessionScope
 @Subcomponent(modules = {UserSessionModule.class})
 public interface UserSessionComponent {
-    UserSessionResult getUserSession();
+    AccessToken getUserSession();
     XMPPManager getXMPPConnection();
 
     // Subcomponents
@@ -37,5 +36,5 @@ public interface UserSessionComponent {
     ContactsViewComponent plus(ContactsViewModule contactsViewModule);
     InitializeViewComponent plus(InitializeViewModule initializeViewModule);
     SearchViewComponent plus(SearchViewModule searchViewModule);
-    ProfileViewComponent plus(ProfileViewModule profileViewModule);
+//    ProfileViewComponent plus(ProfileViewModule profileViewModule);
 }

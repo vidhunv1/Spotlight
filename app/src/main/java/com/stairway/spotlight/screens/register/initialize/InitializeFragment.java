@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -31,7 +32,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     @Bind(R.id.tv_fragment_initialize)
     TextView initializeText;
 
-    UserSessionResult userSession;
+    AccessToken userSession;
 
     public static InitializeFragment getInstance() {
         InitializeFragment initializeFragment = new InitializeFragment();

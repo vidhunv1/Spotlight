@@ -2,6 +2,7 @@ package com.stairway.spotlight.screens.register.verifyotp;
 
 import com.stairway.data.error.DataException;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 import com.stairway.spotlight.screens.register.initialize.SyncContactsUseCase;
 
@@ -28,10 +29,10 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
         Subscription subscription = registerUseCase.execute(countryCode, mobile, otp)
                 .subscribeOn(Schedulers.io())
                 .observeOn(verifyOtpView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<UserSessionResult>(verifyOtpView) {
+                .subscribe(new UseCaseSubscriber<AccessToken>(verifyOtpView) {
                     @Override
-                    public void onResult(UserSessionResult result) {
-                        verifyOtpView.navigateToInitializeFragment(result);
+                    public void onResult(AccessToken accessToken) {
+                        verifyOtpView.navigateToInitializeFragment(accessToken);
                     }
 
                     @Override

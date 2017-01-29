@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -75,7 +76,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     private PopupWindow addContactPopupWindow;
     private View addContactPopupView;
-    private UserSessionResult userSession;
+    private AccessToken userSession;
     private boolean showSoftInput;
 
     private static final String KEY_SHOW_SOFT_INPUT = "KEY_SHOW_SOFT_INPUT";

@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.stairway.spotlight.core.di.scope.ViewScope;
 import com.stairway.spotlight.screens.launcher.LauncherPresenter;
-import com.stairway.spotlight.screens.launcher.UserSessionUseCase;
 
 import dagger.Module;
 import dagger.Provides;
@@ -22,9 +21,7 @@ public class LauncherModule {
 
     @Provides
     @ViewScope
-    public LauncherPresenter providesLauncherPresenter(UserSessionUseCase userSessionUseCase) {
-        if(userSessionUseCase == null)
-            throw new IllegalStateException("UserSessionUseCase is null");
-        return new LauncherPresenter(userSessionUseCase);
+    public LauncherPresenter providesLauncherPresenter() {
+        return new LauncherPresenter();
     }
 }

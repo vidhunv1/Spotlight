@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.gson_models.User;
+import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -114,8 +115,8 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     }
 
     @Override
-    public void navigateToInitializeFragment(UserSessionResult userSessionResult) {
-        componentContainer.initUserSession(userSessionResult);
+    public void navigateToInitializeFragment(AccessToken accessToken) {
+        componentContainer.initUserSession(accessToken);
 
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.register_FragmentContainer, InitializeFragment.getInstance());

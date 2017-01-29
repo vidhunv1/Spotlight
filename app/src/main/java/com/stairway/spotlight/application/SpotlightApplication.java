@@ -3,8 +3,13 @@ package com.stairway.spotlight.application;
 import android.app.Application;
 
 import com.facebook.stetho.Stetho;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 import com.stairway.data.config.Logger;
 import com.stairway.data.db.core.DatabaseManager;
+import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.MessageController;
+import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.di.component.AppComponent;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.di.component.DaggerAppComponent;
@@ -18,12 +23,23 @@ import com.stairway.spotlight.core.di.module.UtilModule;
 public class SpotlightApplication extends Application {
     private ComponentContainer componentContainer;
 
+    private static SpotlightApplication instance;
+
+    public static SpotlightApplication getContext() {
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        instance = this;
         initDatabase();
         initDagger();
+
+        Bus bus = new Bus(ThreadEnforcer.ANY);
+        bus.register(this);
+        EventBus.init(bus);
 
 //         Setting default font
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()

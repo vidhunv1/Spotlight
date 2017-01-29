@@ -21,11 +21,11 @@ import dagger.Provides;
 
 @Module
 public class DataModule {
-    @Provides
-    @ApplicationScope
-    public UserSessionStore userSessionStore(Context context) {
-        return new UserSessionStore(context);
-    }
+//    @Provides
+//    @ApplicationScope
+//    public UserSessionStore userSessionStore(Context context) {
+//        return new UserSessionStore(context);
+//    }
 
     @Provides
     @ApplicationScope
