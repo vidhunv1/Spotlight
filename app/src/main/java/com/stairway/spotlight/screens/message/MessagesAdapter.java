@@ -133,25 +133,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    private boolean hasProfileDP(int position) {
-//        return !(position > 0 && messageList.get(position - 1).getChatId().equals(messageList.get(position - 1).getFromId()));
-        return position == messageList.size()-1 || messageList.get(position+1).isMe();
-    }
-
-    private int bubbleType(int position) {
-        final int START = 1, MIDDLE = 2, END = 3, FULL = 0;
-        final boolean isMe = messageList.get(position).isMe();
-        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
-            return FULL;
-        if(position!=0 && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
-            return END;
-        if((position!=0 && isMe==messageList.get(position-1).isMe()) && position!=messageList.size()-1)
-            return MIDDLE;
-        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe==messageList.get(position+1).isMe()))
-            return START;
-        return FULL;
-    }
-
     @Override
     public int getItemViewType(int position) {
         if(position == messageList.size())
@@ -256,6 +237,25 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 QuickRepliesViewHolder qrVH = (QuickRepliesViewHolder) holder;
                 qrVH.renderItem(quickReplies);
         }
+    }
+
+    private boolean hasProfileDP(int position) {
+//        return !(position > 0 && messageList.get(position - 1).getChatId().equals(messageList.get(position - 1).getFromId()));
+        return position == messageList.size()-1 || messageList.get(position+1).isMe();
+    }
+
+    private int bubbleType(int position) {
+        final int START = 1, MIDDLE = 2, END = 3, FULL = 0;
+        final boolean isMe = messageList.get(position).isMe();
+        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
+            return FULL;
+        if(position!=0 && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
+            return END;
+        if((position!=0 && isMe==messageList.get(position-1).isMe()) && position!=messageList.size()-1)
+            return MIDDLE;
+        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe==messageList.get(position+1).isMe()))
+            return START;
+        return FULL;
     }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
