@@ -6,6 +6,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import java.util.List;
 
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -27,7 +28,7 @@ public class ContactsPresenter implements ContactsContract.Presenter {
     @Override
     public void addContact(String userName) {
         Subscription subscription = addContactUseCase.execute(userName)
-                .observeOn(contactsView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<Boolean>(contactsView) {
                     @Override
                     public void onResult(Boolean result) {
@@ -41,7 +42,7 @@ public class ContactsPresenter implements ContactsContract.Presenter {
     @Override
     public void loadContacts() {
         Subscription subscription = getContactsUseCase.execute()
-                .observeOn(contactsView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<List<ContactItemModel>>(contactsView) {
                     @Override
                     public void onResult(List<ContactItemModel> result) {

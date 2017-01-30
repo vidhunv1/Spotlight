@@ -1,10 +1,16 @@
 package com.stairway.spotlight.screens.register.signup;
 
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.gson_models.StatusResponse;
+import com.stairway.data.source.user.gson_models.User;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
+import javax.inject.Inject;
+
+import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -15,31 +21,33 @@ import rx.subscriptions.CompositeSubscription;
 public class SignUpPresenter implements SignUpContract.Presenter {
     private SignUpContract.View signUpView;
     private CompositeSubscription compositeSubscription;
-    private CreateUserUseCase createUserUseCase;
 
-    public SignUpPresenter(CreateUserUseCase createUserUseCase) {
-        this.createUserUseCase = createUserUseCase;
+    private UserApi userApi;
+
+    public SignUpPresenter(UserApi userApi) {
+        this.userApi = userApi;
         compositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void createUser(String countryCode, String phone) {
-        Subscription subscription = createUserUseCase.execute(countryCode, phone)
-                .subscribeOn(Schedulers.io())
-                .observeOn(signUpView.getUiScheduler())
-                .subscribe(new UseCaseSubscriber<StatusResponse>(signUpView) {
-                    @Override
-                    public void onResult(StatusResponse result) {
-                        Logger.d(this, " gotresutl"+result);
-                        signUpView.navigateToVerifyOtp(countryCode, phone);
-                    }
+    public void createUser(String countryCode, String phoneNumber) {
 
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        Logger.d(this, " goterror"+e.getMessage());
-                    }
-                });
+        Subscription subscription = userApi.createUser(countryCode, phoneNumber).subscribe(new Subscriber<StatusResponse>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Logger.d(this, " goterror"+e.getMessage());
+            }
+
+            @Override
+            public void onNext(StatusResponse createResponse) {
+                Logger.d(this, " gotresutl"+createResponse);
+                signUpView.navigateToVerifyOtp(countryCode, phoneNumber);
+            }
+        });
+
         compositeSubscription.add(subscription);
     }
 

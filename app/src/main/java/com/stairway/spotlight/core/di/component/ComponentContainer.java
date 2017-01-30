@@ -2,8 +2,8 @@ package com.stairway.spotlight.core.di.component;
 
 import android.content.Context;
 
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.spotlight.AccessToken;
+import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.core.di.module.UserSessionModule;
 import com.stairway.spotlight.screens.register.RegisterActivity;
 
@@ -31,9 +31,14 @@ public class ComponentContainer {
     }
 
     public UserSessionComponent userSessionComponent() {
-        if(userSessionComponent == null) {
+        if(!AccessTokenManager.getInstance().hasAccessToken()) {
             Context context = getAppComponent().appContext();
             context.startActivity(RegisterActivity.callingIntent(context));
+            return null;
+        }
+
+        if(userSessionComponent==null) {
+            userSessionComponent = getAppComponent().plus(new UserSessionModule(AccessTokenManager.getInstance().load()));
         }
         return userSessionComponent;
     }

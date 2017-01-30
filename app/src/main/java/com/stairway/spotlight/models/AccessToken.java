@@ -1,4 +1,4 @@
-package com.stairway.spotlight;
+package com.stairway.spotlight.models;
 
 import android.support.annotation.Nullable;
 

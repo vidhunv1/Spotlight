@@ -1,6 +1,7 @@
 package com.stairway.data.db.core;
 
 import android.content.Context;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -23,9 +24,14 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
-        db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
-        db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
+        try {
+            db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+            Logger.e(this, "Error creating database. Cannot recover");
+        }
     }
 
     @Override

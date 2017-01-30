@@ -36,7 +36,7 @@ public class DataModule {
     @Provides
     @ApplicationScope
     public MessageApi messageApi() {
-        return new MessageApi(XMPPManager.getConnection());
+        return new MessageApi(XMPPManager.getInstance().getConnection());
     }
 
     @Provides

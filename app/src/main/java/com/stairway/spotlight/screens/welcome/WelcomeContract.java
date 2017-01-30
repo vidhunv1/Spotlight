@@ -11,6 +11,5 @@ public interface WelcomeContract {
     }
 
     interface Presenter extends BasePresenter<WelcomeContract.View> {
-
     }
 }

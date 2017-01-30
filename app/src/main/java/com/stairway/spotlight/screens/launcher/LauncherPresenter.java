@@ -17,11 +17,10 @@ public class LauncherPresenter implements LauncherContract.Presenter {
     private LauncherContract.View launcherView;
     private AccessTokenManager accessTokenManager;
 
-    public LauncherPresenter() {
-        this.accessTokenManager = AccessTokenManager.getInstance();
+    public LauncherPresenter(AccessTokenManager accessTokenManager) {
+        this.accessTokenManager = accessTokenManager;
     }
 
-    // Get user session and update component with the session.
     @Override
     public void getUserSession() {
         if(accessTokenManager.hasAccessToken()) {

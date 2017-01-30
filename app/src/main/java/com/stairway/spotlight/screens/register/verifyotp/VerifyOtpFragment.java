@@ -1,14 +1,8 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,19 +11,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.data.source.user.gson_models.User;
-import com.stairway.spotlight.AccessToken;
+import com.stairway.data.source.user.UserApi;
+import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.core.di.component.UserSessionComponent;
-import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.register.initialize.InitializeFragment;
-import com.stairway.spotlight.screens.register.verifyotp.di.VerifyOtpViewModule;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -39,26 +27,18 @@ import butterknife.OnTextChanged;
 /**
  * Created by vidhun on 22/07/16.
  */
-public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract.View{
-
-    @Bind(R.id.et_otp_otp)
-    EditText otpEditText;
-
-    @Bind(R.id.tv_otp_mobilenumber)
-    TextView mobileNumberTextView;
-
-    @Bind(R.id.btn_otp_continue)
-    Button continueButton;
-
-    @Inject
-    VerifyOtpPresenter verifyOtpPresenter;
-
-    ComponentContainer componentContainer;
-
-    int OTP_LENGTH = 4;
+public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract.View {
 
     private static String KEY_MOBILE = "MOBILE";
     private static String KEY_COUNTRY_CODE = "COUNTRY_CODE";
+    @Bind(R.id.et_otp_otp)
+    EditText otpEditText;
+    @Bind(R.id.tv_otp_mobilenumber)
+    TextView mobileNumberTextView;
+    @Bind(R.id.btn_otp_continue)
+    Button continueButton;
+    VerifyOtpPresenter verifyOtpPresenter;
+    int OTP_LENGTH = 4;
 
     public VerifyOtpFragment() {
     }
@@ -77,6 +57,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        verifyOtpPresenter = new VerifyOtpPresenter(new UserApi(), AccessTokenManager.getInstance());
     }
 
     @Nullable
@@ -94,7 +75,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
         String mobile = getArguments().getString(KEY_MOBILE);
         String countryCode = getArguments().getString(KEY_COUNTRY_CODE);
 
-        mobileNumberTextView.setText(countryCode+"-"+mobile);
+        mobileNumberTextView.setText(countryCode + "-" + mobile);
     }
 
     @Override
@@ -116,15 +97,9 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @Override
     public void navigateToInitializeFragment(AccessToken accessToken) {
-        componentContainer.initUserSession(accessToken);
-
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.register_FragmentContainer, InitializeFragment.getInstance());
-//      fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
         fragmentTransaction.commit();
-
-//        startActivity(HomeActivity.callingIntent(getActivity()));
-//        getActivity().finish();
     }
 
     @Override
@@ -135,7 +110,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @OnTextChanged(R.id.et_otp_otp)
     public void onMobileTextChanged() {
-        if(otpEditText.getText().toString().length()==OTP_LENGTH) {
+        if (otpEditText.getText().toString().length() == OTP_LENGTH) {
             continueButton.setAlpha(1);
         } else {
             continueButton.setAlpha(.2f);
@@ -144,7 +119,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @OnClick(R.id.btn_otp_continue)
     public void onContinueClicked() {
-        if(otpEditText.getText().toString().length() == OTP_LENGTH) {
+        if (otpEditText.getText().toString().length() == OTP_LENGTH) {
             verifyOtpPresenter.registerUser(
                     getArguments().getString(KEY_COUNTRY_CODE),
                     getArguments().getString(KEY_MOBILE),
@@ -154,7 +129,5 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        this.componentContainer = componentContainer;
-        componentContainer.getAppComponent().plus(new VerifyOtpViewModule(getContext())).inject(this);
     }
 }

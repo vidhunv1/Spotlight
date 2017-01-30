@@ -8,6 +8,7 @@ import com.stairway.spotlight.screens.home.FindUserUseCase;
 import java.util.List;
 
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -41,7 +42,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     public void initContactList() {
         Subscription subscription = getNewChatsUseCase.execute()
                 .subscribeOn(Schedulers.io())
-                .observeOn(contactsView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<List<NewChatItemModel>>(contactsView) {
                     @Override
                     public void onResult(List<NewChatItemModel> result) {
@@ -56,7 +57,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     public void addContact(String userId, String accessToken) {
         Subscription subscription = findUserUseCase.executeLocal(userId)
                 .subscribeOn(Schedulers.io())
-                .observeOn(contactsView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
                     @Override
                     public void onResult(ContactResult result) {
@@ -65,7 +66,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                         else {
                             findUserUseCase.execute(userId, accessToken)
                                     .subscribeOn(Schedulers.io())
-                                    .observeOn(contactsView.getUiScheduler())
+                                    .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(new UseCaseSubscriber<ContactResult>(contactsView) {
                                         @Override
                                         public void onResult(ContactResult result) {

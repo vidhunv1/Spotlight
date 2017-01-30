@@ -14,15 +14,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -30,23 +27,24 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.spotlight.AccessToken;
+import com.stairway.data.source.contacts.ContactStore;
+import com.stairway.data.source.user.UserApi;
+import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.screens.home.FindUserUseCase;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.di.NewChatViewModule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 /**
@@ -66,9 +64,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.tv_new_chat_title)
     TextView toolbarTitle;
 
-    @Inject
-    NewChatPresenter newChatPresenter;
-
     NewChatAdapter newChatAdapter;
 
     @Bind(R.id.ll_new_chat)
@@ -78,6 +73,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     private View addContactPopupView;
     private AccessToken userSession;
     private boolean showSoftInput;
+
+    NewChatPresenter newChatPresenter;
 
     private static final String KEY_SHOW_SOFT_INPUT = "KEY_SHOW_SOFT_INPUT";
 
@@ -92,6 +89,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
+
+        newChatPresenter = new NewChatPresenter(new GetNewChatsUseCase(new ContactStore()), new FindUserUseCase(new UserApi(), new ContactStore()));
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_SHOW_SOFT_INPUT))
@@ -299,7 +298,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new NewChatViewModule()).inject(this);
-        userSession = componentContainer.userSessionComponent().getUserSession();
+        userSession = AccessTokenManager.getInstance().load();
     }
 }

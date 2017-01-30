@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import com.stairway.data.config.Logger;
 import com.stairway.data.config.XMPPManager;
 import com.stairway.data.source.message.MessageResult;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
@@ -33,9 +34,7 @@ import rx.android.schedulers.AndroidSchedulers;
 /**
  * Created by vidhun on 05/07/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements BaseFragment.BackHandlerInterface, XmppService.XmppServiceCallback{
-    private List<BaseFragment> baseFragmentList = new ArrayList<>();
-    private XMPPManager connection;
+public abstract class BaseActivity extends AppCompatActivity implements  XmppService.XmppServiceCallback{
     private UserSessionComponent userSessionComponent;
 
     public static boolean isAppWentToBg = false;
@@ -77,9 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             }
         };
 
-        userSessionComponent = ((SpotlightApplication) getApplication()).getComponentContainer().userSessionComponent();
-        if(userSessionComponent!=null) {
-            connection = userSessionComponent.getXMPPConnection();
+        if(AccessTokenManager.getInstance().hasAccessToken()) {
             Intent intent = new Intent(this, XmppService.class);
             intent.putExtra(XmppService.TAG_ACTIVITY_NAME, this.getClass().getName());
             startService(intent);
@@ -105,10 +102,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
 
     @Override
     public void onBackPressed() {
-        if (this instanceof HomeActivity) {
-        } else {
-            isBackPressed = true;
-        }
         super.onBackPressed();
     }
 
@@ -120,16 +113,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             isWindowFocused = true;
         }
         super.onWindowFocusChanged(hasFocus);
-    }
-
-    @Override
-    public void removeSelectedFragment(BaseFragment backHandledFragment) {
-        baseFragmentList.remove(backHandledFragment);
-    }
-
-    @Override
-    public void setSelectedFragment(BaseFragment backHandledFragment) {
-        baseFragmentList.add(backHandledFragment);
     }
 
     @Override
@@ -161,17 +144,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             intent.putExtra(XmppService.TAG_ACTIVITY_NAME, this.getClass().getName());
             startService(intent);
         }
-    }
-
-    public Scheduler getUiScheduler() {
-        return AndroidSchedulers.mainThread();
-    }
-
-    private BaseFragment getCurrentFragment() {
-        int size = baseFragmentList.size();
-        if (size > 0)
-            return baseFragmentList.get(size - 1);
-        return null;
     }
 
     public void onMessageReceived(MessageResult messageId){

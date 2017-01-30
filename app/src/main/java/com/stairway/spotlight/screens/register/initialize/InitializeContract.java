@@ -13,6 +13,6 @@ public interface InitializeContract {
     }
 
     interface Presenter extends BasePresenter<InitializeContract.View> {
-        void syncContacts(String authToken);
+        void syncContacts();
     }
 }

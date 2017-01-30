@@ -23,20 +23,21 @@ import android.view.View;
 
 import com.squareup.otto.Subscribe;
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.contacts.ContactStore;
 import com.stairway.data.source.message.MessageResult;
+import com.stairway.data.source.message.MessageStore;
 import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.data.source.user.gson_models.User;
 import com.stairway.data.source.user.gson_models.UserResponse;
-import com.stairway.spotlight.AccessToken;
+import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import android.widget.PopupWindow;
-import com.stairway.spotlight.screens.home.di.HomeViewModule;
-import com.stairway.spotlight.screens.launcher.LauncherActivity;
+
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
@@ -44,7 +45,6 @@ import com.stairway.spotlight.screens.search.SearchActivity;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import java.util.List;
 
-import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Subscriber;
@@ -72,16 +72,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
 
-	@Inject
 	HomePresenter presenter;
 
 	UserApi userApi;
 	AccessToken userSession;
+	MessageStore messageStore;
+	ContactStore contactStore;
 
 	private List<ChatListItemModel> chats;
-
-	private PopupWindow addContactPopupWindow;
-	private View addContactPopupView;
 
 	private ChatListAdapter chatListAdapter;
 	public static Intent callingIntent(Context context) {
@@ -91,7 +89,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Logger.d(this);
 		super.onCreate(savedInstanceState);
+
+		userSession = AccessTokenManager.getInstance().load();
+		this.messageStore = new MessageStore();
+		this.contactStore = new ContactStore();
+		presenter = new HomePresenter(new GetChatsUseCase(messageStore, contactStore));
+
 		EventBus.getInstance().getBus().register(this);
 		setContentView(R.layout.activity_home);
 
@@ -106,7 +111,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
 		}
 
-		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+			fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
 
 		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 		toggle.setDrawerIndicatorEnabled(false);
@@ -267,13 +272,5 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
-	protected void injectComponent(ComponentContainer componentContainer) {
-		if(componentContainer.userSessionComponent()==null) {
-			startActivity(LauncherActivity.callingIntent(this));
-			finish();
-		} else {
-			componentContainer.userSessionComponent().plus(new HomeViewModule()).inject(this);
-			userSession = componentContainer.userSessionComponent().getUserSession();
-		}
-	}
+	protected void injectComponent(ComponentContainer componentContainer) {}
 }

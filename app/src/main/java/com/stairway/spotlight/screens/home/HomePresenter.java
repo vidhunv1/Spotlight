@@ -6,6 +6,7 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import java.util.List;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -37,7 +38,7 @@ public class HomePresenter implements HomeContract.Presenter {
         Logger.v(this, " initChatList");
         Subscription subscription = getChatsUseCase.execute()
                 .subscribeOn(Schedulers.io())
-                .observeOn(contactsView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<List<ChatListItemModel>>(contactsView) {
                     @Override
                     public void onResult(List<ChatListItemModel> result) {

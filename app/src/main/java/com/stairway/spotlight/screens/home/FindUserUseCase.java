@@ -3,7 +3,6 @@ package com.stairway.spotlight.screens.home;
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.contacts.gson_models.Contact;
 import com.stairway.data.source.user.UserApi;
 import com.stairway.data.source.user.gson_models.UserResponse;
 
@@ -89,7 +88,7 @@ public class FindUserUseCase {
                                 contactResult.setDisplayName(userResponse.getUser().getName());
                                 contactResult.setAdded(true);
 
-                                contactStore.storeContact(contactResult).subscribe(new Subscriber<ContactResult>() {
+                                contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                     @Override
                                     public void onCompleted() {}
 
@@ -97,7 +96,7 @@ public class FindUserUseCase {
                                     public void onError(Throwable e) {}
 
                                     @Override
-                                    public void onNext(ContactResult contactResult) {
+                                    public void onNext(Boolean b) {
                                         subscriber.onNext(contactResult);
                                         subscriber.onCompleted();
                                     }

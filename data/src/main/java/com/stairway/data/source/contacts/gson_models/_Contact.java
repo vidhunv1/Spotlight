@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by vidhun on 09/12/16.
  */
 
-public class Contact {
+public class _Contact {
     @SerializedName("phone")
     @Expose
     private String phone;
@@ -18,15 +18,15 @@ public class Contact {
     @Expose
     private String name;
     @SerializedName("is_registered")
-    boolean isRegistered;
+    private String isRegistered;
     @SerializedName("username")
-    String username;
+    private String username;
     @SerializedName("user_id")
-    String userId;
+    private String userId;
     @SerializedName("id")
-    String id;
+    private String id;
 
-    public Contact(String phone, String countryCode, String name) {
+    public _Contact(String phone, String countryCode, String name) {
         this.phone = phone;
         this.countryCode = countryCode;
         this.name = name;
@@ -49,11 +49,14 @@ public class Contact {
     }
 
     public boolean isRegistered() {
-        return isRegistered;
+        return  (isRegistered!=null && isRegistered.equals("true"));
     }
 
     public void setRegistered(boolean registered) {
-        isRegistered = registered;
+        if(registered)
+            isRegistered = "true";
+        else
+            isRegistered = "false";
     }
 
     public String getUsername() {

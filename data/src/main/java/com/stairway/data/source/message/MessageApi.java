@@ -153,7 +153,7 @@ public class MessageApi {
                     Logger.e(this, "receipt id not found");
                     subscriber.onError(new IllegalArgumentException("receipt id not found"));
                 } else {
-                    XMPPManager.getConnection().sendStanza(message);
+                    XMPPManager.getInstance().getConnection().sendStanza(message);
                     subscriber.onNext(true);
                     subscriber.onCompleted();
                 }

@@ -8,15 +8,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.spotlight.AccessToken;
+import com.stairway.data.source.contacts.ContactApi;
+import com.stairway.data.source.contacts.ContactContent;
+import com.stairway.data.source.contacts.ContactStore;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.home.HomeActivity;
-import com.stairway.spotlight.screens.register.initialize.di.InitializeViewModule;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,13 +25,17 @@ import butterknife.ButterKnife;
  * Created by vidhun on 09/12/16.
  */
 public class InitializeFragment extends BaseFragment implements InitializeContract.View{
-    @Inject
+
     InitializePresenter initializePresenter;
 
     @Bind(R.id.tv_fragment_initialize)
     TextView initializeText;
 
-    AccessToken userSession;
+    private ContactApi contactApi;
+    private ContactContent contactContent;
+    private ContactStore contactStore;
+    private AccessTokenManager accessTokenManager;
+
 
     public static InitializeFragment getInstance() {
         InitializeFragment initializeFragment = new InitializeFragment();
@@ -42,6 +45,12 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.contactApi = new ContactApi();
+        this.contactStore = new ContactStore();
+        this.contactContent = new ContactContent(this.getContext());
+        this.accessTokenManager = AccessTokenManager.getInstance();
+        initializePresenter = new InitializePresenter(contactApi, contactContent, contactStore, accessTokenManager);
     }
 
     @Nullable
@@ -62,7 +71,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
         super.onResume();
         initializePresenter.attachView(this);
         initializeText.setText("Initializing...");
-        initializePresenter.syncContacts(userSession.getAccessToken());
+        initializePresenter.syncContacts();
     }
 
     @Override
@@ -79,7 +88,5 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new InitializeViewModule()).inject(this);
-        userSession = componentContainer.userSessionComponent().getUserSession();
     }
 }

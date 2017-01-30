@@ -78,7 +78,7 @@ public class XmppService extends Service {
         broadcaster = LocalBroadcastManager.getInstance(this);
         activity_name = intent.getStringExtra(TAG_ACTIVITY_NAME);
         messageStore = new MessageStore();
-        messageApi = new MessageApi(XMPPManager.getConnection());
+        messageApi = new MessageApi(XMPPManager.getInstance().getConnection());
 
         try {
             xmppServiceCallback = (XmppServiceCallback) Class.forName(activity_name).newInstance();
@@ -99,7 +99,7 @@ public class XmppService extends Service {
             return;
 
         isReceivingMessages = true;
-        ChatManager chatManager = ChatManager.getInstanceFor(XMPPManager.getConnection());
+        ChatManager chatManager = ChatManager.getInstanceFor(XMPPManager.getInstance().getConnection());
 
         chatManager.addChatListener((chat, createdLocally) -> {
             chat.addMessageListener((chat1, message) -> {
@@ -172,7 +172,7 @@ public class XmppService extends Service {
     }
 
     public void getDeliveryReceipts(){
-        DeliveryReceiptManager.getInstanceFor(XMPPManager.getConnection())
+        DeliveryReceiptManager.getInstanceFor(XMPPManager.getInstance().getConnection())
                 .addReceiptReceivedListener((fromJid, toJid, deliveryReceiptId, stanza) -> {
                     String chatId = XMPPManager.getUserNameFromJid(fromJid);
                     messageStore.updateMessageStatus(chatId, deliveryReceiptId, MessageResult.MessageStatus.DELIVERED).subscribe(new Subscriber<Boolean>() {
@@ -199,7 +199,7 @@ public class XmppService extends Service {
     public void onDestroy() {
         mTimer.cancel();
         try {
-            XMPPManager.getConnection().disconnect(new Presence(Presence.Type.unavailable));
+            XMPPManager.getInstance().getConnection().disconnect(new Presence(Presence.Type.unavailable));
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
@@ -209,8 +209,8 @@ public class XmppService extends Service {
     private boolean tryConnect(){
         try {
             // TODO: BUGGY
-            if(!XMPPManager.getConnection().isConnected()) {
-                XMPPManager.getConnection().connect().login();
+            if(!XMPPManager.getInstance().getConnection().isConnected()) {
+                XMPPManager.getInstance().getConnection().connect().login();
             }
             if(!isOnlineNotified) {
                 retryInterval = RETRY_ONLINE;

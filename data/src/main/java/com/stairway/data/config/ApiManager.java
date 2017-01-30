@@ -1,5 +1,8 @@
 package com.stairway.data.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -36,6 +39,7 @@ public class ApiManager {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(logging);
+        Gson gson = new GsonBuilder().serializeNulls().create();
 
         httpClient.addInterceptor(chain -> {
             Request request = chain.request().newBuilder().addHeader("Authorization", authorization).build();

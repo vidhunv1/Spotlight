@@ -28,6 +28,11 @@ public class Logger {
             Timber.d("["+o.getClass().getSimpleName()+"] "+message);
     }
 
+    public static void d(Object o) {
+        if (isTimberInitialized)
+            Timber.d("["+o.getClass().getSimpleName()+"] ");
+    }
+
     public static void w(Object o, String message) {
         if (isTimberInitialized)
             Timber.w("["+o.getClass().getSimpleName()+"] "+message);

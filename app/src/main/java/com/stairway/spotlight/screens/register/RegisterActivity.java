@@ -12,22 +12,24 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.screens.register.signup.SignUpFragment;
 
 import butterknife.ButterKnife;
 
-public class RegisterActivity extends AppCompatActivity implements BaseFragment.BackHandlerInterface{
+public class RegisterActivity extends AppCompatActivity{
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, RegisterActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         return intent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.d(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
@@ -43,16 +45,6 @@ public class RegisterActivity extends AppCompatActivity implements BaseFragment.
                 requestForSpecificPermission();
             }
         }
-    }
-
-    @Override
-    public void setSelectedFragment(BaseFragment backHandledFragment) {
-
-    }
-
-    @Override
-    public void removeSelectedFragment(BaseFragment backHandledFragment) {
-
     }
 
     private boolean checkIfAlreadyhavePermission() {

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.stairway.data.config.Logger;
 import com.stairway.data.source.message.MessageResult;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.BaseActivity;
@@ -274,7 +275,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new MessageModule()).inject(this);
-        currentUser = componentContainer.userSessionComponent().getUserSession().getUserName();
+        currentUser = AccessTokenManager.getInstance().load().getUserName();
     }
 }

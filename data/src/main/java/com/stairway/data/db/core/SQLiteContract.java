@@ -49,7 +49,7 @@ public abstract class SQLiteContract {
         public static final String TABLE_NAME = "contacts";
 
         public static final String COLUMN_ROW_ID = "rowid";
-        public static final String COLUMN_CONTACT_ID = "contact_id";
+//        public static final String COLUMN_CONTACT_ID = "contact_id";
         public static final String COLUMN_PHONE_NUMBER = "phone_number";
         public static final String COLUMN_COUNTRY_CODE = "country_code";
         public static final String COLUMN_CONTACT_NAME = "contact_name";
@@ -57,9 +57,10 @@ public abstract class SQLiteContract {
         public static final String COLUMN_IS_ADDED = "is_added";
         public static final String COLUMN_USERNAME = "username";
         public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_CREATED_AT = "created_at";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_CONTACT_ID + " INTEGER, " +
+//                COLUMN_CONTACT_ID + " INTEGER, " +
                 COLUMN_PHONE_NUMBER + " TEXT, " +
                 COLUMN_COUNTRY_CODE + " TEXT, " +
                 COLUMN_IS_ADDED + " INTEGER, " +
@@ -67,7 +68,8 @@ public abstract class SQLiteContract {
                 COLUMN_USER_ID + " TEXT, "+
                 COLUMN_IS_REGISTERED + " INTEGER, "+
                 COLUMN_CONTACT_NAME + " TEXT, " +
-                "UNIQUE("+COLUMN_CONTACT_ID+") ON CONFLICT REPLACE); ";
+                COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                "UNIQUE("+COLUMN_PHONE_NUMBER+", "+COLUMN_COUNTRY_CODE+", "+COLUMN_USERNAME+") ON CONFLICT REPLACE); ";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }

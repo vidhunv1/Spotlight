@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.stairway.data.config.Logger;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.models.AccessToken;
 
 import java.util.Date;
 
@@ -54,17 +55,23 @@ public class AccessTokenManager {
                     sharedPreferences.edit().putString(USER_NAME_KEY, accessToken.getUserName()).apply();
                     sharedPreferences.edit().putLong(EXPIRES_AT_KEY, accessToken.getExpires().getTime()).apply();
                     sharedPreferences.edit().putLong(LAST_REFRESH_KEY, accessToken.getExpires().getTime()).apply();
-                    subscriber.onCompleted();
                 });
             }
         }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     public void clear() {
-        sharedPreferences.edit().remove(ACCESS_TOKEN_KEY).apply();
-        sharedPreferences.edit().remove(USER_NAME_KEY).apply();
-        sharedPreferences.edit().remove(EXPIRES_AT_KEY).apply();
-        sharedPreferences.edit().remove(LAST_REFRESH_KEY).apply();
+        Observable.defer(new Func0<Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call() {
+                return Observable.create(subscriber -> {
+                    sharedPreferences.edit().remove(ACCESS_TOKEN_KEY).apply();
+                    sharedPreferences.edit().remove(USER_NAME_KEY).apply();
+                    sharedPreferences.edit().remove(EXPIRES_AT_KEY).apply();
+                    sharedPreferences.edit().remove(LAST_REFRESH_KEY).apply();
+                });
+            }
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     public boolean hasAccessToken() {

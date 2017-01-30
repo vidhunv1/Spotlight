@@ -1,7 +1,5 @@
 package com.stairway.spotlight.screens.launcher;
 
-import com.stairway.data.source.user.UserSessionResult;
-import com.stairway.spotlight.AccessToken;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 
@@ -12,7 +10,6 @@ public interface LauncherContract {
     interface View extends BaseView {
         void navigateToHomeActivity();
         void navigateToWelcomeActivity();
-        void updateSessionDetails(AccessToken accessToken);
     }
 
     interface Presenter extends BasePresenter<LauncherContract.View> {

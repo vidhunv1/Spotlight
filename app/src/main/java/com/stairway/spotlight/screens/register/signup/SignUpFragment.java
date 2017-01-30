@@ -11,13 +11,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.stairway.data.config.Logger;
+import com.stairway.data.source.user.UserApi;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.register.signup.di.SignUpViewModule;
 import com.stairway.spotlight.screens.register.verifyotp.VerifyOtpFragment;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,8 +36,8 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
     @Bind(R.id.btn_register_send_confirmation)
     Button confirmationButton;
 
-    @Inject
     SignUpPresenter signUpPresenter;
+    UserApi userApi;
 
     public static SignUpFragment getInstance() {
         SignUpFragment signUpFragment = new SignUpFragment();
@@ -48,6 +46,8 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        userApi = new UserApi();
+        signUpPresenter = new SignUpPresenter(userApi);
         super.onCreate(savedInstanceState);
     }
 
@@ -94,9 +94,6 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
         String countryCode = countryCodeSpinner.getSelectedItem().toString().substring(countryCodeStart, countrCodeEnd);
         String mobileNumber = mobileEditText.getText().toString();
 
-        Logger.d(this, "Country Code  = "+countryCode);
-        Logger.d(this, "Mobile Number = "+mobileNumber);
-
         if(mobileEditText.getText().toString().length()>=10) {
             signUpPresenter.createUser(countryCode, mobileNumber);
         }
@@ -123,6 +120,5 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
 
     @Override
     protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.getAppComponent().plus(new SignUpViewModule()).inject(this);
     }
 }

@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Created by vidhun on 01/09/16.
  */
 public class ContactResult implements Serializable{
-    private String contactId;
     private String phoneNumber;
     private String countryCode;
     private String contactName;
@@ -15,8 +14,7 @@ public class ContactResult implements Serializable{
     private boolean isAdded;
     private String userId;
 
-    public ContactResult(String contactId, String countryCode, String phoneNumber, String displayName) {
-        this.contactId = contactId;
+    public ContactResult(String countryCode, String phoneNumber, String displayName) {
         this.phoneNumber = phoneNumber;
         this.contactName = displayName;
         this.countryCode = countryCode;
@@ -65,9 +63,6 @@ public class ContactResult implements Serializable{
         this.contactName = contactName;
     }
 
-    public String getContactId() {
-        return contactId;
-    }
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -85,9 +80,6 @@ public class ContactResult implements Serializable{
         return contactName;
     }
 
-    public void setContactId(String contactId) {
-        this.contactId = contactId;
-    }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
@@ -100,7 +92,6 @@ public class ContactResult implements Serializable{
     @Override
     public String toString() {
         return "ContactResult{" +
-                "contactId='" + contactId + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", countryCode='" + countryCode + '\'' +
                 ", contactName='" + contactName + '\'' +

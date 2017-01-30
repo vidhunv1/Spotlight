@@ -19,9 +19,9 @@ public class UserResponse {
     @SerializedName("message")
     @Expose
     private String message;
-    @SerializedName("expiry")
+    @SerializedName("expires")
     @Expose
-    private Date expiry;
+    private String expires;
     @SerializedName("access_token")
     @Expose
     private String accessToken;
@@ -50,12 +50,13 @@ public class UserResponse {
         this.message = message;
     }
 
-    public Date getExpiry() {
-        return expiry;
+    public Date getExpires() {
+        Long ex = Long.parseLong(expires);
+        return new Date(ex);
     }
 
-    public void setExpiry(Date expiry) {
-        this.expiry = expiry;
+    public void setExpires(String expires) {
+        this.expires = expires;
     }
 
     public String getAccessToken() {

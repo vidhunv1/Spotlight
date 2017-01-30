@@ -78,7 +78,7 @@ public class ContactContent {
                                         String mobileNumber = Long.toString(contactNumberFormat.getNationalNumber());
                                         contactNumberFormatted = contactNumberFormat.getCountryCode() + "-" + String.valueOf(contactNumberFormat.getNationalNumber());
 
-                                        ContactResult contactResult = new ContactResult(contactNumberFormatted, countryCode, mobileNumber, contactName);
+                                        ContactResult contactResult = new ContactResult(countryCode, mobileNumber, contactName);
 
                                         contactResults.add(contactResult);
                                     }

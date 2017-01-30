@@ -3,6 +3,8 @@ package com.stairway.data.source.contacts.gson_models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by vidhun on 09/12/16.
  */
@@ -10,16 +12,16 @@ import com.google.gson.annotations.SerializedName;
 public class ContactResponse {
     @SerializedName("data")
     @Expose
-    private Contact contact;
+    private List<_Contact> contacts;
 
-    public Contact getContact() {
-        return contact;
+    public List<_Contact> getContacts() {
+        return contacts;
     }
 
     @Override
     public String toString() {
         return "ContactResponse{" +
-                "contact=" + contact +
+                "contact=" + contacts +
                 '}';
     }
 }

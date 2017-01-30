@@ -14,6 +14,7 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 import java.util.List;
 
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -54,7 +55,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void getName(String username) {
         Subscription subscription = getNameUseCase.execute(username)
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
                     public void onResult(String result) {
@@ -70,7 +71,7 @@ public class MessagePresenter implements MessageContract.Presenter {
         Logger.d(this, "Loading chat messages: "+chatId);
         Subscription subscription = getMessageUseCase.execute(chatId)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
                     @Override
                     public void onResult(List<MessageResult> result) {
@@ -86,7 +87,7 @@ public class MessagePresenter implements MessageContract.Presenter {
         result.setMessageStatus(MessageResult.MessageStatus.SEEN);
         Subscription subscription = updateMessageUseCase.execute(result)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
             @Override
             public void onResult(MessageResult result) {
@@ -109,7 +110,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
         Subscription subscription = storeMessageUseCase.execute(result)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
                     @Override
                     public void onResult(MessageResult message) {
@@ -119,7 +120,7 @@ public class MessagePresenter implements MessageContract.Presenter {
                     @Override
                     public void onCompleted() {
                         Subscription sendMessage = sendMessageUseCase.execute(result)
-                                .observeOn(messageView.getUiScheduler())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
                                     @Override
                                     public void onResult(MessageResult result) {
@@ -138,7 +139,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     public void sendChatState(String chatId, ChatState chatState) {
         Subscription subscription = sendChatStateUseCase.execute(chatId, chatState)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
                     public void onResult(String result) {
@@ -153,7 +154,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     public void getPresence(String chatId) {
         Subscription subscription = getPresenceUseCase.execute(chatId)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
                     @Override
                     public void onResult(String result) {
@@ -168,7 +169,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     public void sendReadReceipt(String chatId) {
         Subscription subscription = sendReadReceiptUseCase.execute(chatId)
                 .subscribeOn(Schedulers.io())
-                .observeOn(messageView.getUiScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<Boolean>(messageView) {
                     @Override
                     public void onResult(Boolean result) {
