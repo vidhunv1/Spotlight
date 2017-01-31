@@ -1,7 +1,7 @@
 package com.stairway.spotlight;
 
-import com.stairway.data.source.message.MessageApi;
-import com.stairway.data.source.message.MessageStore;
+import com.stairway.spotlight.local.MessageApi;
+import com.stairway.spotlight.local.MessageStore;
 
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 

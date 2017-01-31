@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.config.XMPPManager;
-import com.stairway.data.source.message.MessageApi;
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.message.MessageStore;
-import com.stairway.data.xmpp.ReadReceiptExtension;
+import com.stairway.spotlight.XMPPManager;
+import com.stairway.spotlight.local.MessageApi;
+import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.ChatManager;

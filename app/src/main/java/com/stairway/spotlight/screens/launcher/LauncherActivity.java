@@ -2,18 +2,12 @@ package com.stairway.spotlight.screens.launcher;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 
@@ -68,9 +62,5 @@ public class LauncherActivity extends BaseActivity implements LauncherContract.V
         startActivity(WelcomeActivity.callingIntent(this));
         this.overridePendingTransition(0,0);
         finish();
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
     }
 }

@@ -1,7 +1,6 @@
 package com.stairway.spotlight.screens.home;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import java.util.List;

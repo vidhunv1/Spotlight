@@ -1,9 +1,7 @@
 package com.stairway.spotlight.screens.contacts;
 
-import com.stairway.data.source.contacts.ContactResult;
-import com.stairway.data.source.contacts.ContactStore;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.models.ContactResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -15,7 +13,6 @@ import rx.Subscriber;
 public class AddContactUseCase {
     private ContactStore contactStore;
 
-    @Inject
     public AddContactUseCase(ContactStore contactStore) {
         this.contactStore = contactStore;
     }

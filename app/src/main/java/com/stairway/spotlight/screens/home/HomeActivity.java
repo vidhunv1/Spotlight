@@ -22,22 +22,23 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.squareup.otto.Subscribe;
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.message.MessageStore;
-import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.gson_models.User;
-import com.stairway.data.source.user.gson_models.UserResponse;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserRequest;
+import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 import android.widget.PopupWindow;
 
+import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
@@ -91,7 +92,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.d(this);
 		super.onCreate(savedInstanceState);
-
+		userApi = ApiManager.getUserApi();
 		userSession = AccessTokenManager.getInstance().load();
 		this.messageStore = new MessageStore();
 		this.contactStore = new ContactStore();
@@ -253,10 +254,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
 			String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
 			Logger.d(this, "FCM TOKEN:"+fcmToken);
-			User updateUser = new User();
+			_User updateUser = new _User();
 			updateUser.setNotificationToken(fcmToken);
-			userApi = new UserApi();
-			userApi.updateUser(updateUser, userSession.getAccessToken()).subscribe(new Subscriber<UserResponse>() {
+			UserRequest userRequest = new UserRequest();
+			userRequest.setUser(updateUser);
+			userApi.updateUser(userRequest).subscribe(new Subscriber<UserResponse>() {
 				@Override
 				public void onCompleted() {}
 				@Override
@@ -270,7 +272,4 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			});
 		}
 	}
-
-	@Override
-	protected void injectComponent(ComponentContainer componentContainer) {}
 }

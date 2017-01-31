@@ -11,8 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.core.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;

@@ -1,8 +1,8 @@
 package com.stairway.spotlight.screens.new_chat;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.screens.home.FindUserUseCase;
 
 import java.util.List;

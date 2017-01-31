@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.search;
 
-import com.stairway.data.source.message.MessageResult;
 
 import java.util.List;
 

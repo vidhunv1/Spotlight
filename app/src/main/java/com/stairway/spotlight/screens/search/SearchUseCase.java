@@ -1,15 +1,14 @@
 package com.stairway.spotlight.screens.search;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
-import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.message.MessageStore;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.models.ContactResult;
+import com.stairway.spotlight.models.MessageResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -22,7 +21,6 @@ public class SearchUseCase {
     private ContactStore contactStore;
     private MessageStore messageStore;
 
-    @Inject
     public SearchUseCase(ContactStore contactStore, MessageStore messageStore) {
         this.contactStore = contactStore;
         this.messageStore = messageStore;

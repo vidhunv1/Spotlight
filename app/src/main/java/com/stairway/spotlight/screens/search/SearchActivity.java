@@ -14,21 +14,24 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
+import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.screens.home.ChatListAdapter;
 import com.stairway.spotlight.screens.home.ChatListItemModel;
+import com.stairway.spotlight.screens.home.FindUserUseCase;
 import com.stairway.spotlight.screens.home.HomeActivity;
-import com.stairway.spotlight.screens.search.di.SearchViewModule;
 
 import java.io.Serializable;
 import java.util.List;
 
-import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -43,7 +46,6 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     Toolbar toolbar;
     @Bind(R.id.ib_search_clear)
     ImageButton clearSearchView;
-    @Inject
     SearchPresenter searchPresenter;
 
     private EditText searchQuery;
@@ -67,6 +69,11 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
 
+        userSession = AccessTokenManager.getInstance().load();
+        ContactStore contactStore = new ContactStore();
+        MessageStore messageStore = new MessageStore();
+        UserApi userApi = ApiManager.getUserApi();
+        searchPresenter = new SearchPresenter(new SearchUseCase(contactStore, messageStore), new FindUserUseCase(userApi, contactStore));
         Intent i = getIntent();
         List<ChatListItemModel> list = (List<ChatListItemModel>) i.getSerializableExtra(KEY_CHATS);
         ChatListAdapter chatListAdapter = new ChatListAdapter(this, list, this);
@@ -154,11 +161,5 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Override
     public void navigateToAddContact(ContactResult contactResult) {
 //        startActivity(AddUserActivity.callingIntent(this, contactResult));
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new SearchViewModule()).inject(this);
-        userSession = componentContainer.userSessionComponent().getUserSession();
     }
 }

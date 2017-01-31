@@ -5,10 +5,6 @@ import android.preference.PreferenceManager;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.gson_models.User;
-import com.stairway.data.source.user.gson_models.UserResponse;
 
 import rx.Subscriber;
 
@@ -18,7 +14,6 @@ import rx.Subscriber;
 public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
     public static final String SENT_TOKEN_TO_SERVER = "FCM_IS_TOKEN_SENT";
     public static final String FCM_TOKEN = "FCM_TOKEN";
-    UserApi userApi;
 
     public FCMRegistrationIntentService() {
     }

@@ -1,8 +1,8 @@
 package com.stairway.spotlight.screens.search;
 
-import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
+import com.stairway.spotlight.models.ContactResult;
 
 import java.util.List;
 

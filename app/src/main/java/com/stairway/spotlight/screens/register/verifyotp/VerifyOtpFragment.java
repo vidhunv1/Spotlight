@@ -11,12 +11,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stairway.data.source.user.UserApi;
+import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.register.initialize.InitializeFragment;
 
 import butterknife.Bind;
@@ -57,7 +56,7 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        verifyOtpPresenter = new VerifyOtpPresenter(new UserApi(), AccessTokenManager.getInstance());
+        verifyOtpPresenter = new VerifyOtpPresenter(ApiManager.getUserApi(), AccessTokenManager.getInstance());
     }
 
     @Nullable
@@ -125,9 +124,5 @@ public class VerifyOtpFragment extends BaseFragment implements VerifyOtpContract
                     getArguments().getString(KEY_MOBILE),
                     otpEditText.getText().toString());
         }
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
     }
 }

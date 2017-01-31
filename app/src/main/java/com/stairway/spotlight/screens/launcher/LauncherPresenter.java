@@ -1,15 +1,6 @@
 package com.stairway.spotlight.screens.launcher;
 
-import com.stairway.data.source.user.UserSessionResult;
 import com.stairway.spotlight.AccessTokenManager;
-import com.stairway.spotlight.core.UseCaseSubscriber;
-
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
-
 /**
  * Created by vidhun on 21/07/16.
  */

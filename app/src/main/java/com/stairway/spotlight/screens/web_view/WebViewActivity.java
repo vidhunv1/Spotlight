@@ -6,10 +6,9 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.Logger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,7 +42,4 @@ public class WebViewActivity extends BaseActivity {
         webView.loadUrl(receivedIntent.getStringExtra(KEY_WEB_URL));
     }
 
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-    }
 }

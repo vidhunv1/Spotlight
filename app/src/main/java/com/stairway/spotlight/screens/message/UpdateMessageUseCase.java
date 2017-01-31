@@ -1,9 +1,7 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.message.MessageStore;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.models.MessageResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -15,7 +13,6 @@ import rx.Subscriber;
 public class UpdateMessageUseCase {
     private MessageStore messageStore;
 
-    @Inject
     public UpdateMessageUseCase(MessageStore messageStore) {
         this.messageStore = messageStore;
     }

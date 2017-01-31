@@ -8,31 +8,22 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.contacts.di.ContactsViewModule;
-import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 public class ContactsActivity extends BaseActivity implements ContactsContract.View,
         ContactsAdapter.ContactClickListener, ContactsAdapter.ContactAddClickListener{
     private ContactsAdapter contactsAdapter;
 
-    @Inject
     ContactsPresenter contactsPresenter;
 
     @Bind(R.id.rv_contact_list)
@@ -50,6 +41,8 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         ButterKnife.bind(this);
+
+        contactsPresenter = new ContactsPresenter(new AddContactUseCase(new ContactStore()), new GetContactsUseCase(new ContactStore()));
 //        OverScrollDecoratorHelper.setUpOverScroll(contactList, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         contactsPresenter.attachView(this);
         contactsAdapter = new ContactsAdapter(this, this);
@@ -97,10 +90,5 @@ public class ContactsActivity extends BaseActivity implements ContactsContract.V
     public void onContactAddClicked(String userName) {
         Logger.d(this, "Add Clicked: "+userName);
         contactsPresenter.addContact(userName);
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        componentContainer.userSessionComponent().plus(new ContactsViewModule()).inject(this);
     }
 }

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseFragment;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 
 import butterknife.ButterKnife;
 
@@ -44,10 +43,5 @@ public class SearchFragment extends BaseFragment {
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-
     }
 }

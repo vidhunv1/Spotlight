@@ -1,17 +1,12 @@
 package com.stairway.spotlight.screens.register.signup;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.gson_models.StatusResponse;
-import com.stairway.data.source.user.gson_models.User;
-import com.stairway.spotlight.core.UseCaseSubscriber;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.api.user.StatusResponse;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserRequest;
+import com.stairway.spotlight.core.Logger;
 
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -32,7 +27,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     @Override
     public void createUser(String countryCode, String phoneNumber) {
 
-        Subscription subscription = userApi.createUser(countryCode, phoneNumber).subscribe(new Subscriber<StatusResponse>() {
+        Subscription subscription = userApi.createUser(new UserRequest(countryCode, phoneNumber)).subscribe(new Subscriber<StatusResponse>() {
             @Override
             public void onCompleted() {}
 

@@ -1,11 +1,12 @@
 package com.stairway.spotlight;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.models.AccessToken;
 
 import java.util.Date;
@@ -19,30 +20,31 @@ import rx.schedulers.Schedulers;
  */
 
 public class AccessTokenManager {
-    private static volatile AccessTokenManager instance;
-
-    public static AccessTokenManager getInstance() {
-        if (instance == null)
-            instance = new AccessTokenManager();
-
-        return instance;
-    }
-
     static final String ACCESS_TOKEN_KEY = "AccessTokenCache.AccessToken";
     static final String EXPIRES_AT_KEY = "AccessTokenCache.ExpiresAt";
     static final String LAST_REFRESH_KEY = "AccessTokenCache.LastRefresh";
     static final String USER_NAME_KEY = "AccessTokenCache.UserId";
-
+    private static AccessTokenManager instance;
+    private AccessToken accessToken;
     private final SharedPreferences sharedPreferences;
-
-    public AccessTokenManager() {
+    private AccessTokenManager(Context context) {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SpotlightApplication.getContext());
     }
 
+    public static AccessTokenManager getInstance() {
+        if (instance == null)
+            throw new IllegalStateException("AccessTokenManager is not initialized");
+
+        return instance;
+    }
+
+    public static void init(Context context) {
+        instance = new AccessTokenManager(context);
+    }
+
     public AccessToken load() {
-        AccessToken accessToken = null;
-        if (hasAccessToken())
-            accessToken = getAccessToken();
+        if (this.accessToken==null && hasAccessToken())
+            this.accessToken = getAccessToken();
         return accessToken;
     }
 

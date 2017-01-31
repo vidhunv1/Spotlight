@@ -15,11 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import com.stairway.data.config.Logger;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.screens.message.MessageActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -116,8 +113,4 @@ public class UserProfileActivity extends BaseActivity {
 //            profileDP.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 //        }
 //    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-    }
 }

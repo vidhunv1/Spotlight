@@ -26,22 +26,19 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.user.UserApi;
 import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.screens.home.FindUserUseCase;
 import com.stairway.spotlight.screens.message.MessageActivity;
-import com.stairway.spotlight.screens.new_chat.di.NewChatViewModule;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -90,7 +87,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
 
-        newChatPresenter = new NewChatPresenter(new GetNewChatsUseCase(new ContactStore()), new FindUserUseCase(new UserApi(), new ContactStore()));
+        userSession = AccessTokenManager.getInstance().load();
+        newChatPresenter = new NewChatPresenter(new GetNewChatsUseCase(new ContactStore()), new FindUserUseCase(ApiManager.getUserApi(), new ContactStore()));
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_SHOW_SOFT_INPUT))
@@ -294,10 +292,5 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @OnTextChanged(R.id.et_new_chat_search1)
     public void onSearchChanged() {
         newChatAdapter.filterList(toolbarSearch.getText().toString());
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        userSession = AccessTokenManager.getInstance().load();
     }
 }

@@ -7,14 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactApi;
-import com.stairway.data.source.contacts.ContactContent;
-import com.stairway.data.source.contacts.ContactStore;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.contacts.ContactsApi;
 import com.stairway.spotlight.core.BaseFragment;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.ContactsContent;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
 import butterknife.Bind;
@@ -31,8 +31,8 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     @Bind(R.id.tv_fragment_initialize)
     TextView initializeText;
 
-    private ContactApi contactApi;
-    private ContactContent contactContent;
+    private ContactsApi contactApi;
+    private ContactsContent contactContent;
     private ContactStore contactStore;
     private AccessTokenManager accessTokenManager;
 
@@ -46,9 +46,9 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.contactApi = new ContactApi();
+        this.contactApi = ApiManager.getContactsApi();
         this.contactStore = new ContactStore();
-        this.contactContent = new ContactContent(this.getContext());
+        this.contactContent = new ContactsContent(this.getContext());
         this.accessTokenManager = AccessTokenManager.getInstance();
         initializePresenter = new InitializePresenter(contactApi, contactContent, contactStore, accessTokenManager);
     }
@@ -84,9 +84,5 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
         Logger.d(this, "Navigate to home");
         startActivity(HomeActivity.callingIntent(getActivity()));
         getActivity().finish();
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
     }
 }

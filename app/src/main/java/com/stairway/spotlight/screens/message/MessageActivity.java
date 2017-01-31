@@ -15,15 +15,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
+import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.data.config.XMPPManager;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.MessageApi;
+import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
-import com.stairway.spotlight.screens.message.di.MessageModule;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
@@ -32,17 +33,13 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 public class MessageActivity extends BaseActivity
         implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
-    @Inject
     MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem)
@@ -78,7 +75,21 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MessageApi messageApi = new MessageApi(XMPPManager.getInstance().getConnection());
+        MessageStore messageStore = new MessageStore();
+        ContactStore contactStore = new ContactStore();
+        LoadMessagesUseCase loadMessagesUseCase = new LoadMessagesUseCase(messageApi, messageStore);
+        StoreMessageUseCase storeMessageUseCase = new StoreMessageUseCase(messageApi, messageStore);
+        SendMessageUseCase sendMessageUseCase = new SendMessageUseCase(messageApi, messageStore);
+        GetPresenceUseCase getPresenceUseCase = new GetPresenceUseCase(messageApi);
+        UpdateMessageUseCase updateMessageUseCase = new UpdateMessageUseCase(messageStore);
+        SendChatStateUseCase sendChatStateUseCase = new SendChatStateUseCase(messageApi);
+        SendReadReceiptUseCase sendReadReceiptUseCase = new SendReadReceiptUseCase(messageApi, messageStore);
+        GetNameUseCase getNameUseCase = new GetNameUseCase(contactStore);
+        messagePresenter = new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, getPresenceUseCase, updateMessageUseCase, sendChatStateUseCase, sendReadReceiptUseCase, getNameUseCase);
+
         currentChatState = ChatState.inactive;
+        currentUser = AccessTokenManager.getInstance().load().getUserName();
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_USER_NAME))
             return;
@@ -271,10 +282,5 @@ public class MessageActivity extends BaseActivity
         if(this.chatId.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
         }
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
-        currentUser = AccessTokenManager.getInstance().load().getUserName();
     }
 }

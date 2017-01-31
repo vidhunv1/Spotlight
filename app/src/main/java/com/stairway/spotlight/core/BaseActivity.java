@@ -12,15 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.config.XMPPManager;
-import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.application.SpotlightApplication;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
-import com.stairway.spotlight.core.di.component.UserSessionComponent;
-import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
@@ -35,7 +29,6 @@ import rx.android.schedulers.AndroidSchedulers;
  * Created by vidhun on 05/07/16.
  */
 public abstract class BaseActivity extends AppCompatActivity implements  XmppService.XmppServiceCallback{
-    private UserSessionComponent userSessionComponent;
 
     public static boolean isAppWentToBg = false;
     public static boolean isWindowFocused = false;
@@ -46,7 +39,6 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        injectComponent(((SpotlightApplication) getApplication()).getComponentContainer());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -153,6 +145,4 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
     public void onChatStateReceived(String from, ChatState chatState) { Logger.d(this, "chatState: "+chatState.name()+", from "+from);}
 
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {}
-
-    protected abstract void injectComponent(ComponentContainer componentContainer);
 }

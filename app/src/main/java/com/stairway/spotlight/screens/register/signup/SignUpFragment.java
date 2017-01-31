@@ -10,11 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.user.UserApi;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.core.BaseFragment;
-import com.stairway.spotlight.core.di.component.ComponentContainer;
 import com.stairway.spotlight.screens.register.verifyotp.VerifyOtpFragment;
 
 import butterknife.Bind;
@@ -46,7 +45,7 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        userApi = new UserApi();
+        userApi = ApiManager.getUserApi();
         signUpPresenter = new SignUpPresenter(userApi);
         super.onCreate(savedInstanceState);
     }
@@ -116,9 +115,5 @@ public class SignUpFragment extends BaseFragment implements SignUpContract.View{
 //      fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
         fragmentTransaction.addToBackStack("SignUpFragment");
         fragmentTransaction.commit();
-    }
-
-    @Override
-    protected void injectComponent(ComponentContainer componentContainer) {
     }
 }

@@ -1,10 +1,8 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.source.message.MessageApi;
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.source.message.MessageStore;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.local.MessageApi;
+import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.models.MessageResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -16,7 +14,6 @@ public class SendMessageUseCase {
     private MessageApi messageApi;
     private MessageStore messageStore;
 
-    @Inject
     public SendMessageUseCase(MessageApi messageApi, MessageStore messageStore) {
         this.messageApi = messageApi;
         this.messageStore = messageStore;

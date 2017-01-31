@@ -1,8 +1,12 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
-import com.stairway.data.error.DataException;
-import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.gson_models.UserResponse;
+import com.stairway.spotlight.DataException;
+import com.stairway.spotlight.XMPPManager;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserRequest;
+import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.AccessTokenManager;
 
@@ -31,8 +35,13 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
 
     @Override
     public void registerUser(String countryCode, String mobile, String otp) {
-
-        Subscription subscription = userApi.verifyUser(countryCode, mobile, otp)
+        UserRequest userRequest = new UserRequest(countryCode, mobile);
+        _User user = new _User(countryCode, mobile);
+        user.setUserTypeRegular();
+        user.setVerificationCode(otp);
+        UserRequest verifyRequest = new UserRequest();
+        verifyRequest.setUser(user);
+        Subscription subscription = userApi.verifyUser(verifyRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<UserResponse>() {
@@ -51,6 +60,8 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
                 public void onNext(UserResponse verifyResponse) {
                     AccessToken accessToken = new AccessToken(verifyResponse.getAccessToken(), verifyResponse.getUser().getUsername(), verifyResponse.getExpires());
                     accessTokenManager.save(accessToken);
+                    ApiManager.getInstance().setAuthorization(accessToken.getAccessToken());
+                    XMPPManager.init(accessToken.getUserName(), accessToken.getAccessToken());
                     verifyOtpView.navigateToInitializeFragment(accessToken);
                 }
             });

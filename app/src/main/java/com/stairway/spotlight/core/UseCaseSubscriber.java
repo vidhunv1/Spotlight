@@ -1,6 +1,5 @@
 package com.stairway.spotlight.core;
 
-import com.stairway.data.config.Logger;
 
 import rx.Subscriber;
 

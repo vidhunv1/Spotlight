@@ -1,12 +1,10 @@
 package com.stairway.spotlight.screens.home;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
-import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.user.UserApi;
-import com.stairway.data.source.user.gson_models.UserResponse;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.models.ContactResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -19,7 +17,6 @@ public class FindUserUseCase {
     private UserApi userApi;
     private ContactStore contactStore;
 
-    @Inject
     public FindUserUseCase(UserApi userApi, ContactStore contactStore) {
         this.userApi = userApi;
         this.contactStore = contactStore;
@@ -69,7 +66,7 @@ public class FindUserUseCase {
                         subscriber.onNext(res);
                         subscriber.onCompleted();
                     } else {
-                        userApi.findUser(userId, authToken).subscribe(new Subscriber<UserResponse>() {
+                        userApi.findUser(userId).subscribe(new Subscriber<UserResponse>() {
                             @Override
                             public void onCompleted() {}
 

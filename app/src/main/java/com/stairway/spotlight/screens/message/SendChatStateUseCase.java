@@ -1,11 +1,9 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.source.message.MessageApi;
+import com.stairway.spotlight.local.MessageApi;
 
-import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -17,7 +15,6 @@ import rx.Subscriber;
 public class SendChatStateUseCase {
     private MessageApi messageApi;
 
-    @Inject
     public SendChatStateUseCase(MessageApi messageApi) {
         this.messageApi = messageApi;
     }

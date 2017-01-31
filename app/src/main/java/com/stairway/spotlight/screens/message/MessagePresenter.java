@@ -1,10 +1,8 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.config.XMPPManager;
-import com.stairway.data.source.message.MessageResult;
-import com.stairway.data.xmpp.ReadReceiptExtension;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
 import org.jivesoftware.smack.SmackException;

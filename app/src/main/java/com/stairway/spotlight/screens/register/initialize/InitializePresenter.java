@@ -1,12 +1,13 @@
 package com.stairway.spotlight.screens.register.initialize;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactApi;
-import com.stairway.data.source.contacts.ContactContent;
-import com.stairway.data.source.contacts.ContactResult;
-import com.stairway.data.source.contacts.ContactStore;
-import com.stairway.data.source.contacts.gson_models._Contact;
 import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.api.contacts.ContactRequest;
+import com.stairway.spotlight.api.contacts.ContactsApi;
+import com.stairway.spotlight.api.contacts._Contact;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.local.ContactsContent;
+import com.stairway.spotlight.models.ContactResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,11 @@ public class InitializePresenter implements InitializeContract.Presenter {
     private InitializeContract.View initializeView;
 
     private AccessTokenManager accessTokenManager;
-    private ContactApi contactApi;
-    private ContactContent contactContent;
+    private ContactsApi contactApi;
+    private ContactsContent contactContent;
     private ContactStore contactStore;
 
-    public InitializePresenter(ContactApi contactApi, ContactContent contactContent, ContactStore contactStore, AccessTokenManager accessTokenManager) {
+    public InitializePresenter(ContactsApi contactApi, ContactsContent contactContent, ContactStore contactStore, AccessTokenManager accessTokenManager) {
         this.contactApi = contactApi;
         this.contactContent = contactContent;
         this.contactStore = contactStore;
@@ -52,7 +53,7 @@ public class InitializePresenter implements InitializeContract.Presenter {
 
                     @Override
                     public void onNext(List<ContactResult> contactResults) {
-                        contactApi.initPhoneBook(contactResults, accessToken)
+                        contactApi.createContacts(new ContactRequest(contactResults))
                                 .map(contactResponse -> {
                                     List<ContactResult>  contacts = new ArrayList<>(contactResponse.getContacts().size());
                                     Logger.d(this,contactResponse.getContacts().size()+"");

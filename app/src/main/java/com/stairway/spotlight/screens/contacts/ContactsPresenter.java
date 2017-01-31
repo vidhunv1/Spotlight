@@ -1,6 +1,5 @@
 package com.stairway.spotlight.screens.contacts;
 
-import com.stairway.data.source.contacts.ContactResult;
 import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import java.util.List;

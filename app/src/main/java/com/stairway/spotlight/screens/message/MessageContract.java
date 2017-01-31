@@ -1,8 +1,8 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.source.message.MessageResult;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
+import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
 import org.jivesoftware.smackx.chatstates.ChatState;

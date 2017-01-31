@@ -1,10 +1,8 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.data.config.Logger;
-import com.stairway.data.source.contacts.ContactResult;
-import com.stairway.data.source.contacts.ContactStore;
-
-import javax.inject.Inject;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.models.ContactResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -15,7 +13,6 @@ import rx.Subscriber;
 public class GetNameUseCase {
     private ContactStore contactStore;
 
-    @Inject
     public GetNameUseCase(ContactStore contactStore) {
         this.contactStore = contactStore;
     }
