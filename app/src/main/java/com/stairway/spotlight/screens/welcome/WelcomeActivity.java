@@ -12,7 +12,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class WelcomeActivity extends AppCompatActivity implements WelcomeContract.View {
-    private WelcomePresenter welcomePresenter;
+
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
@@ -23,10 +23,8 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.welcomePresenter = new WelcomePresenter();
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
-        welcomePresenter.attachView(this);
     }
 
     @OnClick(R.id.btn_welcome_signup)

@@ -1,4 +1,4 @@
-package com.stairway.spotlight.local.core;
+package com.stairway.spotlight.db.core;
 
 /**
  * Created by vidhun on 05/07/16.
@@ -48,13 +48,9 @@ public abstract class SQLiteContract {
     public static final class ContactsContract {
         public static final String TABLE_NAME = "contacts";
 
-        public static final String COLUMN_ROW_ID = "rowid";
-        //        public static final String COLUMN_CONTACT_ID = "contact_id";
         public static final String COLUMN_PHONE_NUMBER = "phone_number";
         public static final String COLUMN_COUNTRY_CODE = "country_code";
         public static final String COLUMN_CONTACT_NAME = "contact_name";
-        public static final String COLUMN_IS_REGISTERED = "is_registered";
-        public static final String COLUMN_IS_ADDED = "is_added";
         public static final String COLUMN_USERNAME = "username";
         public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_CREATED_AT = "created_at";
@@ -63,13 +59,11 @@ public abstract class SQLiteContract {
 //                COLUMN_CONTACT_ID + " INTEGER, " +
                 COLUMN_PHONE_NUMBER + " TEXT, " +
                 COLUMN_COUNTRY_CODE + " TEXT, " +
-                COLUMN_IS_ADDED + " INTEGER, " +
                 COLUMN_USERNAME + " TEXT, "+
                 COLUMN_USER_ID + " TEXT, "+
-                COLUMN_IS_REGISTERED + " INTEGER, "+
                 COLUMN_CONTACT_NAME + " TEXT, " +
                 COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
-                "UNIQUE("+COLUMN_PHONE_NUMBER+", "+COLUMN_COUNTRY_CODE+", "+COLUMN_USERNAME+") ON CONFLICT REPLACE); ";
+                "UNIQUE("+COLUMN_USERNAME+") ON CONFLICT REPLACE); ";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }

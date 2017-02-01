@@ -7,14 +7,14 @@ import java.io.Serializable;
 /**
  * Created by vidhun on 14/07/16.
  */
-public class ChatListItemModel implements Serializable{
+public class ChatItem implements Serializable{
     private String chatId;
     private String chatName;
     private String lastMessage;
     private String time;
     private int notificationCount;
 
-    public ChatListItemModel(String chatId, String chatName, String lastMessage, String time, int notificationCount) {
+    public ChatItem(String chatId, String chatName, String lastMessage, String time, int notificationCount) {
         this.chatId = chatId;
         this.chatName = chatName;
         this.lastMessage = lastMessage;
@@ -22,7 +22,7 @@ public class ChatListItemModel implements Serializable{
         this.notificationCount = notificationCount;
     }
 
-    public ChatListItemModel() {
+    public ChatItem() {
     }
 
     public String getChatId() {

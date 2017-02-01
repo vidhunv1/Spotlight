@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,14 +29,12 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.api.ApiManager;
-import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.lib.AndroidUtils;
-import com.stairway.spotlight.screens.home.FindUserUseCase;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.List;
@@ -88,7 +87,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         setContentView(R.layout.activity_new_chat);
 
         userSession = AccessTokenManager.getInstance().load();
-        newChatPresenter = new NewChatPresenter(new GetNewChatsUseCase(new ContactStore()), new FindUserUseCase(ApiManager.getUserApi(), new ContactStore()));
+        newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi());
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_SHOW_SOFT_INPUT))
@@ -154,8 +153,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
+        Logger.d(this, "showContactAddedSuccess:"+addContactPopupWindow.isShowing());
         addContactPopupWindow.dismiss();
-        newChatPresenter.initContactList();
         AndroidUtils.hideSoftInput(this);
 
         String message;
@@ -174,12 +173,12 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         );
         if(Build.VERSION.SDK_INT>=21)
             addedPopupWindow.setElevation(5.0f);
+
+        addedPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         addedPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
 
         RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
-        out.setOnClickListener(view -> {
-            addedPopupWindow.dismiss();
-        });
+        out.setOnClickListener(view -> addedPopupWindow.dismiss());
 
         Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
         sendMessage.setOnClickListener(v1 -> {
@@ -189,13 +188,14 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
         resultMessage.setText(message);
+        newChatPresenter.initContactList();
     }
 
     @Override
     public void showInvalidIDError() {
         if(addContactPopupWindow.isShowing()) {
             ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
-            pb.setVisibility(View.GONE);
+            pb.setVisibility(View.INVISIBLE);
             showAlertDialog("Please enter a valid iChat ID.", R.layout.alert);
         }
     }
@@ -212,8 +212,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         );
         if(Build.VERSION.SDK_INT>=21)
             addContactPopupWindow.setElevation(5.0f);
-        addContactPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
+
         addContactPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
+        addContactPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
 
         FrameLayout outLayout = (FrameLayout) addContactPopupView.findViewById(R.id.fl_add_contact);
         outLayout.setOnClickListener(v -> {
@@ -228,31 +229,31 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         Button addButton = (Button) addContactPopupView.findViewById(R.id.btn_add_contact);
         addButton.setOnClickListener(v -> {
             if(enterId.getText().length()>0) {
-                newChatPresenter.addContact(enterId.getText().toString(), userSession.getAccessToken());
                 ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
                 pb.setVisibility(View.VISIBLE);
+                newChatPresenter.addContact(enterId.getText().toString(), userSession.getAccessToken());
             }
         });
 
         // popup not working in older versions
-        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
-            newChatLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
-                public void onGlobalLayout(){
-                    int heightDiff = newChatLayout.getRootView().getHeight()- newChatLayout.getHeight();
-                    // IF height diff is more then 150, consider keyboard as visible.
-                    Logger.d(this, "DIFF: "+heightDiff);
-                    RelativeLayout content = (RelativeLayout) addContactPopupView.findViewById(R.id.rl_add_contact_content);
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)content.getLayoutParams();
-                    if(heightDiff>150) {
-                        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -110, getResources().getDisplayMetrics());
-                        params.setMargins(0, px, 0, 0);
-                        content.setLayoutParams(params);
-                    } else {
-                        params.setMargins(0, 0, 0, 0);
-                        content.setLayoutParams(params);
-                    }
-                }
-            });
+//        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
+//            newChatLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
+//                public void onGlobalLayout(){
+//                    int heightDiff = newChatLayout.getRootView().getHeight()- newChatLayout.getHeight();
+//                    // IF height diff is more then 150, consider keyboard as visible.
+//                    Logger.d(this, "DIFF: "+heightDiff);
+//                    RelativeLayout content = (RelativeLayout) addContactPopupView.findViewById(R.id.rl_add_contact_content);
+//                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)content.getLayoutParams();
+//                    if(heightDiff>150) {
+//                        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -110, getResources().getDisplayMetrics());
+//                        params.setMargins(0, px, 0, 0);
+//                        content.setLayoutParams(params);
+//                    } else {
+//                        params.setMargins(0, 0, 0, 0);
+//                        content.setLayoutParams(params);
+//                    }
+//                }
+//            });
     }
 
     public void showAlertDialog(String message, int layout) {

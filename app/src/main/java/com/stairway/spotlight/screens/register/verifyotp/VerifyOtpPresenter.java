@@ -1,12 +1,13 @@
 package com.stairway.spotlight.screens.register.verifyotp;
 
-import com.stairway.spotlight.DataException;
+import com.stairway.spotlight.api.ApiException;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.AccessTokenManager;
 
@@ -51,8 +52,8 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
                 @Override
                 public void onError(Throwable e) {
                     e.printStackTrace();
-                    if(e instanceof DataException)
-                        if(((DataException) e).getKind()== DataException.Kind.OTP_INVALID)
+                    if(e instanceof ApiException)
+                        if(((ApiException) e).getKind()== ApiException.Kind.OTP_INVALID)
                             verifyOtpView.invalidOtpError();
                 }
 
@@ -62,6 +63,7 @@ public class VerifyOtpPresenter implements VerifyOtpContract.Presenter {
                     accessTokenManager.save(accessToken);
                     ApiManager.getInstance().setAuthorization(accessToken.getAccessToken());
                     XMPPManager.init(accessToken.getUserName(), accessToken.getAccessToken());
+                    SpotlightApplication.getContext().initSession();
                     verifyOtpView.navigateToInitializeFragment(accessToken);
                 }
             });

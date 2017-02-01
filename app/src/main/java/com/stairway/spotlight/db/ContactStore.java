@@ -1,4 +1,4 @@
-package com.stairway.spotlight.local;
+package com.stairway.spotlight.db;
 
 
 import android.content.ContentValues;
@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.core.DatabaseManager;
-import com.stairway.spotlight.local.core.SQLiteContract;
+import com.stairway.spotlight.db.core.DatabaseManager;
+import com.stairway.spotlight.db.core.SQLiteContract;
 import com.stairway.spotlight.models.ContactResult;
 
 import java.util.ArrayList;
@@ -24,6 +24,15 @@ public class ContactStore {
 
     public ContactStore() {
         databaseManager = DatabaseManager.getInstance();
+    }
+
+    private static ContactStore instance;
+
+    public static ContactStore getInstance() {
+        if (instance == null) {
+            instance = new ContactStore();
+        }
+        return instance;
     }
 
     public Observable<Boolean> storeContact(ContactResult contactResult){
@@ -44,8 +53,6 @@ public class ContactStore {
                 values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED, contactResult.isRegistered());
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
                 long rowId = db.insert(SQLiteContract.ContactsContract.TABLE_NAME, null, values);
             }
             subscriber.onNext(true);
@@ -65,8 +72,6 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME,
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
-                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
-                    SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID
             };
@@ -81,12 +86,8 @@ public class ContactStore {
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
-                    boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED)) == 1);
-                    boolean isAdded = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1);
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
-                    contactResult.setAdded(isAdded);
-                    contactResult.setRegistered(isRegistered);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
                     result.add(contactResult);
@@ -122,8 +123,6 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME,
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
-                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
-                    SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID
             };
@@ -139,12 +138,8 @@ public class ContactStore {
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
-                    boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED)) == 1);
-                    boolean isAdded = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1);
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
-                    contactResult.setAdded(isAdded);
-                    contactResult.setRegistered(isRegistered);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
                     result.add(contactResult);
@@ -193,8 +188,6 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME,
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
-                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
-                    SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID
             };
@@ -211,13 +204,9 @@ public class ContactStore {
                     String countryCode = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE));
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
-                    boolean isRegistered = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_REGISTERED)) == 1);
-                    boolean isAdded = (cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1);
                     //String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
-                    contactResult.setAdded(isAdded);
-                    contactResult.setRegistered(isRegistered);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
 
@@ -235,17 +224,15 @@ public class ContactStore {
             }
         });
     }
-
-    public Observable<ContactResult> update(ContactResult contactResult) {
-        return Observable.create(subscriber -> {
-            SQLiteDatabase db = databaseManager.openConnection();
-            ContentValues values = new ContentValues();
-            if(contactResult.isAdded())
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, 1);
-            db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME+"='"+contactResult.getUsername()+"'", null);
-            subscriber.onNext(contactResult);
-            subscriber.onCompleted();
-            databaseManager.closeConnection();
-        });
-    }
+//
+//    public Observable<ContactResult> update(ContactResult contactResult) {
+//        return Observable.create(subscriber -> {
+//            SQLiteDatabase db = databaseManager.openConnection();
+//            ContentValues values = new ContentValues();
+//            db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME+"='"+contactResult.getUsername()+"'", null);
+//            subscriber.onNext(contactResult);
+//            subscriber.onCompleted();
+//            databaseManager.closeConnection();
+//        });
+//    }
 }

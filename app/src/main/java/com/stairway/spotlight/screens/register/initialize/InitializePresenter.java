@@ -1,12 +1,11 @@
 package com.stairway.spotlight.screens.register.initialize;
 
-import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.api.contacts.ContactRequest;
 import com.stairway.spotlight.api.contacts.ContactsApi;
 import com.stairway.spotlight.api.contacts._Contact;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.ContactsContent;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.ContactsContent;
 import com.stairway.spotlight.models.ContactResult;
 
 import java.util.ArrayList;
@@ -26,24 +25,20 @@ public class InitializePresenter implements InitializeContract.Presenter {
     private CompositeSubscription subscriptions;
     private InitializeContract.View initializeView;
 
-    private AccessTokenManager accessTokenManager;
     private ContactsApi contactApi;
     private ContactsContent contactContent;
-    private ContactStore contactStore;
+    private ContactStore appContactStore;
 
-    public InitializePresenter(ContactsApi contactApi, ContactsContent contactContent, ContactStore contactStore, AccessTokenManager accessTokenManager) {
+    public InitializePresenter(ContactsApi contactApi, ContactsContent contactContent, ContactStore appContactStore) {
         this.contactApi = contactApi;
         this.contactContent = contactContent;
-        this.contactStore = contactStore;
-        this.accessTokenManager = accessTokenManager;
+        this.appContactStore = appContactStore;
 
         this.subscriptions = new CompositeSubscription();
     }
 
     @Override
     public void syncContacts() {
-        String accessToken = accessTokenManager.load().getAccessToken();
-
         Subscription subscription = contactContent.getContacts()
                 .subscribe(new Subscriber<List<ContactResult>>() {
                     @Override
@@ -62,12 +57,10 @@ public class InitializePresenter implements InitializeContract.Presenter {
                                         ContactResult contactResult = new ContactResult(contact.getCountryCode(), contact.getPhone(), contact.getName());
                                         contactResult.setUsername(contact.getUsername());
                                         contactResult.setUserId(contact.getUserId());
-                                        contactResult.setRegistered(contact.isRegistered());
 
                                         // default behaviour, we auto add phone contacts
                                         if(contact.isRegistered())
-                                            contactResult.setAdded(true);
-                                        contacts.add(contactResult);
+                                            contacts.add(contactResult);
                                     }
                                     return contacts; })
                                 .subscribeOn(Schedulers.io())
@@ -83,7 +76,7 @@ public class InitializePresenter implements InitializeContract.Presenter {
 
                                     @Override
                                     public void onNext(List<ContactResult> contacts) {
-                                        contactStore.storeContacts(contacts)
+                                        appContactStore.storeContacts(contacts)
                                                 .subscribe(isSuccessful -> initializeView.navigateToHome());
                                     }
                                 });

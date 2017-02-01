@@ -3,7 +3,7 @@ package com.stairway.spotlight.screens.message.view_models;
 /**
  * Created by vidhun on 26/12/16.
  */
-import static com.stairway.spotlight.local.MessageXMLValues.*;
+import static com.stairway.spotlight.db.MessageXMLValues.*;
 
 public class TextMessage{
     private String text;

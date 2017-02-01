@@ -1,7 +1,6 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.spotlight.local.MessageApi;
-
+import com.stairway.spotlight.MessageController;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 
@@ -13,9 +12,9 @@ import rx.Subscriber;
  */
 
 public class SendChatStateUseCase {
-    private MessageApi messageApi;
+    private MessageController messageApi;
 
-    public SendChatStateUseCase(MessageApi messageApi) {
+    public SendChatStateUseCase(MessageController messageApi) {
         this.messageApi = messageApi;
     }
 

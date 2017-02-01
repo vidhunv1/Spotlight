@@ -10,7 +10,6 @@ public class ContactResult implements Serializable {
     private String countryCode;
     private String contactName;
     private String username;
-    private boolean isRegistered;
     private boolean isAdded;
     private String userId;
 
@@ -29,14 +28,6 @@ public class ContactResult implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public boolean isRegistered() {
-        return isRegistered;
-    }
-
-    public void setRegistered(boolean registered) {
-        isRegistered = registered;
     }
 
     public boolean isAdded() {
@@ -96,7 +87,6 @@ public class ContactResult implements Serializable {
                 ", countryCode='" + countryCode + '\'' +
                 ", contactName='" + contactName + '\'' +
                 ", username='" + username + '\'' +
-                ", isRegistered=" + isRegistered +
                 ", isAdded=" + isAdded +
                 ", userId='" + userId + '\'' +
                 '}';

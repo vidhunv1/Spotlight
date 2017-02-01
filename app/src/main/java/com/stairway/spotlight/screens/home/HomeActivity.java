@@ -22,21 +22,21 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.squareup.otto.Subscribe;
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
-import android.widget.PopupWindow;
 
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
@@ -75,12 +75,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	HomePresenter presenter;
 
-	UserApi userApi;
-	AccessToken userSession;
-	MessageStore messageStore;
-	ContactStore contactStore;
-
-	private List<ChatListItemModel> chats;
+	private List<ChatItem> chats;
 
 	private ChatListAdapter chatListAdapter;
 	public static Intent callingIntent(Context context) {
@@ -92,32 +87,26 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.d(this);
 		super.onCreate(savedInstanceState);
-		userApi = ApiManager.getUserApi();
-		userSession = AccessTokenManager.getInstance().load();
-		this.messageStore = new MessageStore();
-		this.contactStore = new ContactStore();
-		presenter = new HomePresenter(new GetChatsUseCase(messageStore, contactStore));
-
-		EventBus.getInstance().getBus().register(this);
 		setContentView(R.layout.activity_home);
-
 		ButterKnife.bind(this);
 
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+		presenter = new HomePresenter(MessageController.getInstance());
+		presenter.attachView(this);
+		presenter.initChatList();
+
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
-		if (animator instanceof SimpleItemAnimator) {
+		if (animator instanceof SimpleItemAnimator)
 			((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
-		}
 
-			fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
 
 		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 		toggle.setDrawerIndicatorEnabled(false);
 		Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_menu, this.getTheme());
-
 		toggle.setHomeAsUpIndicator(drawable);
 		toggle.setToolbarNavigationClickListener(v -> {
 			if (drawer.isDrawerVisible(GravityCompat.START)) {
@@ -126,25 +115,22 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				drawer.openDrawer(GravityCompat.START);
 			}
 		});
-
 		drawer.addDrawerListener(toggle);
 		toggle.syncState();
-
 		navigationView.setNavigationItemSelectedListener(this);
 
-		uploadFCMToken();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		presenter.attachView(this);
-		presenter.initChatList();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		presenter.detachView();
 	}
 
 	@Override
@@ -171,7 +157,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void setDeliveryStatus(int status, int chatId) {}
 
 	@Override
-	public void displayChatList(List<ChatListItemModel> chats) {
+	public void displayChatList(List<ChatItem> chats) {
 		this.chats = chats;
 		chatListAdapter = new ChatListAdapter(this, chats, this);
 		chatList.setAdapter(chatListAdapter);
@@ -179,7 +165,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void addNewMessage(MessageResult messageResult) {
-		ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
+		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
 		chatListAdapter.newChatMessage(item);
 		Logger.d(this, "new notification: "+item);
 	}
@@ -221,14 +207,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void onMessageReceived(MessageResult messageId) {
 		Logger.d(this, "Message:::"+messageId);
-//		addNewMessage(messageId);
-	}
-
-	@Subscribe public void onMessageReceive(MessageResult messageResult) {
-		Logger.d(this, "Message---"+messageResult);
-		ChatListItemModel item = new ChatListItemModel(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
-		chatListAdapter.newChatMessage(item);
-//		this.addNewMessage(messageResult);
+		addNewMessage(messageId);
 	}
 
 	@Override
@@ -250,26 +229,28 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	private void uploadFCMToken() {
 		//Upload to token to server if FCM token not updated
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
-			String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
-			Logger.d(this, "FCM TOKEN:"+fcmToken);
-			_User updateUser = new _User();
-			updateUser.setNotificationToken(fcmToken);
-			UserRequest userRequest = new UserRequest();
-			userRequest.setUser(updateUser);
-			userApi.updateUser(userRequest).subscribe(new Subscriber<UserResponse>() {
-				@Override
-				public void onCompleted() {}
-				@Override
-				public void onError(Throwable e) {
-					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-				}
-				@Override
-				public void onNext(UserResponse userResponse) {
-					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-				}
-			});
-		}
+//		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//		if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
+//			String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
+//			Logger.d(this, "FCM TOKEN:"+fcmToken);
+//			_User updateUser = new _User();
+//			updateUser.setNotificationToken(fcmToken);
+//			UserRequest userRequest = new UserRequest();
+//			userRequest.setUser(updateUser);
+//			ApiManager.getUserApi().updateUser(userRequest)
+//
+//					.subscribe(new Subscriber<UserResponse>() {
+//				@Override
+//				public void onCompleted() {}
+//				@Override
+//				public void onError(Throwable e) {
+//					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+//				}
+//				@Override
+//				public void onNext(UserResponse userResponse) {
+//					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+//				}
+//			});
+//		}
 	}
 }

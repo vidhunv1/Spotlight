@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.message;
-import com.stairway.spotlight.local.MessageApi;
+
+import com.stairway.spotlight.MessageController;
 
 import org.jivesoftware.smack.packet.Presence;
 
@@ -12,9 +13,9 @@ import rx.Subscriber;
  */
 
 public class GetPresenceUseCase {
-    private MessageApi messageApi;
+    private MessageController messageApi;
 
-    public GetPresenceUseCase(MessageApi messageApi) {
+    public GetPresenceUseCase(MessageController messageApi) {
         this.messageApi = messageApi;
     }
 

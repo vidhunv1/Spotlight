@@ -1,4 +1,4 @@
-package com.stairway.spotlight.local;
+package com.stairway.spotlight.db;
 
 
 import android.content.ContentResolver;

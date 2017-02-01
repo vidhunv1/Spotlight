@@ -56,7 +56,7 @@
             android:paddingTop="89dp"
             android:paddingBottom="89dp"
             android:background="#FFFFFF"
-            android:visibility="gone"
+            android:visibility="invisible"
             android:layout_gravity="center_vertical|center_horizontal"/>
     </RelativeLayout>
 </FrameLayout>

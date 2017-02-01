@@ -66,4 +66,15 @@ public class UserResponse {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
+
+    @Override
+    public String toString() {
+        return "UserResponse{" +
+                "user=" + user +
+                ", status='" + status + '\'' +
+                ", message='" + message + '\'' +
+                ", expires='" + expires + '\'' +
+                ", accessToken='" + accessToken + '\'' +
+                '}';
+    }
 }

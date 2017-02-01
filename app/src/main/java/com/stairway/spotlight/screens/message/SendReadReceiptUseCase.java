@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.spotlight.local.MessageApi;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.MessageController;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 
 import rx.Observable;
@@ -12,10 +12,10 @@ import rx.Subscriber;
  */
 
 public class SendReadReceiptUseCase {
-    private MessageApi messageApi;
+    private MessageController messageApi;
     private MessageStore messageStore;
 
-    public SendReadReceiptUseCase(MessageApi messageApi, MessageStore messageStore) {
+    public SendReadReceiptUseCase(MessageController messageApi, MessageStore messageStore) {
         this.messageApi = messageApi;
         this.messageStore = messageStore;
     }

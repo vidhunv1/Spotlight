@@ -1,7 +1,9 @@
 package com.stairway.spotlight.screens.home;
 
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.db.MessageStore;
 
 import java.util.List;
 import rx.Subscription;
@@ -14,12 +16,10 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class HomePresenter implements HomeContract.Presenter {
     private HomeContract.View contactsView;
-    private CompositeSubscription compositeSubscription;
-    private GetChatsUseCase getChatsUseCase;
+    private MessageController messageController;
 
-    public HomePresenter(GetChatsUseCase getChatsUseCase) {
-        this.compositeSubscription = new CompositeSubscription();
-        this.getChatsUseCase = getChatsUseCase;
+    public HomePresenter(MessageController messageController) {
+        this.messageController = messageController;
     }
 
     @Override
@@ -35,16 +35,6 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void initChatList() {
         Logger.v(this, " initChatList");
-        Subscription subscription = getChatsUseCase.execute()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<List<ChatListItemModel>>(contactsView) {
-                    @Override
-                    public void onResult(List<ChatListItemModel> result) {
-                        contactsView.displayChatList(result);
-                    }
-                });
-
-        compositeSubscription.add(subscription);
+        contactsView.displayChatList(messageController.getChatList());
     }
 }

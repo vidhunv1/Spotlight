@@ -1,4 +1,4 @@
-package com.stairway.spotlight.local;
+package com.stairway.spotlight.db;
 /**
  * Created by vidhun on 06/01/17.
  */

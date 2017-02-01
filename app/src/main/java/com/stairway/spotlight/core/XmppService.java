@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.XMPPManager;
-import com.stairway.spotlight.local.MessageApi;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smack.SmackException;
@@ -52,7 +52,7 @@ public class XmppService extends Service {
     private final int RETRY_ONLINE = 1;
     private int retryInterval = RETRY_OFFLINE; //seconds
     private MessageStore messageStore;
-    private MessageApi messageApi;
+    private MessageController messageApi;
     private LocalBroadcastManager broadcaster;
 
     private Timer mTimer = null;
@@ -76,7 +76,7 @@ public class XmppService extends Service {
         broadcaster = LocalBroadcastManager.getInstance(this);
         activity_name = intent.getStringExtra(TAG_ACTIVITY_NAME);
         messageStore = new MessageStore();
-        messageApi = new MessageApi(XMPPManager.getInstance().getConnection());
+        messageApi = MessageController.getInstance();
 
         try {
             xmppServiceCallback = (XmppServiceCallback) Class.forName(activity_name).newInstance();

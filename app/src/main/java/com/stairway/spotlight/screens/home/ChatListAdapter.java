@@ -23,39 +23,39 @@ import butterknife.ButterKnife;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context context;
-    private List<ChatListItemModel> chatList;
-    private List<ChatListItemModel> temp;
+    private List<ChatItem> chatList;
+    private List<ChatItem> temp;
     private ChatClickListener chatClickListener;
     private final int VIEW_WITH_NOTIFICATION=0, VIEW_WITHOUT_NOTIFICATION=1;
 
-    public ChatListAdapter(Context context, List<ChatListItemModel> chatList, ChatClickListener chatClickListener) {
+    public ChatListAdapter(Context context, List<ChatItem> chatList, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
         this.chatList = chatList;
         temp = new ArrayList<>();
         this.context = context;
     }
 
-    public void newChatMessage(ChatListItemModel chatListItemModel){
+    public void newChatMessage(ChatItem chatItem){
         int i;
         for (i = 0; i < chatList.size(); i++) {
-            if(chatListItemModel.getChatId().equals(chatList.get(i).getChatId())){
-                chatListItemModel.setNotificationCount(chatListItemModel.getNotificationCount() + chatList.get(i).getNotificationCount());
-                chatListItemModel.setChatName(chatList.get(i).getChatName());
+            if(chatItem.getChatId().equals(chatList.get(i).getChatId())){
+                chatItem.setNotificationCount(chatItem.getNotificationCount() + chatList.get(i).getNotificationCount());
+                chatItem.setChatName(chatList.get(i).getChatName());
 
                 if(i==0){
-                    chatList.set(0, chatListItemModel);
+                    chatList.set(0, chatItem);
                     notifyItemChanged(0);
                 } else {
                     chatList.remove(i);
                     notifyItemRemoved(i);
-                    chatList.add(0, chatListItemModel);
+                    chatList.add(0, chatItem);
                     notifyItemInserted(0);
                 }
                 break;
             }
         }
         if(i==chatList.size()) {
-            chatList.add(0, chatListItemModel);
+            chatList.add(0, chatItem);
             notifyItemChanged(0);
         }
     }
@@ -65,8 +65,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(fromId.equals(chatList.get(i).getChatId())){
                 if(chatState.equals(chatList.get(i).getLastMessage()))
                     return;
-                ChatListItemModel item = chatList.get(i);
-                temp.add(new ChatListItemModel(
+                ChatItem item = chatList.get(i);
+                temp.add(new ChatItem(
                         item.getChatId(),
                         item.getChatName(),
                         item.getLastMessage(),
@@ -82,7 +82,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void resetChatState(String fromId){
-        ChatListItemModel tempItem, item;
+        ChatItem tempItem, item;
         for (int i = 0; i < chatList.size() ; i++) {
             item = chatList.get(i);
             if (fromId.equals(item.getChatId())) {
@@ -186,7 +186,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        public void renderItem(ChatListItemModel chatListItem) {
+        public void renderItem(ChatItem chatListItem) {
             contactName.setText(chatListItem.getChatName());
 
             try {
@@ -239,7 +239,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        public void renderItem(ChatListItemModel chatListItem) {
+        public void renderItem(ChatItem chatListItem) {
             contactName.setText(chatListItem.getChatName());
 
             try {

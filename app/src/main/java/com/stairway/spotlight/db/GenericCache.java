@@ -1,12 +1,12 @@
-package com.stairway.spotlight.local;
+package com.stairway.spotlight.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.core.DatabaseManager;
-import com.stairway.spotlight.local.core.SQLiteContract;
+import com.stairway.spotlight.db.core.DatabaseManager;
+import com.stairway.spotlight.db.core.SQLiteContract;
 
 import java.util.HashMap;
 import java.util.Map;

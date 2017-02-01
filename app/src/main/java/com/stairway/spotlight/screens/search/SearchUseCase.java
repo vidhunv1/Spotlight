@@ -1,8 +1,8 @@
 package com.stairway.spotlight.screens.search;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 

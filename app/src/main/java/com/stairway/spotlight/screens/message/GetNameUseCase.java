@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.message;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
+import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.ContactResult;
 
 import rx.Observable;

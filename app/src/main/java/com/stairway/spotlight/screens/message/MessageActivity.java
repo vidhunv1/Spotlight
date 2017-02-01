@@ -2,7 +2,6 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,13 +15,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.XMPPManager;
+
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.MessageApi;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
@@ -75,16 +74,16 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MessageApi messageApi = new MessageApi(XMPPManager.getInstance().getConnection());
+        MessageController messageController = MessageController.getInstance();
         MessageStore messageStore = new MessageStore();
         ContactStore contactStore = new ContactStore();
-        LoadMessagesUseCase loadMessagesUseCase = new LoadMessagesUseCase(messageApi, messageStore);
-        StoreMessageUseCase storeMessageUseCase = new StoreMessageUseCase(messageApi, messageStore);
-        SendMessageUseCase sendMessageUseCase = new SendMessageUseCase(messageApi, messageStore);
-        GetPresenceUseCase getPresenceUseCase = new GetPresenceUseCase(messageApi);
+        LoadMessagesUseCase loadMessagesUseCase = new LoadMessagesUseCase(messageController, messageStore);
+        StoreMessageUseCase storeMessageUseCase = new StoreMessageUseCase(messageController, messageStore);
+        SendMessageUseCase sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
+        GetPresenceUseCase getPresenceUseCase = new GetPresenceUseCase(messageController);
         UpdateMessageUseCase updateMessageUseCase = new UpdateMessageUseCase(messageStore);
-        SendChatStateUseCase sendChatStateUseCase = new SendChatStateUseCase(messageApi);
-        SendReadReceiptUseCase sendReadReceiptUseCase = new SendReadReceiptUseCase(messageApi, messageStore);
+        SendChatStateUseCase sendChatStateUseCase = new SendChatStateUseCase(messageController);
+        SendReadReceiptUseCase sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
         GetNameUseCase getNameUseCase = new GetNameUseCase(contactStore);
         messagePresenter = new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, getPresenceUseCase, updateMessageUseCase, sendChatStateUseCase, sendReadReceiptUseCase, getNameUseCase);
 

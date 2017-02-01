@@ -1,6 +1,6 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 
 import rx.Observable;

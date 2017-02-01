@@ -1,7 +1,7 @@
 package com.stairway.spotlight.screens.message;
 
-import com.stairway.spotlight.local.MessageApi;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.MessageController;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 
 import java.util.List;
@@ -14,9 +14,9 @@ import rx.Subscriber;
  */
 public class LoadMessagesUseCase {
     private MessageStore messageStore;
-    private MessageApi messageApi;
+    private MessageController messageApi;
 
-    public LoadMessagesUseCase(MessageApi messageApi, MessageStore messageStore) {
+    public LoadMessagesUseCase(MessageController messageApi, MessageStore messageStore) {
         this.messageApi = messageApi;
         this.messageStore = messageStore;
     }

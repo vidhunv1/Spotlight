@@ -13,8 +13,8 @@ import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.contacts.ContactsApi;
 import com.stairway.spotlight.core.BaseFragment;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.ContactsContent;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.ContactsContent;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
 import butterknife.Bind;
@@ -34,8 +34,6 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
     private ContactsApi contactApi;
     private ContactsContent contactContent;
     private ContactStore contactStore;
-    private AccessTokenManager accessTokenManager;
-
 
     public static InitializeFragment getInstance() {
         InitializeFragment initializeFragment = new InitializeFragment();
@@ -49,8 +47,7 @@ public class InitializeFragment extends BaseFragment implements InitializeContra
         this.contactApi = ApiManager.getContactsApi();
         this.contactStore = new ContactStore();
         this.contactContent = new ContactsContent(this.getContext());
-        this.accessTokenManager = AccessTokenManager.getInstance();
-        initializePresenter = new InitializePresenter(contactApi, contactContent, contactStore, accessTokenManager);
+        initializePresenter = new InitializePresenter(contactApi, contactContent, contactStore);
     }
 
     @Nullable

@@ -1,4 +1,4 @@
-package com.stairway.spotlight.local.core;
+package com.stairway.spotlight.db.core;
 
 
 import android.content.Context;

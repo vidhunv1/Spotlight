@@ -6,11 +6,14 @@ import com.facebook.stetho.Stetho;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.core.DatabaseManager;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.models.AccessToken;
 
 /**
@@ -36,12 +39,6 @@ public class SpotlightApplication extends Application {
         EventBus.init(bus);
         AccessTokenManager.init(this);
 
-        if(AccessTokenManager.getInstance().hasAccessToken()) {
-            AccessToken accessToken = AccessTokenManager.getInstance().load();
-            XMPPManager.init(accessToken.getUserName(), accessToken.getAccessToken());
-            ApiManager.getInstance().setAuthorization(accessToken.getAccessToken());
-        }
-
         if(com.stairway.spotlight.BuildConfig.DEBUG) {
             // Initialize facebook Stetho
             Stetho.initialize(
@@ -51,6 +48,18 @@ public class SpotlightApplication extends Application {
                             .build());
 
             Logger.init();
+        }
+
+        initSession();
+    }
+
+    public void initSession() {
+        Logger.d(this, "initUserSession");
+        if(AccessTokenManager.getInstance().hasAccessToken()) {
+            AccessToken accessToken = AccessTokenManager.getInstance().load();
+            XMPPManager.init(accessToken.getUserName(), accessToken.getAccessToken());
+            ApiManager.getInstance().setAuthorization(accessToken.getAccessToken());
+            MessageController.init(XMPPManager.getInstance().getConnection(), MessageStore.getInstance(), ContactStore.getInstance());
         }
     }
 }

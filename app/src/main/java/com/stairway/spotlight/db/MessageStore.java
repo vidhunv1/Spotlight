@@ -1,12 +1,12 @@
-package com.stairway.spotlight.local;
+package com.stairway.spotlight.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.core.DatabaseManager;
-import com.stairway.spotlight.local.core.SQLiteContract.MessagesContract;
+import com.stairway.spotlight.db.core.DatabaseManager;
+import com.stairway.spotlight.db.core.SQLiteContract.MessagesContract;
 import com.stairway.spotlight.models.MessageResult;
 
 import java.text.ParseException;
@@ -28,6 +28,16 @@ public class MessageStore {
     public MessageStore() {
         databaseManager = DatabaseManager.getInstance();
     }
+
+    private static MessageStore instance;
+
+    public static MessageStore getInstance() {
+        if (instance == null) {
+            instance = new MessageStore();
+        }
+        return instance;
+    }
+
     /*
     Get messages with chatId.
      */

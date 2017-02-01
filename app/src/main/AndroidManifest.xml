@@ -72,7 +72,6 @@
         <activity
             android:name=".screens.user_profile.UserProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".screens.contacts.ContactsActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar"
@@ -86,7 +85,7 @@
             android:windowSoftInputMode="adjustResize"
             android:label="NewChatActivity" />
         <activity
-            android:name=".screens.my_profile.ProfileActivity"
+            android:name=".screens.my_profile__remove__.ProfileActivity"
             android:label="ProfileActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
     </application>

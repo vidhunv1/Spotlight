@@ -18,15 +18,14 @@ import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.local.ContactStore;
-import com.stairway.spotlight.local.MessageStore;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.screens.home.ChatListAdapter;
-import com.stairway.spotlight.screens.home.ChatListItemModel;
-import com.stairway.spotlight.screens.home.FindUserUseCase;
+import com.stairway.spotlight.screens.home.ChatItem;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
 import java.io.Serializable;
@@ -55,10 +54,10 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     private boolean isAdapterSet = false;
     private static final String KEY_CHATS = "CHATS";
 
-    public static Intent callingIntent(Context context, List<ChatListItemModel> chatListItemModelList) {
+    public static Intent callingIntent(Context context, List<ChatItem> chatListItemModel) {
         Intent intent = new Intent(context, SearchActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putExtra(KEY_CHATS, (Serializable) chatListItemModelList);
+        intent.putExtra(KEY_CHATS, (Serializable) chatListItemModel);
         return intent;
     }
 
@@ -73,9 +72,9 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         ContactStore contactStore = new ContactStore();
         MessageStore messageStore = new MessageStore();
         UserApi userApi = ApiManager.getUserApi();
-        searchPresenter = new SearchPresenter(new SearchUseCase(contactStore, messageStore), new FindUserUseCase(userApi, contactStore));
+        searchPresenter = new SearchPresenter(new SearchUseCase(contactStore, messageStore));
         Intent i = getIntent();
-        List<ChatListItemModel> list = (List<ChatListItemModel>) i.getSerializableExtra(KEY_CHATS);
+        List<ChatItem> list = (List<ChatItem>) i.getSerializableExtra(KEY_CHATS);
         ChatListAdapter chatListAdapter = new ChatListAdapter(this, list, this);
         contactsSearchList.setAdapter(chatListAdapter);
 
