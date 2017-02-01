@@ -6,6 +6,8 @@ import com.stairway.spotlight.core.UseCaseSubscriber;
 import com.stairway.spotlight.db.MessageStore;
 
 import java.util.List;
+
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -34,7 +36,26 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void initChatList() {
-        Logger.v(this, " initChatList");
-        contactsView.displayChatList(messageController.getChatList());
+        Logger.d(this, " initChatList");
+        messageController.getChatList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<List<ChatItem>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Logger.d(this, "Error initchatlist");
+                    }
+
+                    @Override
+                    public void onNext(List<ChatItem> chatItems) {
+                        contactsView.displayChatList(chatItems);
+                    }
+                });
     }
 }

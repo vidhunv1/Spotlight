@@ -7,6 +7,11 @@ import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.ChatItem;
+import com.stairway.spotlight.screens.message.GetNameUseCase;
+import com.stairway.spotlight.screens.message.GetPresenceUseCase;
+import com.stairway.spotlight.screens.message.SendChatStateUseCase;
+import com.stairway.spotlight.screens.message.SendMessageUseCase;
+import com.stairway.spotlight.screens.message.SendReadReceiptUseCase;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -44,8 +49,10 @@ public class MessageController {
     }
 
     public static MessageController getInstance() {
-        if (instance == null)
+        if (instance == null) {
+            Logger.d(MessageController.class, "[MessageController Not Initialized]");
             throw new IllegalStateException("[MessageController Not Initialized]");
+        }
 
         return instance;
     }
@@ -53,40 +60,43 @@ public class MessageController {
     private XMPPTCPConnection conn;
     private MessageStore messageStore;
     private ContactStore contactStore;
-    private List<ChatItem> chatList;
+
+    public SendMessageUseCase sendMessageUseCase;
+    public GetPresenceUseCase getPresenceUseCase;
+    public SendChatStateUseCase sendChatStateUseCase;
+    public SendReadReceiptUseCase sendReadReceiptUseCase;
+    public GetNameUseCase getNameUseCase;
 
     private MessageController(XMPPTCPConnection conn, MessageStore messageStore, ContactStore contactStore) {
         this.conn = conn;
         this.messageStore = messageStore;
         this.contactStore = contactStore;
-        this.chatList = new ArrayList<>();
+        this.sendMessageUseCase = new SendMessageUseCase(this, messageStore);
+        this.getPresenceUseCase = new GetPresenceUseCase(this);
+        this.sendChatStateUseCase = new SendChatStateUseCase(this);
+        this.sendReadReceiptUseCase = new SendReadReceiptUseCase(this, messageStore);
     }
 
-    public List<ChatItem> getChatList() {
-        messageStore.getChatList()
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<List<MessageResult>>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(List<MessageResult> messageResults) {
+    public Observable<List<ChatItem>> getChatList() {
+        return Observable.create(subscriber -> {
+            messageStore.getChatList()
+                    .subscribeOn(Schedulers.io())
+                    .map(messageResults -> {
                         List<ChatItem> chatItems = new ArrayList<>(messageResults.size());
                         for (MessageResult messageResult : messageResults) {
-                            Logger.d(this, "MessageRslt: - "+messageResult.toString());
                             contactStore.getContactByUserName(messageResult.getChatId()).subscribe(new Subscriber<ContactResult>() {
                                 @Override
-                                public void onCompleted() {}
+                                public void onCompleted() {
+                                }
+
                                 @Override
-                                public void onError(Throwable e) {}
+                                public void onError(Throwable e) {
+                                }
 
                                 @Override
                                 public void onNext(ContactResult contactResult) {
                                     String name;
-                                    if(contactResult!=null)
+                                    if (contactResult != null)
                                         name = contactResult.getDisplayName();
                                     else {
                                         //TODO: get user details from server
@@ -101,11 +111,14 @@ public class MessageController {
                                             messageResult.getUnSeenCount()));
                                 }
                             });
-                            chatList = chatItems;
                         }
-                    }
-                });
-        return chatList;
+                        return chatItems;
+                    })
+                    .subscribe(chats -> {
+                        subscriber.onNext(chats);
+                        subscriber.onCompleted();
+                    });
+        });
     }
 
     public Observable<MessageResult> sendMessage(MessageResult message){

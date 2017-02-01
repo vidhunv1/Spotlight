@@ -77,18 +77,23 @@ public class AccessTokenManager {
     }
 
     public boolean hasAccessToken() {
-        Logger.d(this, sharedPreferences.contains(ACCESS_TOKEN_KEY)+"");
+        if(accessToken!=null)
+            return true;
+        
         return sharedPreferences.contains(ACCESS_TOKEN_KEY);
     }
 
     private AccessToken getAccessToken() {
-        String accessToken = sharedPreferences.getString(ACCESS_TOKEN_KEY, null);
+        if (accessToken != null)
+            return accessToken;
+
+        String access = sharedPreferences.getString(ACCESS_TOKEN_KEY, null);
         Date expiresAt = new Date(sharedPreferences.getLong(EXPIRES_AT_KEY, 0));
 //        Date lastRefresh = new Date(sharedPreferences.getLong(LAST_REFRESH_KEY, 0));
         String userName = sharedPreferences.getString(USER_NAME_KEY, null);
 
-        if (accessToken != null)
-            return new AccessToken(accessToken, userName,  expiresAt);
+        if(access!=null && !access.isEmpty())
+            return new AccessToken(access, userName,  expiresAt);
         return null;
     }
 }

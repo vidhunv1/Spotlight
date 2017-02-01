@@ -74,18 +74,7 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MessageController messageController = MessageController.getInstance();
-        MessageStore messageStore = new MessageStore();
-        ContactStore contactStore = new ContactStore();
-        LoadMessagesUseCase loadMessagesUseCase = new LoadMessagesUseCase(messageController, messageStore);
-        StoreMessageUseCase storeMessageUseCase = new StoreMessageUseCase(messageController, messageStore);
-        SendMessageUseCase sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
-        GetPresenceUseCase getPresenceUseCase = new GetPresenceUseCase(messageController);
-        UpdateMessageUseCase updateMessageUseCase = new UpdateMessageUseCase(messageStore);
-        SendChatStateUseCase sendChatStateUseCase = new SendChatStateUseCase(messageController);
-        SendReadReceiptUseCase sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
-        GetNameUseCase getNameUseCase = new GetNameUseCase(contactStore);
-        messagePresenter = new MessagePresenter(loadMessagesUseCase, storeMessageUseCase, sendMessageUseCase, getPresenceUseCase, updateMessageUseCase, sendChatStateUseCase, sendReadReceiptUseCase, getNameUseCase);
+        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), ContactStore.getInstance());
 
         currentChatState = ChatState.inactive;
         currentUser = AccessTokenManager.getInstance().load().getUserName();

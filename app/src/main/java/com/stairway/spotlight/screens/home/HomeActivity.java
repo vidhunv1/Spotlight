@@ -95,7 +95,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 		presenter = new HomePresenter(MessageController.getInstance());
 		presenter.attachView(this);
-		presenter.initChatList();
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
@@ -125,6 +124,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	protected void onResume() {
 		super.onResume();
 		presenter.attachView(this);
+		presenter.initChatList();
 	}
 
 	@Override

@@ -460,18 +460,30 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_full);
+                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
                     break;
                 case 1:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_top);
+                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
                     break;
                 case 2:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
+                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null) {
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                    }
                     break;
                 case 3:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
+                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null) {
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
+                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                    }
                     break;
             }
 
@@ -483,8 +495,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 subtitle.setText(templateMessage.getSubtitle());
             if(!templateMessage.getUrl().isEmpty() && templateMessage.getUrl()!=null)
                 url.setText(templateMessage.getUrl());
-            if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
-                Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
 
             int i = 0;
             for (TemplateButton button : templateMessage.getButtons()) {

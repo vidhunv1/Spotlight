@@ -1,7 +1,10 @@
 package com.stairway.spotlight.screens.message;
 
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
@@ -11,6 +14,7 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.List;
 
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -22,31 +26,17 @@ import rx.subscriptions.CompositeSubscription;
 public class MessagePresenter implements MessageContract.Presenter {
     private MessageContract.View messageView;
     private CompositeSubscription compositeSubscription;
-    private LoadMessagesUseCase getMessageUseCase;
-    private StoreMessageUseCase storeMessageUseCase;
-    private SendMessageUseCase sendMessageUseCase;
-    private GetPresenceUseCase getPresenceUseCase;
-    private UpdateMessageUseCase updateMessageUseCase;
-    private SendChatStateUseCase sendChatStateUseCase;
-    private SendReadReceiptUseCase sendReadReceiptUseCase;
+
     private GetNameUseCase getNameUseCase;
 
-    public MessagePresenter(LoadMessagesUseCase messageUseCase,
-                            StoreMessageUseCase storeMessageUseCase,
-                            SendMessageUseCase sendMessageUseCase,
-                            GetPresenceUseCase getPresenceUseCase,
-                            UpdateMessageUseCase updateMessageUseCase,
-                            SendChatStateUseCase sendChatStateUseCase,
-                            SendReadReceiptUseCase sendReadReceiptUseCase,
-                            GetNameUseCase getNameUseCase) {
-        this.getMessageUseCase = messageUseCase;
-        this.storeMessageUseCase = storeMessageUseCase;
-        this.sendMessageUseCase = sendMessageUseCase;
-        this.getPresenceUseCase = getPresenceUseCase;
-        this.updateMessageUseCase = updateMessageUseCase;
-        this.sendChatStateUseCase = sendChatStateUseCase;
-        this.sendReadReceiptUseCase = sendReadReceiptUseCase;
-        this.getNameUseCase = getNameUseCase;
+    private MessageStore messageStore;
+    private MessageController messageController;
+
+    public MessagePresenter(MessageStore messageStore, MessageController messageController, ContactStore contactStore) {
+        this.getNameUseCase = new GetNameUseCase(contactStore);
+
+        this.messageController = messageController;
+        this.messageStore = messageStore;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -67,14 +57,11 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void loadMessages(String chatId) {
         Logger.d(this, "Loading chat messages: "+chatId);
-        Subscription subscription = getMessageUseCase.execute(chatId)
+        Subscription subscription = messageStore.getMessages(chatId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<List<MessageResult>>(messageView) {
-                    @Override
-                    public void onResult(List<MessageResult> result) {
-                        messageView.displayMessages(result);
-                    }
+                .subscribe(messageResults -> {
+                    messageView.displayMessages(messageResults);
                 });
 
         compositeSubscription.add(subscription);
@@ -83,21 +70,14 @@ public class MessagePresenter implements MessageContract.Presenter {
     @Override
     public void updateMessageRead(MessageResult result) {
         result.setMessageStatus(MessageResult.MessageStatus.SEEN);
-        Subscription subscription = updateMessageUseCase.execute(result)
+        Subscription subscription = messageStore.updateMessage(result)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
-            @Override
-            public void onResult(MessageResult result) {
-                // send read receipt
-                sendReadReceiptUseCase.execute(result).subscribe(new UseCaseSubscriber<Boolean>(messageView) {
-                    @Override
-                    public void onResult(Boolean result) {
+                .subscribe(messageResult -> {
+                    messageController.sendReadReceiptUseCase.execute(result).subscribe(isReceiptSent -> {
                         // is_receipt_sent updated if true
-                    }
+                    });
                 });
-            }
-        });
         compositeSubscription.add(subscription);
     }
 
@@ -106,18 +86,23 @@ public class MessagePresenter implements MessageContract.Presenter {
         MessageResult result = new MessageResult(toId, fromId, message.toXML());
         result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
 
-        Subscription subscription = storeMessageUseCase.execute(result)
+        Subscription subscription = messageStore.storeMessage(result)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
+                .subscribe(new Subscriber<MessageResult>() {
                     @Override
-                    public void onResult(MessageResult message) {
-                        messageView.addMessageToList(message);
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        messageView.addMessageToList(messageResult);
                     }
 
                     @Override
                     public void onCompleted() {
-                        Subscription sendMessage = sendMessageUseCase.execute(result)
+                        Subscription sendMessage = messageController.sendMessageUseCase.execute(result)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
                                     @Override
@@ -135,7 +120,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     @Override
     public void sendChatState(String chatId, ChatState chatState) {
-        Subscription subscription = sendChatStateUseCase.execute(chatId, chatState)
+        Subscription subscription = messageController.sendChatStateUseCase.execute(chatId, chatState)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
@@ -150,7 +135,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     @Override
     public void getPresence(String chatId) {
-        Subscription subscription = getPresenceUseCase.execute(chatId)
+        Subscription subscription = messageController.getPresenceUseCase.execute(chatId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<String>(messageView) {
@@ -165,7 +150,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     @Override
     public void sendReadReceipt(String chatId) {
-        Subscription subscription = sendReadReceiptUseCase.execute(chatId)
+        Subscription subscription = messageController.sendReadReceiptUseCase.execute(chatId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UseCaseSubscriber<Boolean>(messageView) {
