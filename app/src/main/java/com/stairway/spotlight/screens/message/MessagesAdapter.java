@@ -78,6 +78,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void setQuickReplies() {
         try {
+            if(messageList.isEmpty())
+                return;
             MessageParser messageParser = new MessageParser(messageList.get(messageList.size()-1).getMessage());
             quickReplies = messageParser.parseQuickReplies();
             if(quickReplies.size()>=1)

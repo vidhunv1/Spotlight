@@ -39,7 +39,7 @@ import butterknife.OnTextChanged;
 
 public class MessageActivity extends BaseActivity
         implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
-    MessagePresenter messagePresenter;
+    private MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem)
     RecyclerView messageItem;
@@ -55,6 +55,9 @@ public class MessageActivity extends BaseActivity
 
     @Bind(R.id.tb_message_title)
     TextView title;
+
+    @Bind(R.id.tb_message_presence)
+    TextView presenceView;
 
     private ChatState currentChatState;
 
@@ -74,22 +77,23 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_message);
+        ButterKnife.bind(this);
         messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), ContactStore.getInstance());
 
-        currentChatState = ChatState.inactive;
-        currentUser = AccessTokenManager.getInstance().load().getUserName();
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_USER_NAME))
             return;
-
         chatId = receivedIntent.getStringExtra(KEY_USER_NAME);
-        setContentView(R.layout.activity_message);
-        ButterKnife.bind(this);
+
+        currentChatState = ChatState.inactive;
+        currentUser = AccessTokenManager.getInstance().load().getUserName();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         messagesAdapter = new MessagesAdapter(this, this, this, this);
         messageItem.setLayoutManager(linearLayoutManager);
+
         RecyclerView.ItemAnimator animator = messageItem.getItemAnimator();
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
@@ -101,25 +105,16 @@ public class MessageActivity extends BaseActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        messagePresenter.attachView(this);
-        Logger.d(this, "ChatId: "+chatId+", CurrentUser:"+currentUser);
-        messagePresenter.getName(chatId);
-        messagePresenter.loadMessages(chatId);
     }
 
     @Override
-        protected void onResume() {
+    protected void onResume() {
         super.onResume();
         messagePresenter.attachView(this);
-        messagePresenter.getPresence(chatId);
+        messagePresenter.getName(chatId);
         messagePresenter.sendReadReceipt(chatId);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        messagePresenter.detachView();
+        messagePresenter.loadMessages(chatId);
+        messagePresenter.getPresence(chatId);
     }
 
     @Override
@@ -130,7 +125,8 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        startActivity(HomeActivity.callingIntent(this));
+        super.onBackPressed();
+        this.finish();
     }
 
     @Override
@@ -144,20 +140,15 @@ public class MessageActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if((id == android.R.id.home)) {
-            super.onBackPressed();
+            this.onBackPressed();
         }
         else if(id == R.id.view_contact) {
             startActivity(UserProfileActivity.callingIntent(this, chatId));
             this.overridePendingTransition(0, 0);
         }
-//        else if(id == R.id.action_profile) {
-//            startActivity(UserProfileActivity.callingIntent(this, chatId));
-//            this.overridePendingTransition(0, 0);
-//        }
         return super.onOptionsItemSelected(item);
     }
 
-    // send text message
     @OnClick(R.id.btn_sendMessage_send)
     public void onSendClicked() {
         String message = messageBox.getText().toString().trim();
@@ -192,14 +183,14 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         messagesAdapter.setMessages(messages);
-        messageItem.scrollToPosition(messages.size()-1);
+        messageItem.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
 
     @Override
     public void addMessageToList(MessageResult message) {
         Logger.i(this, "Add message:"+message.toString());
+        messageItem.scrollToPosition(messagesAdapter.getItemCount());
         messagesAdapter.addMessage(message);
-        messageItem.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
 
     @Override
@@ -221,7 +212,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void updatePresence(String presence) {
         Logger.d(this, "Presence: "+presence);
-//        presenceTextView.setText(presence);
+        presenceView.setText(presence);
     }
 
 

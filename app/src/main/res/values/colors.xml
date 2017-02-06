@@ -17,7 +17,7 @@
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textPrimaryDark">#212121</color>
     <color name="textSecondary">#64b0d2</color>
-    <color name="textHintColor">#9e9e9e</color>
+    <color name="textHintColor">#cbd9d7</color>
     <color name="drawerText">#212121</color>
     <color name="buttonText">#ffffff</color>
     <color name="searchHighlight">#32AFFF</color>

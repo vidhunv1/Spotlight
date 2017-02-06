@@ -9,9 +9,9 @@
         android:id="@+id/ll_item_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:focusable="true"
-        android:clickable="true"
         android:background="?android:selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="horizontal">
 
         <ImageView

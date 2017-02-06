@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.launcher;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
@@ -14,7 +15,7 @@ import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 import butterknife.ButterKnife;
 
 
-public class LauncherActivity extends BaseActivity implements LauncherContract.View {
+public class LauncherActivity extends AppCompatActivity implements LauncherContract.View {
 
     AccessTokenManager accessTokenManager;
 

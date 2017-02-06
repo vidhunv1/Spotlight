@@ -28,11 +28,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private ChatClickListener chatClickListener;
     private final int VIEW_WITH_NOTIFICATION=0, VIEW_WITHOUT_NOTIFICATION=1;
 
-    public ChatListAdapter(Context context, List<ChatItem> chatList, ChatClickListener chatClickListener) {
+    public ChatListAdapter(Context context, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
-        this.chatList = chatList;
+        this.chatList = new ArrayList<>();
         temp = new ArrayList<>();
         this.context = context;
+    }
+
+    public void setChatList(List<ChatItem> chatItems) {
+        this.chatList = chatItems;
+        this.notifyDataSetChanged();
     }
 
     public void newChatMessage(ChatItem chatItem){

@@ -7,6 +7,7 @@ public class NewChatItemModel {
     private String contactName;
     private String userName;
     private String userId;
+    private String status;
 
 
     public NewChatItemModel() {
@@ -28,6 +29,14 @@ public class NewChatItemModel {
 
     public String getUserName() {
         return userName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public void setUserName(String userName) {

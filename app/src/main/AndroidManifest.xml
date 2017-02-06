@@ -66,7 +66,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".core.XmppService"
+            android:name=".MessageService"
             android:enabled="true" />
 
         <activity
@@ -84,9 +84,6 @@
             android:name=".screens.new_chat.NewChatActivity"
             android:windowSoftInputMode="adjustResize"
             android:label="NewChatActivity" />
-        <activity
-            android:name=".screens.my_profile__remove__.ProfileActivity"
-            android:label="ProfileActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
     </application>
 

@@ -75,7 +75,8 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         searchPresenter = new SearchPresenter(new SearchUseCase(contactStore, messageStore));
         Intent i = getIntent();
         List<ChatItem> list = (List<ChatItem>) i.getSerializableExtra(KEY_CHATS);
-        ChatListAdapter chatListAdapter = new ChatListAdapter(this, list, this);
+        ChatListAdapter chatListAdapter = new ChatListAdapter(this, this);
+        chatListAdapter.setChatList(list);
         contactsSearchList.setAdapter(chatListAdapter);
 
         setSupportActionBar(toolbar);

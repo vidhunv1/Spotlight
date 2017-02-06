@@ -19,9 +19,11 @@ import rx.subscriptions.CompositeSubscription;
 public class HomePresenter implements HomeContract.Presenter {
     private HomeContract.View contactsView;
     private MessageController messageController;
+    private CompositeSubscription compositeSubscription;
 
     public HomePresenter(MessageController messageController) {
         this.messageController = messageController;
+        compositeSubscription = new CompositeSubscription();
     }
 
     @Override
@@ -32,19 +34,17 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void detachView() {
         contactsView = null;
+        compositeSubscription.clear();
     }
 
     @Override
     public void initChatList() {
         Logger.d(this, " initChatList");
-        messageController.getChatList()
+        Subscription subscription = messageController.getChatList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<List<ChatItem>>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
@@ -57,5 +57,7 @@ public class HomePresenter implements HomeContract.Presenter {
                         contactsView.displayChatList(chatItems);
                     }
                 });
+
+        compositeSubscription.add(subscription);
     }
 }

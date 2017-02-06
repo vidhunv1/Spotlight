@@ -23,11 +23,12 @@
                     android:background="@android:color/transparent"
                     android:id="@+id/et_search"
                     android:hint="Search"
+                    android:textCursorDrawable="@drawable/bg_cursor"
                     android:textColorHint="@color/colorPrimaryLight"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:textSize="18sp"
-                    android:textColor="@color/textPrimaryLight"
+                    android:textColor="@color/textHintColor"
                     android:textColorLink="@android:color/black" />
 
                 <ImageButton

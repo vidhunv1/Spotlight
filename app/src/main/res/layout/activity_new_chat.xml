@@ -21,7 +21,8 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/et_new_chat_search1"
                 android:hint="@string/new_chat_search_hint"
-                android:textColorHint="#cbd9d7"
+                android:textCursorDrawable="@drawable/bg_cursor"
+                android:textColorHint="@color/textHintColor"
                 android:textSize="18sp"
                 android:textColor="@color/textPrimaryLight" />
 

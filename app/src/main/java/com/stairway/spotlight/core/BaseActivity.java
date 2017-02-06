@@ -14,21 +14,18 @@ import android.view.WindowManager;
 
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.MessageService;
+import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by vidhun on 05/07/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements  XmppService.XmppServiceCallback{
+public class BaseActivity extends AppCompatActivity{
 
     public static boolean isAppWentToBg = false;
     public static boolean isWindowFocused = false;
@@ -39,6 +36,9 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AccessToken accessToken = AccessTokenManager.getInstance().load();
+        if(accessToken==null)
+            throw new IllegalStateException("Base activity should be only initialized on user session");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -51,36 +51,34 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_MSG)) {
-                    MessageResult s = (MessageResult) intent.getSerializableExtra(XmppService.XMPP_RESULT_MESSAGE);
+                if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_MSG)) {
+                    MessageResult s = (MessageResult) intent.getSerializableExtra(MessageService.XMPP_RESULT_MESSAGE);
                     Logger.d(this, "Message received: "+s);
                     onMessageReceived(s);
-                } else if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_STATE)) {
-                    String from = intent.getStringExtra(XmppService.XMPP_RESULT_FROM);
-                    ChatState chatState = (ChatState) intent.getSerializableExtra(XmppService.XMPP_RESULT_STATE);
+                } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_STATE)) {
+                    String from = intent.getStringExtra(MessageService.XMPP_RESULT_FROM);
+                    ChatState chatState = (ChatState) intent.getSerializableExtra(MessageService.XMPP_RESULT_STATE);
                     onChatStateReceived(from, chatState);
-                } else if(intent.getAction().equals(XmppService.XMPP_ACTION_RCV_RECEIPT)) {
-                    String chatId = intent.getStringExtra(XmppService.XMPP_RESULT_CHAT_ID);
-                    String deliveryReceiptId = intent.getStringExtra(XmppService.XMPP_RESULT_RECEIPT_ID);
-                    MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(intent.getStringExtra(XmppService.XMPP_RESULT_MSG_STATUS));
+                } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_RECEIPT)) {
+                    String chatId = intent.getStringExtra(MessageService.XMPP_RESULT_CHAT_ID);
+                    String deliveryReceiptId = intent.getStringExtra(MessageService.XMPP_RESULT_RECEIPT_ID);
+                    MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(intent.getStringExtra(MessageService.XMPP_RESULT_MSG_STATUS));
                     onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
+                } else if(intent.getAction().equals(MessageService.ACTION_INTERNET_CONNECTION_STATUS)) {
+                    boolean isConnectionAvailable = intent.getBooleanExtra(MessageService.ACTION_INTERNET_CONNECTION_STATUS, false);
+                    onNetworkStatus(isConnectionAvailable);
                 }
             }
         };
-
-        if(AccessTokenManager.getInstance().hasAccessToken()) {
-            Intent intent = new Intent(this, XmppService.class);
-            intent.putExtra(XmppService.TAG_ACTIVITY_NAME, this.getClass().getName());
-            startService(intent);
-        }
     }
 
     @Override
     protected void onStart() {
         onApplicationToForeground();
-        IntentFilter filter = new IntentFilter(XmppService.XMPP_ACTION_RCV_STATE);
-        filter.addAction(XmppService.XMPP_ACTION_RCV_MSG);
-        filter.addAction(XmppService.XMPP_ACTION_RCV_RECEIPT);
+        IntentFilter filter = new IntentFilter(MessageService.XMPP_ACTION_RCV_STATE);
+        filter.addAction(MessageService.XMPP_ACTION_RCV_MSG);
+        filter.addAction(MessageService.XMPP_ACTION_RCV_RECEIPT);
+        filter.addAction(MessageService.ACTION_INTERNET_CONNECTION_STATUS);
         LocalBroadcastManager.getInstance(this).registerReceiver((receiver), filter);
         super.onStart();
     }
@@ -93,11 +91,6 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         isWindowFocused = hasFocus;
         if (isBackPressed && !hasFocus) {
@@ -107,39 +100,41 @@ public abstract class BaseActivity extends AppCompatActivity implements  XmppSer
         super.onWindowFocusChanged(hasFocus);
     }
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
-    public void networkOnline() {
-//        Logger.d(this, "HAS INTERNET CONNECTION");
-    }
-
-    @Override
-    public void networkOffline() {
-//        Logger.d(this, "HAS NO INTERNET CONNECTION");
-    }
-
     public void onApplicationToBackground() {
         if (!isWindowFocused) {
             isAppWentToBg = true;
-            stopService(new Intent(this, XmppService.class));
+            Logger.d(this, "onApplicationToBackground()");
+            Logger.d(this, "Stopping MessageService");
+//            stopService(new Intent(this, MessageService.class));
         }
     }
 
     private void onApplicationToForeground() {
         if (isAppWentToBg) {
             isAppWentToBg = false;
-            Intent intent = new Intent(this, XmppService.class);
-            intent.putExtra(XmppService.TAG_ACTIVITY_NAME, this.getClass().getName());
-            startService(intent);
+            Logger.d(this, "onApplicationToForeground()");
+            Logger.d(this, "Starting MessageService");
+//            Intent intent = new Intent(this, MessageService.class);
+//            intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
+//            startService(intent);
         }
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+
     public void onMessageReceived(MessageResult messageId){
         Logger.d(this, "MessageId "+messageId);
+    }
+
+    public void onNetworkStatus(boolean isAvailable) {
+        if(isAvailable)
+            Logger.d(this, "Internet available");
+        else
+            Logger.d(this, "Internet not available");
     }
 
     public void onChatStateReceived(String from, ChatState chatState) { Logger.d(this, "chatState: "+chatState.name()+", from "+from);}

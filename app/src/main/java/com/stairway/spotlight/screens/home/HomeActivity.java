@@ -53,8 +53,6 @@ import rx.Subscriber;
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener {
-	private ActionBarDrawerToggle toggle;
-
 	@Bind(R.id.fab)
 	FloatingActionButton fab;
 
@@ -73,14 +71,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
 
-	HomePresenter presenter;
+	private ActionBarDrawerToggle toggle;
 
+	private HomePresenter presenter;
 	private List<ChatItem> chats;
-
 	private ChatListAdapter chatListAdapter;
+
 	public static Intent callingIntent(Context context) {
-		Intent intent = new Intent(context, HomeActivity.class);
-		return intent;
+		return new Intent(context, HomeActivity.class);
 	}
 
 	@Override
@@ -89,19 +87,17 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ButterKnife.bind(this);
-
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-		presenter = new HomePresenter(MessageController.getInstance());
-		presenter.attachView(this);
-
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
 		if (animator instanceof SimpleItemAnimator)
 			((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+		chatListAdapter = new ChatListAdapter(this, this);
+		chatList.setAdapter(chatListAdapter);
 
-		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+		this.presenter = new HomePresenter(MessageController.getInstance());
+
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 		toggle.setDrawerIndicatorEnabled(false);
@@ -118,6 +114,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		toggle.syncState();
 		navigationView.setNavigationItemSelectedListener(this);
 
+		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
 	}
 
 	@Override
@@ -130,7 +127,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onPause() {
 		super.onPause();
-		presenter.detachView();
 	}
 
 	@Override
@@ -159,8 +155,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void displayChatList(List<ChatItem> chats) {
 		this.chats = chats;
-		chatListAdapter = new ChatListAdapter(this, chats, this);
-		chatList.setAdapter(chatListAdapter);
+		chatListAdapter.setChatList(chats);
 	}
 
 	@Override
@@ -201,6 +196,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onChatItemClicked(String userName) {
+		Logger.d(this, "onChatItemClicked");
 		startActivity(MessageActivity.callingIntent(this, userName));
 	}
 

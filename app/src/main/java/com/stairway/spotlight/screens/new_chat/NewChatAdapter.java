@@ -40,6 +40,17 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         filteredList = new ArrayList<>();
         filterQuery = "";
         this.itemList.addAll(contacts);
+
+        //test
+        String statusTest[] = {"Available", "Busy", "Can't talk", "In a meeting"};
+        int pos = 0;
+        for (NewChatItemModel newChatItemModel : itemList) {
+            if(!(pos<statusTest.length)) {
+                pos = 0;
+            }
+            newChatItemModel.setStatus(statusTest[pos]);
+            pos++;
+        }
     }
 
     public void filterList(String query) {
@@ -188,7 +199,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else
                 contactName.setText(contactItem.getContactName());
 
-            status.setText("ID: " + contactItem.getUserId());
+            status.setText(contactItem.getStatus());
             contactName.setTag(contactItem.getUserName());
         }
     }

@@ -99,6 +99,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Typically replies instantly"
+                        android:id="@+id/tb_message_presence"
                         android:textSize="14dp"
                         android:textColor="@color/textPrimaryLight" />
                 </LinearLayout>

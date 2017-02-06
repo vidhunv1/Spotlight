@@ -7,9 +7,6 @@ import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.ChatItem;
-import com.stairway.spotlight.screens.message.GetNameUseCase;
-import com.stairway.spotlight.screens.message.GetPresenceUseCase;
-import com.stairway.spotlight.screens.message.SendChatStateUseCase;
 import com.stairway.spotlight.screens.message.SendMessageUseCase;
 import com.stairway.spotlight.screens.message.SendReadReceiptUseCase;
 
@@ -61,20 +58,10 @@ public class MessageController {
     private MessageStore messageStore;
     private ContactStore contactStore;
 
-    public SendMessageUseCase sendMessageUseCase;
-    public GetPresenceUseCase getPresenceUseCase;
-    public SendChatStateUseCase sendChatStateUseCase;
-    public SendReadReceiptUseCase sendReadReceiptUseCase;
-    public GetNameUseCase getNameUseCase;
-
     private MessageController(XMPPTCPConnection conn, MessageStore messageStore, ContactStore contactStore) {
         this.conn = conn;
         this.messageStore = messageStore;
         this.contactStore = contactStore;
-        this.sendMessageUseCase = new SendMessageUseCase(this, messageStore);
-        this.getPresenceUseCase = new GetPresenceUseCase(this);
-        this.sendChatStateUseCase = new SendChatStateUseCase(this);
-        this.sendReadReceiptUseCase = new SendReadReceiptUseCase(this, messageStore);
     }
 
     public Observable<List<ChatItem>> getChatList() {
@@ -251,7 +238,6 @@ public class MessageController {
     }
 
     private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber){
-
         ChatManager chatManager = ChatManager.getInstanceFor(this.conn);
         Chat newChat = chatManager.createChat(XMPPManager.getJidFromUserName(message.getChatId()));
         String deliveryReceiptId;
