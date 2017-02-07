@@ -17,6 +17,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.screens.home.HomeActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
@@ -92,6 +93,7 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        Logger.d(this, "windowFocus: "+hasFocus);
         isWindowFocused = hasFocus;
         if (isBackPressed && !hasFocus) {
             isBackPressed = false;
@@ -100,23 +102,33 @@ public class BaseActivity extends AppCompatActivity{
         super.onWindowFocusChanged(hasFocus);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (this instanceof HomeActivity) {
+        } else {
+            isBackPressed = true;
+        }
+        super.onBackPressed();
+    }
+
+
     public void onApplicationToBackground() {
         if (!isWindowFocused) {
             isAppWentToBg = true;
-            Logger.d(this, "onApplicationToBackground()");
+            Logger.d(this, "APPLICATION_IS_BACKGROUND");
             Logger.d(this, "Stopping MessageService");
-//            stopService(new Intent(this, MessageService.class));
+            stopService(new Intent(this, MessageService.class));
         }
     }
 
     private void onApplicationToForeground() {
         if (isAppWentToBg) {
             isAppWentToBg = false;
-            Logger.d(this, "onApplicationToForeground()");
+            Logger.d(this, "APPLICATION_IS_FOREGROUND");
             Logger.d(this, "Starting MessageService");
-//            Intent intent = new Intent(this, MessageService.class);
-//            intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
-//            startService(intent);
+            Intent intent = new Intent(this, MessageService.class);
+            intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
+            startService(intent);
         }
     }
 

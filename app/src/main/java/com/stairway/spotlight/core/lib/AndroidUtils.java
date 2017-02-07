@@ -1,10 +1,15 @@
 package com.stairway.spotlight.core.lib;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by vidhun on 26/01/17.

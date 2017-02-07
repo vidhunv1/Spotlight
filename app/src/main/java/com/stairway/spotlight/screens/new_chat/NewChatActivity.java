@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -164,7 +162,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
             message = name+" is added to your contacts on iChat.";
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View addedContactView = inflater.inflate(R.layout.added_contact_popup, null);
+        View addedContactView = inflater.inflate(R.layout.popup_contact_added, null);
         PopupWindow addedPopupWindow = new PopupWindow(
                 addedContactView,
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -203,7 +201,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     private void showAddContactPopup() {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        addContactPopupView = inflater.inflate(R.layout.add_contact_popup,null);
+        addContactPopupView = inflater.inflate(R.layout.popup_add_contact,null);
         addContactPopupWindow = new PopupWindow(
                 addContactPopupView,
                 ViewGroup.LayoutParams.MATCH_PARENT,

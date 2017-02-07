@@ -37,7 +37,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void setChatList(List<ChatItem> chatItems) {
         this.chatList = chatItems;
-        this.notifyDataSetChanged();
+        this.notifyItemRangeChanged(0, chatItems.size());
     }
 
     public void newChatMessage(ChatItem chatItem){

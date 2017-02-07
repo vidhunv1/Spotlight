@@ -61,7 +61,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         quickReplies = new ArrayList<>();
         this.messageList.clear();
         this.messageList.addAll(messages);
-        this.notifyItemRangeInserted(0, messageList.size() - 1);
+        this.notifyItemRangeChanged(0, messageList.size() - 1);
         setQuickReplies();
     }
 
