@@ -75,7 +75,10 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     protected void onStart() {
-        onApplicationToForeground();
+        if (isAppWentToBg) {
+            isAppWentToBg = false;
+            onApplicationToForeground();
+        }
         IntentFilter filter = new IntentFilter(MessageService.XMPP_ACTION_RCV_STATE);
         filter.addAction(MessageService.XMPP_ACTION_RCV_MSG);
         filter.addAction(MessageService.XMPP_ACTION_RCV_RECEIPT);
@@ -86,7 +89,10 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     protected void onStop() {
-        onApplicationToBackground();
+        if(!isWindowFocused) {
+            isAppWentToBg = true;
+            onApplicationToBackground();
+        }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onStop();
     }
@@ -113,30 +119,21 @@ public class BaseActivity extends AppCompatActivity{
 
 
     public void onApplicationToBackground() {
-        if (!isWindowFocused) {
-            isAppWentToBg = true;
-            Logger.d(this, "APPLICATION_IS_BACKGROUND");
-            Logger.d(this, "Stopping MessageService");
-            stopService(new Intent(this, MessageService.class));
-        }
+        Logger.d(this, "Stopping MessageService");
+        stopService(new Intent(this, MessageService.class));
     }
 
     private void onApplicationToForeground() {
-        if (isAppWentToBg) {
-            isAppWentToBg = false;
-            Logger.d(this, "APPLICATION_IS_FOREGROUND");
-            Logger.d(this, "Starting MessageService");
-            Intent intent = new Intent(this, MessageService.class);
-            intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
-            startService(intent);
-        }
+        Logger.d(this, "Starting MessageService");
+        Intent intent = new Intent(this, MessageService.class);
+        intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
+        startService(intent);
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
-
 
     public void onMessageReceived(MessageResult messageId){
         Logger.d(this, "MessageId "+messageId);
