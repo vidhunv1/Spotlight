@@ -126,7 +126,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void onBackPressed() {
-        startActivity(HomeActivity.callingIntent(this));
+        super.onBackPressed();
         this.overridePendingTransition(0,0);
     }
 

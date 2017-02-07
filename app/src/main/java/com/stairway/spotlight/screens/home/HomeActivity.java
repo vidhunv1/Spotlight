@@ -118,10 +118,21 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		presenter.attachView(this);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		presenter.detachView();
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
-		presenter.attachView(this);
-		presenter.initChatList();
+		presenter.loadChatList();
 	}
 
 	@Override

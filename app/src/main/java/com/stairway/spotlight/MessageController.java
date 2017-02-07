@@ -7,12 +7,8 @@ import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.ChatItem;
-import com.stairway.spotlight.screens.message.SendMessageUseCase;
-import com.stairway.spotlight.screens.message.SendReadReceiptUseCase;
 
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
@@ -73,12 +69,9 @@ public class MessageController {
                         for (MessageResult messageResult : messageResults) {
                             contactStore.getContactByUserName(messageResult.getChatId()).subscribe(new Subscriber<ContactResult>() {
                                 @Override
-                                public void onCompleted() {
-                                }
-
+                                public void onCompleted() {}
                                 @Override
-                                public void onError(Throwable e) {
-                                }
+                                public void onError(Throwable e) {}
 
                                 @Override
                                 public void onNext(ContactResult contactResult) {
@@ -112,39 +105,38 @@ public class MessageController {
         Logger.d(this, "Sending message"+message.getMessage()+" to "+message.getChatId());
 
         return Observable.create(subscriber -> {
-            String recipient = XMPPManager.getJidFromUserName(message.getChatId());
-
             if(!this.conn.isAuthenticated()) {
                 Logger.v(this, "XMPP Not connected");
-
-                this.conn.addConnectionListener(new ConnectionListener() {
-                    @Override
-                    public void connected(XMPPConnection connection) {
-                        Logger.v(this, "Connected XMPP...");
-                    }
-
-                    @Override
-                    public void authenticated(XMPPConnection connection, boolean resumed) {
-                        Logger.v(this, "Authenticated?"+connection.isAuthenticated());
-                        sendMessageXMPP(message, subscriber);
-                    }
-
-                    @Override
-                    public void connectionClosed() {}
-                    @Override
-                    public void connectionClosedOnError(Exception e) {}
-                    @Override
-                    public void reconnectionSuccessful() {}
-                    @Override
-                    public void reconnectingIn(int seconds) {
-                        Logger.v(this, "Reconnecting in"+seconds);
-                    }
-                    @Override
-                    public void reconnectionFailed(Exception e) {}
-                });
+                message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+                subscriber.onNext(message);
             } else {
-                Logger.v(this, "XMPP connected");
-                sendMessageXMPP(message, subscriber);
+                ChatManager chatManager = ChatManager.getInstanceFor(this.conn);
+                Chat newChat = chatManager.createChat(XMPPManager.getJidFromUserName(message.getChatId()));
+                String deliveryReceiptId;
+                try {
+                    Message sendMessage = new Message(XMPPManager.getJidFromUserName(message.getChatId()));
+                    deliveryReceiptId = DeliveryReceiptRequest.addTo(sendMessage);
+                    message.setReceiptId(deliveryReceiptId);
+                    sendMessage.addBody("en", message.getMessage());
+                    newChat.sendMessage(sendMessage);
+
+                    //Acknowledgement
+                    if(this.conn.isSmEnabled()) {
+                        this.conn.addStanzaIdAcknowledgedListener(sendMessage.getStanzaId(), packet -> {
+                            message.setMessageStatus(MessageResult.MessageStatus.SENT);
+                            subscriber.onNext(message);
+                        });
+                    }
+                } catch (SmackException.NotConnectedException e) {
+                    message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+                    subscriber.onNext(message);
+                    Logger.e(this, "XMPP error: "+e);
+                }
+                catch (StreamManagementException.StreamManagementNotEnabledException e) {
+                    message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+                    subscriber.onNext(message);
+                    Logger.e(this, "Stream management not enabled");
+                }
             }
         });
     }
@@ -235,35 +227,5 @@ public class MessageController {
                 e.printStackTrace();
             }
         });
-    }
-
-    private void sendMessageXMPP(MessageResult message, final Subscriber<? super MessageResult> subscriber){
-        ChatManager chatManager = ChatManager.getInstanceFor(this.conn);
-        Chat newChat = chatManager.createChat(XMPPManager.getJidFromUserName(message.getChatId()));
-        String deliveryReceiptId;
-        try {
-            Message sendMessage = new Message(XMPPManager.getJidFromUserName(message.getChatId()));
-            deliveryReceiptId = DeliveryReceiptRequest.addTo(sendMessage);
-            message.setReceiptId(deliveryReceiptId);
-            sendMessage.addBody("en", message.getMessage());
-            newChat.sendMessage(sendMessage);
-
-            //Acknowledgement
-            if(this.conn.isSmEnabled()) {
-                this.conn.addStanzaIdAcknowledgedListener(sendMessage.getStanzaId(), packet -> {
-                    message.setMessageStatus(MessageResult.MessageStatus.SENT);
-                    subscriber.onNext(message);
-                });
-            }
-        } catch (SmackException.NotConnectedException e) {
-            message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
-            subscriber.onNext(message);
-            Logger.e(this, "XMPP error: "+e);
-        }
-        catch (StreamManagementException.StreamManagementNotEnabledException e) {
-            message.setMessageStatus(MessageResult.MessageStatus.SENT);
-            subscriber.onNext(message);
-            Logger.e(this, "Stream management not enabled");
-        }
     }
 }

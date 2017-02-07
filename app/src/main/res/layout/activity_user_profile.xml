@@ -31,42 +31,45 @@
         <LinearLayout
             android:id="@+id/viewA"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.765"
+            android:layout_height="88dp"
+            android:paddingTop="6dp"
             android:background="@color/colorPrimary"
-            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/iv_userprofile_dp"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="17dp"
                 android:src="@drawable/default_profile_image" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:orientation="vertical"
-                android:paddingLeft="20dp">
+                android:gravity="center_vertical"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp">
 
                 <TextView
                     android:id="@+id/tv_profile_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="Airtel"
+                    android:layout_marginTop="-2.25dp"
+                    android:text="H"
+                    android:textAppearance="@style/FontRobotoMedium"
                     android:textColor="@color/textPrimaryLight"
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/tv_profile_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="iChat ID: SZQWDADF"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="16sp" />
+                    android:text="last seen Feb 06"
+                    android:layout_marginTop="0.25dp"
+                    android:textColor="@color/textPrimaryLight"
+                    android:textSize="14sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -74,11 +77,10 @@
         <LinearLayout
             android:id="@+id/viewB"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.234"
+            android:layout_height="wrap_content"
             android:background="#ffffff"
-            android:orientation="horizontal" />
-
+            android:orientation="horizontal" >
+        </LinearLayout>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -91,5 +93,4 @@
         app:backgroundTint="#ffffff"
         app:layout_anchor="@id/viewA"
         app:layout_anchorGravity="bottom|right|end" />
-
 </android.support.design.widget.CoordinatorLayout>

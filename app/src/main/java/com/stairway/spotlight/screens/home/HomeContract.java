@@ -28,6 +28,6 @@ public interface HomeContract {
     }
 
     interface Presenter extends BasePresenter<HomeContract.View> {
-        void initChatList();
+        void loadChatList();
     }
 }

@@ -21,7 +21,6 @@ public class SendMessageUseCase {
 
     public Observable<MessageResult> execute(MessageResult message) {
         Observable<MessageResult> sendMessage = Observable.create(subscriber -> {
-
             messageStore.getUnsentMessages(message.getChatId())
                     .doOnNext(unsentMessageResult -> {
                         messageApi.sendMessage(unsentMessageResult)
@@ -43,7 +42,6 @@ public class SendMessageUseCase {
                                 }).subscribe();
                     }).subscribe();
         });
-
         return sendMessage;
     }
 }

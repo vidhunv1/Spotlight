@@ -68,11 +68,16 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.overridePendingTransition(0, 0);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            super.onBackPressed();
-            this.overridePendingTransition(0, 0);
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -80,8 +85,7 @@ public class UserProfileActivity extends BaseActivity {
 
     @OnClick(R.id.user_profile_message)
     public void onMessageClicked() {
-        super.onBackPressed();
-        this.overridePendingTransition(0, 0);
+        onBackPressed();
     }
 
 //    @OnClick(R.id.iv_userprofile_dp)

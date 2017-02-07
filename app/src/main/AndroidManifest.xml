@@ -67,7 +67,8 @@
         </service>
         <service
             android:name=".MessageService"
-            android:enabled="true" />
+            android:description="@string/service_message_description"
+            android:exported="false" />
 
         <activity
             android:name=".screens.user_profile.UserProfileActivity"
@@ -86,5 +87,4 @@
             android:label="NewChatActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
     </application>
-
 </manifest>

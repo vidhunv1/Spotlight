@@ -76,6 +76,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     public void loadMessages(String chatId) {
         Logger.d(this, "Loading chat messages: "+chatId);
         Subscription subscription = messageStore.getMessages(chatId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<MessageResult>>() {
                     @Override

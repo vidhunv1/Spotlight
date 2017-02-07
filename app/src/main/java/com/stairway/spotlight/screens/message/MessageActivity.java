@@ -110,11 +110,16 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        messagePresenter.attachView(this);
-        messagePresenter.getName(chatId);
-        messagePresenter.sendReadReceipt(chatId);
         messagePresenter.loadMessages(chatId);
         messagePresenter.getPresence(chatId);
+        messagePresenter.sendReadReceipt(chatId);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        messagePresenter.attachView(this);
+        messagePresenter.getName(chatId);
     }
 
     @Override

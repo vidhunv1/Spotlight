@@ -35,7 +35,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp">
+                android:layout_marginBottom="1.5dp">
 
                 <TextView
                     android:layout_width="190dp"
@@ -47,18 +47,6 @@
                     android:textSize="17sp"
                     android:id="@+id/tv_chatItem_contactName"
                     android:maxWidth="190dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="34dp"
-                    android:paddingBottom="0.75dp"
-                    android:textAlignment="viewEnd"
-                    android:textSize="12sp"
-                    android:textColor="#999999"
-                    android:text="MOBILE"
-                    android:layout_gravity="bottom" />
             </LinearLayout>
 
             <LinearLayout

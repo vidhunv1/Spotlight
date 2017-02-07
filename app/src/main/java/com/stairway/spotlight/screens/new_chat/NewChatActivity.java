@@ -115,13 +115,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         contactList.setLayoutManager(new LinearLayoutManager(this));
 
         Activity newChatActivity = this;
-        contactList.setOnFlingListener(new RecyclerView.OnFlingListener() {
-            @Override
-            public boolean onFling(int velocityX, int velocityY) {
-                AndroidUtils.hideSoftInput(newChatActivity);
-                return false;
-            }
-        });
     }
 
     @Override

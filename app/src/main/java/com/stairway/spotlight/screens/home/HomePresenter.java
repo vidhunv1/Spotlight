@@ -38,7 +38,7 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void initChatList() {
+    public void loadChatList() {
         Logger.d(this, " initChatList");
         Subscription subscription = messageController.getChatList()
                 .observeOn(AndroidSchedulers.mainThread())
