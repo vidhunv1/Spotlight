@@ -33,7 +33,7 @@
                 android:layout_below="@+id/add_contact_title"
                 android:textSize="18sp"
                 android:hint="@string/add_contact_hint"
-                android:backgroundTint="@color/colorPrimary"
+                android:textColorHint="#9E9E9E"
                 android:id="@+id/et_add_contact"/>
 
             <TextView

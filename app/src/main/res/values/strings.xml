@@ -28,7 +28,7 @@
     <!-- AddContact -->
     <string name="add_contact_hint">Enter iChat id</string>
     <string name="add_contact_subtitle">Enter someone\'s ID to find them on iChat.</string>
-    <string name="add_contact_button">Add Contact</string>
+    <string name="add_contact_button">Add</string>
 
     <string name="otp_enter_otp">Enter the 6-digit OTP</string>
 

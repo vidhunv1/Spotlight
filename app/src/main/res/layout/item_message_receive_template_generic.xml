@@ -36,6 +36,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/ll_rcv_template_text"
             android:paddingRight="12dp"
             android:paddingLeft="12dp"
             android:paddingTop="6.75dp"

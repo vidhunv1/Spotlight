@@ -9,12 +9,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.core.lib.MessageParser;
-import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
-import com.stairway.spotlight.screens.message.view_models.TextMessage;
+import com.stairway.spotlight.core.GsonProvider;
+import com.stairway.spotlight.models.Message;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -195,16 +194,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             contactName.setText(chatListItem.getChatName());
 
             try {
-                MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
+                Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
 
-                if(messageParser.getMessageType() == MessageParser.MessageType.template) {
-                    TemplateMessage msg = (TemplateMessage)messageParser.getMessageObject();
-                    lastMessage.setText(msg.getDisplayMessage());
-                } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
-                    TextMessage msg = (TextMessage)messageParser.getMessageObject();
-                    lastMessage.setText(msg.getDisplayMessage());
+                if(message.getMessageType() == Message.MessageType.generic_template) {
+                    lastMessage.setText(message.getGenericTemplate().getTitle());
+                } else if(message.getMessageType() == Message.MessageType.button_template) {
+                    lastMessage.setText(message.getButtonTemplate().getText());
+                } else if(message.getMessageType() == Message.MessageType.text) {
+                    lastMessage.setText(message.getText());
                 }
-            } catch(ParseException e) {
+            } catch(JsonSyntaxException e) {
                 lastMessage.setText(chatListItem.getLastMessage());
             }
 
@@ -248,16 +247,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             contactName.setText(chatListItem.getChatName());
 
             try {
-                MessageParser messageParser = new MessageParser(chatListItem.getLastMessage());
+                Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
 
-                if(messageParser.getMessageType() == MessageParser.MessageType.template) {
-                    TemplateMessage msg = (TemplateMessage)messageParser.getMessageObject();
-                    lastMessage.setText(msg.getDisplayMessage());
-                } else if(messageParser.getMessageType() == MessageParser.MessageType.text) {
-                    TextMessage msg = (TextMessage)messageParser.getMessageObject();
-                    lastMessage.setText(msg.getDisplayMessage());
+                if(message.getMessageType() == Message.MessageType.generic_template) {
+                    lastMessage.setText(message.getGenericTemplate().getTitle());
+                } else if(message.getMessageType() == Message.MessageType.button_template) {
+                    lastMessage.setText(message.getButtonTemplate().getText());
+                } else if(message.getMessageType() == Message.MessageType.text) {
+                    lastMessage.setText(message.getText());
                 }
-            } catch(ParseException e) {
+            } catch(JsonSyntaxException e) {
                 lastMessage.setText(chatListItem.getLastMessage());
             }
 

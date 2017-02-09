@@ -12,14 +12,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.lib.MessageParser;
 import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
+import com.stairway.spotlight.models.ButtonTemplate;
+import com.stairway.spotlight.models.GenericTemplate;
+import com.stairway.spotlight.models.Message;
 import com.stairway.spotlight.models.MessageResult;
-import com.stairway.spotlight.screens.message.view_models.TemplateButton;
-import com.stairway.spotlight.screens.message.view_models.TemplateMessage;
-import com.stairway.spotlight.screens.message.view_models.TextMessage;
+import com.stairway.spotlight.models.QuickReply;
+import com.stairway.spotlight.models._Button;
+import com.stairway.spotlight.models._DefaultAction;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +40,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Context context;
     private List<MessageResult> messageList;
-    private SparseArray<Object> messageObjects;
-    private List<String> quickReplies;
+    private SparseArray<Message> messageCache;
+    private List<QuickReply> quickReplies;
 
     private final int VIEW_TYPE_SEND_TEXT = 0;
     private final int VIEW_TYPE_RECV_TEXT = 1;
@@ -54,7 +59,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.urlClickListener = urlClickListener;
         this.context = context;
         this.messageList = new ArrayList<>();
-        this.messageObjects = new SparseArray<>();
+        this.messageCache = new SparseArray<>();
     }
 
     public void setMessages(List<MessageResult> messages) {
@@ -77,15 +82,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void setQuickReplies() {
+        if(messageList.isEmpty())
+            return;
         try {
-            if(messageList.isEmpty())
+            if(messageCache.get((messageList.size()-1), null)==null) {
+                messageCache.put((messageList.size()-1), GsonProvider.getGson().fromJson(messageList.get(messageList.size()-1).getMessage(), Message.class));
+            }
+            if(messageCache.get(messageList.size()-1).getQuickReplies()==null)
                 return;
-            MessageParser messageParser = new MessageParser(messageList.get(messageList.size()-1).getMessage());
-            quickReplies = messageParser.parseQuickReplies();
+            quickReplies = messageCache.get(messageList.size()-1).getQuickReplies();
             if(quickReplies.size()>=1)
                 this.notifyItemInserted(messageList.size());
-        } catch (ParseException e) {
-            Logger.d(this, "Parse exception");
+        } catch (JsonSyntaxException e) {
+            Logger.d(this, "JsonSyntaxError, do nothing");
         }
     }
 
@@ -140,31 +149,31 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(position == messageList.size())
             return VIEW_TYPE_QUICK_REPLIES;
 
-        try {
-            MessageParser messageParser = new MessageParser(messageList.get(position).getMessage());
-            messageObjects.put(position, messageParser.getMessageObject());
-
-            if(messageList.get(position).isMe()) {
-                if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                    return VIEW_TYPE_SEND_TEXT;
-                else
-                    Logger.e(this, messageParser.getMessageType().name()+" is not supported for send");
-            } else {
-                if (messageParser.getMessageType() == MessageParser.MessageType.template) {
-                    TemplateMessage templateMessage = (TemplateMessage) messageObjects.get(position);
-
-                    if(templateMessage.getType() == TemplateMessage.TemplateType.generic)
-                        return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
-                    else if(templateMessage.getType() == TemplateMessage.TemplateType.button)
-                        return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
+        if(messageList.get(position).isMe()) {
+            return VIEW_TYPE_SEND_TEXT;
+        } else {
+            Message parsedMessage;
+            try {
+                if(messageCache.get(position, null)==null) {
+                    parsedMessage = GsonProvider.getGson().fromJson(messageList.get(position).getMessage(), Message.class);
+                    messageCache.put(position, parsedMessage);
+                } else {
+                    parsedMessage = messageCache.get(position);
                 }
-                else if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                    return VIEW_TYPE_RECV_TEXT;
+            } catch (JsonSyntaxException e) {
+                //TODO: Should fallback to text?
+                parsedMessage = new Message();
+                parsedMessage.setText(messageList.get(position).getMessage());
+                messageCache.put(position, parsedMessage);
+                Logger.e(this, "JsonSyntaxError, falling back to text");
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            Logger.e(this, "ParseException Error parsing XML.");
-            return VIEW_TYPE_RECV_TEXT;
+
+            if(parsedMessage.getMessageType() == Message.MessageType.generic_template)
+                return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
+            else if(parsedMessage.getMessageType() == Message.MessageType.button_template)
+                return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
+            else if(parsedMessage.getMessageType() == Message.MessageType.text)
+                return VIEW_TYPE_RECV_TEXT;
         }
         return -1;
     }
@@ -213,31 +222,25 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SEND_TEXT:
                 SendTextViewHolder sendViewHolder = (SendTextViewHolder) holder;
-                TextMessage textMessage =(TextMessage)messageObjects.get(position);
-                if(textMessage==null || textMessage.getText()==null) {
-                    textMessage = new TextMessage(messageList.get(position).getMessage());
-                    Logger.d(this, "Text message null");
-                }
-                sendViewHolder.renderItem(textMessage, messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
+                sendViewHolder.renderItem(messageList.get(position).getMessage(), messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
                 break;
             case VIEW_TYPE_RECV_TEXT:
                 ReceiveTextViewHolder receiveViewHolder = (ReceiveTextViewHolder) holder;
-                TextMessage textMessage1 =(TextMessage)messageObjects.get(position);
-                if(textMessage1==null || textMessage1.getText()==null)
-                    textMessage1 = new TextMessage(messageList.get(position).getMessage());
-                receiveViewHolder.renderItem(textMessage1, messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
+                receiveViewHolder.renderItem(messageCache.get(position).getText(), messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_GENERIC:
                 ReceiveTemplateGenericViewHolder receiveTemplateViewHolder = (ReceiveTemplateGenericViewHolder) holder;
-                receiveTemplateViewHolder.renderItem((TemplateMessage)messageObjects.get(position), hasProfileDP(position), bubbleType(position));
+                receiveTemplateViewHolder.renderItem(messageCache.get(position).getGenericTemplate(), hasProfileDP(position), bubbleType(position));
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_BUTTON:
                 ReceiveTemplateButtonViewHolder templateButtonVH = (ReceiveTemplateButtonViewHolder) holder;
-                templateButtonVH.renderItem((TemplateMessage)messageObjects.get(position), hasProfileDP(position), bubbleType(position));
+                templateButtonVH.renderItem(messageCache.get(position).getButtonTemplate(), hasProfileDP(position), bubbleType(position));
                 break;
             case VIEW_TYPE_QUICK_REPLIES:
                 QuickRepliesViewHolder qrVH = (QuickRepliesViewHolder) holder;
-                qrVH.renderItem(quickReplies);
+                Logger.d(this, messageCache.get(position-1).toString());
+                qrVH.renderItem(messageCache.get(position-1).getQuickReplies());
+                break;
         }
     }
 
@@ -269,7 +272,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(List<String> quickReplies) {
+        void renderItem(List<QuickReply> quickReplies) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             quickRepliesListView.setLayoutManager(layoutManager);
             quickRepliesListView.setAdapter(new QuickRepliesAdapter(quickReplyClickListener, quickReplies));
@@ -302,7 +305,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(TextMessage textMessage, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
+        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
             String deliveryStatus = "";
             switch (bubbleType) {
                 case 0:
@@ -322,7 +325,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     bubbleView.setBackgroundResource(R.drawable.bg_msg_send_bottom);
                     break;
             }
-            messageView.setText(textMessage.getText());
+            messageView.setText(message);
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
                 deliveryStatus = "PENDING";
@@ -381,7 +384,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(TextMessage textMessage, String time, boolean displayProfileDP, int bubbleType) {
+        void renderItem(String message, String time, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -401,7 +404,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     break;
             }
 
-            messageView.setText(textMessage.getText().trim());
+            messageView.setText(message);
 
 //            timeView.setText("2:30 A.M.");
 //            statusView.setText("SEEN");
@@ -439,105 +442,104 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView subtitle;
         @Bind(R.id.tv_rcv_template_url)
         TextView url;
-        @Bind(R.id.tv_rcv_button1)
-        TextView button1;
-        @Bind(R.id.tv_rcv_button2)
-        TextView button2;
-        @Bind(R.id.tv_rcv_button3)
-        TextView button3;
         @Bind(R.id.iv_profileImage)
         ImageView profileImage;
         @Bind(R.id.ll_bubble)
         LinearLayout bubble;
         @Bind(R.id.rl_message_receive_generic)
         RelativeLayout bubbleLayout;
+        @Bind(R.id.ll_rcv_template_text)
+        LinearLayout textContent;
+
+        TextView buttons[];
 
         ReceiveTemplateGenericViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            buttons = new TextView[3];
+            buttons[0] = (TextView) itemView.findViewById(R.id.tv_rcv_button1);
+            buttons[1] = (TextView) itemView.findViewById(R.id.tv_rcv_button2);
+            buttons[2] = (TextView) itemView.findViewById(R.id.tv_rcv_button3);
+
+            buttons[0].setVisibility(View.GONE);
+            buttons[1].setVisibility(View.GONE);
+            buttons[2].setVisibility(View.GONE);
         }
 
-        void renderItem(TemplateMessage templateMessage, boolean displayProfileDP, int bubbleType) {
+        void renderItem(GenericTemplate genericTemplate, boolean displayProfileDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_full);
-                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
+                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null)
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
                     break;
                 case 1:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_top);
-                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null)
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
+                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null)
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
                     break;
                 case 2:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
-                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null) {
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
                     }
                     break;
                 case 3:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
-                    if(!templateMessage.getImage().isEmpty() && templateMessage.getImage()!=null) {
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
-                        Glide.with(context).load(templateMessage.getImage()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
+                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
                     }
                     break;
             }
 
-            button1.setVisibility(View.GONE);
-            button2.setVisibility(View.GONE);
-            button3.setVisibility(View.GONE);
-            title.setText(templateMessage.getTitle());
-            if(!templateMessage.getSubtitle().isEmpty() && templateMessage.getSubtitle()!=null)
-                subtitle.setText(templateMessage.getSubtitle());
-            if(!templateMessage.getUrl().isEmpty() && templateMessage.getUrl()!=null)
-                url.setText(templateMessage.getUrl());
-
-            int i = 0;
-            for (TemplateButton button : templateMessage.getButtons()) {
-                Logger.d(this, button.toString());
-                if(i==0)
-                    if (!button.getTitle().isEmpty()) {
-                        button1.setVisibility(View.VISIBLE);
-                        button1.setText(button.getTitle());
-
-                        button1.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
+            title.setText(genericTemplate.getTitle());
+            if(!genericTemplate.getSubtitle().isEmpty() && genericTemplate.getSubtitle()!=null) {
+                subtitle.setText(genericTemplate.getSubtitle());
+            }
+            if(genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
+                url.setText(genericTemplate.getDefaultAction().getUrl());
+                templateImage.setOnClickListener(v -> {
+                    if(urlClickListener!=null) {
+                        urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
                     }
-                if(i==1)
-                    if (!button.getTitle().isEmpty()) {
-                        button2.setVisibility(View.VISIBLE);
-                        button2.setText(button.getTitle());
-
-                        button2.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
+                });
+                textContent.setOnClickListener(v -> {
+                    if(urlClickListener!=null) {
+                        urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
                     }
-                if(i==2)
-                    if (!button.getTitle().isEmpty()) {
-                        button3.setVisibility(View.VISIBLE);
-                        button3.setText(button.getTitle());
-
-                        button3.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
+                });
+            } else if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.postback){
+                templateImage.setOnClickListener(v -> {
+                    if(postbackClickListener!=null) {
+                        postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
                     }
-                i++;
+                });
+                textContent.setOnClickListener(v -> {
+                    if(postbackClickListener!=null) {
+                        postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
+                    }
+                });
+            }
+
+            for (int i = 0; i < genericTemplate.getButtons().size(); i++) {
+                _Button btn = genericTemplate.getButtons().get(i);
+                if (!btn.getTitle().isEmpty()) {
+                    buttons[i].setVisibility(View.VISIBLE);
+                    buttons[i].setText(btn.getTitle());
+
+                    buttons[i].setOnClickListener(v -> {
+                        if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
+                            postbackClickListener.sendPostbackMessage(btn.getTitle());
+                        else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
+                            urlClickListener.urlButtonClicked(btn.getUrl());
+                    });
+                }
             }
             if(displayProfileDP)
                 profileImage.setImageAlpha(255);
@@ -547,12 +549,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     class ReceiveTemplateButtonViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.tv_rcv_button1)
-        TextView button1;
-        @Bind(R.id.tv_rcv_button2)
-        TextView button2;
-        @Bind(R.id.tv_rcv_button3)
-        TextView button3;
         @Bind(R.id.iv_profileImage)
         ImageView profileImage;
         @Bind(R.id.tv_rcv_message)
@@ -564,12 +560,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.message_receive_button)
         RelativeLayout layout;
 
+        TextView buttons[];
+
         ReceiveTemplateButtonViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            buttons = new TextView[3];
+            buttons[0] = (TextView) itemView.findViewById(R.id.tv_rcv_button1);
+            buttons[1] = (TextView) itemView.findViewById(R.id.tv_rcv_button2);
+            buttons[2] = (TextView) itemView.findViewById(R.id.tv_rcv_button3);
+
+            buttons[0].setVisibility(View.GONE);
+            buttons[1].setVisibility(View.GONE);
+            buttons[2].setVisibility(View.GONE);
         }
 
-        void renderItem(TemplateMessage templateMessage, boolean displayDP, int bubbleType) {
+        void renderItem(ButtonTemplate buttonTemplate, boolean displayDP, int bubbleType) {
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -592,56 +598,27 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
             }
-            button1.setVisibility(View.GONE);
-            button2.setVisibility(View.GONE);
-            button3.setVisibility(View.GONE);
 
-            if(!templateMessage.getText().isEmpty() && templateMessage.getText()!=null)
-                text.setText(templateMessage.getText());
+            if(!buttonTemplate.getText().isEmpty() && buttonTemplate.getText()!=null)
+                text.setText(buttonTemplate.getText());
 
-            if(templateMessage.getButtons().size()>=3)
+            if(buttonTemplate.getButtons().size()>=3)
                 buttonLayout.setOrientation(LinearLayout.VERTICAL);
 
-            int i = 0;
-            for (TemplateButton button : templateMessage.getButtons()) {
-                Logger.d(this, button.toString());
-                if(i==0)
-                    if (!button.getTitle().isEmpty()) {
-                        button1.setVisibility(View.VISIBLE);
-                        button1.setText(button.getTitle());
 
-                        button1.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
-                    }
-                if(i==1)
-                    if (!button.getTitle().isEmpty()) {
-                        button2.setVisibility(View.VISIBLE);
-                        button2.setText(button.getTitle());
+            for (int i = 0; i < buttonTemplate.getButtons().size(); i++) {
+                _Button btn = buttonTemplate.getButtons().get(i);
+                if (!btn.getTitle().isEmpty()) {
+                    buttons[i].setVisibility(View.VISIBLE);
+                    buttons[i].setText(btn.getTitle());
 
-                        button2.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
-                    }
-                if(i==2)
-                    if (!button.getTitle().isEmpty()) {
-                        button3.setVisibility(View.VISIBLE);
-                        button3.setText(button.getTitle());
-
-                        button3.setOnClickListener(v -> {
-                            if(postbackClickListener!=null && button.getType() == TemplateButton.Type.postback)
-                                postbackClickListener.sendPostbackMessage(button.getTitle());
-                            else if(urlClickListener!=null && button.getType() == TemplateButton.Type.web_url)
-                                urlClickListener.urlButtonClicked(button.getUrl());
-                        });
-                    }
-                i++;
+                    buttons[i].setOnClickListener(v -> {
+                        if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
+                            postbackClickListener.sendPostbackMessage(btn.getTitle());
+                        else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
+                            urlClickListener.urlButtonClicked(btn.getUrl());
+                    });
+                }
             }
             if(displayDP)
                 profileImage.setImageAlpha(255);

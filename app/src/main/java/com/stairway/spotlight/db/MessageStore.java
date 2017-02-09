@@ -117,14 +117,12 @@ public class MessageStore {
                 subscriber.onCompleted();
                 return;
             }
-            String textSearch = "<"+ MessageXMLValues.TAG_TEXT+">"+ "%"+message+"%" +"</"+MessageXMLValues.TAG_TEXT+">";
-            String search1 = "<"+MessageXMLValues.TAG_HEAD+">" +textSearch+ "</"+MessageXMLValues.TAG_HEAD+">";
-            String search2 = "<"+MessageXMLValues.TAG_HEAD_SHORT+">" +textSearch+ "</"+MessageXMLValues.TAG_HEAD_SHORT+">";
+            String textSearch = "%"+message+"%";
 
             SQLiteDatabase db = databaseManager.openConnection();
 
-            String selection = MessagesContract.COLUMN_MESSAGE + " LIKE ? OR "+MessagesContract.COLUMN_MESSAGE+" LIKE ? ";
-            String[] selectionArgs = {search1, search2};
+            String selection = MessagesContract.COLUMN_MESSAGE + " LIKE ? ";
+            String[] selectionArgs = {textSearch};
             String[] columns = {
                     MessagesContract.COLUMN_CHAT_ID,
                     MessagesContract.COLUMN_FROM_ID,
@@ -404,7 +402,7 @@ public class MessageStore {
                     MessagesContract.COLUMN_ROW_ID,
                     MessagesContract.COLUMN_CREATED_AT};
 
-            try{
+            try {
                 Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
                 cursor.moveToFirst();
 
@@ -510,8 +508,8 @@ public class MessageStore {
     }
 
     private String getFormattedTime(String time, String format) {
-        SimpleDateFormat formatterFrom = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat formatterTo = new SimpleDateFormat(format);
+        SimpleDateFormat formatterFrom = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat formatterTo = new SimpleDateFormat(format, Locale.ENGLISH);
         formatterTo.setTimeZone(TimeZone.getDefault());
         try {
             Date fullDate = formatterFrom.parse(time);

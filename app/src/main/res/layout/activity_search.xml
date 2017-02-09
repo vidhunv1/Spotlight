@@ -23,7 +23,7 @@
                     android:background="@android:color/transparent"
                     android:id="@+id/et_search"
                     android:hint="Search"
-                    android:textCursorDrawable="@drawable/bg_cursor"
+                    android:textCursorDrawable="@drawable/bg_cursor_search"
                     android:textColorHint="@color/textHintColor"
                     android:focusable="true"
                     android:focusableInTouchMode="true"

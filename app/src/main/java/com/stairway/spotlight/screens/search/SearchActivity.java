@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SearchActivity extends BaseActivity implements SearchContract.View,
-        SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener, SearchAdapter.FindContactClickListener,
+        SearchAdapter.ContactClickListener, SearchAdapter.MessageClickListener,
         ChatListAdapter.ChatClickListener {
 
     @Bind(R.id.rv_contact_list)
@@ -109,7 +109,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         });
 
         searchPresenter.attachView(this);
-        searchAdapter = new SearchAdapter(this, this, this, this);
+        searchAdapter = new SearchAdapter(this, this, this);
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
     }
@@ -151,15 +151,4 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void onChatItemClicked(String userId) {}
-
-    @Override
-    public void onFindContactItemClicked(String userName) {
-        // get username details from searchAdapter. ie. call presenter.
-        searchPresenter.findContact(userName, userSession.getAccessToken());
-    }
-
-    @Override
-    public void navigateToAddContact(ContactResult contactResult) {
-//        startActivity(AddUserActivity.callingIntent(this, contactResult));
-    }
 }

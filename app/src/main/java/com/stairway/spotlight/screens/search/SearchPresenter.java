@@ -39,28 +39,6 @@ public class SearchPresenter implements SearchContract.Presenter {
     }
 
     @Override
-    public void findContact(String userId, String accessToken) {
-//        Subscription subscription = findUserUseCase.execute(userId, accessToken)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new UseCaseSubscriber<ContactResult>(searchView) {
-//                    @Override
-//                    public void onResult(ContactResult result) {
-//                        Logger.d(this, result.toString());
-//                        searchView.navigateToAddContact(result);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        //TODO: display error in view
-//                        Logger.d(this, "No contact found with id: "+userId);
-//                        Logger.d(this,e.getMessage());
-//                    }
-//                });
-//        compositeSubscription.add(subscription);
-    }
-
-    @Override
     public void attachView(SearchContract.View view) {
         this.searchView = view;
     }

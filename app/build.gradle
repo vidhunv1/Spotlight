@@ -72,6 +72,9 @@ dependencies {
     //stetho
     compile 'com.facebook.stetho:stetho:1.4.2'
 
+    //joda datetime
+    compile 'net.danlew:android.joda:2.9.5.1'
+
     // Retrofit
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'

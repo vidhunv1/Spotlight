@@ -13,10 +13,8 @@ import java.util.List;
 public interface SearchContract {
     interface View extends BaseView {
         void displaySearch(SearchModel searchModel);
-        void navigateToAddContact(ContactResult contactResult);
     }
     interface Presenter extends BasePresenter<SearchContract.View> {
         void search(String query);
-        void findContact(String userName, String authToken);
     }
 }

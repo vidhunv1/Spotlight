@@ -23,8 +23,6 @@ import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
-import com.stairway.spotlight.screens.home.HomeActivity;
-import com.stairway.spotlight.screens.message.view_models.TextMessage;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
@@ -42,7 +40,7 @@ public class MessageActivity extends BaseActivity
     private MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem)
-    RecyclerView messageItem;
+    RecyclerView messageList;
 
     @Bind(R.id.et_sendmessage_message)
     EditText messageBox;
@@ -59,9 +57,16 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message_presence)
     TextView presenceView;
 
+    private LinearLayoutManager linearLayoutManager;
+
     private ChatState currentChatState;
 
-    private static final String KEY_USER_NAME = "USERNAME";
+    public static int index = -1;
+    public static int top = -1;
+
+    private static final String BUNDLE_RECYCLER_LAYOUT = "MessageActivity.recyclerlayout";
+
+    private static final String KEY_USER_NAME = "MessageActivity.USERNAME";
     private String chatId; // contact user
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
@@ -89,16 +94,16 @@ public class MessageActivity extends BaseActivity
         currentChatState = ChatState.inactive;
         currentUser = AccessTokenManager.getInstance().load().getUserName();
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         messagesAdapter = new MessagesAdapter(this, this, this, this);
-        messageItem.setLayoutManager(linearLayoutManager);
+        messageList.setLayoutManager(linearLayoutManager);
 
-        RecyclerView.ItemAnimator animator = messageItem.getItemAnimator();
+        RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
-        messageItem.setAdapter(messagesAdapter);
+        messageList.setAdapter(messagesAdapter);
 //        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         setSupportActionBar(toolbar);
@@ -108,9 +113,21 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        index = linearLayoutManager.findFirstVisibleItemPosition();
+        View v = messageList.getChildAt(0);
+        top = (v == null) ? 0 : (v.getTop() - messageList.getPaddingTop());
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         messagePresenter.loadMessages(chatId);
+        if(index != -1) {
+            linearLayoutManager.scrollToPositionWithOffset( index, top);
+        }
         messagePresenter.getPresence(chatId);
         messagePresenter.sendReadReceipt(chatId);
     }
@@ -160,8 +177,7 @@ public class MessageActivity extends BaseActivity
 
         if(message.length()>=1) {
             messageBox.setText("");
-            TextMessage textMessage = new TextMessage(message);
-            messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
+            messagePresenter.sendTextMessage(chatId, currentUser, message);
         }
     }
 
@@ -188,13 +204,12 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         messagesAdapter.setMessages(messages);
-        messageItem.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
 
     @Override
     public void addMessageToList(MessageResult message) {
         Logger.i(this, "Add message:"+message.toString());
-        messageItem.scrollToPosition(messagesAdapter.getItemCount());
+        messageList.scrollToPosition(messagesAdapter.getItemCount());
         messagesAdapter.addMessage(message);
     }
 
@@ -223,8 +238,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void sendPostbackMessage(String message) {
-        TextMessage textMessage = new TextMessage(message);
-        messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
+        messagePresenter.sendTextMessage(chatId, currentUser, message);
     }
 
     @Override
@@ -234,8 +248,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onQuickReplyClicked(String text) {
-        TextMessage textMessage = new TextMessage(text);
-        messagePresenter.sendTextMessage(chatId, currentUser, textMessage);
+        messagePresenter.sendTextMessage(chatId, currentUser, text);
     }
 
     @Override
@@ -243,7 +256,7 @@ public class MessageActivity extends BaseActivity
         super.onMessageReceived(messageResult);
         if(messageResult.getChatId().equals(chatId)) {
             messagesAdapter.addMessage(messageResult);
-            messageItem.scrollToPosition(messagesAdapter.getItemCount() - 1);
+            messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
         }
     }

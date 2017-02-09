@@ -7,10 +7,7 @@ import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
-import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
@@ -112,8 +109,8 @@ public class MessagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void sendTextMessage(String toId, String fromId, TextMessage message) {
-        MessageResult result = new MessageResult(toId, fromId, message.toXML());
+    public void sendTextMessage(String toId, String fromId, String message) {
+        MessageResult result = new MessageResult(toId, fromId, message);
         result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
 
         Subscription subscription = messageStore.storeMessage(result)

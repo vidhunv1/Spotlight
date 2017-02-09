@@ -12,10 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.core.lib.MessageParser;
-import com.stairway.spotlight.screens.message.view_models.TextMessage;
 
-import java.text.ParseException;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -28,22 +25,19 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Context context;
     private ContactClickListener contactClickListener;
     private MessageClickListener messageClickListener;
-    private FindContactClickListener findContactClickListener;
 
     private final int VIEW_TYPE_MESSAGE = 0;
     private final int VIEW_TYPE_CONTACT = 1;
     private final int VIEW_TYPE_CATEGORY_CONTACTS = 2;
     private final int VIEW_TYPE_CATEGORY_MESSAGES = 3;
-    private final int VIEW_TYPE_FIND = 4;
     private final int VIEW_TYPE_NO_RESULT = 5;
 
     private String highlightColor = "#0084ff";
 
-    public SearchAdapter(Context context, ContactClickListener contactClickListener, MessageClickListener messageClickListener, FindContactClickListener findContactClickListener) {
+    public SearchAdapter(Context context, ContactClickListener contactClickListener, MessageClickListener messageClickListener) {
         this.context = context;
         this.contactClickListener = contactClickListener;
         this.messageClickListener = messageClickListener;
-        this.findContactClickListener = findContactClickListener;
     }
 
     public void displaySearch(SearchModel searchModel) {
@@ -82,10 +76,6 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 View categoryView1 = inflater.inflate(R.layout.item_search_category, parent, false);
                 viewHolder = new CategoryViewHolder(categoryView1);
                 break;
-            case VIEW_TYPE_FIND:
-                View contactView1 = inflater.inflate(R.layout.item_search_contact, parent, false);
-                viewHolder = new FindContactViewHolder(contactView1);
-                break;
             case VIEW_TYPE_NO_RESULT:
                 View noResults = inflater.inflate(R.layout.item_no_result, parent, false);
                 viewHolder = new NoResultViewHolder(noResults);
@@ -115,10 +105,6 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             case VIEW_TYPE_CATEGORY_MESSAGES:
                 CategoryViewHolder categoryNameViewHolder2 = (CategoryViewHolder) holder;
                 categoryNameViewHolder2.renderItem("Messages", true);
-                break;
-            case VIEW_TYPE_FIND:
-                FindContactViewHolder findContactViewHolder = (FindContactViewHolder) holder;
-                findContactViewHolder.renderFindItem(searchList.getSearchTerm());
                 break;
             case VIEW_TYPE_NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
@@ -206,30 +192,6 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    class FindContactViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.ll_item_search_contact)
-        LinearLayout searchContent;
-
-        @Bind(R.id.tv_chatItem_contactName)
-        TextView searchText;
-
-        FindContactViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @SuppressWarnings("deprecation")
-        void renderFindItem(String searchQuery) {
-            String textHTML = "Search iChat ID: "+"<font color=\""+highlightColor+"\">"+searchQuery+"</font>";
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                searchText.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
-            } else {
-                searchText.setText(Html.fromHtml(textHTML));
-            }
-            searchContent.setOnClickListener(v -> findContactClickListener.onFindContactItemClicked(searchQuery));
-        }
-    }
-
     class MessageViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.ll_item_chat)
         LinearLayout messagesLayout;
@@ -260,28 +222,20 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             name.setText(messagesModel.getContactName());
             time.setText(messagesModel.getTime());
-            try {
-                MessageParser messageParser = new MessageParser(messagesModel.getMessage());
-                TextMessage textMessage = new TextMessage("");
-                if(messageParser.getMessageType() == MessageParser.MessageType.text)
-                    textMessage = (TextMessage)messageParser.getMessageObject();
+            String messageLower = messagesModel.getMessage().toLowerCase();
+            int startPos = messageLower.indexOf(searchQuery.toLowerCase());
+            if(!searchQuery.isEmpty() && startPos>=0) {
+                String textHTML = messagesModel.getMessage().substring(0,startPos)
+                        +"<font color=\""+highlightColor+"\">"+messagesModel.getMessage().substring(startPos, startPos+searchQuery.length()) +"</font>"
+                        +messagesModel.getMessage().substring(startPos+searchQuery.length());
 
-                String messageLower = textMessage.getText().toLowerCase();
-                int startPos = messageLower.indexOf(searchQuery.toLowerCase());
-                if(!searchQuery.isEmpty() && startPos>=0) {
-                    String textHTML = textMessage.getText().substring(0,startPos)
-                            +"<font color=\""+highlightColor+"\">"+textMessage.getText().substring(startPos, startPos+searchQuery.length()) +"</font>"
-                            +textMessage.getText().substring(startPos+searchQuery.length());
-
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
-                        message.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
-                    else
-                        message.setText(Html.fromHtml(textHTML));
-                } else {
-                    message.setText(textMessage.getText());
-                }
-
-            } catch (ParseException e) {}
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                    message.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
+                else
+                    message.setText(Html.fromHtml(textHTML));
+            } else {
+                message.setText(messagesModel.getMessage());
+            }
             name.setTag(messagesModel.getUserId());
         }
     }
@@ -326,9 +280,5 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     interface MessageClickListener {
         void onMessageItemClicked(String userId);
-    }
-
-    interface FindContactClickListener {
-        void onFindContactItemClicked(String userName);
     }
 }

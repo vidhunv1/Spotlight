@@ -54,7 +54,7 @@
                 android:paddingLeft="0.5dp"
                 android:textSize="16sp"
                 android:cursorVisible="true"
-                android:focusable="true"
+                android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:textColorHint="#FFADADAD" />
 
             <ImageButton
