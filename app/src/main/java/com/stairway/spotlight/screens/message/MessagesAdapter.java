@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
@@ -16,6 +17,7 @@ import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
 import com.stairway.spotlight.models.ButtonTemplate;
 import com.stairway.spotlight.models.GenericTemplate;
@@ -52,17 +54,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
     private QuickRepliesAdapter.QuickReplyClickListener quickReplyClickListener;
+    private Drawable textProfileDrawable;
 
-    public MessagesAdapter(Context context, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickRepliesAdapter.QuickReplyClickListener qrListener) {
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickRepliesAdapter.QuickReplyClickListener qrListener) {
         this.quickReplyClickListener = qrListener;
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.context = context;
         this.messageList = new ArrayList<>();
         this.messageCache = new SparseArray<>();
+        this.textProfileDrawable = ImageUtils.getDefaultTextDP(chatContactName, chatUserName);
     }
 
     public void setMessages(List<MessageResult> messages) {
+        Logger.d(this, "setting messages "+messages.size());
         quickReplies = new ArrayList<>();
         this.messageList.clear();
         this.messageList.addAll(messages);
@@ -166,6 +171,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 parsedMessage.setText(messageList.get(position).getMessage());
                 messageCache.put(position, parsedMessage);
                 Logger.e(this, "JsonSyntaxError, falling back to text");
+                return VIEW_TYPE_RECV_TEXT;
             }
 
             if(parsedMessage.getMessageType() == Message.MessageType.generic_template)
@@ -174,6 +180,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
             else if(parsedMessage.getMessageType() == Message.MessageType.text)
                 return VIEW_TYPE_RECV_TEXT;
+            else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
+                parsedMessage = new Message();
+                parsedMessage.setText(messageList.get(position).getMessage());
+                messageCache.put(position, parsedMessage);
+                return VIEW_TYPE_RECV_TEXT;
+            }
         }
         return -1;
     }
@@ -425,10 +437,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //                }
 //            });
 
-            if(displayProfileDP)
-                profileImageView.setImageAlpha(255);
-            else
-                profileImageView.setImageAlpha(0);
+            if(displayProfileDP) {
+                profileImageView.setVisibility(View.VISIBLE);
+                profileImageView.setImageDrawable(textProfileDrawable);
+            } else {
+                profileImageView.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -484,16 +498,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
                     if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                        Glide.with(context)
+                                .load(genericTemplate.getImageUrl())
+                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
+                                .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
+                                .into(templateImage);
                     }
                     break;
                 case 3:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
                     if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT)).into(templateImage);
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT)).into(templateImage);
+                        Glide.with(context)
+                                .load(genericTemplate.getImageUrl())
+                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
+                                .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
+                                .into(templateImage);
                     }
                     break;
             }
@@ -541,10 +561,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     });
                 }
             }
-            if(displayProfileDP)
-                profileImage.setImageAlpha(255);
-            else
-                profileImage.setImageAlpha(0);
+            if(displayProfileDP) {
+                profileImage.setVisibility(View.VISIBLE);
+                profileImage.setImageDrawable(textProfileDrawable);
+            }
+            else {
+                profileImage.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -620,10 +643,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     });
                 }
             }
-            if(displayDP)
-                profileImage.setImageAlpha(255);
-            else
-                profileImage.setImageAlpha(0);
+            if(displayDP) {
+                profileImage.setVisibility(View.VISIBLE);
+                profileImage.setImageDrawable(textProfileDrawable);
+            } else {
+                profileImage.setVisibility(View.INVISIBLE);
+            }
         }
     }
 

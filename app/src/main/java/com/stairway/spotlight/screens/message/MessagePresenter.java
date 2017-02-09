@@ -28,45 +28,18 @@ public class MessagePresenter implements MessageContract.Presenter {
     private CompositeSubscription compositeSubscription;
 
     private MessageStore messageStore;
-    private ContactStore contactStore;
     private MessageController messageController;
 
     private SendMessageUseCase sendMessageUseCase;
     private SendReadReceiptUseCase sendReadReceiptUseCase;
 
-    public MessagePresenter(MessageStore messageStore, MessageController messageController, ContactStore contactStore) {
-        this.contactStore = contactStore;
-
+    public MessagePresenter(MessageStore messageStore, MessageController messageController) {
         this.messageController = messageController;
         this.messageStore = messageStore;
 
         sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
         sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
         this.compositeSubscription = new CompositeSubscription();
-    }
-
-    @Override
-    public void getName(String username) {
-        Subscription subscription = contactStore.getContactByUserName(username)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ContactResult>() {
-            @Override
-            public void onCompleted() {}
-            @Override
-            public void onError(Throwable e) {}
-
-            @Override
-            public void onNext(ContactResult contactResult) {
-                Logger.d(this, contactResult.toString());
-                if(!contactResult.getContactName().isEmpty())
-                    messageView.setName(contactResult.getDisplayName());
-                if(!contactResult.getDisplayName().isEmpty())
-                    messageView.setName(contactResult.getDisplayName());
-            }
-        });
-
-        compositeSubscription.add(subscription);
     }
 
     @Override

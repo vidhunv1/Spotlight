@@ -10,6 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.stairway.spotlight"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -91,6 +92,9 @@ dependencies {
 
     compile 'com.googlecode.libphonenumber:libphonenumber:7.1.1'
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+
+    // Text bitmap creator
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
     testCompile 'junit:junit:4.12'
 

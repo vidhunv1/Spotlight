@@ -1,7 +1,11 @@
 package com.stairway.spotlight.core.lib;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
+
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,5 +27,19 @@ public class ImageUtils {
                 storageDir
         );
         return image;
+    }
+
+    public static Drawable getDefaultTextDP(String name, String key) {
+        StringBuilder sb = new StringBuilder();
+        for(String s : name.split(" ")){
+            sb.append(s.charAt(0));
+        }
+
+        ColorGenerator generator = ColorGenerator.DEFAULT;
+
+        TextDrawable textDrawable = TextDrawable.builder()
+                .buildRound(sb.toString(), generator.getColor(key));
+
+        return textDrawable;
     }
 }

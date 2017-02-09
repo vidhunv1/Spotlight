@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.home;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.squareup.otto.Subscribe;
 import com.stairway.spotlight.MessageController;
@@ -29,6 +31,7 @@ import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
@@ -38,6 +41,7 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.FCMRegistrationIntentService;
 
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
@@ -49,6 +53,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
@@ -208,7 +214,24 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void onChatItemClicked(String userName) {
 		Logger.d(this, "onChatItemClicked");
-		startActivity(MessageActivity.callingIntent(this, userName));
+		//get chat name
+		Activity activity = this;
+		ContactStore.getInstance().getContactByUserName(userName)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Subscriber<ContactResult>() {
+					@Override
+					public void onCompleted() {}
+					@Override
+					public void onError(Throwable e) {}
+
+					@Override
+					public void onNext(ContactResult contactResult) {
+						String name = "";
+							name = contactResult.getContactName();
+						startActivity(MessageActivity.callingIntent(activity, contactResult.getUsername(), name));
+					}
+				});
 	}
 
 	@Override

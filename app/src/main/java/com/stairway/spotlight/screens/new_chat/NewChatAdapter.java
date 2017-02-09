@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +201,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 contactName.setText(contactItem.getContactName());
 
             status.setText(contactItem.getStatus());
+            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(contactItem.getContactName(), contactItem.getUserName()));
             contactName.setTag(contactItem.getUserName());
         }
     }

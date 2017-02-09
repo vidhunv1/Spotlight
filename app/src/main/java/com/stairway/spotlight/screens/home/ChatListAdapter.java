@@ -9,9 +9,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.Message;
 
 import java.util.ArrayList;
@@ -208,7 +211,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             time.setText(chatListItem.getTime());
-            profileImage.setImageResource(R.drawable.default_profile_image);
+            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(chatListItem.getChatName(), chatListItem.getChatId()));
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
 
             // Set userId to pass through onClick.
@@ -261,8 +264,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             time.setText(chatListItem.getTime());
-            profileImage.setImageResource(R.drawable.default_profile_image);
-
+            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(chatListItem.getChatName(), chatListItem.getChatId()));
             contactName.setTag(chatListItem.getChatId());
         }
     }

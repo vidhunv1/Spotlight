@@ -11,11 +11,12 @@
         android:background="#ffffff">
 
         <ImageView
-            android:layout_width="match_parent"
+            android:layout_width="68dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="9dp"
             android:layout_height="68dp"
             android:id="@+id/iv_profileImage"
+            android:layout_centerHorizontal="true"
             android:src="@drawable/default_profile_image" />
 
         <TextView

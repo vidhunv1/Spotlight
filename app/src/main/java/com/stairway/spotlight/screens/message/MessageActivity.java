@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.message;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stairway.spotlight.AccessTokenManager;
@@ -22,6 +24,7 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
@@ -34,6 +37,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MessageActivity extends BaseActivity
         implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
@@ -57,7 +63,7 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message_presence)
     TextView presenceView;
 
-    private LinearLayoutManager linearLayoutManager;
+    private WrapContentLinearLayoutManager linearLayoutManager;
 
     private ChatState currentChatState;
 
@@ -66,15 +72,18 @@ public class MessageActivity extends BaseActivity
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "MessageActivity.recyclerlayout";
 
-    private static final String KEY_USER_NAME = "MessageActivity.USERNAME";
-    private String chatId; // contact user
+    private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
+    private static final String KEY_CHAT_CONTACT_NAME = "MessageActivity.CHAT_CONTACT_NAME";
+    private String chatUserName; // contact user
+    private String chatContactName;
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
 
     // userName: id for ejabberd xmpp. userId: id set by user:
-    public static Intent callingIntent(Context context, String userName) {
+    public static Intent callingIntent(Context context, String chatUserName, String chatContactName) {
         Intent intent = new Intent(context, MessageActivity.class);
-        intent.putExtra(KEY_USER_NAME, userName);
+        intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
+        intent.putExtra(KEY_CHAT_CONTACT_NAME, chatContactName);
 
         return intent;
     }
@@ -84,19 +93,21 @@ public class MessageActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
-        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), ContactStore.getInstance());
+        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance());
 
         Intent receivedIntent = getIntent();
-        if(!receivedIntent.hasExtra(KEY_USER_NAME))
+        if(!receivedIntent.hasExtra(KEY_CHAT_USER_NAME))
             return;
-        chatId = receivedIntent.getStringExtra(KEY_USER_NAME);
+        this.chatUserName = receivedIntent.getStringExtra(KEY_CHAT_USER_NAME);
+        this.chatContactName = receivedIntent.getStringExtra(KEY_CHAT_CONTACT_NAME);
+        title.setText(chatContactName);
 
         currentChatState = ChatState.inactive;
         currentUser = AccessTokenManager.getInstance().load().getUserName();
 
-        linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager = new WrapContentLinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, this, this, this);
+        messagesAdapter = new MessagesAdapter(this, chatUserName, chatContactName, this, this, this);
         messageList.setLayoutManager(linearLayoutManager);
 
         RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
@@ -124,19 +135,20 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        messagePresenter.loadMessages(chatId);
+        Logger.d(this, "ChatUserName: "+chatUserName);
+        Logger.d(this, "ChatContactName: "+chatContactName);
+        messagePresenter.loadMessages(chatUserName);
         if(index != -1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
         }
-        messagePresenter.getPresence(chatId);
-        messagePresenter.sendReadReceipt(chatId);
+        messagePresenter.getPresence(chatUserName);
+        messagePresenter.sendReadReceipt(chatUserName);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         messagePresenter.attachView(this);
-        messagePresenter.getName(chatId);
     }
 
     @Override
@@ -165,7 +177,7 @@ public class MessageActivity extends BaseActivity
             this.onBackPressed();
         }
         else if(id == R.id.view_contact) {
-            startActivity(UserProfileActivity.callingIntent(this, chatId));
+            startActivity(UserProfileActivity.callingIntent(this, chatUserName));
             this.overridePendingTransition(0, 0);
         }
         return super.onOptionsItemSelected(item);
@@ -177,7 +189,7 @@ public class MessageActivity extends BaseActivity
 
         if(message.length()>=1) {
             messageBox.setText("");
-            messagePresenter.sendTextMessage(chatId, currentUser, message);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, message);
         }
     }
 
@@ -189,16 +201,67 @@ public class MessageActivity extends BaseActivity
             sendImageButton.setVisibility(View.VISIBLE);
             sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
             if(currentChatState != ChatState.composing) {
-                messagePresenter.sendChatState(chatId, ChatState.composing);
+                messagePresenter.sendChatState(chatUserName, ChatState.composing);
                 currentChatState = ChatState.composing;
             }
         } else {
             sendImageButton.setVisibility(View.GONE);
             if(currentChatState != ChatState.gone) {
-                messagePresenter.sendChatState(chatId, ChatState.gone);
+                messagePresenter.sendChatState(chatUserName, ChatState.gone);
                 currentChatState = ChatState.gone;
             }
         }
+    }
+
+    @OnClick(R.id.message_menu)
+    public void onMessageMenuClicked() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View sheetView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+
+        LinearLayout item1 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item1);
+        LinearLayout item2 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item2);
+        LinearLayout item3 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item3);
+        LinearLayout item4 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item4);
+        LinearLayout item5 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item5);
+        LinearLayout enterText = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_entertext);
+
+        item1.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            TextView item1Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item1);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, item1Text.getText().toString());
+        });
+
+        item2.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            TextView item2Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item2);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, item2Text.getText().toString());
+        });
+
+        item3.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            TextView item3Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item3);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, item3Text.getText().toString());
+        });
+
+        item4.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            TextView item4Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item4);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, item4Text.getText().toString());
+        });
+
+        item5.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            TextView item5Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item5);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, item5Text.getText().toString());
+        });
+
+        enterText.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            messageBox.requestFocus();
+        });
     }
 
     @Override
@@ -211,12 +274,6 @@ public class MessageActivity extends BaseActivity
         Logger.i(this, "Add message:"+message.toString());
         messageList.scrollToPosition(messagesAdapter.getItemCount());
         messagesAdapter.addMessage(message);
-    }
-
-    @Override
-    public void setName(String name) {
-        Logger.d(this, "Setting name:");
-        title.setText(name);
     }
 
     @Override
@@ -238,7 +295,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void sendPostbackMessage(String message) {
-        messagePresenter.sendTextMessage(chatId, currentUser, message);
+        messagePresenter.sendTextMessage(chatUserName, currentUser, message);
     }
 
     @Override
@@ -248,13 +305,13 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onQuickReplyClicked(String text) {
-        messagePresenter.sendTextMessage(chatId, currentUser, text);
+        messagePresenter.sendTextMessage(chatUserName, currentUser, text);
     }
 
     @Override
     public void onMessageReceived(MessageResult messageResult) {
         super.onMessageReceived(messageResult);
-        if(messageResult.getChatId().equals(chatId)) {
+        if(messageResult.getChatId().equals(chatUserName)) {
             messagesAdapter.addMessage(messageResult);
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
@@ -264,7 +321,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onChatStateReceived(String from, ChatState chatState) {
         super.onChatStateReceived(from, chatState);
-        if(from.equals(chatId)) {
+        if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing)
                 updatePresence("Typing...");
             else
@@ -276,8 +333,25 @@ public class MessageActivity extends BaseActivity
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
         Logger.d(this, "Message Status:"+messageStatus.name());
-        if(this.chatId.equals(chatId)) {
+        if(this.chatUserName.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
+
+        }
+    }
+
+    // woraround for samsung devices, IndexOutOfBoundsException: Inconsistency detected. Invalid view holder adapter positionViewHolder
+    private class WrapContentLinearLayoutManager extends LinearLayoutManager {
+        public WrapContentLinearLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                Logger.e(this, "meet a IOOBE in RecyclerView");
+            }
         }
     }
 }

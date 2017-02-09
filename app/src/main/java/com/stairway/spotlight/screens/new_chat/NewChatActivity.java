@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -28,11 +29,13 @@ import android.widget.TextView;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
 
 import java.util.List;
@@ -40,6 +43,9 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vidhun on 08/01/17.
@@ -174,11 +180,13 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
         sendMessage.setOnClickListener(v1 -> {
             addedPopupWindow.dismiss();
-            startActivity(MessageActivity.callingIntent(this, username));
+            this.navigateToMessageActivity(username);
         });
 
         TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
         resultMessage.setText(message);
+        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
+        profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(name, username));
         newChatPresenter.initContactList();
     }
 
@@ -272,7 +280,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Override
     public void onContactItemClicked(String userId) {
         AndroidUtils.hideSoftInput(this);
-        startActivity(MessageActivity.callingIntent(this, userId));
+        this.navigateToMessageActivity(userId);
     }
 
     @Override
@@ -284,5 +292,29 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @OnTextChanged(R.id.et_new_chat_search1)
     public void onSearchChanged() {
         newChatAdapter.filterList(toolbarSearch.getText().toString());
+    }
+
+    private void navigateToMessageActivity(String username) {
+        Activity activity = this;
+        ContactStore.getInstance().getContactByUserName(username)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ContactResult>() {
+                    @Override
+                    public void onCompleted() {}
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(ContactResult contactResult) {
+                        Logger.d(this, contactResult.toString());
+                        String name = "";
+                        if(!contactResult.getContactName().isEmpty())
+                            name = contactResult.getContactName();
+                        if(!contactResult.getDisplayName().isEmpty())
+                            name = contactResult.getDisplayName();
+                        startActivity(MessageActivity.callingIntent(activity, username, name));
+                    }
+                });
     }
 }
