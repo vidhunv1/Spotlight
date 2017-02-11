@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.db.core.SQLiteContract;
@@ -48,11 +49,16 @@ public class ContactStore {
             ContentValues values = new ContentValues();
 
             for (ContactResult contactResult : contactResults) {
-                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getDisplayName());
                 values.put(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
+                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getDisplayName());
                 values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
+                if(contactResult.getUserType()==null) {
+                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, _User.UserType.regular.name());
+                } else {
+                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, contactResult.getUserType().name());
+                }
                 long rowId = db.insert(SQLiteContract.ContactsContract.TABLE_NAME, null, values);
             }
             subscriber.onNext(true);
@@ -73,7 +79,8 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
-                    SQLiteContract.ContactsContract.COLUMN_USER_ID
+                    SQLiteContract.ContactsContract.COLUMN_USER_ID,
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
             };
 
             try {
@@ -86,10 +93,12 @@ public class ContactStore {
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
+                    String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
+                    contactResult.setUserType(_User.UserType.valueOf(userType));
                     result.add(contactResult);
 
                     cursor.moveToNext();
@@ -124,7 +133,8 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
-                    SQLiteContract.ContactsContract.COLUMN_USER_ID
+                    SQLiteContract.ContactsContract.COLUMN_USER_ID,
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
             };
 
             try {
@@ -138,10 +148,12 @@ public class ContactStore {
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
+                    String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
+                    contactResult.setUserType(_User.UserType.valueOf(userType));
                     result.add(contactResult);
 
                     Logger.d(this, "Contacts like: "+contactResult.toString());
@@ -189,7 +201,8 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
-                    SQLiteContract.ContactsContract.COLUMN_USER_ID
+                    SQLiteContract.ContactsContract.COLUMN_USER_ID,
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
             };
 
             try {
@@ -205,10 +218,12 @@ public class ContactStore {
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     //String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
+                    String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
+                    contactResult.setUserType(_User.UserType.valueOf(userType));
 
                     cursor.close();
                     subscriber.onNext(contactResult);

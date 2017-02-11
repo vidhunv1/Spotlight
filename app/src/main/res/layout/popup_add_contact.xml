@@ -32,9 +32,14 @@
                 android:layout_marginTop="12dp"
                 android:layout_below="@+id/add_contact_title"
                 android:textSize="18sp"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:enabled="true"
                 android:hint="@string/add_contact_hint"
                 android:textColorHint="#9E9E9E"
-                android:id="@+id/et_add_contact"/>
+                android:id="@+id/et_add_contact">
+                <requestFocus/>
+            </EditText>
 
             <TextView
                 android:layout_width="match_parent"

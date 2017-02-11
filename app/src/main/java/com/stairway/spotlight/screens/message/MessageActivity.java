@@ -177,7 +177,7 @@ public class MessageActivity extends BaseActivity
             this.onBackPressed();
         }
         else if(id == R.id.view_contact) {
-            startActivity(UserProfileActivity.callingIntent(this, chatUserName));
+            startActivity(UserProfileActivity.callingIntent(this, chatUserName, chatContactName));
             this.overridePendingTransition(0, 0);
         }
         return super.onOptionsItemSelected(item);

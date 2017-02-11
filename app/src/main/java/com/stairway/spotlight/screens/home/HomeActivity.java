@@ -26,12 +26,15 @@ import android.widget.ImageView;
 import com.squareup.otto.Subscribe;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.bot.BotResponse;
+import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.AccessToken;
@@ -48,6 +51,8 @@ import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -121,6 +126,39 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		navigationView.setNavigationItemSelectedListener(this);
 
 		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+
+		//test <code></code>
+		ApiManager.getBotApi().getBotDetails("rec")
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Subscriber<BotResponse>() {
+					@Override
+					public void onCompleted() {}
+
+					@Override
+					public void onError(Throwable e) {
+						e.printStackTrace();
+					}
+
+					@Override
+					public void onNext(BotResponse botResponse) {
+						Logger.d(this, botResponse.toString());
+						BotDetailsStore.getInstance().putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
+								.subscribeOn(Schedulers.newThread())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe(new Subscriber<Boolean>() {
+									@Override
+									public void onCompleted() {}
+									@Override
+									public void onError(Throwable e) {}
+
+									@Override
+									public void onNext(Boolean aBoolean) {
+										Logger.d(this, "BOT INSERTED: "+aBoolean);
+									}
+								});
+					}
+				});
 	}
 
 	@Override
@@ -238,6 +276,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void onMessageReceived(MessageResult messageId) {
 		Logger.d(this, "Message:::"+messageId);
 		addNewMessage(messageId);
+		chatList.scrollToPosition(0);
 	}
 
 	@Override

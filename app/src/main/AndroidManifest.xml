@@ -83,7 +83,7 @@
             android:label="SearchActivity" />
         <activity
             android:name=".screens.new_chat.NewChatActivity"
-            android:windowSoftInputMode="adjustResize"
+            android:windowSoftInputMode="adjustResize|stateVisible"
             android:label="NewChatActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
     </application>

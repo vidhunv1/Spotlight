@@ -51,7 +51,6 @@ public class GenericCache {
             SQLiteStatement stmt = db.compileStatement(SQLiteContract.GenericCacheContract.SQL_DELETE);
             stmt.bindString(1, key);
             stmt.execute();
-            stmt.execute();
             stmt.clearBindings();
             stmt.close();
 

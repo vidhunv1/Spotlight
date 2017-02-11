@@ -1,8 +1,11 @@
 package com.stairway.spotlight.screens.new_chat;
 
+import com.stairway.spotlight.api.bot.BotApi;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.ContactResult;
 
@@ -22,9 +25,11 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     private NewChatContract.View contactsView;
     private CompositeSubscription compositeSubscription;
     private ContactStore contactStore;
+    private BotDetailsStore botDetailsStore;
     private UserApi userApi;
+    private BotApi botApi;
 
-    public NewChatPresenter(ContactStore contactStore, UserApi userApi) {
+    public NewChatPresenter(ContactStore contactStore, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
         this.contactStore = contactStore;
         this.userApi = userApi;
         this.compositeSubscription = new CompositeSubscription();
@@ -88,6 +93,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                     contactResult.setUserId(userResponse.getUser().getUserId());
                                     contactResult.setUsername(userResponse.getUser().getUsername());
                                     contactResult.setDisplayName(userResponse.getUser().getName());
+                                    contactResult.setUserType(userResponse.getUser().getUserType());
                                     contactResult.setAdded(true);
 
                                     return contactResult;
@@ -95,34 +101,34 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
                                 .subscribe(new Subscriber<ContactResult>() {
-                            @Override
-                            public void onCompleted() {}
-
-                            @Override
-                            public void onError(Throwable e) {
-                                e.printStackTrace();
-                                Logger.d("userApi.findUser error");
-
-                                //TODO: remove not found user from error.
-                                contactsView.showInvalidIDError();
-                            }
-
-                            @Override
-                            public void onNext(ContactResult contactResult) {
-                                contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                     @Override
                                     public void onCompleted() {}
 
                                     @Override
-                                    public void onError(Throwable e) {}
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        Logger.d("userApi.findUser error");
+
+                                        //TODO: remove not found user from error.
+                                        contactsView.showInvalidIDError();
+                                    }
 
                                     @Override
-                                    public void onNext(Boolean b) {
-                                        contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                    public void onNext(ContactResult contactResult) {
+                                        contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
+                                            @Override
+                                            public void onCompleted() {}
+
+                                            @Override
+                                            public void onError(Throwable e) {}
+
+                                            @Override
+                                            public void onNext(Boolean b) {
+                                                contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                            }
+                                        });
                                     }
                                 });
-                            }
-                        });
                     }
                 });
         compositeSubscription.add(subscription);

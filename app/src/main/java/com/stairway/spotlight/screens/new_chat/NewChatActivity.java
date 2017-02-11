@@ -30,6 +30,7 @@ import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.R;
@@ -89,21 +90,20 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
+        ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         userSession = AccessTokenManager.getInstance().load();
-        newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi());
+        newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_SHOW_SOFT_INPUT))
             return;
 
         showSoftInput = receivedIntent.getBooleanExtra(KEY_SHOW_SOFT_INPUT, false);
-
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         if(showSoftInput) {
             toolbarSearch.setVisibility(View.VISIBLE);
@@ -186,7 +186,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
         resultMessage.setText(message);
         ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
-        profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(name, username));
+        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
         newChatPresenter.initContactList();
     }
 

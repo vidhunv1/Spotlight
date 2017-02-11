@@ -201,7 +201,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 contactName.setText(contactItem.getContactName());
 
             status.setText(contactItem.getStatus());
-            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(contactItem.getContactName(), contactItem.getUserName()));
+            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             contactName.setTag(contactItem.getUserName());
         }
     }

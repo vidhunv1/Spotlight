@@ -13,12 +13,12 @@ public class _User {
         this.countryCode = countryCode;
     }
 
-    public String getUserType() {
+    public UserType getUserType() {
         return userType;
     }
 
     public void setUserTypeRegular() {
-        this.userType = "regular";
+        this.userType = UserType.regular;
     }
 
     public _User() {
@@ -45,18 +45,22 @@ public class _User {
     @SerializedName("phone_formatted")
     @Expose
     private String phoneFormatted;
-    @SerializedName("notification_token")
-    @Expose
-    private String notificationToken;
     @SerializedName("user_type")
     @Expose
-    private String userType;
+    private UserType userType;
     @SerializedName("user_id")
     @Expose
     private String userId;
     @SerializedName("profile_dp")
     @Expose
     private String profileDP;
+
+    public static enum UserType {
+        @SerializedName("official")
+        official,
+        @SerializedName("regular")
+        regular
+    }
 
     public String getProfileDP() {
         return profileDP;
@@ -66,7 +70,7 @@ public class _User {
         this.profileDP = profileDP;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(UserType userType) {
         this.userType = userType;
     }
 
@@ -76,14 +80,6 @@ public class _User {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getNotificationToken() {
-        return notificationToken;
-    }
-
-    public void setNotificationToken(String notificationToken) {
-        this.notificationToken = notificationToken;
     }
 
     public String getPhoneFormatted() {

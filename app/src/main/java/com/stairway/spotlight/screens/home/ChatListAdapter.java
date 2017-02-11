@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.home;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
@@ -211,7 +210,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             time.setText(chatListItem.getTime());
-            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(chatListItem.getChatName(), chatListItem.getChatId()));
+            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
 
             // Set userId to pass through onClick.
@@ -264,7 +263,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             time.setText(chatListItem.getTime());
-            profileImage.setImageDrawable(ImageUtils.getDefaultTextDP(chatListItem.getChatName(), chatListItem.getChatId()));
+            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             contactName.setTag(chatListItem.getChatId());
         }
     }

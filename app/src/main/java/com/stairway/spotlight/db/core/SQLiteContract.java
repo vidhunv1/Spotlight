@@ -20,6 +20,20 @@ public abstract class SQLiteContract {
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " where key = ?";
     }
 
+    public static final class BotDetailsContract {
+        public static final String TABLE_NAME = "bot_details";
+
+        public static final String COLUMN_USER_NAME = "user_name";
+        public static final String COLUMN_PERSISTENT_MENU = "persistent_menu";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_USER_NAME + " TEXT PRIMARY KEY, " +
+                COLUMN_PERSISTENT_MENU + " TEXT, " +
+                "UNIQUE("+COLUMN_USER_NAME+") ON CONFLICT REPLACE); ";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
     public static final class MessagesContract {
         public static final String TABLE_NAME = "messages";
 
@@ -53,6 +67,7 @@ public abstract class SQLiteContract {
         public static final String COLUMN_CONTACT_NAME = "contact_name";
         public static final String COLUMN_USERNAME = "username";
         public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_USER_TYPE = "user_type";
         public static final String COLUMN_CREATED_AT = "created_at";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
@@ -61,6 +76,7 @@ public abstract class SQLiteContract {
                 COLUMN_COUNTRY_CODE + " TEXT, " +
                 COLUMN_USERNAME + " TEXT, "+
                 COLUMN_USER_ID + " TEXT, "+
+                COLUMN_USER_TYPE + " TEXT, " +
                 COLUMN_CONTACT_NAME + " TEXT, " +
                 COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
                 "UNIQUE("+COLUMN_USERNAME+") ON CONFLICT REPLACE); ";

@@ -1,5 +1,7 @@
 package com.stairway.spotlight.models;
 
+import com.stairway.spotlight.api.user._User;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,8 @@ public class ContactResult implements Serializable {
     private String username;
     private boolean isAdded;
     private String userId;
+    private _User.UserType userType;
+
 
     public ContactResult(String countryCode, String phoneNumber, String displayName) {
         this.phoneNumber = phoneNumber;
@@ -54,6 +58,13 @@ public class ContactResult implements Serializable {
         this.contactName = contactName;
     }
 
+    public _User.UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(_User.UserType userType) {
+        this.userType = userType;
+    }
 
     public String getPhoneNumber() {
         return phoneNumber;

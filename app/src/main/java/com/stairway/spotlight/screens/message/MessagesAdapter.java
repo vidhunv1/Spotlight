@@ -27,7 +27,6 @@ import com.stairway.spotlight.models.QuickReply;
 import com.stairway.spotlight.models._Button;
 import com.stairway.spotlight.models._DefaultAction;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
@@ -63,7 +62,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.context = context;
         this.messageList = new ArrayList<>();
         this.messageCache = new SparseArray<>();
-        this.textProfileDrawable = ImageUtils.getDefaultTextDP(chatContactName, chatUserName);
+        this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
     }
 
     public void setMessages(List<MessageResult> messages) {

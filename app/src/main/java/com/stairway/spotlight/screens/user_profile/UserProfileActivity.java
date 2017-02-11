@@ -2,21 +2,17 @@ package com.stairway.spotlight.screens.user_profile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.core.lib.ImageUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,14 +27,20 @@ public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.user_profile_message)
     FloatingActionButton fab;
 
-    private static int RESULT_LOAD_IMAGE = 1;
-    private String chatId;
+    @Bind(R.id.tv_contact_name)
+    TextView contactNameView;
 
-    private static String KEY_USER_NAME = "USERID";
-    public static Intent callingIntent(Context context, String userId) {
+    private static int RESULT_LOAD_IMAGE = 1;
+    private String username;
+    private String contactName;
+
+    private static String KEY_USER_NAME = "UserProfileActivity.USER_NAME";
+    private static String KEY_CONTACT_NAME = "UserProfileActivity.CONTACT_NAME";
+    public static Intent callingIntent(Context context, String userId, String contactName) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(KEY_USER_NAME, userId);
+        intent.putExtra(KEY_CONTACT_NAME, contactName);
         return intent;
     }
 
@@ -51,13 +53,16 @@ public class UserProfileActivity extends BaseActivity {
         if(!receivedIntent.hasExtra(KEY_USER_NAME))
             return;
 
-        chatId = receivedIntent.getStringExtra(KEY_USER_NAME);
+        username = receivedIntent.getStringExtra(KEY_USER_NAME);
+        contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
+
+        contactNameView.setText(contactName);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        profileDP.setImageResource(R.drawable.default_profile_image);
+        profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
     }
 
     @Override

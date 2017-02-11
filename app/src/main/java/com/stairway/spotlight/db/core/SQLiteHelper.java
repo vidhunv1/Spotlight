@@ -13,7 +13,7 @@ import com.stairway.spotlight.core.Logger;
 public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLiteHelper";
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "spotlight.db";
 
     public SQLiteHelper(Context context)
@@ -28,6 +28,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
             db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
             db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.BotDetailsContract.SQL_CREATE_TABLE);
         } catch (SQLException sql) {
             sql.printStackTrace();
             Logger.e(this, "Error creating database. Cannot recover");
@@ -40,6 +41,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(SQLiteContract.GenericCacheContract.SQL_DELETE_TABLE);
         db.execSQL(SQLiteContract.MessagesContract.SQL_DELETE_TABLE);
         db.execSQL(SQLiteContract.ContactsContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.BotDetailsContract.SQL_DELETE_TABLE);
         onCreate(db);
         Logger.d(this, "Sqlite Cache database upgraded");
     }
