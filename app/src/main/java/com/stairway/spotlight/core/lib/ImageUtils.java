@@ -16,6 +16,7 @@ import com.stairway.spotlight.application.SpotlightApplication;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -36,6 +37,17 @@ public class ImageUtils {
     }
 
     public static Drawable getDefaultProfileImage(String name, String key, double textSize) {
+        ColorGenerator defaultColors = ColorGenerator.create(Arrays.asList(
+                0xff5fbed5,
+                0xff76c84d,
+                0xff8e85ee,
+                0xfff274a9,
+                0xff549cdd,
+                0xfff2749a,
+                0xfff28c48,
+                0xffe56555
+        ));
+
         int count = 1;
         StringBuilder sb = new StringBuilder();
         for(String s : name.split(" ")){
@@ -48,7 +60,6 @@ public class ImageUtils {
         Context context = SpotlightApplication.getContext();
 
         final int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float)textSize, context.getResources().getDisplayMetrics());
-
         TextDrawable textDrawable = TextDrawable.builder()
                 .beginConfig()
                 .textColor(Color.WHITE)
@@ -56,7 +67,7 @@ public class ImageUtils {
                 .fontSize(px) /* size in px */
                 .toUpperCase()
                 .endConfig()
-                .buildRound(sb.toString(), ColorGenerator.DEFAULT.getColor(key));
+                .buildRound(sb.toString(), defaultColors.getColor(key));
 
         return textDrawable;
     }

@@ -94,12 +94,13 @@ public class ContactResult implements Serializable {
     @Override
     public String toString() {
         return "ContactResult{" +
-                ", phoneNumber='" + phoneNumber + '\'' +
+                "phoneNumber='" + phoneNumber + '\'' +
                 ", countryCode='" + countryCode + '\'' +
                 ", contactName='" + contactName + '\'' +
                 ", username='" + username + '\'' +
                 ", isAdded=" + isAdded +
                 ", userId='" + userId + '\'' +
+                ", userType=" + userType.name() +
                 '}';
     }
 

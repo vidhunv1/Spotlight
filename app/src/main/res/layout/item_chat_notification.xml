@@ -95,6 +95,7 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/view_contactItem_divider"
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
         android:layout_marginLeft="72dp"

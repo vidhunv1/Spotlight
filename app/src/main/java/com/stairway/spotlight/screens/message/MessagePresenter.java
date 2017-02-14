@@ -1,8 +1,10 @@
 package com.stairway.spotlight.screens.message;
 
 import com.stairway.spotlight.MessageController;
+import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.UseCaseSubscriber;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -29,13 +31,15 @@ public class MessagePresenter implements MessageContract.Presenter {
 
     private MessageStore messageStore;
     private MessageController messageController;
+    private BotDetailsStore botDetailsStore;
 
     private SendMessageUseCase sendMessageUseCase;
     private SendReadReceiptUseCase sendReadReceiptUseCase;
 
-    public MessagePresenter(MessageStore messageStore, MessageController messageController) {
+    public MessagePresenter(MessageStore messageStore, MessageController messageController, BotDetailsStore botDetailsStore) {
         this.messageController = messageController;
         this.messageStore = messageStore;
+        this.botDetailsStore = botDetailsStore;
 
         sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
         sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
@@ -64,6 +68,33 @@ public class MessagePresenter implements MessageContract.Presenter {
                     }
                 });
 
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void loadKeyboard(String chatId) {
+        Subscription subscription= botDetailsStore.getMenu(chatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<PersistentMenu>>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        messageView.setKeyboardType(false);
+                    }
+
+                    @Override
+                    public void onNext(List<PersistentMenu> persistentMenus) {
+                        if(persistentMenus!=null && !persistentMenus.isEmpty()) {
+                            messageView.setKeyboardType(true);
+                            messageView.initBotMenu(persistentMenus);
+                        } else {
+                            messageView.setKeyboardType(false);
+                        }
+                    }
+                });
         compositeSubscription.add(subscription);
     }
 

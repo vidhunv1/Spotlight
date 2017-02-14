@@ -26,9 +26,13 @@ import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.models.QuickReply;
 import com.stairway.spotlight.models._Button;
 import com.stairway.spotlight.models._DefaultAction;
+import com.stairway.spotlight.screens.home.HomeContract;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
@@ -49,6 +53,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_RECV_TEMPLATE_GENERIC = 2;
     private final int VIEW_TYPE_RECV_TEMPLATE_BUTTON = 3;
     private final int VIEW_TYPE_QUICK_REPLIES = 4;
+    private final int VIEW_TYPE_SEND_EMOTICON = 5;
+    private final int VIEW_TYPE_RECV_EMOTICON = 6;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -154,7 +160,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return VIEW_TYPE_QUICK_REPLIES;
 
         if(messageList.get(position).isMe()) {
-            return VIEW_TYPE_SEND_TEXT;
+            if(isAllEmoticon(messageList.get(position).getMessage())) {
+                return VIEW_TYPE_SEND_EMOTICON;
+            } else {
+                return VIEW_TYPE_SEND_TEXT;
+            }
         } else {
             Message parsedMessage;
             try {
@@ -170,20 +180,33 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 parsedMessage.setText(messageList.get(position).getMessage());
                 messageCache.put(position, parsedMessage);
                 Logger.e(this, "JsonSyntaxError, falling back to text");
-                return VIEW_TYPE_RECV_TEXT;
+                if(isAllEmoticon(parsedMessage.getText())) {
+                    return VIEW_TYPE_RECV_EMOTICON;
+                } else {
+                    return VIEW_TYPE_RECV_TEXT;
+                }
             }
 
             if(parsedMessage.getMessageType() == Message.MessageType.generic_template)
                 return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
             else if(parsedMessage.getMessageType() == Message.MessageType.button_template)
                 return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
-            else if(parsedMessage.getMessageType() == Message.MessageType.text)
-                return VIEW_TYPE_RECV_TEXT;
+            else if(parsedMessage.getMessageType() == Message.MessageType.text) {
+                if(isAllEmoticon(parsedMessage.getText())) {
+                    return VIEW_TYPE_RECV_EMOTICON;
+                } else {
+                    return VIEW_TYPE_RECV_TEXT;
+                }
+            }
             else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
                 messageCache.put(position, parsedMessage);
-                return VIEW_TYPE_RECV_TEXT;
+                if(isAllEmoticon(parsedMessage.getText())) {
+                    return VIEW_TYPE_RECV_EMOTICON;
+                } else {
+                    return VIEW_TYPE_RECV_TEXT;
+                }
             }
         }
         return -1;
@@ -222,6 +245,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view5 = inflater.inflate(R.layout.item_quick_replies, parent, false);
                 viewHolder = new QuickRepliesViewHolder(view5);
                 break;
+            case VIEW_TYPE_RECV_EMOTICON:
+                View view6 = inflater.inflate(R.layout.item_message_receive_emoticon, parent, false);
+                viewHolder = new ReceiveEmoticonViewHolder(view6);
+                break;
+            case VIEW_TYPE_SEND_EMOTICON:
+                View view7 = inflater.inflate(R.layout.item_message_send_emoticon, parent, false);
+                viewHolder = new SendEmoticonViewHolder(view7);
+                break;
             default:
                 return null;
         }
@@ -252,7 +283,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Logger.d(this, messageCache.get(position-1).toString());
                 qrVH.renderItem(messageCache.get(position-1).getQuickReplies());
                 break;
+            case VIEW_TYPE_RECV_EMOTICON:
+                ReceiveEmoticonViewHolder receiveEmoticonViewHolder = (ReceiveEmoticonViewHolder) holder;
+                receiveEmoticonViewHolder.renderItem(messageCache.get(position).getText(), messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
+                break;
+            case VIEW_TYPE_SEND_EMOTICON:
+                SendEmoticonViewHolder sendEmoticonViewHolder = (SendEmoticonViewHolder) holder;
+                sendEmoticonViewHolder.renderItem(messageList.get(position).getMessage(), messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
         }
+    }
+
+    private boolean isAllEmoticon(String message) {
+        final String emo_regex = "(^[\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee ]+$)";
+        boolean isAll = Pattern.compile(emo_regex).matcher(message).find();
+        Logger.d(this, message+": all Emojis? "+isAll);
+        return isAll;
     }
 
     private boolean hasProfileDP(int position) {
@@ -291,6 +336,93 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    class SendEmoticonViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_messageitem_message)
+        TextView messageView;
+
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatusView;
+
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+
+        public SendEmoticonViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
+            messageView.setText(message);
+
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
+            }
+            else if(messageStatus == MessageResult.MessageStatus.SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
+            }
+            else if(messageStatus == MessageResult.MessageStatus.READ) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
+            }
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+            }
+        }
+    }
+
+    class ReceiveEmoticonViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_messageitem_message)
+        TextView messageView;
+
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImageView;
+
+        @Bind(R.id.rl_message_receive_text)
+        RelativeLayout layout;
+
+        ReceiveEmoticonViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String message, String time, boolean displayProfileDP, int bubbleType) {
+            messageView.setText(message);
+
+            if(displayProfileDP) {
+                profileImageView.setVisibility(View.VISIBLE);
+                profileImageView.setImageDrawable(textProfileDrawable);
+            } else {
+                profileImageView.setVisibility(View.INVISIBLE);
+            }
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+            }
+        }
+    }
+
     class SendTextViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_messageitem_message)
@@ -305,12 +437,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.message_send_text)
         RelativeLayout layout;
 
-//        @Bind(R.id.tv_messageitem_time)
-//        TextView timeView;
-//
-//        @Bind(R.id.tv_messageitem_status)
-//        TextView statusView;
-
         SendTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -318,6 +444,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
             String deliveryStatus = "";
+
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -351,22 +478,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             else if(messageStatus == MessageResult.MessageStatus.DELIVERED)
                 deliveryStatus = "DELIVERED";
-
-
-//            String finalDeliveryStatus = deliveryStatus;
-//            bubbleView.setOnClickListener(v -> {
-//                if(bubbleView.isPressed()) {
-//                    timeView.setVisibility(View.GONE);
-//                    statusView.setVisibility(View.GONE);
-//                    bubbleView.setPressed(false);
-//                } else {
-//                    timeView.setVisibility(View.VISIBLE);
-//                    statusView.setVisibility(View.VISIBLE);
-//                    timeView.setText(time);
-//                    statusView.setText(finalDeliveryStatus);
-//                    bubbleView.setPressed(true);
-//                }
-//            });
         }
     }
 
@@ -383,12 +494,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @Bind(R.id.rl_message_receive_text)
         RelativeLayout bubbleLayout;
-
-//        @Bind(R.id.tv_messageitem_time)
-//        TextView timeView;
-//
-//        @Bind(R.id.tv_messageitem_status)
-//        TextView statusView;
 
         ReceiveTextViewHolder(View itemView) {
             super(itemView);
@@ -416,25 +521,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             messageView.setText(message);
-
-//            timeView.setText("2:30 A.M.");
-//            statusView.setText("SEEN");
-
-//            bubbleView.setOnClickListener(v -> {
-//                if(!bubbleView.isPressed()) {
-//                    Logger.d(this, "UNPRESS");
-//                    timeView.setVisibility(View.GONE);
-//                    statusView.setVisibility(View.GONE);
-//                    bubbleView.setPressed(false);
-//                } else {
-//                    Logger.d(this, "PRESS");
-//                    timeView.setVisibility(View.VISIBLE);
-//                    statusView.setVisibility(View.VISIBLE);
-//                    timeView.setText(time);
-//                    statusView.setText("SEEN");
-//                    bubbleView.setPressed(true);
-//                }
-//            });
 
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);

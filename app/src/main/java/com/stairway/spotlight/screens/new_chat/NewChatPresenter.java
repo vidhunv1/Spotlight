@@ -1,6 +1,8 @@
 package com.stairway.spotlight.screens.new_chat;
 
+import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.bot.BotApi;
+import com.stairway.spotlight.api.bot.BotResponse;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
@@ -32,6 +34,8 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     public NewChatPresenter(ContactStore contactStore, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
         this.contactStore = contactStore;
         this.userApi = userApi;
+        this.botDetailsStore = botDetailsStore;
+        this.botApi = botApi;
         this.compositeSubscription = new CompositeSubscription();
     }
 
@@ -115,6 +119,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
                                     @Override
                                     public void onNext(ContactResult contactResult) {
+                                        Logger.d(this, contactResult.toString());
                                         contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                             @Override
                                             public void onCompleted() {}
@@ -124,7 +129,54 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
                                             @Override
                                             public void onNext(Boolean b) {
-                                                contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                if(contactResult.getUserType()== _User.UserType.regular) {
+                                                    contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                } else if(contactResult.getUserType() == _User.UserType.official){
+                                                    botApi.getBotDetails(contactResult.getUsername())
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(new Subscriber<BotResponse>() {
+                                                                @Override
+                                                                public void onCompleted() {
+                                                                    Logger.d(this, "onComplete");
+                                                                }
+
+                                                                @Override
+                                                                public void onError(Throwable e) {
+                                                                    Logger.d(this, "Error: "+e.getMessage());
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                @Override
+                                                                public void onNext(BotResponse data) {
+                                                                    if(data.isSuccess()) {
+                                                                        BotResponse.Data botResponse = data.getData();
+                                                                        Logger.d(this, botResponse.toString());
+                                                                        botDetailsStore.putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
+                                                                                .subscribeOn(Schedulers.newThread())
+                                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                                .subscribe(new Subscriber<Boolean>() {
+                                                                                    @Override
+                                                                                    public void onCompleted() {
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onError(Throwable e) {
+                                                                                        contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onNext(Boolean aBoolean) {
+                                                                                        contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                                                    }
+                                                                                });
+                                                                    } else {
+                                                                        Logger.d(this, "Error response");
+                                                                        Logger.d(this, data.getError().toString());
+                                                                    }
+                                                                }
+                                                            });
+                                                }
                                             }
                                         });
                                     }

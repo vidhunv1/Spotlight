@@ -10,7 +10,7 @@
     <color name="activeIndicator">#2A97F0</color>
 
     <!--chat-->
-    <color name="sendMessageBubble">#3688ad</color>
+    <color name="sendMessageBubble">@color/colorPrimary</color>
     <color name="receiveMessageBubble">#eaeaea</color>
 
     <!--text-->
@@ -19,7 +19,7 @@
     <color name="textSecondary">#64b0d2</color>
     <color name="textHintColor">#cbd9d7</color>
     <color name="drawerText">#212121</color>
-    <color name="buttonText">#3688ad</color>
+    <color name="buttonText">@color/colorPrimary</color>
     <color name="searchHighlight">#32AFFF</color>
 
     <!--icons-->
@@ -28,5 +28,5 @@
     <color name="drawerIcon">#737373</color>
     <color name="error">#C62828</color>
     <color name="divider">#E0E0E0</color>
-    <color name="colorAccent">#7f8c8d</color>
+    <color name="colorAccent">@color/colorPrimary</color>
 </resources>

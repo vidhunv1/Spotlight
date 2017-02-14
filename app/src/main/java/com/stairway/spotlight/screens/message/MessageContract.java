@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.message;
 
+import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 import com.stairway.spotlight.models.MessageResult;
@@ -18,6 +19,8 @@ public interface MessageContract {
         void updateDeliveryStatus(MessageResult messageResult);
         void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
         void updatePresence(String presence);
+        void setKeyboardType(boolean isBotKeyboard);
+        void initBotMenu(List<PersistentMenu> persistentMenus);
     }
 
     interface Presenter extends BasePresenter<MessageContract.View> {
@@ -27,5 +30,6 @@ public interface MessageContract {
         void updateMessageRead(MessageResult result);
         void getPresence(String chatId);
         void sendReadReceipt(String chatId);
+        void loadKeyboard(String chatId);
     }
 }

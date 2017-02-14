@@ -30,6 +30,9 @@ public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.tv_contact_name)
     TextView contactNameView;
 
+    @Bind(R.id.tv_user_profile_id)
+    TextView userIdView;
+
     private static int RESULT_LOAD_IMAGE = 1;
     private String username;
     private String contactName;
@@ -57,6 +60,7 @@ public class UserProfileActivity extends BaseActivity {
         contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
 
         contactNameView.setText(contactName);
+        userIdView.setText(username);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

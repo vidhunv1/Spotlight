@@ -37,6 +37,11 @@ public class BotDetailsStore {
 
     public Observable<Boolean> putMenu(String userName, List<PersistentMenu> menus){
         return Observable.create(subscriber -> {
+            if(userName==null || menus.size()==0) {
+                subscriber.onNext(false);
+                subscriber.onCompleted();
+                return;
+            }
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
             values.put(SQLiteContract.BotDetailsContract.COLUMN_USER_NAME, userName);

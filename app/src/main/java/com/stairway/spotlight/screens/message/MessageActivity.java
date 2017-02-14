@@ -8,9 +8,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -20,8 +24,10 @@ import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 
+import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -31,6 +37,7 @@ import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -48,10 +55,8 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.rv_messageitem)
     RecyclerView messageList;
 
-    @Bind(R.id.et_sendmessage_message)
     EditText messageBox;
 
-    @Bind(R.id.btn_sendMessage_send)
     ImageButton sendImageButton;
 
     @Bind(R.id.tb_message)
@@ -63,14 +68,15 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message_presence)
     TextView presenceView;
 
+    View menuItemsView;
+    BottomSheetDialog bottomSheetDialog;
+
     private WrapContentLinearLayoutManager linearLayoutManager;
 
     private ChatState currentChatState;
 
     public static int index = -1;
     public static int top = -1;
-
-    private static final String BUNDLE_RECYCLER_LAYOUT = "MessageActivity.recyclerlayout";
 
     private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
     private static final String KEY_CHAT_CONTACT_NAME = "MessageActivity.CHAT_CONTACT_NAME";
@@ -93,7 +99,7 @@ public class MessageActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
-        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance());
+        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance());
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_CHAT_USER_NAME))
@@ -149,6 +155,7 @@ public class MessageActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
         messagePresenter.attachView(this);
+        messagePresenter.loadKeyboard(chatUserName);
     }
 
     @Override
@@ -183,7 +190,6 @@ public class MessageActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.btn_sendMessage_send)
     public void onSendClicked() {
         String message = messageBox.getText().toString().trim();
 
@@ -193,19 +199,15 @@ public class MessageActivity extends BaseActivity
         }
     }
 
-    @OnTextChanged(R.id.et_sendmessage_message)
     public void onMessageChanged() {
         String message = messageBox.getText().toString().trim();
 
         if(message.length()>=1) {
-            sendImageButton.setVisibility(View.VISIBLE);
-            sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
             if(currentChatState != ChatState.composing) {
                 messagePresenter.sendChatState(chatUserName, ChatState.composing);
                 currentChatState = ChatState.composing;
             }
         } else {
-            sendImageButton.setVisibility(View.GONE);
             if(currentChatState != ChatState.gone) {
                 messagePresenter.sendChatState(chatUserName, ChatState.gone);
                 currentChatState = ChatState.gone;
@@ -213,51 +215,52 @@ public class MessageActivity extends BaseActivity
         }
     }
 
-    @OnClick(R.id.message_menu)
     public void onMessageMenuClicked() {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View sheetView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
+        if(bottomSheetDialog!=null) {
+            bottomSheetDialog.show();
+        }
+    }
 
-        bottomSheetDialog.setContentView(sheetView);
-        bottomSheetDialog.show();
+    @Override
+    public void initBotMenu(List<PersistentMenu> persistentMenus) {
+        bottomSheetDialog = new BottomSheetDialog(this);
+        menuItemsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
 
-        LinearLayout item1 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item1);
-        LinearLayout item2 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item2);
-        LinearLayout item3 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item3);
-        LinearLayout item4 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item4);
-        LinearLayout item5 = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_item5);
-        LinearLayout enterText = (LinearLayout) sheetView.findViewById(R.id.ll_bottomsheet_entertext);
+        bottomSheetDialog.setContentView(menuItemsView);
 
-        item1.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            TextView item1Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item1);
-            messagePresenter.sendTextMessage(chatUserName, currentUser, item1Text.getText().toString());
-        });
+        List<TextView> itemsTV = new ArrayList<>(5);
+        List<LinearLayout> itemsLL = new ArrayList<>(5);
+        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item1));
+        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item2));
+        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item3));
+        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item4));
+        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item5));
 
-        item2.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            TextView item2Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item2);
-            messagePresenter.sendTextMessage(chatUserName, currentUser, item2Text.getText().toString());
-        });
+        for (LinearLayout linearLayout : itemsLL) {
+            linearLayout.setVisibility(View.GONE);
+        }
 
-        item3.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            TextView item3Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item3);
-            messagePresenter.sendTextMessage(chatUserName, currentUser, item3Text.getText().toString());
-        });
+        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item1));
+        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item2));
+        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item3));
+        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item4));
+        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item5));
 
-        item4.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            TextView item4Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item4);
-            messagePresenter.sendTextMessage(chatUserName, currentUser, item4Text.getText().toString());
-        });
+        for (int i = 0; i < persistentMenus.size(); i++) {
+            itemsLL.get(i).setVisibility(View.VISIBLE);
+            itemsTV.get(i).setText(persistentMenus.get(i).getTitle());
+            PersistentMenu menu = persistentMenus.get(i);
+            itemsLL.get(i).setOnClickListener(v -> {
+                bottomSheetDialog.dismiss();
+                if(menu.getType() == PersistentMenu.Type.postback) {
+                    messagePresenter.sendTextMessage(chatUserName, currentUser, menu.getTitle());
+                } else if(menu.getType() == PersistentMenu.Type.web_url) {
+                    startActivity(WebViewActivity.callingIntent(this, menu.getUrl()));
+                }
+            });
+        }
 
-        item5.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            TextView item5Text = (TextView) sheetView.findViewById(R.id.tv_bottomsheet_item5);
-            messagePresenter.sendTextMessage(chatUserName, currentUser, item5Text.getText().toString());
-        });
-
+        LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
         enterText.setOnClickListener(v -> {
             bottomSheetDialog.dismiss();
             messageBox.requestFocus();
@@ -267,6 +270,45 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         messagesAdapter.setMessages(messages);
+    }
+
+    @Override
+    public void setKeyboardType(boolean isBotKeyboard) {
+        LinearLayout rootLayout = (LinearLayout) findViewById(R.id.ll_keyboard);
+        rootLayout.removeViewAt(rootLayout.getChildCount()-1);
+        if(isBotKeyboard) {
+            View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
+            sendImageButton = (ImageButton) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
+
+            botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
+        } else {
+            View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
+            sendImageButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            messageBox = (EditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
+        }
+
+        sendImageButton.setOnClickListener(v -> onSendClicked());
+        messageBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isBotKeyboard) {
+                    if (s.length() >= 1) {
+                        sendImageButton.setVisibility(View.VISIBLE);
+                        sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
+                    } else {
+                        sendImageButton.setVisibility(View.GONE);
+                    }
+                }
+                onMessageChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
@@ -291,7 +333,6 @@ public class MessageActivity extends BaseActivity
         Logger.d(this, "Presence: "+presence);
         presenceView.setText(presence);
     }
-
 
     @Override
     public void sendPostbackMessage(String message) {

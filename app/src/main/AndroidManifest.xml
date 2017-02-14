@@ -47,6 +47,10 @@
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".screens.sign_up.SignUpActivity"
+            android:label="@string/title_activity_sign_up"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".screens.welcome.WelcomeActivity"
             android:label="WelcomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -83,7 +87,7 @@
             android:label="SearchActivity" />
         <activity
             android:name=".screens.new_chat.NewChatActivity"
-            android:windowSoftInputMode="adjustResize|stateVisible"
+            android:windowSoftInputMode="adjustResize"
             android:label="NewChatActivity" />
         <activity android:name=".screens.web_view.WebViewActivity" />
     </application>

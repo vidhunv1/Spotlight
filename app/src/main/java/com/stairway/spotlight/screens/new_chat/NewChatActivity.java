@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -96,6 +97,13 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        contactList.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView.ItemAnimator animator = contactList.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator)
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        newChatAdapter = new NewChatAdapter(this, this);
+        contactList.setAdapter(newChatAdapter);
+
         userSession = AccessTokenManager.getInstance().load();
         newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
@@ -117,10 +125,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         newChatPresenter.attachView(this);
         newChatPresenter.initContactList();
-
-        contactList.setLayoutManager(new LinearLayoutManager(this));
-
-        Activity newChatActivity = this;
     }
 
     @Override
@@ -285,8 +289,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     public void displayContacts(List<NewChatItemModel> newChatItemModel) {
-        newChatAdapter = new NewChatAdapter(this, this, newChatItemModel);
-        contactList.setAdapter(newChatAdapter);
+        newChatAdapter.setContactList(newChatItemModel);
     }
 
     @OnTextChanged(R.id.et_new_chat_search1)

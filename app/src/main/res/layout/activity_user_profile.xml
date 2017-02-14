@@ -71,16 +71,107 @@
                     android:textColor="@color/textPrimaryLight"
                     android:textSize="14sp" />
             </LinearLayout>
-
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/viewB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="35.25dp"
+            android:paddingLeft="16dp"
             android:background="#ffffff"
-            android:orientation="horizontal" >
-        </LinearLayout>
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/profile_first_line"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="USERID"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    android:id="@+id/tv_user_profile_id"
+                    android:paddingLeft="55dp"/>
+
+                <TextView
+                    android:layout_marginTop="3.5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#8A8A8A"
+                    android:text="IChat ID"
+                    android:textSize="13sp"
+                    android:paddingLeft="55dp"/>
+            </LinearLayout>
+
+            <View
+                android:layout_below="@id/profile_first_line"
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="7dp"
+                android:layout_marginLeft="55dp"
+                android:id="@+id/profile_first_line_divider"
+                android:background="#d9d9d9" />
+
+            <ImageView
+                android:id="@+id/profile_second_line"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:layout_below="@id/profile_first_line_divider"
+                app:srcCompat="@drawable/ic_profile_notification"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_below="@id/profile_first_line_divider"
+                android:layout_toRightOf="@id/profile_second_line"
+                android:layout_marginLeft="31dp"
+                android:paddingRight="24dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Notifications"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="On"
+                    android:textColor="@color/activeIndicator"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical|right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_below="@id/profile_second_line"
+                android:layout_marginLeft="55dp"
+                android:paddingRight="24dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Shared Media"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="0"
+                    android:textColor="@color/activeIndicator"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical|right" />
+            </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -89,7 +180,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/ic_message"
+        app:srcCompat="@drawable/ic_message"
         app:backgroundTint="#ffffff"
         app:layout_anchor="@id/viewA"
         app:layout_anchorGravity="bottom|right|end" />

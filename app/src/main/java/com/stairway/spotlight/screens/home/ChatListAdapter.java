@@ -1,7 +1,6 @@
 package com.stairway.spotlight.screens.home;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,11 +143,19 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_WITH_NOTIFICATION:
                 NotificationViewHolder notificationViewHolder = (NotificationViewHolder) holder;
-                notificationViewHolder.renderItem(chatList.get(position));
+                if(position < (chatList.size()-1)) {
+                    notificationViewHolder.renderItem(chatList.get(position), true);
+                } else {
+                    notificationViewHolder.renderItem(chatList.get(position), false);
+                }
                 break;
             case VIEW_WITHOUT_NOTIFICATION:
                 WithoutNotificationViewHolder withoutNotificationViewHolder = (WithoutNotificationViewHolder) holder;
-                withoutNotificationViewHolder.renderItem(chatList.get(position));
+                if(position < (chatList.size()-1)) {
+                    withoutNotificationViewHolder.renderItem(chatList.get(position), true);
+                } else {
+                    withoutNotificationViewHolder.renderItem(chatList.get(position), false);
+                }
                 break;
             default:
                 break;
@@ -182,6 +189,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_chatlist_notification)
         TextView notificationCount;
 
+        @Bind(R.id.view_contactItem_divider)
+        View dividerLine;
+
         public NotificationViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -192,8 +202,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        public void renderItem(ChatItem chatListItem) {
+        public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
             contactName.setText(chatListItem.getChatName());
+
+            if(isLineVisible) {
+                dividerLine.setVisibility(View.VISIBLE);
+            } else {
+                dividerLine.setVisibility(View.GONE);
+            }
 
             try {
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
@@ -235,6 +251,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_chatItem_time)
         TextView time;
 
+        @Bind(R.id.view_contactItem_divider)
+        View dividerLine;
+
         public WithoutNotificationViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -245,8 +264,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        public void renderItem(ChatItem chatListItem) {
+        public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
             contactName.setText(chatListItem.getChatName());
+
+            if(isLineVisible) {
+                dividerLine.setVisibility(View.VISIBLE);
+            } else {
+                dividerLine.setVisibility(View.GONE);
+            }
 
             try {
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);

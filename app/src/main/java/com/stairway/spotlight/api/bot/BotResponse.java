@@ -9,49 +9,83 @@ import java.util.List;
  */
 
 public class BotResponse {
-    @SerializedName("username")
-    private String username;
-    @SerializedName("user_id")
-    private String userId;
-    @SerializedName("persistent_menu")
-    List<PersistentMenu> persistentMenus;
+    @SerializedName("data")
+    Data data;
+    @SerializedName("error")
+    Error error;
 
-    public String getUsername() {
-        return username;
+    public Data getData() {
+        return data;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public Error getError() {
+        return error;
     }
 
-    public String getUserId() {
-        return userId;
+    public boolean isSuccess() {
+        return error==null;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    public class Data {
+        @SerializedName("username")
+        private String username;
+        @SerializedName("user_id")
+        private String userId;
+        @SerializedName("persistent_menu")
+        List<PersistentMenu> persistentMenus;
 
-    public List<PersistentMenu> getPersistentMenus() {
-        return persistentMenus;
-    }
-
-    public void setPersistentMenus(List<PersistentMenu> persistentMenus) {
-        this.persistentMenus = persistentMenus;
-    }
-
-    @Override
-    public String toString() {
-        String menusString = "";
-        if(persistentMenus!=null && !persistentMenus.isEmpty()) {
-            for (PersistentMenu persistentMenu : persistentMenus) {
-                menusString = menusString + "\n" + persistentMenu;
-            }
+        public String getUsername() {
+            return username;
         }
-        return "BotResponse{" +
-                "username='" + username + '\'' +
-                ", userId='" + userId + '\'' +
-                ", persistentMenus=" + menusString +
-                '}';
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public List<PersistentMenu> getPersistentMenus() {
+            return persistentMenus;
+        }
+
+        public void setPersistentMenus(List<PersistentMenu> persistentMenus) {
+            this.persistentMenus = persistentMenus;
+        }
+
+        @Override
+        public String toString() {
+            String menusString = "";
+            if(persistentMenus!=null && !persistentMenus.isEmpty()) {
+                for (PersistentMenu persistentMenu : persistentMenus) {
+                    menusString = menusString + "\n" + persistentMenu;
+                }
+            }
+            return "BotResponse{" +
+                    "username='" + username + '\'' +
+                    ", userId='" + userId + '\'' +
+                    ", persistentMenus=" + menusString +
+                    '}';
+        }
+    }
+
+    public class Error {
+        @SerializedName("code")
+        private String code;
+        @SerializedName("message")
+        private String message;
+
+        @Override
+        public String toString() {
+            return "Error{" +
+                    "code='" + code + '\'' +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
     }
 }

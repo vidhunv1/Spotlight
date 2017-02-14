@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.screens.home.ChatItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,21 +28,23 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
-    private final int CATEGORY = 2;
+    private final int INVITE_FRIENDS = 2;
     private final int NO_RESULT = 3;
     private Context context;
 
     private List<Integer> filteredList;
     private String filterQuery;
 
-    public NewChatAdapter(Context context, ContactClickListener contactClickListener, List<NewChatItemModel> contacts) {
+    public NewChatAdapter(Context context, ContactClickListener contactClickListener) {
         this.context = context;
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
         filteredList = new ArrayList<>();
         filterQuery = "";
-        this.itemList.addAll(contacts);
+    }
 
+    public void setContactList(List<NewChatItemModel> contactItems) {
+        this.itemList = contactItems;
         //test
         String statusTest[] = {"Available", "Busy", "Can't talk", "In a meeting"};
         int pos = 0;
@@ -52,6 +55,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             newChatItemModel.setStatus(statusTest[pos]);
             pos++;
         }
+
+        this.notifyItemRangeChanged(0, contactItems.size());
     }
 
     public void filterList(String query) {
@@ -83,10 +88,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if(filteredList.size()==0 && !filterQuery.isEmpty())
+        if(filteredList.size()==0 && !filterQuery.isEmpty()) {
             return NO_RESULT;
-        if(position==itemList.size() && filterQuery.isEmpty())
-            return CATEGORY;
+        } if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
+            return INVITE_FRIENDS;
+        } if(position == itemList.size() && filterQuery.isEmpty() && filteredList.size()==0)
+            return INVITE_FRIENDS;
         return CONTACT;
     }
 
@@ -100,9 +107,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
-            case CATEGORY:
-                View categoryView = inflater.inflate(R.layout.item_new_chat_category, parent, false);
-                viewHolder = new CategoryViewHolder(categoryView);
+            case INVITE_FRIENDS:
+                View categoryView = inflater.inflate(R.layout.item_invite_friends, parent, false);
+                viewHolder = new InviteFriendsViewHolder(categoryView);
                 break;
             case NO_RESULT:
                 View noResultView = inflater.inflate(R.layout.item_no_result, parent, false);
@@ -117,7 +124,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
         int position;
-        if(!filterQuery.isEmpty() && filteredList.size()>0)
+        if(!filterQuery.isEmpty() && filteredList.size()>0 && vPos<filteredList.size())
             position = filteredList.get(vPos);
         else
             position = vPos;
@@ -128,9 +135,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem(itemList.get(position), filterQuery);
                 break;
-            case CATEGORY:
-                CategoryViewHolder catVH = (CategoryViewHolder) holder;
-                catVH.renderItem(itemList.size(), filterQuery);
+            case INVITE_FRIENDS:
+//                InviteFriendsViewHolder catVH = (InviteFriendsViewHolder) holder;
                 break;
             case NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
@@ -146,7 +152,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(filteredList.size()==0)
                 return 1;
             else
-                return filteredList.size();
+                return filteredList.size() + 1;
         }
         return itemList.size() + 1;
     }
@@ -206,18 +212,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    class CategoryViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.tv_new_chat_category)
-        TextView categoryName;
-
-        public CategoryViewHolder(View itemView) {
+    class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
+        public InviteFriendsViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        public void renderItem(int count, String filterQuery) {
-//            categoryName.setText(count+" contacts");
-            categoryName.setText("");
         }
     }
 

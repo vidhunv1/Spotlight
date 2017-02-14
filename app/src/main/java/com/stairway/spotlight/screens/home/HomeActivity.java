@@ -98,6 +98,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ButterKnife.bind(this);
+
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
 		if (animator instanceof SimpleItemAnimator)
@@ -126,39 +127,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		navigationView.setNavigationItemSelectedListener(this);
 
 		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
-
-		//test <code></code>
-		ApiManager.getBotApi().getBotDetails("rec")
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Subscriber<BotResponse>() {
-					@Override
-					public void onCompleted() {}
-
-					@Override
-					public void onError(Throwable e) {
-						e.printStackTrace();
-					}
-
-					@Override
-					public void onNext(BotResponse botResponse) {
-						Logger.d(this, botResponse.toString());
-						BotDetailsStore.getInstance().putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
-								.subscribeOn(Schedulers.newThread())
-								.observeOn(AndroidSchedulers.mainThread())
-								.subscribe(new Subscriber<Boolean>() {
-									@Override
-									public void onCompleted() {}
-									@Override
-									public void onError(Throwable e) {}
-
-									@Override
-									public void onNext(Boolean aBoolean) {
-										Logger.d(this, "BOT INSERTED: "+aBoolean);
-									}
-								});
-					}
-				});
 	}
 
 	@Override

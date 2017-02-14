@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * Created by vidhun on 09/12/16.
  */
-
 public class ContactResponse {
     @SerializedName("data")
     @Expose

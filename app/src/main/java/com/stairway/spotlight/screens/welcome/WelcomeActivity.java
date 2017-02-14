@@ -7,16 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.screens.register.RegisterActivity;
+import com.stairway.spotlight.screens.sign_up.SignUpActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class WelcomeActivity extends AppCompatActivity implements WelcomeContract.View {
-
-
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
-
         return intent;
     }
 
@@ -31,5 +29,4 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
     public void signUpClicked() {
         startActivity(RegisterActivity.callingIntent(this));
     }
-
 }

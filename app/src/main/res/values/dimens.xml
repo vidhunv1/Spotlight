@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="bubble_full_corner_radius">18dp</dimen>
     <dimen name="bubble_mid_corner_radius">3.75dp</dimen>
 
@@ -9,4 +9,5 @@
     <dimen name="activity_horizontal_margin">14dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="action_bar_content_inset_material">27.5dp</dimen>
+    <dimen name="design_fab_size_normal" tools:override="true">58dp</dimen>
 </resources>

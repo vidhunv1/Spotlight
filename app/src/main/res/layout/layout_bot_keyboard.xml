@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="47.5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ffffff"
+    android:orientation="horizontal"
+    android:id="@+id/ll_keyboard"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:padding="12dp"
+        app:srcCompat="@drawable/ic_keyboard_menu"
+        android:background="@android:color/transparent"
+        android:id="@+id/message_menu" />
+
+    <EditText
+        android:layout_marginLeft="18dp"
+        android:layout_width="240.5dp"
+        android:layout_height="match_parent"
+        android:id="@+id/et_sendmessage_message"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent"
+        android:hint="@string/keyboard_hint"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:cursorVisible="true"
+        android:textCursorDrawable="@drawable/bg_cursor_message"
+        android:textColorHint="#FFADADAD">
+        <requestFocus/>
+    </EditText>
+
+    <ImageButton
+        android:layout_width="24dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="match_parent"
+        android:id="@+id/btn_sendMessage_send"
+        android:background="@android:color/transparent"
+        android:layout_weight="1" />
+</LinearLayout>
