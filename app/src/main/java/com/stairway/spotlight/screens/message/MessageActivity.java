@@ -10,12 +10,15 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,11 +30,13 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.screens.message.emoji.EmojiPicker;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
@@ -70,10 +75,12 @@ public class MessageActivity extends BaseActivity
 
     View menuItemsView;
     BottomSheetDialog bottomSheetDialog;
+    private EmojiPicker emojiPicker;
 
     private WrapContentLinearLayoutManager linearLayoutManager;
 
     private ChatState currentChatState;
+    private boolean shouldHandleBack = true;
 
     public static int index = -1;
     public static int top = -1;
@@ -149,6 +156,9 @@ public class MessageActivity extends BaseActivity
         }
         messagePresenter.getPresence(chatUserName);
         messagePresenter.sendReadReceipt(chatUserName);
+        if(emojiPicker!=null) {
+            emojiPicker.reset();
+        }
     }
 
     @Override
@@ -166,8 +176,11 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        this.finish();
+        AndroidUtils.hideSoftInput(this);
+        if(shouldHandleBack) {
+            super.onBackPressed();
+        }
+        shouldHandleBack = true;
     }
 
     @Override
@@ -280,12 +293,44 @@ public class MessageActivity extends BaseActivity
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
             sendImageButton = (ImageButton) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
-
             botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
         } else {
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
             sendImageButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
-            messageBox = (EditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
+            ImageButton emojiButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_message_smiley);
+
+            MessageEditText messageEditText = (MessageEditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
+            FrameLayout smileyLayout = (FrameLayout) regularKeyboardView.findViewById(R.id.smiley_layout);
+            messageBox = messageEditText;
+            emojiPicker = new EmojiPicker(this, smileyLayout, getWindow());
+
+            messageEditText.setOnEditTextImeBackListener(new MessageEditText.EditTextImeBackListener() {
+                @Override
+                public void onImeBack() {
+                    emojiPicker.removeEmojiPickerView();
+                    if(!emojiPicker.isEmojiState()) {
+                        shouldHandleBack = false;
+                        emojiPicker.reset();
+                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+                    }
+                }
+            });
+
+            emojiButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shouldHandleBack = true;
+                    emojiPicker.emojiButtonToggle();
+                    if(!emojiPicker.isEmojiState()) {
+                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
+                    } else {
+                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.showSoftInput(messageEditText, InputMethodManager.SHOW_FORCED);
+                    }
+                }
+            });
+
         }
 
         sendImageButton.setOnClickListener(v -> onSendClicked());

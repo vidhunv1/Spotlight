@@ -95,7 +95,6 @@ dependencies {
 
     // Text bitmap creator
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
-
     testCompile 'junit:junit:4.12'
 
 }

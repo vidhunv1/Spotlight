@@ -49,6 +49,9 @@ public class ImageUtils {
         ));
 
         int count = 1;
+        if(name==null || name.isEmpty()) {
+            name = "#";
+        }
         StringBuilder sb = new StringBuilder();
         for(String s : name.split(" ")){
             sb.append(s.charAt(0));

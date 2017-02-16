@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
@@ -6,14 +6,43 @@
     android:background="#FFFAFAFA"
     android:fitsSystemWindows="true">
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rv_messageitem"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:layout_marginBottom="47.5dp"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/action_bar"
+        android:theme="@style/AppTheme.AppBarOverlay">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tb_message"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorPrimary">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textSize="18dp"
+                    android:textColor="@color/textPrimaryLight"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:id="@+id/tb_message_title" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Typically replies instantly"
+                    android:id="@+id/tb_message_presence"
+                    android:textSize="14dp"
+                    android:textColor="@color/textPrimaryLight" />
+            </LinearLayout>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
+        android:layout_alignParentBottom="true"
         android:id="@+id/ll_keyboard"
         android:layout_width="match_parent"
         android:orientation="vertical"
@@ -29,48 +58,10 @@
             android:background="#DADADA"/>
     </LinearLayout>
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rv_messageitem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/tb_message"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent"
-                android:minHeight="?attr/actionBarSize"
-                android:background="@color/colorPrimary">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Name"
-                        android:textSize="18dp"
-                        android:textColor="@color/textPrimaryLight"
-                        android:textAppearance="@style/FontRobotoMedium"
-                        android:id="@+id/tb_message_title" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Typically replies instantly"
-                        android:id="@+id/tb_message_presence"
-                        android:textSize="14dp"
-                        android:textColor="@color/textPrimaryLight" />
-                </LinearLayout>
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:layout_gravity="top"
-            android:background="#D6D6D6"/>
-    </LinearLayout>
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        android:layout_above="@id/ll_keyboard"/>
+</RelativeLayout>

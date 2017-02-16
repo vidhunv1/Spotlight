@@ -82,6 +82,13 @@
             android:background="#ffffff"
             android:orientation="vertical" >
 
+            <ImageView
+                android:id="@+id/profile_first_line_contact"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:paddingTop="5dp"
+                app:srcCompat="@drawable/ic_contact"/>
+
             <LinearLayout
                 android:id="@+id/profile_first_line"
                 android:layout_width="match_parent"
