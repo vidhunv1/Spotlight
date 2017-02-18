@@ -2,7 +2,7 @@ package com.stairway.spotlight.screens.message.emoji;
 
 import android.content.Context;
 
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
 
 
 /**

@@ -296,7 +296,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private boolean isAllEmoticon(String message) {
         final String emo_regex = "(^[\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee ]+$)";
         boolean isAll = Pattern.compile(emo_regex).matcher(message).find();
-        Logger.d(this, message+": all Emojis? "+isAll);
         return isAll;
     }
 

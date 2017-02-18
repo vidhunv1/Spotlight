@@ -2,10 +2,12 @@ package com.stairway.spotlight.screens.message.emoji;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -21,12 +23,15 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
-import com.stairway.spotlight.screens.message.emoji.emoji.Nature;
-import com.stairway.spotlight.screens.message.emoji.emoji.Objects;
-import com.stairway.spotlight.screens.message.emoji.emoji.People;
-import com.stairway.spotlight.screens.message.emoji.emoji.Places;
-import com.stairway.spotlight.screens.message.emoji.emoji.Symbols;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.db.GenericCache;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Nature;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Objects;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.People;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Places;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Symbols;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,10 +40,10 @@ import java.util.List;
  * Created by vidhun on 15/02/17.
  */
 
-public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRecents{
-    Context mContext;
+public class EmojiViewHelper implements ViewPager.OnPageChangeListener, EmojiconRecents{
     private View[] mEmojiTabs;
-    EmojiconGridView1.OnEmojiconClickedListener onEmojiconClickedListener;
+    Context mContext;
+    EmojiconGridView.OnEmojiconClickedListener onEmojiconClickedListener;
     OnEmojiconBackspaceClickedListener onEmojiconBackspaceClickedListener;
     private PagerAdapter mEmojisAdapter;
     private EmojiconRecentsManager mRecentsManager;
@@ -51,14 +56,24 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
 
     private boolean isEmojiViewInflated = false;
     private boolean isEmojiState = true;
-    private boolean isKeyboardOpen = false;
 
-    public EmojiPicker(Context mContext, final ViewGroup viewGroup, Window window) {
+    private SharedPreferences sharedPreferences;
+
+    private static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
+    private static String PREFS_NAME = "EmojiViewHelper";
+
+    public EmojiViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
         this.mContext = mContext;
         this.smileyLayout = viewGroup;
         this.window = window;
         this.emojiPickerLayout = createCustomView();
-        layoutHeightpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 230, mContext.getResources().getDisplayMetrics());
+        sharedPreferences = mContext.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
+        float cachedHeight = sharedPreferences.getFloat(KEY_KEYBOARD_HEIGHT, -1);
+        if(cachedHeight!=-1) {
+            layoutHeightpx = (int) AndroidUtils.px(cachedHeight);
+        } else {
+            layoutHeightpx = (int) AndroidUtils.px(230);
+        }
         updateKeyboardHeight();
     }
 
@@ -75,13 +90,15 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
                         .getIdentifier("status_bar_height",
                                 "dimen", "android");
                 if (resourceId > 0) {
-                    heightDifference -= mContext.getResources()
-                            .getDimensionPixelSize(resourceId);
+                    heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
                 }
                 if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
+                    if(layoutHeightpx!=heightDifference) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
+                        editor.apply();
+                    }
                     layoutHeightpx = heightDifference;
-                    isKeyboardOpen = true;
-                    Log.d("DEF", "OPEN");
                 } else
                     Log.d("DEF", "CLOSE");
             }
@@ -93,6 +110,7 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
         if(!isEmojiViewInflated) {
             this.isEmojiViewInflated = true;
             ViewGroup.LayoutParams layoutParams = smileyLayout.getLayoutParams();
+            Logger.d(this, "adding smiley view, Setting height: "+layoutHeightpx);
             layoutParams.height = layoutHeightpx;
             smileyLayout.setLayoutParams(layoutParams);
             smileyLayout.addView(emojiPickerLayout);
@@ -146,7 +164,6 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
             isEmojiState = false;
         } else {
             isEmojiState = true;
-            isKeyboardOpen = true;
         }
     }
 
@@ -154,26 +171,10 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
         return isEmojiState;
     }
 
-    public boolean isResetState() {
-        Log.e("isResetState", isEmojiState + " " + isKeyboardOpen);
-        return isEmojiViewInflated;
-    }
-
     public void reset() {
-        Log.d("RESET", "RESET");
         isEmojiState = true;
-        isKeyboardOpen = false;
-
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        Activity currentActivity = (Activity)mContext;
-        View view = currentActivity.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
         removeEmojiPickerView();
     }
-
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.emojicons, null, false);
@@ -182,12 +183,12 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
         EmojiconRecents recents = this;
         mEmojisAdapter = new EmojisPagerAdapter(
                 Arrays.asList(
-                        new EmojiconRecentsGridView1(mContext, null, null, this),
-                        new EmojiconGridView1(mContext, People.DATA, recents, this),
-                        new EmojiconGridView1(mContext, Nature.DATA, recents, this),
-                        new EmojiconGridView1(mContext, Objects.DATA, recents, this),
-                        new EmojiconGridView1(mContext, Places.DATA, recents, this),
-                        new EmojiconGridView1(mContext, Symbols.DATA, recents, this)
+                        new EmojiconRecentsGridView(mContext, null, null, this),
+                        new EmojiconGridView(mContext, People.DATA, recents, this),
+                        new EmojiconGridView(mContext, Nature.DATA, recents, this),
+                        new EmojiconGridView(mContext, Objects.DATA, recents, this),
+                        new EmojiconGridView(mContext, Places.DATA, recents, this),
+                        new EmojiconGridView(mContext, Symbols.DATA, recents, this)
                 )
         );
         emojisPager.setAdapter(mEmojisAdapter);
@@ -235,15 +236,15 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
     }
 
     private static class EmojisPagerAdapter extends PagerAdapter {
-        private List<EmojiconGridView1> views;
-        public EmojiconRecentsGridView1 getRecentFragment(){
-            for (EmojiconGridView1 it : views) {
-                if(it instanceof EmojiconRecentsGridView1)
-                    return (EmojiconRecentsGridView1)it;
+        private List<EmojiconGridView> views;
+        public EmojiconRecentsGridView getRecentFragment(){
+            for (EmojiconGridView it : views) {
+                if(it instanceof EmojiconRecentsGridView)
+                    return (EmojiconRecentsGridView)it;
             }
             return null;
         }
-        public EmojisPagerAdapter(List<EmojiconGridView1> views) {
+        public EmojisPagerAdapter(List<EmojiconGridView> views) {
             super();
             this.views = views;
         }
@@ -360,12 +361,21 @@ public class EmojiPicker implements ViewPager.OnPageChangeListener, EmojiconRece
         }
     }
 
-    public interface OnEmojiconBackspaceClickedListener {
-        void onEmojiconBackspaceClicked(View v);
+    /**
+     * Set the listener for the event when any of the emojicon is clicked
+     */
+    public void setOnEmojiconClickedListener(EmojiconGridView.OnEmojiconClickedListener listener){
+        this.onEmojiconClickedListener = listener;
     }
 
-    public interface OnSoftKeyboardOpenCloseListener{
-        void onKeyboardOpen(int keyBoardHeight);
-        void onKeyboardClose();
+    /**
+     * Set the listener for the event when backspace on emojicon popup is clicked
+     */
+    public void setOnEmojiconBackspaceClickedListener(OnEmojiconBackspaceClickedListener listener){
+        this.onEmojiconBackspaceClickedListener = listener;
+    }
+
+    public interface OnEmojiconBackspaceClickedListener {
+        void onEmojiconBackspaceClicked(View v);
     }
 }

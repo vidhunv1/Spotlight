@@ -8,26 +8,26 @@ import android.content.Context;
 import android.widget.GridView;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
 
 /**
  * Created by vidhun on 15/02/17.
  */
-public class EmojiconRecentsGridView1 extends EmojiconGridView1 implements EmojiconRecents {
-    EmojiAdapter1 mAdapter;
+public class EmojiconRecentsGridView extends EmojiconGridView implements EmojiconRecents {
+    EmojiAdapter mAdapter;
 
-    public EmojiconRecentsGridView1(Context context, Emojicon[] emojicons,
-                                    EmojiconRecents recents, final EmojiPicker emojiPicker) {
-        super(context, emojicons, recents, emojiPicker);
+    public EmojiconRecentsGridView(Context context, Emojicon[] emojicons,
+                                   EmojiconRecents recents, final EmojiViewHelper emojiViewHelper) {
+        super(context, emojicons, recents, emojiViewHelper);
         EmojiconRecentsManager recents1 = EmojiconRecentsManager
                 .getInstance(rootView.getContext());
-        mAdapter = new EmojiAdapter1(rootView.getContext(),  recents1);
+        mAdapter = new EmojiAdapter(rootView.getContext(),  recents1);
         mAdapter.setEmojiClickListener(new OnEmojiconClickedListener() {
 
             @Override
             public void onEmojiconClicked(Emojicon emojicon) {
-                if (emojiPicker.onEmojiconClickedListener != null) {
-                    emojiPicker.onEmojiconClickedListener.onEmojiconClicked(emojicon);
+                if (emojiViewHelper.onEmojiconClickedListener != null) {
+                    emojiViewHelper.onEmojiconClickedListener.onEmojiconClicked(emojicon);
                 }
             }
         });

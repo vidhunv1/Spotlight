@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.message.emoji.emoji;
+package com.stairway.spotlight.screens.message.emoji.emoji_objects;
 
 /**
  * @author Hieu Rocker (rockerhieu@gmail.com)

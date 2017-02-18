@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.message.emoji.emoji;
+package com.stairway.spotlight.screens.message.emoji.emoji_objects;
 
 import java.io.Serializable;
 

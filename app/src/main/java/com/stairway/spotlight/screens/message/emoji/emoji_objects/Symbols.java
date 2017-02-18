@@ -1,4 +1,4 @@
-package com.stairway.spotlight.screens.message.emoji.emoji;
+package com.stairway.spotlight.screens.message.emoji.emoji_objects;
 
 /**
  * Created by vidhun on 15/02/17.

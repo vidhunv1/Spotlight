@@ -12,8 +12,8 @@ import android.widget.GridView;
 
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
-import com.stairway.spotlight.screens.message.emoji.emoji.People;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.People;
 
 import java.util.Arrays;
 
@@ -22,15 +22,15 @@ import java.util.Arrays;
  * @author Hieu Rocker (rockerhieu@gmail.com)
  * @author 	Ankush Sachdeva (sankush@yahoo.co.in)
  */
-public class EmojiconGridView1 {
+public class EmojiconGridView {
     public View rootView;
-    EmojiPicker emojiPicker;
+    EmojiViewHelper emojiViewHelper;
     EmojiconRecents mRecents;
     Emojicon[] mData;
 
-    public EmojiconGridView1(Context context, Emojicon[] emojicons, EmojiconRecents recents, EmojiPicker emojiconPopup) {
+    public EmojiconGridView(Context context, Emojicon[] emojicons, EmojiconRecents recents, EmojiViewHelper emojiconPopup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        emojiPicker = emojiconPopup;
+        emojiViewHelper = emojiconPopup;
         rootView = inflater.inflate(R.layout.emojicon_grid, null);
         setRecents(recents);
         GridView gridView = (GridView) rootView.findViewById(R.id.Emoji_GridView);
@@ -40,13 +40,13 @@ public class EmojiconGridView1 {
             Object[] o = (Object[]) emojicons;
             mData = Arrays.asList(o).toArray(new Emojicon[o.length]);
         }
-        EmojiAdapter1 mAdapter = new EmojiAdapter1(rootView.getContext(), mData);
+        EmojiAdapter mAdapter = new EmojiAdapter(rootView.getContext(), mData);
         mAdapter.setEmojiClickListener(new OnEmojiconClickedListener() {
 
             @Override
             public void onEmojiconClicked(Emojicon emojicon) {
-                if (emojiPicker.onEmojiconClickedListener != null) {
-                    emojiPicker.onEmojiconClickedListener.onEmojiconClicked(emojicon);
+                if (emojiViewHelper.onEmojiconClickedListener != null) {
+                    emojiViewHelper.onEmojiconClickedListener.onEmojiconClicked(emojicon);
                 }
                 if (mRecents != null) {
                     mRecents.addRecentEmoji(rootView.getContext(), emojicon);

@@ -11,6 +11,5 @@
         android:textSize="28sp"
         android:padding="5dp"
         android:textColor="#FFF"
-        android:focusableInTouchMode="false"
         android:gravity="center"/>
 </FrameLayout>

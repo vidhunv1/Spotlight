@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:title="View Contact" android:id="@+id/view_contact" />
-    <item android:title="Chat Files" android:id="@+id/chat_files" />
-    <item android:title="Search" android:id="@+id/search" />
-    <item android:title="Mute" android:id="@+id/mute" />
-    <item android:title="More" android:id="@+id/more" />
     <item
         android:id="@+id/action_add_contact"
         android:icon="@drawable/ic_attach_file"
         android:title="Attach Files"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/view_contact"
+        android:icon="@drawable/ic_info"
+        android:title="View Contact"
         app:showAsAction="always" />
 </menu>

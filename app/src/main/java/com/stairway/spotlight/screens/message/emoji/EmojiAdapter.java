@@ -8,24 +8,24 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
 
 import java.util.List;
 
 /**
  * @author Ankush Sachdeva (sankush@yahoo.co.in)
  */
-class EmojiAdapter1 extends ArrayAdapter<Emojicon> {
-    EmojiconGridView1.OnEmojiconClickedListener emojiClickListener;
-    public EmojiAdapter1(Context context, List<Emojicon> data) {
+class EmojiAdapter extends ArrayAdapter<Emojicon> {
+    EmojiconGridView.OnEmojiconClickedListener emojiClickListener;
+    public EmojiAdapter(Context context, List<Emojicon> data) {
         super(context, R.layout.emojicon_item, data);
     }
 
-    public EmojiAdapter1(Context context, Emojicon[] data) {
+    public EmojiAdapter(Context context, Emojicon[] data) {
         super(context, R.layout.emojicon_item, data);
     }
 
-    public void setEmojiClickListener(EmojiconGridView1.OnEmojiconClickedListener listener){
+    public void setEmojiClickListener(EmojiconGridView.OnEmojiconClickedListener listener){
         this.emojiClickListener = listener;
     }
 

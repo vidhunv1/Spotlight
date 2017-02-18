@@ -4,57 +4,58 @@
     <LinearLayout
         android:id="@+id/emojis_tab"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#e7e7e7"
+        android:layout_height="48dp"
+        android:background="#D6D6D6"
         android:layout_alignParentTop="true"
         android:orientation="horizontal">
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_0_recents"
             android:src="@drawable/ic_emoji_recent_light_activated"/>
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_1_people"
             android:src="@drawable/ic_emoji_people_light"/>
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_2_nature"
             android:src="@drawable/ic_emoji_nature_light"/>
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_3_objects"
             android:src="@drawable/ic_emoji_objects_light"/>
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_4_cars"
             android:src="@drawable/ic_emoji_places_light"/>
         <ImageButton
             android:background="@null"
-            android:layout_width="0dip"
+            android:layout_width="44dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:scaleType="center"
             android:id="@+id/emojis_tab_5_punctuation"
+            android:src="@drawable/ic_emoji_symbols_light"/>
+        <ImageButton
+            android:background="@null"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:id="@+id/emojis_tab_5_punctuation1"
             android:src="@drawable/ic_emoji_symbols_light"/>
         <ImageButton
             android:background="@null"

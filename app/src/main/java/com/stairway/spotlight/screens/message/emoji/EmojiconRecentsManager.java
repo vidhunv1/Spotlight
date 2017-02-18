@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
-import com.stairway.spotlight.screens.message.emoji.emoji.Emojicon;
+import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
