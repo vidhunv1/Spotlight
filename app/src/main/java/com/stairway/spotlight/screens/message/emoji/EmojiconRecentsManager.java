@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
- * Created by vidhun on 15/02/17.
+ * @author Hieu Rocker (rockerhieu@gmail.com)
+ * @author 	Ankush Sachdeva (sankush@yahoo.co.in)
  */
-
 public class EmojiconRecentsManager extends ArrayList<Emojicon> {
 
     private static final String PREFERENCE_NAME = "emojicon";

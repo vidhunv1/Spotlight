@@ -42,7 +42,6 @@ public class EmojiconGridView {
         }
         EmojiAdapter mAdapter = new EmojiAdapter(rootView.getContext(), mData);
         mAdapter.setEmojiClickListener(new OnEmojiconClickedListener() {
-
             @Override
             public void onEmojiconClicked(Emojicon emojicon) {
                 if (emojiViewHelper.onEmojiconClickedListener != null) {

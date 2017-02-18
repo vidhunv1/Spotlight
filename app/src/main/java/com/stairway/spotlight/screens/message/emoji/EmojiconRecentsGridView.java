@@ -11,7 +11,8 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.screens.message.emoji.emoji_objects.Emojicon;
 
 /**
- * Created by vidhun on 15/02/17.
+ * @author Hieu Rocker (rockerhieu@gmail.com)
+ * @author 	Ankush Sachdeva (sankush@yahoo.co.in)
  */
 public class EmojiconRecentsGridView extends EmojiconGridView implements EmojiconRecents {
     EmojiAdapter mAdapter;

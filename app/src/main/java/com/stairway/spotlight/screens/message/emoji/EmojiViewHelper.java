@@ -37,9 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by vidhun on 15/02/17.
+ * Source modified from https://github.com/rockerhieu/emojicon
  */
-
 public class EmojiViewHelper implements ViewPager.OnPageChangeListener, EmojiconRecents{
     private View[] mEmojiTabs;
     Context mContext;

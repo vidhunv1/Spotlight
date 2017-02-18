@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
-import com.stairway.spotlight.screens.home.ChatItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int CONTACT  = 1;
     private final int INVITE_FRIENDS = 2;
     private final int NO_RESULT = 3;
+    private final int HEADER = 4;
     private Context context;
 
     private List<Integer> filteredList;
@@ -55,13 +55,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             newChatItemModel.setStatus(statusTest[pos]);
             pos++;
         }
-
         this.notifyItemRangeChanged(0, contactItems.size());
     }
 
     public void filterList(String query) {
         int modPos = 0, temp, item;
-
         filterQuery = query;
         String queryLower = filterQuery.toLowerCase();
         String contactNameLower;
@@ -92,8 +90,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return NO_RESULT;
         } if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
             return INVITE_FRIENDS;
-        } if(position == itemList.size() && filterQuery.isEmpty() && filteredList.size()==0)
+        } if(position == itemList.size()+1 && filterQuery.isEmpty() && filteredList.size()==0) {
             return INVITE_FRIENDS;
+        } if(position == 0 && filterQuery.isEmpty()) {
+            Logger.d(this, "NewGroup");
+            return HEADER;
+        }
         return CONTACT;
     }
 
@@ -115,6 +117,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View noResultView = inflater.inflate(R.layout.item_no_result, parent, false);
                 viewHolder = new NoResultViewHolder(noResultView);
                 break;
+            case HEADER:
+                View newGroup = inflater.inflate(R.layout.item_header_contact, parent, false);
+                viewHolder = new HeaderViewHolder(newGroup);
+                break;
             default:
                 return null;
         }
@@ -124,10 +130,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int vPos) {
         int position;
-        if(!filterQuery.isEmpty() && filteredList.size()>0 && vPos<filteredList.size())
+        if(!filterQuery.isEmpty() && filteredList.size() > 0 && vPos < filteredList.size())
             position = filteredList.get(vPos);
         else
-            position = vPos;
+            position = vPos - 1;
 
         Logger.d(this, "Position: "+position+" vpos: "+vPos+" itemSize: "+itemList.size()+" itemViewType: "+holder.getItemViewType());
         switch (holder.getItemViewType()) {
@@ -141,6 +147,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
                 noResultViewHolder.renderItem(filterQuery);
+                break;
+            case HEADER:
+//                NewGroupViewHolder newGroupViewHolder = (NewGroupViewHolder) holder;
             default:
                 break;
         }
@@ -154,7 +163,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             else
                 return filteredList.size() + 1;
         }
-        return itemList.size() + 1;
+        return itemList.size() + 2;
     }
 
     class ContactsViewHolder extends RecyclerView.ViewHolder {
@@ -209,6 +218,13 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             status.setText(contactItem.getStatus());
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             contactName.setTag(contactItem.getUserName());
+        }
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+        HeaderViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 

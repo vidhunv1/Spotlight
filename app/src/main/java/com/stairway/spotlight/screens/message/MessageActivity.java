@@ -147,9 +147,9 @@ public class MessageActivity extends BaseActivity
         }
         messagePresenter.getPresence(chatUserName);
         messagePresenter.sendReadReceipt(chatUserName);
-        if(emojiPicker!=null) {
-            emojiPicker.reset();
-        }
+//        if(emojiPicker!=null) {
+//            emojiPicker.reset();
+//        }
     }
 
     @Override
@@ -191,6 +191,7 @@ public class MessageActivity extends BaseActivity
             this.finish();
         }
         else if(id == R.id.view_contact) {
+            AndroidUtils.hideSoftInput(this);
             startActivity(UserProfileActivity.callingIntent(this, chatUserName, chatContactName));
             this.overridePendingTransition(0, 0);
         }
