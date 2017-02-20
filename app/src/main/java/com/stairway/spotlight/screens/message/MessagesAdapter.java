@@ -319,6 +319,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
         if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
             return time.toString(timeFormat).toUpperCase();
+        } else if((time.getDayOfMonth() > timeNow.getDayOfMonth()-7)) {
+            return time.dayOfWeek().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat);
         } else if(timeNow.getMonthOfYear() == time.getMonthOfYear()) {
             return time.getDayOfMonth()+" "+time.monthOfYear().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat).toUpperCase();
         } else {
@@ -328,23 +330,35 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private int bubbleType(int position) {
         final int START = 1, MIDDLE = 2, END = 3, FULL = 0;
-        final boolean isMe = messageList.get(position).isMe();
-        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
-            return FULL;
-        if(position!=0 && (position==messageList.size()-1 || isMe!=messageList.get(position+1).isMe()))
-            return END;
-        if((position!=0 && isMe==messageList.get(position-1).isMe()) && position!=messageList.size()-1)
-            return MIDDLE;
-        if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe==messageList.get(position+1).isMe()))
+
+        if(isSameConversation(position, position+1) && !isSameConversation(position, position-1))
             return START;
-        return FULL;
+        else if(isSameConversation(position, position+1) && isSameConversation(position, position-1))
+            return MIDDLE;
+        else if(!isSameConversation(position, position+1) && isSameConversation(position, position-1))
+            return END;
+        else
+            return FULL;
+    }
+
+    private boolean isSameConversation(int pos1, int pos2) {
+        if(pos1<0 || pos1==messageList.size() || pos2<0 || pos2==messageList.size())
+            return false;
+
+        boolean isLt1Min;
+        if(pos1<pos2)
+            isLt1Min = messageList.get(pos1).getTime().isAfter(messageList.get(pos2).getTime().minusMinutes(1));
+        else
+            isLt1Min = messageList.get(pos2).getTime().isAfter(messageList.get(pos1).getTime().minusMinutes(1));
+
+        return messageList.get(pos1).isMe() == messageList.get(pos2).isMe() && isLt1Min;
     }
 
     private boolean shouldShowTime(int position) {
         if (position==0)
             return true;
 
-        return !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(5));
+        return !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(10));
     }
 
     private void setMessageClicked(int position, boolean isClicked) {
@@ -384,6 +398,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ImageView deliveryStatusView;
         @Bind(R.id.message_send_text)
         RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
 
         public SendEmoticonViewHolder(View itemView) {
             super(itemView);
@@ -392,7 +412,18 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int position) {
             int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
             messageView.setText(message);
+
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0,12,0,12);
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,2,0,0);
+            }
 
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
@@ -403,6 +434,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             else if(messageStatus == MessageResult.MessageStatus.READ) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
             }
+
+            deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
 
             switch (bubbleType) {
                 case 0:
@@ -418,6 +451,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     break;
             }
+
+            bubbleView.setOnClickListener(v -> {
+                if(deliveryStatusText.getVisibility() == View.VISIBLE) {
+                    if(!shouldShowTime) {
+                        timeView.setVisibility(View.GONE);
+                    }
+                    deliveryStatusText.setVisibility(View.GONE);
+                    setMessageClicked(position, false);
+                } else {
+                    timeView.setVisibility(View.VISIBLE);
+                    deliveryStatusText.setVisibility(View.VISIBLE);
+                    setMessageClicked(position, true);
+                }
+            });
         }
     }
 
@@ -426,8 +473,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView messageView;
         @Bind(R.id.iv_profileImage)
         ImageView profileImageView;
-        @Bind(R.id.rl_message_receive_text)
+        @Bind(R.id.ll_message_receive_text)
         RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
 
         ReceiveEmoticonViewHolder(View itemView) {
             super(itemView);
@@ -437,7 +488,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(String message, String time, int position) {
             int bubbleType = bubbleType(position);
             boolean displayProfileDP = hasProfileDP(position);
+            boolean shouldShowTime = shouldShowTime(position);
+            timeView.setText(time);
             messageView.setText(message);
+
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0,12,0,12);
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,2,0,0);
+            }
 
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);
@@ -460,6 +521,18 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     break;
             }
+
+            bubbleView.setOnClickListener(v -> {
+                if(!shouldShowTime) {
+                    if(timeView.getVisibility() == View.VISIBLE) {
+                        timeView.setVisibility(View.GONE);
+                        setMessageClicked(position, false);
+                    } else {
+                        timeView.setVisibility(View.VISIBLE);
+                        setMessageClicked(position, true);
+                    }
+                }
+            });
         }
     }
 
@@ -486,14 +559,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
-            String deliveryStatus = "";
             Logger.d(this, "Time:: "+timeView.getText());
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0,12,0,12);
             } else {
                 timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,2,0,0);
             }
 
             switch (bubbleType) {
@@ -517,21 +591,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             messageView.setText(message);
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
-                deliveryStatus = "Pending";
             }
             else if(messageStatus == MessageResult.MessageStatus.SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
-                deliveryStatus = "Sent";
             }
             else if(messageStatus == MessageResult.MessageStatus.READ) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
-                deliveryStatus = "Seen";
-            }
-            else if(messageStatus == MessageResult.MessageStatus.DELIVERED) {
-                deliveryStatus = "Delivered";
             }
 
-            deliveryStatusText.setText(deliveryStatus);
+            deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
 
             bubbleView.setOnClickListener(v -> {
                 if(deliveryStatusText.getVisibility() == View.VISIBLE) {
@@ -574,8 +642,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             timeView.setText(time);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0,12,0,12);
             } else {
                 timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,2,0,0);
             }
 
             switch (bubbleType) {

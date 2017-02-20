@@ -1,37 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rl_message_receive_text"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_message_receive_text"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/iv_profileImage"
-        android:layout_toEndOf="@+id/iv_profileImage"
-        android:id="@+id/rl_bubble"
-        android:paddingTop="7.25dp"
-        android:maxWidth="258dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="12dp">
-        <TextView
-            android:id="@+id/tv_messageitem_message"
-            android:text="FLE : À"
-            android:layout_width="wrap_content"
-            android:textSize="30sp"
-            android:textColor="#000000"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity=""
+            android:src="@drawable/default_profile_image"
+            android:id="@+id/iv_profileImage"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:maxWidth="234dp" />
-    </RelativeLayout>
-    <ImageView
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/default_profile_image"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/iv_profileImage"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="12dp" />
-</RelativeLayout>
+            android:layout_marginLeft="12dp" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/iv_profileImage"
+            android:layout_toEndOf="@+id/iv_profileImage"
+            android:id="@+id/rl_bubble"
+            android:maxWidth="258dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp">
+            <TextView
+                android:id="@+id/tv_messageitem_message"
+                android:text="FLE : À"
+                android:layout_width="wrap_content"
+                android:textSize="30sp"
+                android:textColor="#000000"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:maxWidth="234dp" />
+        </RelativeLayout>
+    </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/rl_bubble"
+        android:paddingTop="2dp"
+        android:text="9:47 PM"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        android:id="@+id/tv_time"
+        android:gravity="center" />
+</LinearLayout>

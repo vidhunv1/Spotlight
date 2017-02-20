@@ -36,6 +36,18 @@ public class MessageResult implements Serializable {
         this.fromId = fromId;
     }
 
+    public static String getDeliveryStatusText(MessageStatus messageStatus) {
+        if(messageStatus == MessageStatus.NOT_SENT) {
+            return "Sending";
+        } else if(messageStatus == MessageStatus.SENT) {
+            return "Sent";
+        } else if(messageStatus == MessageStatus.DELIVERED) {
+            return "Delivered";
+        } else if(messageStatus == MessageStatus.READ) {
+            return "Seen";
+        } else return "";
+    }
+
     public String getReceiptId() {
         return receiptId;
     }

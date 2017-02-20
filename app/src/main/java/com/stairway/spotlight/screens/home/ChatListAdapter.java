@@ -171,6 +171,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
         if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
             return time.toString(timeFormat);
+        } else if(time.getDayOfMonth() > (timeNow.getDayOfMonth()-7)) {
+            return time.dayOfWeek().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat);
         } else if(timeNow.getYear() == time.getYear()) {
             return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth();
         } else {

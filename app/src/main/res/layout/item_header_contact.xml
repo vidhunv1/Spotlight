@@ -3,14 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#efefef"
     android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
         tools:ignore="MissingPrefix"
         android:layout_height="wrap_content"
         android:paddingTop="3dp"
-        android:paddingBottom="3dp"
         android:text="CONTACTS"
         android:paddingLeft="16dp"
         android:textAppearance="@style/FontRobotoMedium"
