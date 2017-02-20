@@ -1,5 +1,7 @@
 package com.stairway.spotlight.screens.search;
 
+import org.joda.time.DateTime;
+
 /**
  * Created by vidhun on 16/12/16.
  */
@@ -7,10 +9,10 @@ package com.stairway.spotlight.screens.search;
 public class MessagesModel {
     private String contactName;
     private String message;
-    private String time;
+    private DateTime time;
     private String userId;
 
-    public MessagesModel(String userId, String contactName, String message, String time) {
+    public MessagesModel(String userId, String contactName, String message, DateTime time) {
         this.contactName = contactName;
         this.message = message;
         this.time = time;
@@ -41,11 +43,11 @@ public class MessagesModel {
         this.message = message;
     }
 
-    public String getTime() {
+    public DateTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(DateTime time) {
         this.time = time;
     }
 

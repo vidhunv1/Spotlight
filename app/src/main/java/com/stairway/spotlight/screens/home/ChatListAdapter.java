@@ -15,6 +15,10 @@ import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.Message;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,6 +166,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    private String getFormattedTime(DateTime time) {
+        DateTime timeNow = DateTime.now();
+        DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
+        if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
+            return time.toString(timeFormat);
+        } else if(timeNow.getYear() == time.getYear()) {
+            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth();
+        } else {
+            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth()+" AT "+time.toString(timeFormat)+" "+time.getYear();
+        }
+    }
+
     //    @Override
 //    public void onBindViewHolder(ViewHolder holder, int position) {
 //        holder.renderItem(chatList.get(position));
@@ -225,7 +241,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 lastMessage.setText(chatListItem.getLastMessage());
             }
 
-            time.setText(chatListItem.getTime());
+            time.setText(getFormattedTime(chatListItem.getTime()));
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
 
@@ -286,8 +302,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } catch(JsonSyntaxException e) {
                 lastMessage.setText(chatListItem.getLastMessage());
             }
-
-            time.setText(chatListItem.getTime());
+            time.setText(getFormattedTime(chatListItem.getTime()));
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             contactName.setTag(chatListItem.getChatId());
         }

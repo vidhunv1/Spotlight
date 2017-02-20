@@ -1,6 +1,8 @@
 package com.stairway.spotlight.models;
 
 
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
 
 /**
@@ -14,7 +16,7 @@ public class MessageResult implements Serializable {
     private String messageId;
     private String receiptId;
     private boolean isReceiptSent;
-    private String time;
+    private DateTime time;
     private String name;
     private int unSeenCount;
 
@@ -50,11 +52,11 @@ public class MessageResult implements Serializable {
         this.unSeenCount = unSeenCount;
     }
 
-    public String getTime() {
+    public DateTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(DateTime time) {
         this.time = time;
     }
 

@@ -19,6 +19,8 @@ import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.models.AccessToken;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 /**
  * Created by vidhun on 05/07/16.
  */
@@ -41,6 +43,8 @@ public class SpotlightApplication extends Application {
         DatabaseManager.init(this);
         EventBus.init(bus);
         AccessTokenManager.init(this);
+
+        JodaTimeAndroid.init(this);
 
         if(com.stairway.spotlight.BuildConfig.DEBUG) {
             // Initialize facebook Stetho

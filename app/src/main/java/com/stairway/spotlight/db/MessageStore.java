@@ -9,6 +9,9 @@ import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.db.core.SQLiteContract.MessagesContract;
 import com.stairway.spotlight.models.MessageResult;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +75,7 @@ public class MessageStore {
 
                     MessageResult msg = new MessageResult(chatId, fromId, message);
                     msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
-                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setTime(DateTime.parse(time));
                     msg.setMessageId(messageId);
                     msg.setReceiptId(receiptId);
                     result.add(msg);
@@ -146,7 +149,7 @@ public class MessageStore {
 
                     MessageResult msg = new MessageResult(chatId, fromId, m);
                     msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
-                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setTime(DateTime.parse(time));
                     msg.setMessageId(messageId);
                     msg.setReceiptId(receiptId);
                     result.add(msg);
@@ -199,7 +202,7 @@ public class MessageStore {
 
                 MessageResult msg = new MessageResult(chatId, fromId, message);
                 msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
-                msg.setTime(getFormattedTime(time, "hh:mm"));
+                msg.setTime(DateTime.parse(time));
                 msg.setMessageId(messageId);
                 msg.setReceiptId(receiptId);
                 subscriber.onNext(msg);
@@ -215,24 +218,29 @@ public class MessageStore {
 
     public Observable<MessageResult> storeMessage(MessageResult messageResult){
         return Observable.create(subscriber -> {
-            SQLiteDatabase db = databaseManager.openConnection();
-            String currentTime = getDateTime();
+            try {
+                SQLiteDatabase db = databaseManager.openConnection();
+                DateTime timeNow = DateTime.now();
+                ContentValues values = new ContentValues();
+                values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
+                values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
+                values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
+                values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
+                values.put(MessagesContract.COLUMN_CREATED_AT, timeNow.toString());
+                values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
 
-            ContentValues values = new ContentValues();
-            values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
-            values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
-            values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-            values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
-            values.put(MessagesContract.COLUMN_CREATED_AT, currentTime);
-            values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
+                long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
+                messageResult.setTime(timeNow);
+                messageResult.setMessageId(String.valueOf(rowId));
 
-            long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
-            messageResult.setTime(getFormattedTime(currentTime, "hh:mm"));
-            messageResult.setMessageId(String.valueOf(rowId));
-
-            subscriber.onNext(messageResult);
-            subscriber.onCompleted();
-            databaseManager.closeConnection();
+                subscriber.onNext(messageResult);
+                subscriber.onCompleted();
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                databaseManager.closeConnection();
+                e.printStackTrace();
+                subscriber.onError(e);
+            }
         });
     }
 
@@ -369,7 +377,7 @@ public class MessageStore {
 
                     MessageResult msg = new MessageResult(chatId, fromId, message);
                     msg.setMessageStatus(deliveryStatus);
-                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setTime(DateTime.parse(time));
                     msg.setMessageId(messageId);
 
                     subscriber.onNext(msg);
@@ -418,7 +426,7 @@ public class MessageStore {
 
                     MessageResult msg = new MessageResult(chatId, fromId, message);
                     msg.setMessageStatus(deliveryStatus);
-                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setTime(DateTime.parse(time));
                     msg.setMessageId(messageId);
 
                     subscriber.onNext(msg);
@@ -481,7 +489,7 @@ public class MessageStore {
 
                     MessageResult msg = new MessageResult(chatId, fromId, message);
                     msg.setMessageStatus(messageStatus);
-                    msg.setTime(getFormattedTime(time, "hh:mm"));
+                    msg.setTime(DateTime.parse(time));
                     msg.setUnSeenCount(unSeenCount);
                     msg.setMessageId(messageId);
 

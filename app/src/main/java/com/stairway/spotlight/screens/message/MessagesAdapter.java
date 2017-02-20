@@ -26,11 +26,13 @@ import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.models.QuickReply;
 import com.stairway.spotlight.models._Button;
 import com.stairway.spotlight.models._DefaultAction;
-import com.stairway.spotlight.screens.home.HomeContract;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -60,6 +62,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private UrlClickListener urlClickListener;
     private QuickRepliesAdapter.QuickReplyClickListener quickReplyClickListener;
     private Drawable textProfileDrawable;
+
+    private int lastClickedPosition = -1;
 
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickRepliesAdapter.QuickReplyClickListener qrListener) {
         this.quickReplyClickListener = qrListener;
@@ -154,6 +158,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+
     @Override
     public int getItemViewType(int position) {
         if(position == messageList.size())
@@ -220,6 +225,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
+    public long getItemId(int position) {
+        return  messageList.get(position).getTime().getMillis();
+    }
+
+    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder viewHolder;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -264,19 +274,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SEND_TEXT:
                 SendTextViewHolder sendViewHolder = (SendTextViewHolder) holder;
-                sendViewHolder.renderItem(messageList.get(position).getMessage(), messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
+                sendViewHolder.renderItem(messageList.get(position).getMessage(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
                 break;
             case VIEW_TYPE_RECV_TEXT:
                 ReceiveTextViewHolder receiveViewHolder = (ReceiveTextViewHolder) holder;
-                receiveViewHolder.renderItem(messageCache.get(position).getText(), messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
+                receiveViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_GENERIC:
                 ReceiveTemplateGenericViewHolder receiveTemplateViewHolder = (ReceiveTemplateGenericViewHolder) holder;
-                receiveTemplateViewHolder.renderItem(messageCache.get(position).getGenericTemplate(), hasProfileDP(position), bubbleType(position));
+                receiveTemplateViewHolder.renderItem(messageCache.get(position).getGenericTemplate(), position);
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_BUTTON:
                 ReceiveTemplateButtonViewHolder templateButtonVH = (ReceiveTemplateButtonViewHolder) holder;
-                templateButtonVH.renderItem(messageCache.get(position).getButtonTemplate(), hasProfileDP(position), bubbleType(position));
+                templateButtonVH.renderItem(messageCache.get(position).getButtonTemplate(), position);
                 break;
             case VIEW_TYPE_QUICK_REPLIES:
                 QuickRepliesViewHolder qrVH = (QuickRepliesViewHolder) holder;
@@ -285,11 +295,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_RECV_EMOTICON:
                 ReceiveEmoticonViewHolder receiveEmoticonViewHolder = (ReceiveEmoticonViewHolder) holder;
-                receiveEmoticonViewHolder.renderItem(messageCache.get(position).getText(), messageList.get(position).getTime(), hasProfileDP(position), bubbleType(position));
+                receiveEmoticonViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
             case VIEW_TYPE_SEND_EMOTICON:
                 SendEmoticonViewHolder sendEmoticonViewHolder = (SendEmoticonViewHolder) holder;
-                sendEmoticonViewHolder.renderItem(messageList.get(position).getMessage(), messageList.get(position).getTime(), messageList.get(position).getMessageStatus(), bubbleType(position));
+                sendEmoticonViewHolder.renderItem(messageList.get(position).getMessage(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
         }
     }
 
@@ -304,6 +314,18 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return position == messageList.size()-1 || messageList.get(position+1).isMe();
     }
 
+    private String getFormattedTime(DateTime time) {
+        DateTime timeNow = DateTime.now();
+        DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
+        if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
+            return time.toString(timeFormat).toUpperCase();
+        } else if(timeNow.getMonthOfYear() == time.getMonthOfYear()) {
+            return time.getDayOfMonth()+" "+time.monthOfYear().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat).toUpperCase();
+        } else {
+            return time.getYear()+", "+time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth()+" AT "+time.toString(timeFormat).toUpperCase();
+        }
+    }
+
     private int bubbleType(int position) {
         final int START = 1, MIDDLE = 2, END = 3, FULL = 0;
         final boolean isMe = messageList.get(position).isMe();
@@ -316,6 +338,26 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if((position==0 || isMe!=messageList.get(position-1).isMe()) && (position==messageList.size()-1 || isMe==messageList.get(position+1).isMe()))
             return START;
         return FULL;
+    }
+
+    private boolean shouldShowTime(int position) {
+        if (position==0)
+            return true;
+
+        return !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(5));
+    }
+
+    private void setMessageClicked(int position, boolean isClicked) {
+        Logger.d(this, "Position: "+position+", "+isClicked+" "+ lastClickedPosition);
+        if(!isClicked) {
+            lastClickedPosition = -1;
+        } else {
+            if(lastClickedPosition >= 0) {
+
+                notifyItemChanged(lastClickedPosition);
+            }
+            lastClickedPosition = position;
+        }
     }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
@@ -338,10 +380,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class SendEmoticonViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_messageitem_message)
         TextView messageView;
-
         @Bind(R.id.iv_delivery_status)
         ImageView deliveryStatusView;
-
         @Bind(R.id.message_send_text)
         RelativeLayout layout;
 
@@ -350,7 +390,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
+        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int position) {
+            int bubbleType = bubbleType(position);
             messageView.setText(message);
 
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
@@ -383,10 +424,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class ReceiveEmoticonViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_messageitem_message)
         TextView messageView;
-
         @Bind(R.id.iv_profileImage)
         ImageView profileImageView;
-
         @Bind(R.id.rl_message_receive_text)
         RelativeLayout layout;
 
@@ -395,7 +434,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String message, String time, boolean displayProfileDP, int bubbleType) {
+        void renderItem(String message, String time, int position) {
+            int bubbleType = bubbleType(position);
+            boolean displayProfileDP = hasProfileDP(position);
             messageView.setText(message);
 
             if(displayProfileDP) {
@@ -423,26 +464,37 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     class SendTextViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.tv_messageitem_message)
         TextView messageView;
-
         @Bind(R.id.iv_delivery_status)
         ImageView deliveryStatusView;
-
         @Bind(R.id.rl_bubble)
         RelativeLayout bubbleView;
-
         @Bind(R.id.message_send_text)
         RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
 
         SendTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int bubbleType) {
+        void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int position) {
+            int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
             String deliveryStatus = "";
+            Logger.d(this, "Time:: "+timeView.getText());
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+            } else {
+                timeView.setVisibility(View.GONE);
+            }
 
             switch (bubbleType) {
                 case 0:
@@ -465,41 +517,67 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             messageView.setText(message);
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
-                deliveryStatus = "PENDING";
+                deliveryStatus = "Pending";
             }
             else if(messageStatus == MessageResult.MessageStatus.SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
-                deliveryStatus = "SENT";
+                deliveryStatus = "Sent";
             }
             else if(messageStatus == MessageResult.MessageStatus.READ) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
-                deliveryStatus = "SEEN";
+                deliveryStatus = "Seen";
             }
-            else if(messageStatus == MessageResult.MessageStatus.DELIVERED)
-                deliveryStatus = "DELIVERED";
+            else if(messageStatus == MessageResult.MessageStatus.DELIVERED) {
+                deliveryStatus = "Delivered";
+            }
+
+            deliveryStatusText.setText(deliveryStatus);
+
+            bubbleView.setOnClickListener(v -> {
+                if(deliveryStatusText.getVisibility() == View.VISIBLE) {
+                    if(!shouldShowTime) {
+                        timeView.setVisibility(View.GONE);
+                    }
+                    deliveryStatusText.setVisibility(View.GONE);
+                    setMessageClicked(position, false);
+                } else {
+                    timeView.setVisibility(View.VISIBLE);
+                    deliveryStatusText.setVisibility(View.VISIBLE);
+                    setMessageClicked(position, true);
+                }
+            });
         }
     }
 
     class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.tv_messageitem_message)
         TextView messageView;
-
         @Bind(R.id.iv_profileImage)
         ImageView profileImageView;
-
         @Bind(R.id.rl_bubble)
         RelativeLayout bubbleView;
-
-        @Bind(R.id.rl_message_receive_text)
-        RelativeLayout bubbleLayout;
+        @Bind(R.id.ll_message_receive_text)
+        LinearLayout bubbleLayout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
 
         ReceiveTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String message, String time, boolean displayProfileDP, int bubbleType) {
+        void renderItem(String message, String time, int position) {
+            int bubbleType = bubbleType(position);
+            boolean displayProfileDP = hasProfileDP(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+            } else {
+                timeView.setVisibility(View.GONE);
+            }
+
             switch (bubbleType) {
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -527,11 +605,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 profileImageView.setVisibility(View.INVISIBLE);
             }
+
+            bubbleView.setOnClickListener(v -> {
+                if(!shouldShowTime) {
+                    if(timeView.getVisibility() == View.VISIBLE) {
+                        timeView.setVisibility(View.GONE);
+                        setMessageClicked(position, false);
+                    } else {
+                        timeView.setVisibility(View.VISIBLE);
+                        setMessageClicked(position, true);
+                    }
+                }
+            });
         }
     }
 
     class ReceiveTemplateGenericViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.iv_rcv_template_image)
         ImageView templateImage;
         @Bind(R.id.tv_rcv_template_title)
@@ -564,7 +653,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             buttons[2].setVisibility(View.GONE);
         }
 
-        void renderItem(GenericTemplate genericTemplate, boolean displayProfileDP, int bubbleType) {
+        void renderItem(GenericTemplate genericTemplate, int position) {
+            int bubbleType = bubbleType(position);
+            boolean displayProfileDP = hasProfileDP(position);
+
             switch (bubbleType) {
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -682,7 +774,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             buttons[2].setVisibility(View.GONE);
         }
 
-        void renderItem(ButtonTemplate buttonTemplate, boolean displayDP, int bubbleType) {
+        void renderItem(ButtonTemplate buttonTemplate, int position) {
+            int bubbleType = bubbleType(position);
+            boolean displayDP = hasProfileDP(position);
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));

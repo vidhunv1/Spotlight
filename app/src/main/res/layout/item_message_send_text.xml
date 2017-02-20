@@ -1,41 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/message_send_text">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_msg_send_full"
-        android:id="@+id/rl_bubble"
-        android:paddingTop="7.25dp"
-        android:paddingBottom="7.25dp"
-        android:maxWidth="258dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="14dp"
+        android:gravity="right"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="26dp">
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/rl_bubble"
+            android:text="9:47 PM"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            android:id="@+id/tv_time"
+            android:gravity="center" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_msg_send_full"
+            android:id="@+id/rl_bubble"
+            android:paddingTop="7.25dp"
+            android:paddingBottom="7.25dp"
+            android:maxWidth="258dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="14dp"
+            android:layout_marginRight="26dp">
+            <TextView
+                android:text="Hello"
+                android:layout_width="wrap_content"
+                android:id="@+id/tv_messageitem_message"
+                android:textSize="16sp"
+                android:textColor="@color/textPrimaryLight"
+                android:layout_height="wrap_content"
+                android:maxWidth="234dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+        </RelativeLayout>
 
         <TextView
-            android:text="Hello"
-            android:layout_width="wrap_content"
-            android:id="@+id/tv_messageitem_message"
-            android:textSize="16sp"
-            android:textColor="@color/textPrimaryLight"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxWidth="234dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
+            android:layout_below="@id/rl_bubble"
+            android:text="Seen"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            android:id="@+id/tv_delivery_status"
+            android:layout_marginRight="38dp"
+            android:gravity="right" />
+
+    </LinearLayout>
 
     <ImageView
         android:layout_width="12dp"
         android:layout_height="12dp"
-        android:src="@drawable/ic_delivery_pending"
+        app:srcCompat="@drawable/ic_delivery_pending"
         android:id="@+id/iv_delivery_status"
         android:layout_marginRight="6dp"
         android:layout_alignParentRight="true"
@@ -43,4 +72,5 @@
         android:layout_marginBottom="1dp"
         android:baselineAlignBottom="false"
         android:layout_alignParentTop="false" />
+
 </RelativeLayout>

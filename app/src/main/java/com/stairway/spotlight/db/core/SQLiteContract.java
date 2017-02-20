@@ -53,7 +53,7 @@ public abstract class SQLiteContract {
                 COLUMN_MESSAGE_STATUS + " INTEGER, " +
                 COLUMN_RECEIPT_ID + " TEXT, " +
                 COLUMN_IS_RECEIPT_SENT + " INTEGER DEFAULT 0, " +
-                COLUMN_CREATED_AT+ " DATETIME);";
+                COLUMN_CREATED_AT+ " TEXT);";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

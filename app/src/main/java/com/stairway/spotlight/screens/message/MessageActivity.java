@@ -193,7 +193,6 @@ public class MessageActivity extends BaseActivity
         else if(id == R.id.view_contact) {
             AndroidUtils.hideSoftInput(this);
             startActivity(UserProfileActivity.callingIntent(this, chatUserName, chatContactName));
-            this.overridePendingTransition(0, 0);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -304,13 +303,16 @@ public class MessageActivity extends BaseActivity
                 @Override
                 public void onImeBack() {
                     Logger.d(this, "backPressed: "+emojiPicker.isEmojiState());
+
                     if(!emojiPicker.isEmojiState()) {
                         shouldHandleBack = false;
+                        emojiPicker.reset();
+                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+
                         messageEditText.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
-                        emojiPicker.reset();
-                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+
                     } else {
                         shouldHandleBack = true;
                     }
@@ -337,7 +339,7 @@ public class MessageActivity extends BaseActivity
                     } else {
                         emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
                         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        mgr.showSoftInput(messageEditText, InputMethodManager.SHOW_FORCED);
+                        mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
                     }
                 }
             });

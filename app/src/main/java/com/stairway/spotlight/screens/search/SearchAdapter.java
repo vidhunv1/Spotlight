@@ -221,7 +221,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
 
             name.setText(messagesModel.getContactName());
-            time.setText(messagesModel.getTime());
+            time.setText(messagesModel.getTime().toString());
             String messageLower = messagesModel.getMessage().toLowerCase();
             int startPos = messageLower.indexOf(searchQuery.toLowerCase());
             if(!searchQuery.isEmpty() && startPos>=0) {
