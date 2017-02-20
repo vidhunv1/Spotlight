@@ -125,6 +125,9 @@ public class MessageActivity extends BaseActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        index = -1;
+        top = -1;
     }
 
     @Override
@@ -139,8 +142,6 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.d(this, "ChatUserName: "+chatUserName);
-        Logger.d(this, "ChatContactName: "+chatContactName);
         messagePresenter.loadMessages(chatUserName);
         if(index != -1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
