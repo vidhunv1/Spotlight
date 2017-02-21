@@ -474,7 +474,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_profileImage)
         ImageView profileImageView;
         @Bind(R.id.ll_message_receive_text)
-        RelativeLayout layout;
+        LinearLayout layout;
         @Bind(R.id.tv_time)
         TextView timeView;
         @Bind(R.id.rl_bubble)
@@ -559,7 +559,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
-            Logger.d(this, "Time:: "+timeView.getText());
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
@@ -873,8 +872,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(!buttonTemplate.getText().isEmpty() && buttonTemplate.getText()!=null)
                 text.setText(buttonTemplate.getText());
 
-            if(buttonTemplate.getButtons().size()>=3)
+            if(buttonTemplate.getButtons().size()>=3) {
                 buttonLayout.setOrientation(LinearLayout.VERTICAL);
+            } else {
+                buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+            }
 
 
             for (int i = 0; i < buttonTemplate.getButtons().size(); i++) {

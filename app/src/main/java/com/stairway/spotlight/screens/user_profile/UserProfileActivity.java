@@ -71,7 +71,7 @@ public class UserProfileActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_profile_settings, menu);
+        getMenuInflater().inflate(R.menu.user_profile_toolbar, menu);
 
         return true;
     }

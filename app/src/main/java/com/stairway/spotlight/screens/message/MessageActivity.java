@@ -179,7 +179,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.messages_settings, menu);
+        getMenuInflater().inflate(R.menu.messages_toolbar, menu);
 
         return true;
     }

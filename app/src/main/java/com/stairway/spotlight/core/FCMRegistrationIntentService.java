@@ -5,6 +5,10 @@ import android.preference.PreferenceManager;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserRequest;
+import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
 
 import rx.Subscriber;
 
@@ -25,7 +29,7 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
         try {
             String token = instanceId.getToken();
             sharedPreferences.edit().putString(FCM_TOKEN, token).apply();
-            sendTokenToServer(token);
+            uploadFCMToken(token);
             Logger.d(this, "FCM token refresh: "+token);
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,26 +37,26 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
         }
     }
 
-    public void sendTokenToServer(String token){
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//
-//        String accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, "");
-//        User updateUser = new User();
-//        updateUser.setNotificationToken(token);
-//
-//        userApi.updateUser(updateUser, accessToken).subscribe(new Subscriber<UserResponse>() {
-//            @Override
-//            public void onCompleted() {}
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-//            }
-//
-//            @Override
-//            public void onNext(UserResponse userResponse) {
-//                sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-//            }
-//        });
+    private void uploadFCMToken(String fcmToken) {
+        //Upload to token to server if FCM token not updated
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Logger.d(this, "FCM TOKEN:"+fcmToken);
+        _User updateUser = new _User();
+        updateUser.setNotificationToken(fcmToken);
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUser(updateUser);
+        ApiManager.getUserApi().updateUser(userRequest)
+                .subscribe(new Subscriber<UserResponse>() {
+                    @Override
+                    public void onCompleted() {}
+                    @Override
+                    public void onError(Throwable e) {
+                        sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+                    }
+                    @Override
+                    public void onNext(UserResponse userResponse) {
+                        sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+                    }
+                });
     }
 }

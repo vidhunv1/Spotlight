@@ -54,12 +54,23 @@ public class _User {
     @SerializedName("profile_dp")
     @Expose
     private String profileDP;
+    @SerializedName("notification_token")
+    @Expose
+    private String notificationToken;
 
     public static enum UserType {
         @SerializedName("official")
         official,
         @SerializedName("regular")
         regular
+    }
+
+    public String getNotificationToken() {
+        return notificationToken;
+    }
+
+    public void setNotificationToken(String notificationToken) {
+        this.notificationToken = notificationToken;
     }
 
     public String getProfileDP() {

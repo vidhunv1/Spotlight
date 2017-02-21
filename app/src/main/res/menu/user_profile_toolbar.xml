@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Share" android:id="@+id/share_contact" />
+    <item android:title="Block" android:id="@+id/block_contact" />
+    <item android:title="Edit" android:id="@+id/edit_contact" />
+    <item android:title="Delete" android:id="@+id/delete_contact" />
+    <item android:title="Add Shortcut" android:id="@+id/add_shortcut" />
+</menu>

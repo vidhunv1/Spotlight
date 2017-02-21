@@ -127,6 +127,19 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		navigationView.setNavigationItemSelectedListener(this);
 
 		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+
+		chatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				if(dy > 0){
+					fab.hide();
+				} else{
+					fab.show();
+				}
+
+				super.onScrolled(recyclerView, dx, dy);
+			}
+		});
 	}
 
 	@Override
@@ -234,7 +247,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 					@Override
 					public void onNext(ContactResult contactResult) {
 						String name = "";
-							name = contactResult.getContactName();
+						name = contactResult.getContactName();
 						startActivity(MessageActivity.callingIntent(activity, contactResult.getUsername(), name));
 					}
 				});
@@ -259,35 +272,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		} else {
 			toggle.setDrawerIndicatorEnabled(true);
 			fab.setVisibility(View.VISIBLE);
-//            setChatFragment();
 			super.onBackPressed();
 		}
-	}
-
-	private void uploadFCMToken() {
-		//Upload to token to server if FCM token not updated
-//		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//		if(! sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
-//			String fcmToken = sharedPreferences.getString(FCMRegistrationIntentService.FCM_TOKEN, "");
-//			Logger.d(this, "FCM TOKEN:"+fcmToken);
-//			_User updateUser = new _User();
-//			updateUser.setNotificationToken(fcmToken);
-//			UserRequest userRequest = new UserRequest();
-//			userRequest.setUser(updateUser);
-//			ApiManager.getUserApi().updateUser(userRequest)
-//
-//					.subscribe(new Subscriber<UserResponse>() {
-//				@Override
-//				public void onCompleted() {}
-//				@Override
-//				public void onError(Throwable e) {
-//					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-//				}
-//				@Override
-//				public void onNext(UserResponse userResponse) {
-//					sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-//				}
-//			});
-//		}
 	}
 }
