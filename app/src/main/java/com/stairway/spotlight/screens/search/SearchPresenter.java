@@ -1,7 +1,6 @@
 package com.stairway.spotlight.screens.search;
 
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.UseCaseSubscriber;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -28,11 +27,8 @@ public class SearchPresenter implements SearchContract.Presenter {
         Subscription subscription = searchUseCase.execute(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<SearchModel>(searchView) {
-                    @Override
-                    public void onResult(SearchModel searchModel) {
-                        searchView.displaySearch(searchModel);
-                    }
+                .subscribe(searchModel -> {
+                    searchView.displaySearch(searchModel);
                 });
 
         compositeSubscription.add(subscription);

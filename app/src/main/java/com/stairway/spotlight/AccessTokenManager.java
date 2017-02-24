@@ -20,15 +20,15 @@ import rx.schedulers.Schedulers;
  */
 
 public class AccessTokenManager {
-    static final String ACCESS_TOKEN_KEY = "AccessTokenCache.AccessToken";
-    static final String EXPIRES_AT_KEY = "AccessTokenCache.ExpiresAt";
-    static final String LAST_REFRESH_KEY = "AccessTokenCache.LastRefresh";
-    static final String USER_NAME_KEY = "AccessTokenCache.UserId";
+    static final String ACCESS_TOKEN_KEY = "AccessToken";
+    static final String EXPIRES_AT_KEY = "ExpiresAt";
+    static final String LAST_REFRESH_KEY = "LastRefresh";
+    static final String USER_NAME_KEY = "UserId";
     private static AccessTokenManager instance;
     private AccessToken accessToken;
     private final SharedPreferences sharedPreferences;
-    private AccessTokenManager(Context context) {
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SpotlightApplication.getContext());
+    private AccessTokenManager() {
+        this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("AccessTokenManager", Context.MODE_PRIVATE);
     }
 
     public static AccessTokenManager getInstance() {
@@ -38,8 +38,8 @@ public class AccessTokenManager {
         return instance;
     }
 
-    public static void init(Context context) {
-        instance = new AccessTokenManager(context);
+    public static void init() {
+        instance = new AccessTokenManager();
     }
 
     public AccessToken load() {

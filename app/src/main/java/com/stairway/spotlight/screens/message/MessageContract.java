@@ -5,6 +5,7 @@ import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
 import com.stairway.spotlight.models.MessageResult;
 
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.List;
@@ -18,7 +19,8 @@ public interface MessageContract {
         void addMessageToList(MessageResult message);
         void updateDeliveryStatus(MessageResult messageResult);
         void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
-        void updatePresence(String presence);
+        void updatePresence(Presence.Type presence);
+        void updateLastActivity(long secAgo);
         void setKeyboardType(boolean isBotKeyboard);
         void initBotMenu(List<PersistentMenu> persistentMenus);
     }
@@ -28,7 +30,7 @@ public interface MessageContract {
         void sendTextMessage(String toId, String fromId, String message);
         void sendChatState(String chatId, ChatState chatState);
         void updateMessageRead(MessageResult result);
-        void getPresence(String chatId);
+        void getLastActivity(String chatId);
         void sendReadReceipt(String chatId);
         void loadKeyboard(String chatId);
     }

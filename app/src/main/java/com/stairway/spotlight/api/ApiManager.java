@@ -4,6 +4,7 @@ import com.stairway.spotlight.api.bot.BotApi;
 import com.stairway.spotlight.api.contacts.ContactsApi;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.config.AppConfig;
+import com.stairway.spotlight.core.Logger;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -57,7 +58,7 @@ public class ApiManager {
                     return chain.proceed(request);
                 });
 
-        this.retrofitClient = new Retrofit.Builder()
+        getInstance().retrofitClient = new Retrofit.Builder()
                 .baseUrl(AppConfig.API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(rxAdapter)

@@ -30,8 +30,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/rl_bubble"
             android:maxWidth="258dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="14dp"
             android:layout_marginRight="26dp">
             <TextView
                 android:text="Hello"

@@ -13,12 +13,14 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.ForegroundDetector;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -27,16 +29,12 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by vidhun on 05/07/16.
  */
 public class BaseActivity extends AppCompatActivity{
-
-    public static boolean isAppWentToBg = false;
-    public static boolean isWindowFocused = false;
-    public static boolean isBackPressed = false;
-
     BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AccessToken accessToken = AccessTokenManager.getInstance().load();
         if(accessToken==null)
             throw new IllegalStateException("Base activity should be only initialized on user session");
@@ -54,7 +52,6 @@ public class BaseActivity extends AppCompatActivity{
             public void onReceive(Context context, Intent intent) {
                 if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_MSG)) {
                     MessageResult s = (MessageResult) intent.getSerializableExtra(MessageService.XMPP_RESULT_MESSAGE);
-                    Logger.d(this, "Message received: "+s);
                     onMessageReceived(s);
                 } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_STATE)) {
                     String from = intent.getStringExtra(MessageService.XMPP_RESULT_FROM);
@@ -68,6 +65,10 @@ public class BaseActivity extends AppCompatActivity{
                 } else if(intent.getAction().equals(MessageService.ACTION_INTERNET_CONNECTION_STATUS)) {
                     boolean isConnectionAvailable = intent.getBooleanExtra(MessageService.ACTION_INTERNET_CONNECTION_STATUS, false);
                     onNetworkStatus(isConnectionAvailable);
+                } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_PRESENCE)) {
+                    Presence.Type type = (Presence.Type) intent.getSerializableExtra(MessageService.XMPP_RESULT_PRESENCE_TYPE);
+                    String username = intent.getStringExtra(MessageService.XMPP_RESULT_PRESENCE_FROM);
+                    onPresenceChanged(username, type);
                 }
             }
         };
@@ -75,59 +76,25 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     protected void onStart() {
-        if (isAppWentToBg) {
-            isAppWentToBg = false;
-            onApplicationToForeground();
-        }
         IntentFilter filter = new IntentFilter(MessageService.XMPP_ACTION_RCV_STATE);
         filter.addAction(MessageService.XMPP_ACTION_RCV_MSG);
         filter.addAction(MessageService.XMPP_ACTION_RCV_RECEIPT);
         filter.addAction(MessageService.ACTION_INTERNET_CONNECTION_STATUS);
+        filter.addAction(MessageService.XMPP_ACTION_RCV_PRESENCE);
         LocalBroadcastManager.getInstance(this).registerReceiver((receiver), filter);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        if(!isWindowFocused) {
-            isAppWentToBg = true;
-            onApplicationToBackground();
-        }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onStop();
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        Logger.d(this, "windowFocus: "+hasFocus);
-        isWindowFocused = hasFocus;
-        if (isBackPressed && !hasFocus) {
-            isBackPressed = false;
-            isWindowFocused = true;
-        }
-        super.onWindowFocusChanged(hasFocus);
-    }
 
     @Override
     public void onBackPressed() {
-        if (this instanceof HomeActivity) {
-        } else {
-            isBackPressed = true;
-        }
         super.onBackPressed();
-    }
-
-
-    public void onApplicationToBackground() {
-        Logger.d(this, "Stopping MessageService");
-        stopService(new Intent(this, MessageService.class));
-    }
-
-    private void onApplicationToForeground() {
-        Logger.d(this, "Starting MessageService");
-        Intent intent = new Intent(this, MessageService.class);
-        intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
-        startService(intent);
     }
 
     @Override
@@ -137,6 +104,10 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onMessageReceived(MessageResult messageId){
         Logger.d(this, "MessageId "+messageId);
+    }
+
+    public void onPresenceChanged(String username, Presence.Type type) {
+        Logger.d(this, "Received Presence: "+username+", Type: "+type);
     }
 
     public void onNetworkStatus(boolean isAvailable) {

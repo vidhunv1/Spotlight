@@ -29,34 +29,11 @@ public class FCMRegistrationIntentService extends FirebaseInstanceIdService {
         try {
             String token = instanceId.getToken();
             sharedPreferences.edit().putString(FCM_TOKEN, token).apply();
-            uploadFCMToken(token);
-            Logger.d(this, "FCM token refresh: "+token);
+            sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+            Logger.d(this, "Got FCM token: "+token);
         } catch (Exception e) {
             e.printStackTrace();
             sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
         }
-    }
-
-    private void uploadFCMToken(String fcmToken) {
-        //Upload to token to server if FCM token not updated
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Logger.d(this, "FCM TOKEN:"+fcmToken);
-        _User updateUser = new _User();
-        updateUser.setNotificationToken(fcmToken);
-        UserRequest userRequest = new UserRequest();
-        userRequest.setUser(updateUser);
-        ApiManager.getUserApi().updateUser(userRequest)
-                .subscribe(new Subscriber<UserResponse>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {
-                        sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
-                    }
-                    @Override
-                    public void onNext(UserResponse userResponse) {
-                        sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
-                    }
-                });
     }
 }

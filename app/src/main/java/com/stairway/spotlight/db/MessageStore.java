@@ -483,7 +483,6 @@ public class MessageStore {
                         unSeenCursor.moveToFirst();
                         unSeenCount = unSeenCursor.getInt(unSeenCursor.getColumnIndex(COLUMN_UNSEEN_COUNT));
                     }
-                    Logger.d(this, "Notification count"+unSeenCount);
 
                     MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(delivery);
 
@@ -507,24 +506,5 @@ public class MessageStore {
                 subscriber.onCompleted();
             }
         });
-    }
-
-    private String getDateTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
-    private String getFormattedTime(String time, String format) {
-        SimpleDateFormat formatterFrom = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat formatterTo = new SimpleDateFormat(format, Locale.ENGLISH);
-        formatterTo.setTimeZone(TimeZone.getDefault());
-        try {
-            Date fullDate = formatterFrom.parse(time);
-            return formatterTo.format(fullDate);
-        } catch (ParseException e) {
-            Logger.e(this, "Error parsing DateTime");
-            return "";
-        }
     }
 }

@@ -29,6 +29,7 @@ import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
@@ -36,6 +37,7 @@ import com.stairway.spotlight.screens.message.emoji.EmojiViewHelper;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.ArrayList;
@@ -83,6 +85,8 @@ public class MessageActivity extends BaseActivity
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
 
+    private Presence.Type presence;
+
     // userName: id for ejabberd xmpp. userId: id set by user:
     public static Intent callingIntent(Context context, String chatUserName, String chatContactName) {
         Intent intent = new Intent(context, MessageActivity.class);
@@ -119,12 +123,15 @@ public class MessageActivity extends BaseActivity
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
         messageList.setAdapter(messagesAdapter);
-//        OverScrollDecoratorHelper.setUpOverScroll(messageItem, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        toolbar.setTitle("vidhun vinod");
+        toolbar.setSubtitle("online");
+        toolbar.setLogo(ImageUtils.getDefaultProfileImage("Vidhun Vinod", "vidhunvinod", 18));
 
         index = -1;
         top = -1;
@@ -146,11 +153,8 @@ public class MessageActivity extends BaseActivity
         if(index != -1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
         }
-        messagePresenter.getPresence(chatUserName);
+        messagePresenter.getLastActivity(chatUserName);
         messagePresenter.sendReadReceipt(chatUserName);
-//        if(emojiPicker!=null) {
-//            emojiPicker.reset();
-//        }
     }
 
     @Override
@@ -168,7 +172,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        Logger.d(this, "activityBackPressed");
         if(shouldHandleBack) {
             super.onBackPressed();
         } else {
@@ -303,8 +306,6 @@ public class MessageActivity extends BaseActivity
             messageEditText.setOnEditTextImeBackListener(new MessageEditText.EditTextImeBackListener() {
                 @Override
                 public void onImeBack() {
-                    Logger.d(this, "backPressed: "+emojiPicker.isEmojiState());
-
                     if(!emojiPicker.isEmojiState()) {
                         shouldHandleBack = false;
                         emojiPicker.reset();
@@ -330,18 +331,15 @@ public class MessageActivity extends BaseActivity
                 return false;
             });
 
-            emojiButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shouldHandleBack = true;
-                    emojiPicker.emojiButtonToggle();
-                    if(!emojiPicker.isEmojiState()) {
-                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
-                    } else {
-                        emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
-                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
-                    }
+            emojiButton.setOnClickListener(v -> {
+                shouldHandleBack = true;
+                emojiPicker.emojiButtonToggle();
+                if(!emojiPicker.isEmojiState()) {
+                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
+                } else {
+                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
                 }
             });
 
@@ -388,7 +386,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void addMessageToList(MessageResult message) {
-        Logger.i(this, "Add message:"+message.toString());
         messageList.scrollToPosition(messagesAdapter.getItemCount());
         messagesAdapter.addMessage(message);
     }
@@ -404,9 +401,18 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
-    public void updatePresence(String presence) {
+    public void updatePresence(Presence.Type presence) {
         Logger.d(this, "Presence: "+presence);
-        presenceView.setText(presence);
+        if(presence == Presence.Type.available)
+            presenceView.setText("Active now");
+        else {
+            messagePresenter.getLastActivity(chatUserName);
+        }
+    }
+
+    @Override
+    public void updateLastActivity(long secAgo) {
+        presenceView.setText("Active "+secAgo+"s ago");
     }
 
     @Override
@@ -439,19 +445,34 @@ public class MessageActivity extends BaseActivity
         super.onChatStateReceived(from, chatState);
         if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing)
-                updatePresence("Typing...");
-            else
-                messagePresenter.getPresence(from);
+                presenceView.setText("Typing...");
+            else {
+                updatePresence(presence);
+            }
+        }
+    }
+
+    @Override
+    public void onPresenceChanged(String username, Presence.Type type) {
+        super.onPresenceChanged(username, type);
+        if(username.equals(chatUserName)) {
+            if(type == Presence.Type.available) {
+                presence = Presence.Type.available;
+                updatePresence(presence);
+            } else {
+                if(presence!= Presence.Type.unavailable)
+                    presenceView.setText("Active a while ago");
+                presence = Presence.Type.unavailable;
+            }
         }
     }
 
     @Override
     public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
-        Logger.d(this, "Message Status:"+messageStatus.name());
+
         if(this.chatUserName.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
-
         }
     }
 

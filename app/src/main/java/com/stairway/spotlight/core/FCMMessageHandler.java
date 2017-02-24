@@ -31,6 +31,7 @@ public class FCMMessageHandler extends FirebaseMessagingService {
     // Creates notification based on title and body received
     private void createNotification(RemoteMessage.Notification notification) {
         Context context = getBaseContext();
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher).setContentTitle(notification.getTitle())
                 .setContentText(notification.getBody());

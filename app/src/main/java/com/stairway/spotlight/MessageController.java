@@ -141,33 +141,6 @@ public class MessageController {
         });
     }
 
-    public Observable<Presence.Type> getPresence(String userId) {
-        String jid = XMPPManager.getJidFromUserName(userId);
-        Observable<Presence.Type> getPresence;
-        getPresence = Observable.create(subscriber -> {
-            //initial presence
-            Roster roster = Roster.getInstanceFor(this.conn);
-            roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
-
-            boolean pre = roster.addRosterListener(new RosterListener() {
-                @Override
-                public void entriesAdded(Collection<String> addresses) {}
-                @Override
-                public void entriesUpdated(Collection<String> addresses) {}
-                @Override
-                public void entriesDeleted(Collection<String> addresses) {}
-
-                public void presenceChanged(Presence presence) {
-                    Logger.d(this, "Presence received"+presence.getFrom()+", "+presence.getType());
-                    if(presence.getFrom().split("/")[0].equals(jid))
-                        subscriber.onNext(presence.getType());
-                }
-            });
-        });
-
-        return getPresence;
-    }
-
     public Observable<Long> getLastActivity(String userId) {
         Logger.d(this, "Getting last activity");
         String jid = XMPPManager.getJidFromUserName(userId);

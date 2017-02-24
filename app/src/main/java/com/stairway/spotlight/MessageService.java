@@ -4,26 +4,27 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.ReadReceiptExtension;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.MessageResult;
-
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.packet.ExtensionElement;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import rx.Subscriber;
 
 /**
@@ -42,6 +43,10 @@ public class MessageService extends Service {
     static final public String XMPP_RESULT_STATE = "com.stairway.spotlight.MessageService.XMPP_STATE";
     static final public String XMPP_RESULT_FROM = "com.stairway.spotlight.MessageService.XMPP_FROM";
 
+    static final public String XMPP_ACTION_RCV_PRESENCE = "com.stairway.spotlight.MessageService.PRESENCE_RECEIVED";
+    static final public String XMPP_RESULT_PRESENCE_TYPE = "com.stairway.spotlight.MessageService.XMPP_PRESENCE_TYPE";
+    static final public String XMPP_RESULT_PRESENCE_FROM = "com.stairway.spotlight.MessageService.XMPP_PRESENCE_FROM";
+
     static final public String XMPP_ACTION_RCV_RECEIPT = "com.stairway.spotlight.MessageService.DELIVERY_RECEIPT_RECEIVED";
     static final public String XMPP_RESULT_MSG_STATUS = "com.stairway.spotlight.MessageService.XMPP_MSG_STATUS";
     static final public String XMPP_RESULT_CHAT_ID = "com.stairway.spotlight.MessageService.XMPP_CHAT_ID";
@@ -59,10 +64,13 @@ public class MessageService extends Service {
     private MessageStore messageStore;
     private MessageController messageApi;
     private XMPPTCPConnection connection;
+
     private ChatManagerListener chatListener;
     private ReceiptReceivedListener receiptReceivedListener;
+    private RosterListener presenceStateListener;
 
     private LocalBroadcastManager broadcaster;
+    Roster roster;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -90,6 +98,28 @@ public class MessageService extends Service {
                 @Override
                 public void onNext(Boolean aBoolean) {}
             });
+        };
+
+        this.presenceStateListener = new RosterListener() {
+            @Override
+            public void entriesAdded(Collection<String> addresses) {
+
+            }
+
+            @Override
+            public void entriesUpdated(Collection<String> addresses) {
+
+            }
+
+            @Override
+            public void entriesDeleted(Collection<String> addresses) {
+
+            }
+
+            @Override
+            public void presenceChanged(Presence presence) {
+                broadcastPresenceState(presence.getFrom().split("/")[0], presence.getType());
+            }
         };
 
         this.chatListener = (chat, createdLocally) -> {
@@ -164,6 +194,9 @@ public class MessageService extends Service {
         ChatManager.getInstanceFor(connection).addChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection)
                 .addReceiptReceivedListener(receiptReceivedListener);
+        roster = Roster.getInstanceFor(connection);
+        roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+        roster.addRosterListener(presenceStateListener);
 
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
@@ -181,6 +214,7 @@ public class MessageService extends Service {
 
         ChatManager.getInstanceFor(connection).removeChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection).removeReceiptReceivedListener(receiptReceivedListener);
+        Roster.getInstanceFor(connection).removeRosterListener(presenceStateListener);
 
         try {
             connection.disconnect(new Presence(Presence.Type.unavailable));
@@ -197,7 +231,7 @@ public class MessageService extends Service {
         }
     }
 
-    private boolean tryConnect(){
+    private boolean tryConnect() {
         try {
             // TODO: BUGGY
             if(!connection.isConnected()) {
@@ -226,7 +260,7 @@ public class MessageService extends Service {
         }
     }
 
-    private void sendUnsentMessages(){
+    private void sendUnsentMessages() {
         //send unsent messages
         Logger.d(this, " sending unsentMsgs");
         messageStore.getUnsentMessages()
@@ -276,7 +310,7 @@ public class MessageService extends Service {
         broadcaster.sendBroadcast(intent);
     }
 
-    private void broadcastDeliveryReceipt(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus){
+    private void broadcastDeliveryReceipt(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         Intent intent = new Intent(XMPP_ACTION_RCV_RECEIPT);
         intent.putExtra(XMPP_RESULT_MSG_STATUS, messageStatus.name());
         intent.putExtra(XMPP_RESULT_CHAT_ID, chatId);
@@ -287,6 +321,13 @@ public class MessageService extends Service {
     private void broadcastConnectionStatus(boolean isAvailable) {
         Intent intent = new Intent(ACTION_INTERNET_CONNECTION_STATUS);
         intent.putExtra(CONNECTION_STATE, isAvailable);
+        broadcaster.sendBroadcast(intent);
+    }
+
+    private void broadcastPresenceState(String jid, Presence.Type type) {
+        Intent intent = new Intent(XMPP_ACTION_RCV_PRESENCE);
+        intent.putExtra(XMPP_RESULT_PRESENCE_TYPE, type);
+        intent.putExtra(XMPP_RESULT_PRESENCE_FROM, XMPPManager.getUserNameFromJid(jid));
         broadcaster.sendBroadcast(intent);
     }
 }

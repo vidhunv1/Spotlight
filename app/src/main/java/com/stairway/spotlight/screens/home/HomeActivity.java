@@ -21,38 +21,27 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.squareup.otto.Subscribe;
+import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.api.ApiManager;
-import com.stairway.spotlight.api.bot.BotResponse;
-import com.stairway.spotlight.api.bot.PersistentMenu;
-import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.lib.ImageUtils;
-import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
-import com.stairway.spotlight.db.MessageStore;
-import com.stairway.spotlight.models.AccessToken;
-import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.EventBus;
-import com.stairway.spotlight.core.FCMRegistrationIntentService;
 
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
+import com.stairway.spotlight.screens.settings.SettingsActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -61,6 +50,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.stairway.spotlight.core.FCMRegistrationIntentService.FCM_TOKEN;
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener {
@@ -198,7 +188,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void addNewMessage(MessageResult messageResult) {
 		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
 		chatListAdapter.newChatMessage(item);
-		Logger.d(this, "new notification: "+item);
 	}
 
 	@Override
@@ -214,11 +203,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		int id = item.getItemId();
 		switch(id) {
 			case R.id.nav_settings:
+				startActivity(SettingsActivity.callingIntent(this));
 				break;
-
-			case R.id.nav_manage:
+			case R.id.nav_faq:
 				break;
-
 			case R.id.nav_contacts:
 				startActivity(NewChatActivity.callingIntent(this, false));
 				break;
@@ -232,7 +220,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onChatItemClicked(String userName) {
-		Logger.d(this, "onChatItemClicked");
 		//get chat name
 		Activity activity = this;
 		ContactStore.getInstance().getContactByUserName(userName)
@@ -255,7 +242,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onMessageReceived(MessageResult messageId) {
-		Logger.d(this, "Message:::"+messageId);
 		addNewMessage(messageId);
 		chatList.scrollToPosition(0);
 	}

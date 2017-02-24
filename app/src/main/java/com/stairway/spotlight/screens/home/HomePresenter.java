@@ -2,15 +2,12 @@ package com.stairway.spotlight.screens.home;
 
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.UseCaseSubscriber;
-import com.stairway.spotlight.db.MessageStore;
 
 import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 /**

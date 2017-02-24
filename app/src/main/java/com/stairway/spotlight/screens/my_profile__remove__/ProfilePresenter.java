@@ -2,7 +2,6 @@
 //
 //import com.stairway.data.source.user.UserSessionResult;
 //import com.stairway.data.source.user.gson_models.UserResponse;
-//import com.stairway.spotlight.core.UseCaseSubscriber;
 //
 //import java.io.File;
 //
@@ -29,7 +28,7 @@
 //        Subscription subscription = updateProfileDPUseCase.execute(image, userSession)
 //                .subscribeOn(Schedulers.newThread())
 //                .observeOn(profileView.getUiScheduler())
-//                .subscribe(new UseCaseSubscriber<UserResponse>(profileView) {
+//                .subscribe(new seCaseSubscriber<UserResponse>(profileView) {
 //                    @Override
 //                    public void onResult(UserResponse result) {
 //                        profileView.updateProfileDP(result.getUser().getProfileDP().replace("https://", "http://"));

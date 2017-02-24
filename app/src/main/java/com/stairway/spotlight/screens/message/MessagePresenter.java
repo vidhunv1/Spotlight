@@ -3,11 +3,8 @@ package com.stairway.spotlight.screens.message;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.UseCaseSubscriber;
 import com.stairway.spotlight.db.BotDetailsStore;
-import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
-import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smack.packet.Presence;
@@ -135,11 +132,8 @@ public class MessagePresenter implements MessageContract.Presenter {
                     public void onCompleted() {
                         sendMessageUseCase.execute(result)
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new UseCaseSubscriber<MessageResult>(messageView) {
-                                    @Override
-                                    public void onResult(MessageResult result) {
-                                        messageView.updateDeliveryStatus(result);
-                                    }
+                                .subscribe(result -> {
+                                    messageView.updateDeliveryStatus(result);
                                 });
                     }
                 });
@@ -167,7 +161,7 @@ public class MessagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void getPresence(String chatId) {
+    public void getLastActivity(String chatId) {
 
         Subscription subscription = messageController.getLastActivity(chatId).subscribe(new Subscriber<Long>() {
             @Override
@@ -178,44 +172,13 @@ public class MessagePresenter implements MessageContract.Presenter {
             @Override
             public void onNext(Long secAgo) {
                 if(secAgo == 0)
-                    messageView.updatePresence("Active now");
+                    messageView.updatePresence(Presence.Type.available);
                 else
-                    messageView.updatePresence("Active "+secAgo+"s ago..");
+                    messageView.updateLastActivity(secAgo);
             }
         });
 
-
-        Subscription subscription1 = messageController.getPresence(chatId)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Presence.Type>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {}
-
-                    @Override
-                    public void onNext(Presence.Type presence) {
-                        if (presence == Presence.Type.available) {
-                            messageView.updatePresence("Active now");
-                        } else {
-                            messageController.getLastActivity(chatId).subscribe(new Subscriber<Long>() {
-                                @Override
-                                public void onCompleted() {}
-                                @Override
-                                public void onError(Throwable e) {}
-
-                                @Override
-                                public void onNext(Long secAgo) {
-                                    messageView.updatePresence("Active "+secAgo+"s ago..");
-                                }
-                            });
-                        }
-                    }
-                });
-
         compositeSubscription.add(subscription);
-        compositeSubscription.add(subscription1);
     }
 
     @Override
@@ -224,11 +187,8 @@ public class MessagePresenter implements MessageContract.Presenter {
         Subscription subscription = sendReadReceiptUseCase.execute(chatId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new UseCaseSubscriber<Boolean>(messageView) {
-                    @Override
-                    public void onResult(Boolean result) {
-                        //sent read receipt. Add to cache to send later.
-                    }
+                .subscribe(onResult -> {
+
                 });
 
         compositeSubscription.add(subscription);

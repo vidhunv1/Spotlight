@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb_settings"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_width="match_parent"
+                app:layout_collapseMode="pin" />
+
+            <com.stairway.spotlight.components.SmoothCollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:minHeight="?attr/actionBarSize"
+                app:sctl_avatar_id="@+id/avatar"
+                app:sctl_collapsed_avatarSize="40dp"
+                app:sctl_collapsed_offsetX="72dp"
+                app:sctl_collapsed_offsetY="20dp"
+                app:sctl_collapsed_subtitleTextSize="15dp"
+                app:sctl_collapsed_titleTextSize="20dp"
+                app:sctl_expanded_avatarSize="60dp"
+                app:sctl_expanded_offsetX="16dp"
+                app:sctl_expanded_offsetY="40dp"
+                app:sctl_expanded_subtitleTextSize="14dp"
+                app:sctl_expanded_titleTextSize="20dp"
+                app:sctl_subtitle_id="@+id/subtitle"
+                app:sctl_title_id="@+id/title">
+
+                <ImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/default_profile_image" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:text="vidhun vinod"
+                        android:textAppearance="@style/FontRobotoMedium"
+                        android:textColor="@color/textPrimaryLight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/subtitle"
+                        android:text="online"
+                        android:textColor="@color/textPrimaryLight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.stairway.spotlight.components.SmoothCollapsingToolbarLayout>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="11.5dp"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Info"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorAccent"/>
+
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="USERID"
+                    android:textSize="13sp"
+                    android:textColor="#212121"
+                    android:id="@+id/tv_user_profile_id" />
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_marginTop="3.5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#8A8A8A"
+                    android:text="iChat ID"
+                    android:textSize="13sp" />
+            </LinearLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="12dp"
+                android:background="#f0f0f0" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorAccent"/>
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="1">
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Alert"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <Switch
+                            android:paddingRight="10dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:switchMinWidth="37.5dp"/>
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Sound"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:text="Default"
+                            android:textSize="16sp"
+                            android:textColor="#2f8cc9" />
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Vibrate"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:text="Default"
+                            android:textSize="16sp"
+                            android:textColor="#2f8cc9" />
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="LED color"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <ImageView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_height="48.25dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:text="Default" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="12dp"
+                android:background="#f0f0f0" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chats"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorAccent"/>
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="1">
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Send by Enter"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <Switch
+                            android:paddingRight="10dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:switchMinWidth="37.5dp"/>
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Text Size"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:text="16"
+                            android:textSize="16sp"
+                            android:textColor="#2f8cc9" />
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow>
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
+                            android:text="Chat Background"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="12dp"
+                android:background="#f0f0f0" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Support"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorAccent"/>
+
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="48.25dp"
+                    android:text="Ask a Question"
+                    android:textSize="16sp"
+                    android:textColor="#212121" />
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#f0f0f0" />
+
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="48.25dp"
+                    android:text="iChat FAQ"
+                    android:textSize="16sp"
+                    android:textColor="#212121" />
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#f0f0f0" />
+
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="48.25dp"
+                    android:text="Privacy Policy"
+                    android:textSize="16sp"
+                    android:textColor="#212121" />
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#f0f0f0" />
+
+                <TextView
+                    android:paddingLeft="17dp"
+                    android:paddingRight="17dp"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="55.55dp"
+                    android:text="iChat for Android v1.0.0"
+                    android:textSize="13sp"
+                    android:textColor="#D2D2D2" />
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom|right|end"
+        app:srcCompat="@drawable/ic_camera"
+        android:backgroundTint="#FFFFFF"
+        android:layout_marginRight="16dp"
+        app:borderWidth="0dp"
+        android:clickable="true"/>
+</android.support.design.widget.CoordinatorLayout>

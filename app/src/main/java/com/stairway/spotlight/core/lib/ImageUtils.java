@@ -36,6 +36,7 @@ public class ImageUtils {
         return image;
     }
 
+    //textsize in dp
     public static Drawable getDefaultProfileImage(String name, String key, double textSize) {
         ColorGenerator defaultColors = ColorGenerator.create(Arrays.asList(
                 0xff5fbed5,
