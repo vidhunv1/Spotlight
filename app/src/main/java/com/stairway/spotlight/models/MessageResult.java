@@ -34,6 +34,10 @@ public class MessageResult implements Serializable {
         this.message = message;
         this.chatId = chatId;
         this.fromId = fromId;
+
+        if(this.chatId.equals(this.getFromId())) {
+            this.messageStatus = MessageStatus.UNSEEN;
+        }
     }
 
     public static String getDeliveryStatusText(MessageStatus messageStatus) {
@@ -85,7 +89,7 @@ public class MessageResult implements Serializable {
     }
 
     public MessageResult.MessageStatus getMessageStatus() {
-        return messageStatus;
+        return this.messageStatus;
     }
 
     public String getFromId() {
@@ -131,5 +135,14 @@ public class MessageResult implements Serializable {
     @Override
     public String toString() {
         return "Message: "+message+", DS: "+messageStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId+", time"+getTime();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof MessageResult) {
+            if(((MessageResult) obj).getChatId().equals(this.getChatId()))
+                return true;
+        }
+        return false;
     }
 }

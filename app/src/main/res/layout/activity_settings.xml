@@ -104,15 +104,20 @@
                     android:textAppearance="@style/FontRobotoMedium"
                     android:textSize="15sp"
                     android:textColor="@color/colorAccent"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
+                </LinearLayout>
                 <TextView
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="USERID"
-                    android:textSize="13sp"
+                    android:text="airtel"
+                    android:textSize="16sp"
                     android:textColor="#212121"
                     android:id="@+id/tv_user_profile_id" />
                 <TextView
@@ -122,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="#8A8A8A"
-                    android:text="iChat ID"
+                    android:text="ID"
                     android:textSize="13sp" />
             </LinearLayout>
             <View

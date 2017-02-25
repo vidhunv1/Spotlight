@@ -195,7 +195,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, String query) {
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
-
             String contactNameLower = contactItem.getContactName().toLowerCase();
             int startPos = contactNameLower.indexOf(query.toLowerCase());
             if(!query.isEmpty() && startPos>=0) {

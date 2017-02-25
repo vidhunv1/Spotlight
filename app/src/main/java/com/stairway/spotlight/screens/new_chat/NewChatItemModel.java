@@ -9,12 +9,14 @@ public class NewChatItemModel {
     private String userId;
     private String status;
 
-
-    public NewChatItemModel() {
-    }
+    public NewChatItemModel() {}
 
     public NewChatItemModel(String contactName, String username, String userId) {
-        this.contactName = contactName;
+        if(contactName==null) {
+            this.contactName = "";
+        } else {
+            this.contactName = contactName;
+        }
         this.userId = userId;
         this.userName = username;
     }

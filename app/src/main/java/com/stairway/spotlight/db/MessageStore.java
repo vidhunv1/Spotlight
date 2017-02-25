@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.core.DatabaseManager;
+import com.stairway.spotlight.db.core.SQLiteContract;
 import com.stairway.spotlight.db.core.SQLiteContract.MessagesContract;
 import com.stairway.spotlight.models.MessageResult;
 
@@ -220,21 +221,36 @@ public class MessageStore {
         return Observable.create(subscriber -> {
             try {
                 SQLiteDatabase db = databaseManager.openConnection();
-                DateTime timeNow = DateTime.now();
-                ContentValues values = new ContentValues();
-                values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
-                values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
-                values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
-                values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
-                values.put(MessagesContract.COLUMN_CREATED_AT, timeNow.toString());
-                values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
 
-                long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
-                messageResult.setTime(timeNow);
-                messageResult.setMessageId(String.valueOf(rowId));
+                String selection = MessagesContract.COLUMN_RECEIPT_ID +" =? ";
+                String[] selectionArgs = {messageResult.getReceiptId()};
+                String[] columns = {
+                        MessagesContract.COLUMN_RECEIPT_ID
+                };
+                Cursor cursor = null;
+                if(messageResult.getReceiptId()!=null)
+                    cursor = db.query(SQLiteContract.MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+                if(cursor!=null && cursor.getCount()>0 && messageResult.getChatId().equals(messageResult.getFromId())) {
+                    subscriber.onNext(null);
+                    subscriber.onCompleted();
+                    cursor.close();
+                } else {
+                    DateTime timeNow = DateTime.now();
+                    ContentValues values = new ContentValues();
+                    values.put(MessagesContract.COLUMN_CHAT_ID, messageResult.getChatId());
+                    values.put(MessagesContract.COLUMN_FROM_ID, messageResult.getFromId());
+                    values.put(MessagesContract.COLUMN_MESSAGE, messageResult.getMessage());
+                    values.put(MessagesContract.COLUMN_MESSAGE_STATUS, messageResult.getMessageStatus().name());
+                    values.put(MessagesContract.COLUMN_CREATED_AT, timeNow.toString());
+                    values.put(MessagesContract.COLUMN_RECEIPT_ID, messageResult.getReceiptId());
 
-                subscriber.onNext(messageResult);
-                subscriber.onCompleted();
+                    long rowId = db.insert(MessagesContract.TABLE_NAME, null, values);
+                    messageResult.setTime(timeNow);
+                    messageResult.setMessageId(String.valueOf(rowId));
+
+                    subscriber.onNext(messageResult);
+                    subscriber.onCompleted();
+                }
                 databaseManager.closeConnection();
             } catch (Exception e) {
                 databaseManager.closeConnection();
@@ -302,8 +318,7 @@ public class MessageStore {
                         +MessageResult.MessageStatus.READ+"')";
             else if(messageStatus == MessageResult.MessageStatus.DELIVERED)
                 notFilter = "AND "+MessagesContract.COLUMN_MESSAGE_STATUS
-                        +" NOT IN ('"
-                        +MessageResult.MessageStatus.READ+"')";
+                        +" NOT IN ('" +MessageResult.MessageStatus.READ+"', '"+MessageResult.MessageStatus.UNSEEN+"', '"+MessageResult.MessageStatus.SEEN+"')";
             else
                 notFilter = "";
             db.update(MessagesContract.TABLE_NAME, values,
@@ -346,13 +361,70 @@ public class MessageStore {
     }
 
     public Observable<MessageResult> getUnsentMessages(String chatId) {
+        return getMessagesWithStatus(chatId, MessageResult.MessageStatus.NOT_SENT);
+    }
+
+    public Observable<List<MessageResult>> getUnseenMessages() {
+        return Observable.create(subscriber -> {
+            List<MessageResult> messageResults = new ArrayList<>();
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
+
+            String[] selectionArgs = {MessageResult.MessageStatus.UNSEEN.name()};
+            String[] columns = {
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT};
+
+            try{
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_CREATED_AT+" DESC");
+                cursor.moveToFirst();
+                while(!cursor.isAfterLast()) {
+                    String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String message = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String delivery = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+
+                    MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
+
+                    MessageResult msg = new MessageResult(chatId, fromId, message);
+                    msg.setMessageStatus(deliveryStatus);
+                    msg.setTime(DateTime.parse(time));
+                    msg.setMessageId(messageId);
+                    messageResults.add(msg);
+
+                    cursor.moveToNext();
+                }
+                if(messageResults.size()>=1)
+                    subscriber.onNext(messageResults);
+                else
+                    subscriber.onNext(null);
+                cursor.close();
+                subscriber.onCompleted();
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e(this, "MessageStore sqlite error: getunsentmessages(chatid) - "+e.getMessage());
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+    private Observable<MessageResult> getMessagesWithStatus(String chatId, MessageResult.MessageStatus messageStatus) {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
 
             String selection = MessagesContract.COLUMN_CHAT_ID + "=? AND "
                     +MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
 
-            String[] selectionArgs = {chatId, MessageResult.MessageStatus.NOT_SENT.name()};
+            String[] selectionArgs = {chatId, messageStatus.name()};
             String[] columns = {
                     MessagesContract.COLUMN_CHAT_ID,
                     MessagesContract.COLUMN_FROM_ID,

@@ -312,7 +312,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private boolean hasProfileDP(int position) {
 //        return !(position > 0 && messageList.get(position - 1).getChatId().equals(messageList.get(position - 1).getFromId()));
-        return position == messageList.size()-1 || messageList.get(position+1).isMe();
+        return !isSameConversation(position, position+1);
     }
 
     private String getFormattedTime(DateTime time) {

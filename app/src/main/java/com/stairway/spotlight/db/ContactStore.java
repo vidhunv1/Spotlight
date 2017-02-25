@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vidhun on 07/12/16.
@@ -192,9 +193,9 @@ public class ContactStore {
             String selection;
 
             if(isId)
-                selection= SQLiteContract.ContactsContract.COLUMN_USER_ID + " = ?";
+                selection= SQLiteContract.ContactsContract.COLUMN_USER_ID + " =? ";
             else
-                selection= SQLiteContract.ContactsContract.COLUMN_USERNAME + " = ?";
+                selection= SQLiteContract.ContactsContract.COLUMN_USERNAME + " =? ";
             String[] selectionArgs = {userId};
             String[] columns = {
                     SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME,

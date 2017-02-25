@@ -13,12 +13,10 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.stairway.spotlight.AccessTokenManager;
-import com.stairway.spotlight.ForegroundDetector;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.models.MessageResult;
-import com.stairway.spotlight.screens.home.HomeActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -104,6 +102,7 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onMessageReceived(MessageResult messageId){
         Logger.d(this, "MessageId "+messageId);
+        NotificationController.getInstance().handleNewMessageNotification(messageId.getChatId(), messageId.getMessage(), messageId.getReceiptId());
     }
 
     public void onPresenceChanged(String username, Presence.Type type) {

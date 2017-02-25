@@ -60,7 +60,7 @@ public class UserProfileActivity extends BaseActivity {
         contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
 
         contactNameView.setText(contactName);
-        userIdView.setText(username);
+        userIdView.setText("airtel");
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

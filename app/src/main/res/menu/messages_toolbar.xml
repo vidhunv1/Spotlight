@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_add_contact"
-        android:icon="@drawable/ic_attach_file"
-        android:title="Attach Files"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/view_contact"
         android:icon="@drawable/ic_info"
         android:title="View Contact"

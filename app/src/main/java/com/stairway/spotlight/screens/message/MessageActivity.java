@@ -28,6 +28,7 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
@@ -280,6 +281,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void displayMessages(List<MessageResult> messages) {
+        NotificationController.getInstance().updateNotification();
         messagesAdapter.setMessages(messages);
     }
 
@@ -432,11 +434,12 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onMessageReceived(MessageResult messageResult) {
-        super.onMessageReceived(messageResult);
         if(messageResult.getChatId().equals(chatUserName)) {
             messagesAdapter.addMessage(messageResult);
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
+        } else {
+            NotificationController.getInstance().handleNewMessageNotification(messageResult.getChatId(), messageResult.getMessage(), messageResult.getReceiptId());
         }
     }
 

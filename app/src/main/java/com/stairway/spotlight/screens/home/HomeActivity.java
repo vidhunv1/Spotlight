@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -29,10 +30,12 @@ import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
@@ -244,6 +247,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void onMessageReceived(MessageResult messageId) {
 		addNewMessage(messageId);
 		chatList.scrollToPosition(0);
+		NotificationController.getInstance().handleNewMessageNotification(messageId.getChatId(), messageId.getMessage(), messageId.getReceiptId());
 	}
 
 	@Override

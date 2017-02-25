@@ -142,7 +142,8 @@ public class MessageService extends Service {
 
                         @Override
                         public void onNext(MessageResult messageResult) {
-                            broadcastReceivedMessage(receivedMessage);
+                            if(messageResult!=null)
+                                broadcastReceivedMessage(receivedMessage);
                         }
                     });
                 } else{
