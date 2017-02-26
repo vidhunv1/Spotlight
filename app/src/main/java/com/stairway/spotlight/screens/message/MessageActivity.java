@@ -439,7 +439,7 @@ public class MessageActivity extends BaseActivity
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
         } else {
-            NotificationController.getInstance().handleNewMessageNotification(messageResult.getChatId(), messageResult.getMessage(), messageResult.getReceiptId());
+            NotificationController.getInstance().showNotification(true);
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SmoothCollapsingToolbarLayout">
+    <declare-styleable name="SmoothCollapsingToolbar">
         <attr name="sctl_collapsed_offsetX" format="dimension|reference" />
         <attr name="sctl_collapsed_offsetY" format="dimension|reference" />
         <attr name="sctl_collapsed_avatarSize" format="dimension|reference" />

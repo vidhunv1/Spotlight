@@ -167,7 +167,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class ContactsViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.ll_chatItem_content)
+        @Bind(R.id.ll_item_chat)
         LinearLayout contactListContent;
 
         @Bind(R.id.iv_chatItem_profileImage)

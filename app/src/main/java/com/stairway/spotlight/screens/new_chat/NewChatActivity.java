@@ -199,7 +199,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if(addContactPopupWindow.isShowing()) {
             ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
             pb.setVisibility(View.INVISIBLE);
-            showAlertDialog("Please enter a valid iChat ID.", R.layout.alert);
+            showAlertDialog("Please enter a valid iChat ID.");
         }
     }
 
@@ -259,9 +259,10 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 //            });
     }
 
-    public void showAlertDialog(String message, int layout) {
+    public void showAlertDialog(String message) {
         //TODO: Something wrong. 16?
         final int WIDTH = 294, HEIGHT = 98;
+        int layout = R.layout.alert;
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();

@@ -20,7 +20,7 @@ import com.stairway.spotlight.R;
 /**
  * Created by henrytao on 9/24/15.
  */
-public class SmoothCollapsingToolbarLayout extends LinearLayout {
+public class SmoothCollapsingToolbar extends LinearLayout {
 
     public static boolean DEBUG = false;
 
@@ -74,24 +74,24 @@ public class SmoothCollapsingToolbarLayout extends LinearLayout {
 
     protected Toolbar vToolbar;
 
-    public SmoothCollapsingToolbarLayout(Context context) {
+    public SmoothCollapsingToolbar(Context context) {
         super(context);
         init(null);
     }
 
-    public SmoothCollapsingToolbarLayout(Context context, AttributeSet attrs) {
+    public SmoothCollapsingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public SmoothCollapsingToolbarLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SmoothCollapsingToolbar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public SmoothCollapsingToolbarLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public SmoothCollapsingToolbar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(attrs);
     }
@@ -105,7 +105,7 @@ public class SmoothCollapsingToolbarLayout extends LinearLayout {
 
                 @Override
                 public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
-                    SmoothCollapsingToolbarLayout.this.onOffsetChanged(appBarLayout, i);
+                    SmoothCollapsingToolbar.this.onOffsetChanged(appBarLayout, i);
                 }
             };
             getAppBarLayout().addOnOffsetChangedListener(mOnAppBarLayoutOffsetChangedListener);
@@ -221,23 +221,23 @@ public class SmoothCollapsingToolbarLayout extends LinearLayout {
 
     protected void init(AttributeSet attrs) {
         setOrientation(HORIZONTAL);
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.SmoothCollapsingToolbarLayout, 0, 0);
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.SmoothCollapsingToolbar, 0, 0);
         try {
-            mCollapsedOffsetX = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_collapsed_offsetX, 0);
-            mCollapsedOffsetY = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_collapsed_offsetY, 0);
-            mCollapsedAvatarSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_collapsed_avatarSize, -1);
-            mCollapsedTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_collapsed_titleTextSize, -1);
-            mCollapsedSubTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_collapsed_subtitleTextSize, -1);
+            mCollapsedOffsetX = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_collapsed_offsetX, 0);
+            mCollapsedOffsetY = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_collapsed_offsetY, 0);
+            mCollapsedAvatarSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_collapsed_avatarSize, -1);
+            mCollapsedTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_collapsed_titleTextSize, -1);
+            mCollapsedSubTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_collapsed_subtitleTextSize, -1);
 
-            mExpandedOffsetX = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_expanded_offsetX, 0);
-            mExpandedOffsetY = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_expanded_offsetY, 0);
-            mExpandedAvatarSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_expanded_avatarSize, -1);
-            mExpandedTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_expanded_titleTextSize, -1);
-            mExpandedSubtitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbarLayout_sctl_expanded_subtitleTextSize, -1);
+            mExpandedOffsetX = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_expanded_offsetX, 0);
+            mExpandedOffsetY = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_expanded_offsetY, 0);
+            mExpandedAvatarSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_expanded_avatarSize, -1);
+            mExpandedTitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_expanded_titleTextSize, -1);
+            mExpandedSubtitleTextSize = a.getDimension(R.styleable.SmoothCollapsingToolbar_sctl_expanded_subtitleTextSize, -1);
 
-            mAvatarId = a.getResourceId(R.styleable.SmoothCollapsingToolbarLayout_sctl_avatar_id, 0);
-            mTitleId = a.getResourceId(R.styleable.SmoothCollapsingToolbarLayout_sctl_title_id, 0);
-            mSubtitleId = a.getResourceId(R.styleable.SmoothCollapsingToolbarLayout_sctl_subtitle_id, 0);
+            mAvatarId = a.getResourceId(R.styleable.SmoothCollapsingToolbar_sctl_avatar_id, 0);
+            mTitleId = a.getResourceId(R.styleable.SmoothCollapsingToolbar_sctl_title_id, 0);
+            mSubtitleId = a.getResourceId(R.styleable.SmoothCollapsingToolbar_sctl_subtitle_id, 0);
         } finally {
             a.recycle();
         }

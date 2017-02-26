@@ -247,7 +247,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void onMessageReceived(MessageResult messageId) {
 		addNewMessage(messageId);
 		chatList.scrollToPosition(0);
-		NotificationController.getInstance().handleNewMessageNotification(messageId.getChatId(), messageId.getMessage(), messageId.getReceiptId());
+		NotificationController.getInstance().showNotification(true);
 	}
 
 	@Override

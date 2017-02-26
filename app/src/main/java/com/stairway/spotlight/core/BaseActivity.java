@@ -102,7 +102,7 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onMessageReceived(MessageResult messageId){
         Logger.d(this, "MessageId "+messageId);
-        NotificationController.getInstance().handleNewMessageNotification(messageId.getChatId(), messageId.getMessage(), messageId.getReceiptId());
+        NotificationController.getInstance().showNotification(true);
     }
 
     public void onPresenceChanged(String username, Presence.Type type) {
