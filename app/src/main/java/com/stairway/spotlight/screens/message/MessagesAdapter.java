@@ -883,32 +883,40 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             title.setText(genericTemplate.getTitle());
-            if(!genericTemplate.getSubtitle().isEmpty() && genericTemplate.getSubtitle()!=null) {
-                subtitle.setText(genericTemplate.getSubtitle());
-            }
-            if(genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
-                url.setText(genericTemplate.getDefaultAction().getUrl());
-                templateImage.setOnClickListener(v -> {
-                    if(urlClickListener!=null) {
-                        urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
-                    }
-                });
-                textContent.setOnClickListener(v -> {
-                    if(urlClickListener!=null) {
-                        urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
-                    }
-                });
-            } else if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.postback){
-                templateImage.setOnClickListener(v -> {
-                    if(postbackClickListener!=null) {
-                        postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
-                    }
-                });
-                textContent.setOnClickListener(v -> {
-                    if(postbackClickListener!=null) {
-                        postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
-                    }
-                });
+
+            if(genericTemplate.getDefaultAction()!=null) {
+                if (genericTemplate.getSubtitle() != null && !genericTemplate.getSubtitle().isEmpty()) {
+                    subtitle.setText(genericTemplate.getSubtitle());
+                } else {
+                    subtitle.setVisibility(View.GONE);
+                }
+                if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
+                    url.setText(genericTemplate.getDefaultAction().getUrl());
+                    templateImage.setOnClickListener(v -> {
+                        if (urlClickListener != null) {
+                            urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
+                        }
+                    });
+                    textContent.setOnClickListener(v -> {
+                        if (urlClickListener != null) {
+                            urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
+                        }
+                    });
+                } else if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.postback) {
+                    templateImage.setOnClickListener(v -> {
+                        if (postbackClickListener != null) {
+                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
+                        }
+                    });
+                    textContent.setOnClickListener(v -> {
+                        if (postbackClickListener != null) {
+                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
+                        }
+                    });
+                }
+            } else {
+                subtitle.setVisibility(View.GONE);
+                url.setVisibility(View.GONE);
             }
 
             for (int i = 0; i < genericTemplate.getButtons().size(); i++) {

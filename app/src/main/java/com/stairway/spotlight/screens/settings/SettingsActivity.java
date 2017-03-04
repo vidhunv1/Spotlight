@@ -209,22 +209,6 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public void showAskAQuestionPopup() {
-//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-//        View askAQuestionView = inflater.inflate(R.layout.popup_settings_askaquestion, null);
-//        PopupWindow askAQuestionPopupWindow = new PopupWindow(
-//                askAQuestionView,
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                true
-//        );
-//        if(Build.VERSION.SDK_INT>=21)
-//            askAQuestionPopupWindow.setElevation(5.0f);
-//
-//        askAQuestionPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
-//        askAQuestionPopupWindow.showAtLocation(rootLayout, Gravity.CENTER,0,0);
-//
-//        FrameLayout out = (FrameLayout) askAQuestionView.findViewById(R.id.fl_settings_askaquestion);
-//        out.setOnClickListener(view -> askAQuestionPopupWindow.dismiss());
         LinearLayout parent = new LinearLayout(this);
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
@@ -359,10 +343,8 @@ public class SettingsActivity extends BaseActivity {
             }
             rg.addView(rb[i]);
         }
-//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Led Color");
-//        builder.setView(inflater.inflate(R.layout.popup_settings_ledcolor, null));
         builder.setView(rg);
         // hack for positioning button left-right<-->
             builder.setNegativeButton(" ", ((dialog, which) -> {}));

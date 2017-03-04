@@ -131,7 +131,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if((id == android.R.id.home)) {
-            AndroidUtils.hideSoftInput(this);
             super.onBackPressed();
             return true;
         } else if(id == R.id.action_add_contact) {
