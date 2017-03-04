@@ -3,11 +3,9 @@ package com.stairway.spotlight.screens.home;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.preference.PreferenceManager;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,19 +21,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.MessageController;
-import com.stairway.spotlight.api.ApiManager;
-import com.stairway.spotlight.api.user.UserRequest;
-import com.stairway.spotlight.api.user.UserResponse;
-import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 
-import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.MessageActivity;
@@ -52,9 +44,6 @@ import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static com.stairway.spotlight.core.FCMRegistrationIntentService.FCM_TOKEN;
-import static com.stairway.spotlight.core.FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener {
 	@Bind(R.id.fab)
@@ -241,6 +230,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 						startActivity(MessageActivity.callingIntent(activity, contactResult.getUsername(), name));
 					}
 				});
+	}
+
+	@Override
+	public void onChatItemLongClicked(String username) {
+		BottomSheetDialog chatActionsDialog = new BottomSheetDialog(this);
+		View chatActionsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_chat_actions, null);
+		chatActionsDialog.setContentView(chatActionsView);
+		chatActionsDialog.show();
 	}
 
 	@Override

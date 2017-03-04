@@ -302,7 +302,6 @@ public class SmoothCollapsingToolbar extends LinearLayout {
     }
 
     public interface OnOffsetChangedListener {
-
         void onOffsetChanged(float ratio);
     }
 }

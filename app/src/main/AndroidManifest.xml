@@ -19,7 +19,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/BaseTheme">
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.stairway.spotlight.fileprovider"
@@ -32,8 +32,7 @@
 
         <activity
             android:name=".screens.launcher.LauncherActivity"
-            android:noHistory="true"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,20 +41,16 @@
         </activity>
         <activity
             android:name=".screens.message.MessageActivity"
-            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".screens.register.RegisterActivity"
-            android:label="@string/title_activity_register"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_register" />
         <activity
             android:name=".screens.sign_up.SignUpActivity"
-            android:label="@string/title_activity_sign_up"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_sign_up" />
         <activity
             android:name=".screens.welcome.WelcomeActivity"
-            android:label="WelcomActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="WelcomActivity" />
 
         <service
             android:name=".core.FCMMessageHandler"
@@ -77,11 +72,9 @@
             android:exported="false" />
 
         <activity
-            android:name=".screens.user_profile.UserProfileActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".screens.user_profile.UserProfileActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".screens.search.SearchActivity"
@@ -91,6 +84,7 @@
             android:label="NewChatActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".screens.web_view.WebViewActivity" />
+
         <activity android:name=".screens.settings.SettingsActivity" />
     </application>
 

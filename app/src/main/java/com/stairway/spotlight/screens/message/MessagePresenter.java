@@ -132,8 +132,17 @@ public class MessagePresenter implements MessageContract.Presenter {
                     public void onCompleted() {
                         sendMessageUseCase.execute(result)
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(result -> {
-                                    messageView.updateDeliveryStatus(result);
+                                .subscribe(new Subscriber<MessageResult>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(MessageResult messageResult) {
+                                        messageView.updateDeliveryStatus(messageResult);
+                                    }
                                 });
                     }
                 });

@@ -151,4 +151,9 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void onChatItemClicked(String userId) {}
+
+    @Override
+    public void onChatItemLongClicked(String username) {
+
+    }
 }

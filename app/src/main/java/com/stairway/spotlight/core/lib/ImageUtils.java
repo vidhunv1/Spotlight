@@ -64,15 +64,14 @@ public class ImageUtils {
         Context context = SpotlightApplication.getContext();
 
         final int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float)textSize, context.getResources().getDisplayMetrics());
-        TextDrawable textDrawable = TextDrawable.builder()
+        return TextDrawable.builder()
                 .beginConfig()
                 .textColor(Color.WHITE)
                 .useFont(Typeface.createFromAsset(context.getResources().getAssets(), "fonts/roboto-medium.ttf"))
-                .fontSize(px) /* size in px */
+                .fontSize(px)
                 .toUpperCase()
                 .endConfig()
                 .buildRound(sb.toString(), defaultColors.getColor(key));
 
-        return textDrawable;
     }
 }

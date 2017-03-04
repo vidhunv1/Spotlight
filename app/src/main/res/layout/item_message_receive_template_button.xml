@@ -42,7 +42,7 @@
                 android:layout_alignParentTop="true"
                 android:maxWidth="234dp"
                 android:text="FLE : À "
-                android:textColor="@color/textPrimaryDark"
+                android:textColor="@color/textColor"
                 android:textSize="16sp" />
         </RelativeLayout>
 

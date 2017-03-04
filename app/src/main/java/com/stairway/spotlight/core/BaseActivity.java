@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.AccessToken;
 import com.stairway.spotlight.models.MessageResult;
 
@@ -89,6 +90,11 @@ public class BaseActivity extends AppCompatActivity{
         super.onStop();
     }
 
+    @Override
+    protected void onPause() {
+        AndroidUtils.hideSoftInput(this);
+        super.onPause();
+    }
 
     @Override
     public void onBackPressed() {

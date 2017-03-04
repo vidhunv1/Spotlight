@@ -19,12 +19,12 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.stairway.spotlight.AccessTokenManager;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
-
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
@@ -67,9 +67,11 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message_presence)
     TextView presenceView;
 
-    View menuItemsView;
-    BottomSheetDialog bottomSheetDialog;
+    @Bind(R.id.container)
+    RelativeLayout rootLayout;
+
     private EmojiViewHelper emojiPicker;
+    private List<PersistentMenu> persistentMenus;
 
     private WrapContentLinearLayoutManager linearLayoutManager;
 
@@ -88,9 +90,11 @@ public class MessageActivity extends BaseActivity
 
     private Presence.Type presence;
 
-    // userName: id for ejabberd xmpp. userId: id set by user:
+    // userName: id for ejabberd xmpp. userId: id set by user
     public static Intent callingIntent(Context context, String chatUserName, String chatContactName) {
         Intent intent = new Intent(context, MessageActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
         intent.putExtra(KEY_CHAT_CONTACT_NAME, chatContactName);
 
@@ -228,55 +232,58 @@ public class MessageActivity extends BaseActivity
     }
 
     public void onMessageMenuClicked() {
-        if(bottomSheetDialog!=null) {
+        if(persistentMenus!=null) {
+            View menuItemsView;
+            BottomSheetDialog bottomSheetDialog;
+            bottomSheetDialog = new BottomSheetDialog(this);
+            menuItemsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
+
+            bottomSheetDialog.setContentView(menuItemsView);
+
+            List<TextView> itemsTV = new ArrayList<>(5);
+            List<LinearLayout> itemsLL = new ArrayList<>(5);
+            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item1));
+            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item2));
+            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item3));
+            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item4));
+            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item5));
+
+            for (LinearLayout linearLayout : itemsLL) {
+                linearLayout.setVisibility(View.GONE);
+            }
+
+            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item1));
+            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item2));
+            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item3));
+            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item4));
+            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item5));
+
+            for (int i = 0; i < persistentMenus.size(); i++) {
+                itemsLL.get(i).setVisibility(View.VISIBLE);
+                itemsTV.get(i).setText(persistentMenus.get(i).getTitle());
+                PersistentMenu menu = persistentMenus.get(i);
+                itemsLL.get(i).setOnClickListener(v -> {
+                    bottomSheetDialog.dismiss();
+                    if(menu.getType() == PersistentMenu.Type.postback) {
+                        messagePresenter.sendTextMessage(chatUserName, currentUser, menu.getTitle());
+                    } else if(menu.getType() == PersistentMenu.Type.web_url) {
+                        startActivity(WebViewActivity.callingIntent(this, menu.getUrl()));
+                    }
+                });
+            }
+
+            LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
+            enterText.setOnClickListener(v -> {
+                bottomSheetDialog.dismiss();
+                messageBox.requestFocus();
+            });
             bottomSheetDialog.show();
         }
     }
 
     @Override
     public void initBotMenu(List<PersistentMenu> persistentMenus) {
-        bottomSheetDialog = new BottomSheetDialog(this);
-        menuItemsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
-
-        bottomSheetDialog.setContentView(menuItemsView);
-
-        List<TextView> itemsTV = new ArrayList<>(5);
-        List<LinearLayout> itemsLL = new ArrayList<>(5);
-        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item1));
-        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item2));
-        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item3));
-        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item4));
-        itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item5));
-
-        for (LinearLayout linearLayout : itemsLL) {
-            linearLayout.setVisibility(View.GONE);
-        }
-
-        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item1));
-        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item2));
-        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item3));
-        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item4));
-        itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item5));
-
-        for (int i = 0; i < persistentMenus.size(); i++) {
-            itemsLL.get(i).setVisibility(View.VISIBLE);
-            itemsTV.get(i).setText(persistentMenus.get(i).getTitle());
-            PersistentMenu menu = persistentMenus.get(i);
-            itemsLL.get(i).setOnClickListener(v -> {
-                bottomSheetDialog.dismiss();
-                if(menu.getType() == PersistentMenu.Type.postback) {
-                    messagePresenter.sendTextMessage(chatUserName, currentUser, menu.getTitle());
-                } else if(menu.getType() == PersistentMenu.Type.web_url) {
-                    startActivity(WebViewActivity.callingIntent(this, menu.getUrl()));
-                }
-            });
-        }
-
-        LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
-        enterText.setOnClickListener(v -> {
-            bottomSheetDialog.dismiss();
-            messageBox.requestFocus();
-        });
+        this.persistentMenus = persistentMenus;
     }
 
     @Override
@@ -431,6 +438,11 @@ public class MessageActivity extends BaseActivity
     public void onQuickReplyClicked(String text) {
         messagePresenter.sendTextMessage(chatUserName, currentUser, text);
     }
+
+//    @Override
+//    public void onMessageLongClicked(String messageId) {
+//        showMessageActionPopup();
+//    }
 
     @Override
     public void onMessageReceived(MessageResult messageResult) {

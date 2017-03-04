@@ -180,13 +180,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    //    @Override
-//    public void onBindViewHolder(ViewHolder holder, int position) {
-//        holder.renderItem(chatList.get(position));
-//
-//        Logger.d("ChatList: "+chatList.get(position).toString());
-//    }
-
     public class NotificationViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.ll_item_chat_notification)
@@ -217,6 +210,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatListContent.setOnClickListener(view -> {
                 if(chatClickListener != null)
                     chatClickListener.onChatItemClicked(contactName.getTag().toString());
+            });
+
+            chatListContent.setOnLongClickListener(v -> {
+                if(chatClickListener != null)
+                    chatClickListener.onChatItemLongClicked(contactName.getTag().toString());
+                return true;
             });
         }
 
@@ -280,6 +279,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if(chatClickListener != null)
                     chatClickListener.onChatItemClicked(contactName.getTag().toString());
             });
+
+            chatListContent.setOnLongClickListener(v -> {
+                if(chatClickListener != null)
+                    chatClickListener.onChatItemLongClicked(contactName.getTag().toString());
+                return true;
+            });
         }
 
         public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
@@ -311,6 +316,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public interface ChatClickListener {
-        void onChatItemClicked(String userId);
+        void onChatItemClicked(String username);
+        void onChatItemLongClicked(String username);
     }
 }

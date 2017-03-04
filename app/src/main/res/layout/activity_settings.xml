@@ -10,7 +10,6 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="168dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -31,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:minHeight="?attr/actionBarSize"
-                app:sctl_avatar_id="@+id/avatar"
+                app:sctl_avatar_id="@+id/settings_dp"
                 app:sctl_collapsed_avatarSize="42dp"
                 app:sctl_collapsed_offsetX="72dp"
                 app:sctl_collapsed_offsetY="18dp"
@@ -46,11 +45,10 @@
                 app:sctl_title_id="@+id/title">
 
                 <ImageView
-                    android:id="@+id/avatar"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/default_profile_image" />
+                    android:id="@+id/settings_dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -169,6 +167,7 @@
                             android:textSize="16sp"
                             android:textColor="#212121" />
                         <Switch
+                            android:id="@+id/settings_alert"
                             android:paddingRight="10dp"
                             android:layout_width="match_parent"
                             android:gravity="center_vertical|right"
@@ -221,6 +220,7 @@
                             android:textSize="16sp"
                             android:textColor="#212121" />
                         <TextView
+                            android:id="@+id/settings_vibrate_option"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
                             android:layout_width="match_parent"
@@ -289,10 +289,36 @@
                             android:layout_width="wrap_content"
                             android:gravity="center_vertical"
                             android:layout_height="48.25dp"
+                            android:text="In-app Browser"
+                            android:textSize="16sp"
+                            android:textColor="#212121" />
+                        <Switch
+                            android:id="@+id/settings_in_app_browser"
+                            android:paddingRight="10dp"
+                            android:checked="true"
+                            android:layout_width="match_parent"
+                            android:gravity="center_vertical|right"
+                            android:layout_height="48.25dp"
+                            android:switchMinWidth="37.5dp"/>
+                    </TableRow>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+                    <TableRow android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:layout_width="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_height="48.25dp"
                             android:text="Send by Enter"
                             android:textSize="16sp"
                             android:textColor="#212121" />
                         <Switch
+                            android:id="@+id/settings_send_by_enter"
                             android:paddingRight="10dp"
                             android:layout_width="match_parent"
                             android:gravity="center_vertical|right"
@@ -317,6 +343,7 @@
                             android:textSize="16sp"
                             android:textColor="#212121" />
                         <TextView
+                            android:id="@+id/settings_text_size"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
                             android:layout_width="match_parent"
@@ -325,23 +352,6 @@
                             android:text="16"
                             android:textSize="16sp"
                             android:textColor="#2f8cc9" />
-                    </TableRow>
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
-                        android:background="#f0f0f0" />
-                    <TableRow android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
-                            android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_height="48.25dp"
-                            android:text="Chat Background"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
                     </TableRow>
                 </TableLayout>
             </LinearLayout>
@@ -366,12 +376,13 @@
                     android:textColor="@color/colorAccent"/>
 
                 <TextView
+                    android:id="@+id/settings_askquestion_row"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:gravity="center_vertical"
                     android:layout_height="48.25dp"
                     android:text="Ask a Question"
@@ -389,9 +400,10 @@
                     android:focusable="true"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:gravity="center_vertical"
                     android:layout_height="48.25dp"
+                    android:id="@+id/settings_faq_row"
                     android:text="iChat FAQ"
                     android:textSize="16sp"
                     android:textColor="#212121" />
@@ -402,12 +414,13 @@
                     android:background="#f0f0f0" />
 
                 <TextView
+                    android:id="@+id/settings_privacy_policy_row"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:gravity="center_vertical"
                     android:layout_height="48.25dp"
                     android:text="Privacy Policy"
@@ -430,12 +443,13 @@
                     android:layout_height="55.55dp"
                     android:text="iChat for Android v1.0.0"
                     android:textSize="13sp"
-                    android:textColor="#838383" />
+                    android:textColor="#A3A3A3" />
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/settings_take_pic"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_anchor="@id/appbar"

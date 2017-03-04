@@ -1,15 +1,25 @@
 package com.stairway.spotlight.screens.message;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -38,7 +48,11 @@ import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 /**
  * Created by vidhun on 07/08/16.
@@ -64,7 +78,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private QuickRepliesAdapter.QuickReplyClickListener quickReplyClickListener;
     private Drawable textProfileDrawable;
 
-    private int lastClickedPosition = -1;
+    private int lastClickedPosition;
 
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickRepliesAdapter.QuickReplyClickListener qrListener) {
         this.quickReplyClickListener = qrListener;
@@ -74,6 +88,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messageList = new ArrayList<>();
         this.messageCache = new SparseArray<>();
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
+
+        lastClickedPosition=-1;
     }
 
     public void setMessages(List<MessageResult> messages) {
@@ -142,13 +158,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if (messageStatus == MessageResult.MessageStatus.NOT_SENT)
                     return;
                 if (messageStatus == MessageResult.MessageStatus.SENT)
-                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
+                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ) {
                         return;
-//                    if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
+                    }
+
+//              if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
 //                        return;
-//                if (messageStatus == MessageResult.MessageStatus.DELIVERED)
-//                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
-//                        return;
+//              if (messageStatus == MessageResult.MessageStatus.DELIVERED)
+//                  if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
+//                      return;
 
                 if(!m.getChatId().equals(m.getFromId())) {
                     m.setMessageStatus(messageStatus);
@@ -362,7 +380,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(10));
     }
 
-    private void setMessageClicked(int position, boolean isClicked) {
+    private void toggleMessagePressed(int position, boolean isClicked) {
         Logger.d(this, "Position: "+position+", "+isClicked+" "+ lastClickedPosition);
         if(!isClicked) {
             lastClickedPosition = -1;
@@ -373,6 +391,69 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             lastClickedPosition = position;
         }
+    }
+
+    private boolean isMessagePressed(int position) {
+        return lastClickedPosition == position && lastClickedPosition>=0;
+    }
+
+    private void showMessageActionPopup(RecyclerView.ViewHolder viewHolder, int position, String text) {
+        TextView copyTextAction, deleteAction, detailsAction;
+        LinearLayout parent = new LinearLayout(context);
+
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding(0, 0, (int)AndroidUtils.px(16), 0);
+
+        copyTextAction = new TextView(context);
+        copyTextAction.setText("Copy Text");
+        copyTextAction.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+        copyTextAction.setTextSize(16);
+        copyTextAction.setHeight((int)AndroidUtils.px(48));
+        copyTextAction.setGravity(Gravity.CENTER_VERTICAL);
+        copyTextAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
+
+        deleteAction = new TextView(context);
+        deleteAction.setText("Delete");
+        deleteAction.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+        deleteAction.setTextSize(16);
+        deleteAction.setHeight((int)AndroidUtils.px(48));
+        deleteAction.setGravity(Gravity.CENTER_VERTICAL);
+        deleteAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
+
+        detailsAction = new TextView(context);
+        detailsAction.setText("Details");
+        detailsAction.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+        detailsAction.setTextSize(16);
+        detailsAction.setHeight((int)AndroidUtils.px(48));
+        detailsAction.setGravity(Gravity.CENTER_VERTICAL);
+        detailsAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
+
+        parent.addView(copyTextAction);
+        parent.addView(deleteAction);
+        parent.addView(detailsAction);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Message");
+        builder.setView(parent);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        copyTextAction.setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Message text", text);
+            clipboard.setPrimaryClip(clip);
+            alertDialog.dismiss();
+        });
+        deleteAction.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        detailsAction.setOnClickListener(v -> {
+            if(viewHolder instanceof SendTextViewHolder) {
+                ((SendTextViewHolder) viewHolder).onMessageClicked();
+            }
+            alertDialog.dismiss();
+        });
     }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
@@ -459,11 +540,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         timeView.setVisibility(View.GONE);
                     }
                     deliveryStatusText.setVisibility(View.GONE);
-                    setMessageClicked(position, false);
+                    toggleMessagePressed(position, false);
                 } else {
                     timeView.setVisibility(View.VISIBLE);
                     deliveryStatusText.setVisibility(View.VISIBLE);
-                    setMessageClicked(position, true);
+                    toggleMessagePressed(position, true);
                 }
             });
         }
@@ -527,10 +608,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if(!shouldShowTime) {
                     if(timeView.getVisibility() == View.VISIBLE) {
                         timeView.setVisibility(View.GONE);
-                        setMessageClicked(position, false);
+                        toggleMessagePressed(position, false);
                     } else {
                         timeView.setVisibility(View.VISIBLE);
-                        setMessageClicked(position, true);
+                        toggleMessagePressed(position, true);
                     }
                 }
             });
@@ -551,14 +632,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_delivery_status)
         TextView deliveryStatusText;
 
+        private int position;
+
         SendTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String message, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.position = position;
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
+
+            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+            drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
 
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
@@ -600,20 +687,33 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
+        }
 
-            bubbleView.setOnClickListener(v -> {
-                if(deliveryStatusText.getVisibility() == View.VISIBLE) {
-                    if(!shouldShowTime) {
-                        timeView.setVisibility(View.GONE);
-                    }
-                    deliveryStatusText.setVisibility(View.GONE);
-                    setMessageClicked(position, false);
-                } else {
-                    timeView.setVisibility(View.VISIBLE);
-                    deliveryStatusText.setVisibility(View.VISIBLE);
-                    setMessageClicked(position, true);
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+            boolean shouldShowTime = shouldShowTime(position);
+
+            if(isMessagePressed(position)) {
+                if(!shouldShowTime) {
+                    timeView.setVisibility(View.GONE);
                 }
-            });
+                deliveryStatusText.setVisibility(View.GONE);
+                toggleMessagePressed(position, false);
+                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
+            } else {
+                timeView.setVisibility(View.VISIBLE);
+                deliveryStatusText.setVisibility(View.VISIBLE);
+                toggleMessagePressed(position, true);
+                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubblePressed));
+            }
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            showMessageActionPopup(this, position, messageView.getText().toString());
+            return true;
         }
     }
 
@@ -638,6 +738,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int bubbleType = bubbleType(position);
             boolean displayProfileDP = hasProfileDP(position);
             boolean shouldShowTime = shouldShowTime(position);
+
+            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+            drawable.setColor(ContextCompat.getColor(context, R.color.receiveMessageBubble));
 
             timeView.setText(time);
             if(shouldShowTime) {
@@ -677,14 +780,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             bubbleView.setOnClickListener(v -> {
-                if(!shouldShowTime) {
-                    if(timeView.getVisibility() == View.VISIBLE) {
+                if(isMessagePressed(position)) {
+                    if(!shouldShowTime) {
                         timeView.setVisibility(View.GONE);
-                        setMessageClicked(position, false);
-                    } else {
-                        timeView.setVisibility(View.VISIBLE);
-                        setMessageClicked(position, true);
                     }
+                    toggleMessagePressed(position, false);
+                    GradientDrawable drawable1 = (GradientDrawable) bubbleView.getBackground();
+                    drawable1.setColor(ContextCompat.getColor(context, R.color.receiveMessageBubble));
+
+                } else {
+                    timeView.setVisibility(View.VISIBLE);
+                    toggleMessagePressed(position, true);
+                    GradientDrawable drawable2 = (GradientDrawable) bubbleView.getBackground();
+                    drawable2.setColor(ContextCompat.getColor(context, R.color.receiveMessageBubblePressed));
                 }
             });
         }
@@ -731,35 +839,45 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 case 0:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_full);
-                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null)
+                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
+                    } else {
+                        templateImage.setVisibility(View.GONE);
+                    }
                     break;
                 case 1:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_top);
-                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null)
+                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
+                    } else {
+                        templateImage.setVisibility(View.GONE);
+                    }
                     break;
                 case 2:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_middle);
-                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
+                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
                                 .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
                                 .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
                                 .into(templateImage);
+                    } else {
+                        templateImage.setVisibility(View.GONE);
                     }
                     break;
                 case 3:
                     bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_template_bottom);
-                    if(!genericTemplate.getImageUrl().isEmpty() && genericTemplate.getImageUrl()!=null) {
+                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
                                 .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
                                 .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
                                 .into(templateImage);
+                    } else {
+                        templateImage.setVisibility(View.GONE);
                     }
                     break;
             }
@@ -894,6 +1012,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     });
                 }
             }
+
             if(displayDP) {
                 profileImage.setVisibility(View.VISIBLE);
                 profileImage.setImageDrawable(textProfileDrawable);

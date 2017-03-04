@@ -79,7 +79,6 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        this.overridePendingTransition(0, 0);
     }
 
     @Override

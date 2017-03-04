@@ -17,7 +17,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 16/10/16.
  */
-
 public class ApiManager {
     private static ApiManager instance;
 

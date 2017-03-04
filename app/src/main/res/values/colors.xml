@@ -5,6 +5,7 @@
     <color name="colorPrimary">#3688ad</color>
     <color name="colorPrimaryDark">#1A7ECE</color>
     <color name="colorPrimaryLight">#61B2F3</color>
+    <color name="colorAccent">@color/colorPrimary</color>
     <color name="background_default">#FFFFFF</color>
     <color name="statusBar">#2c6d8a</color>
     <color name="activeIndicator">#2A97F0</color>
@@ -12,10 +13,12 @@
     <!--chat-->
     <color name="sendMessageBubble">@color/colorPrimary</color>
     <color name="receiveMessageBubble">#eaeaea</color>
+    <color name="sendMessageBubblePressed">#296d8c</color>
+    <color name="receiveMessageBubblePressed">#BBBBBB</color>
 
     <!--text-->
     <color name="textPrimaryLight">#ffffff</color>
-    <color name="textPrimaryDark">#212121</color>
+    <color name="textColor">#212121</color>
     <color name="textSecondary">#64b0d2</color>
     <color name="textHintColor">#cbd9d7</color>
     <color name="drawerText">#212121</color>
@@ -28,5 +31,4 @@
     <color name="drawerIcon">#737373</color>
     <color name="error">#C62828</color>
     <color name="divider">#E0E0E0</color>
-    <color name="colorAccent">@color/colorPrimary</color>
 </resources>

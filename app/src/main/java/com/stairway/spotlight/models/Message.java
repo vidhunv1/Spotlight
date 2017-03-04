@@ -66,6 +66,17 @@ public class Message {
         return text;
     }
 
+    public String getDisplayText() {
+        if(getMessageType() == MessageType.text)
+            return getText();
+        else if(getMessageType() == MessageType.button_template)
+            return getButtonTemplate().getText();
+        else if(getMessageType() == MessageType.generic_template)
+            return getGenericTemplate().getTitle();
+        else
+            return "";
+    }
+
     public ButtonTemplate getButtonTemplate() {
         return buttonTemplate;
     }
