@@ -118,7 +118,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				} else{
 					fab.show();
 				}
-
 				super.onScrolled(recyclerView, dx, dy);
 			}
 		});
@@ -139,6 +138,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if(fab!=null) {
+			fab.setVisibility(View.VISIBLE);
+		}
 		presenter.loadChatList();
 	}
 
@@ -196,17 +198,23 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		switch(id) {
 			case R.id.nav_settings:
 				startActivity(SettingsActivity.callingIntent(this));
+				drawer.closeDrawer(GravityCompat.START, false);
+				overridePendingTransition(R.anim.enter, R.anim.exit);
+				fab.setVisibility(View.INVISIBLE);
 				break;
 			case R.id.nav_faq:
 				break;
 			case R.id.nav_contacts:
 				startActivity(NewChatActivity.callingIntent(this, false));
+				drawer.closeDrawer(GravityCompat.START, false);
+				overridePendingTransition(R.anim.enter, R.anim.exit);
+				fab.setVisibility(View.INVISIBLE);
 				break;
 			case android.R.id.home:
 				onBackPressed();
+				drawer.closeDrawer(GravityCompat.START);
 				break;
 		}
-		drawer.closeDrawer(GravityCompat.START);
 		return true;
 	}
 

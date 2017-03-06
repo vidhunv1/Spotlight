@@ -403,7 +403,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         parent.setOrientation(LinearLayout.VERTICAL);
-        parent.setPadding(0, 0, (int)AndroidUtils.px(16), 0);
+        parent.setPadding((int)AndroidUtils.px(24), (int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
 
         copyTextAction = new TextView(context);
         copyTextAction.setText("Copy Text");
@@ -411,7 +411,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         copyTextAction.setTextSize(16);
         copyTextAction.setHeight((int)AndroidUtils.px(48));
         copyTextAction.setGravity(Gravity.CENTER_VERTICAL);
-        copyTextAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
 
         deleteAction = new TextView(context);
         deleteAction.setText("Delete");
@@ -419,7 +418,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         deleteAction.setTextSize(16);
         deleteAction.setHeight((int)AndroidUtils.px(48));
         deleteAction.setGravity(Gravity.CENTER_VERTICAL);
-        deleteAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
 
         detailsAction = new TextView(context);
         detailsAction.setText("Details");
@@ -427,7 +425,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         detailsAction.setTextSize(16);
         detailsAction.setHeight((int)AndroidUtils.px(48));
         detailsAction.setGravity(Gravity.CENTER_VERTICAL);
-        detailsAction.setPadding((int)AndroidUtils.px(24), 0, 0, 0);
 
         parent.addView(copyTextAction);
         parent.addView(deleteAction);
@@ -441,7 +438,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         copyTextAction.setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Message text", text);
+            ClipData clip = ClipData.newPlainText("messageText", text);
             clipboard.setPrimaryClip(clip);
             alertDialog.dismiss();
         });

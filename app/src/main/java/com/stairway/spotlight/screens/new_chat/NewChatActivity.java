@@ -2,10 +2,15 @@ package com.stairway.spotlight.screens.new_chat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -17,9 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -70,6 +75,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Bind(R.id.ll_new_chat)
     LinearLayout newChatLayout;
+
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     private PopupWindow addContactPopupWindow;
     private View addContactPopupView;
@@ -128,13 +135,20 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if((id == android.R.id.home)) {
-            super.onBackPressed();
+            onBackPressed();
             return true;
         } else if(id == R.id.action_add_contact) {
-            showAddContactPopup();
+            final Handler handler = new Handler();
+            AndroidUtils.hideSoftInput(this);
+            handler.postDelayed(() -> showAddContactPopup(), 250);
         } else if(id == R.id.action_search) {
             toolbarSearch.setVisibility(View.VISIBLE);
             AndroidUtils.showSoftInput(this,toolbarSearch);
@@ -153,9 +167,12 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
-        Logger.d(this, "showContactAddedSuccess:"+addContactPopupWindow.isShowing());
-        addContactPopupWindow.dismiss();
+        toolbarSearch.clearFocus();
         AndroidUtils.hideSoftInput(this);
+
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
 
         String message;
         if(isExistingContact)
@@ -195,70 +212,60 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     public void showInvalidIDError() {
-        if(addContactPopupWindow.isShowing()) {
-            ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
-            pb.setVisibility(View.INVISIBLE);
-            showAlertDialog("Please enter a valid iChat ID.");
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
         }
+        showMessageAlertDialog("Please enter a valid iChat ID.");
     }
 
     private void showAddContactPopup() {
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        LinearLayout parent = new LinearLayout(this);
 
-        addContactPopupView = inflater.inflate(R.layout.popup_add_contact,null);
-        addContactPopupWindow = new PopupWindow(
-                addContactPopupView,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                true
-        );
-        if(Build.VERSION.SDK_INT>=21)
-            addContactPopupWindow.setElevation(5.0f);
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(8), (int)AndroidUtils.px(24), 0);
 
-        addContactPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
-        addContactPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
+        EditText editText = new EditText(this);
+        ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        editText.setLayoutParams(lparams);
+        editText.setHint(getResources().getString(R.string.add_contact_hint));
+        editText.setHintTextColor(Color.parseColor("#9E9E9E"));
+        parent.addView(editText);
 
-        FrameLayout outLayout = (FrameLayout) addContactPopupView.findViewById(R.id.fl_add_contact);
-        outLayout.setOnClickListener(v -> {
-            addContactPopupWindow.dismiss();
+        TextView tv = new TextView(this);
+        tv.setText(getResources().getString(R.string.add_contact_subtitle));
+        tv.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        tv.setTextSize(12);
+        parent.addView(tv);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add a contact");
+
+        builder.setPositiveButton("ADD", ((dialog, which) -> {
+//            dialog.dismiss();
+            progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
+            if(editText.getText().length()>=1) {
+                newChatPresenter.addContact(editText.getText().toString(), userSession.getAccessToken());
+            }
+        }));
+        builder.setView(parent);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.setOnDismissListener(dialog -> {
+            toolbarSearch.clearFocus();
             AndroidUtils.hideSoftInput(this);
         });
 
-        EditText enterId = (EditText) addContactPopupView.findViewById(R.id.et_add_contact);
-        enterId.requestFocus();
-        AndroidUtils.showSoftInput(this, enterId);
-
-        Button addButton = (Button) addContactPopupView.findViewById(R.id.btn_add_contact);
-        addButton.setOnClickListener(v -> {
-            if(enterId.getText().length()>0) {
-                ProgressBar pb = (ProgressBar) addContactPopupView.findViewById(R.id.pb_add_contact);
-                pb.setVisibility(View.VISIBLE);
-                newChatPresenter.addContact(enterId.getText().toString(), userSession.getAccessToken());
-            }
-        });
-
-        // popup not working in older versions
-//        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
-//            newChatLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
-//                public void onGlobalLayout(){
-//                    int heightDiff = newChatLayout.getRootView().getHeight()- newChatLayout.getHeight();
-//                    // IF height diff is more then 150, consider keyboard as visible.
-//                    Logger.d(this, "DIFF: "+heightDiff);
-//                    RelativeLayout content = (RelativeLayout) addContactPopupView.findViewById(R.id.rl_add_contact_content);
-//                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)content.getLayoutParams();
-//                    if(heightDiff>150) {
-//                        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -110, getResources().getDisplayMetrics());
-//                        params.setMargins(0, px, 0, 0);
-//                        content.setLayoutParams(params);
-//                    } else {
-//                        params.setMargins(0, 0, 0, 0);
-//                        content.setLayoutParams(params);
-//                    }
-//                }
-//            });
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
-    public void showAlertDialog(String message) {
+    public void showMessageAlertDialog(String message) {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
         //TODO: Something wrong. 16?
         final int WIDTH = 294, HEIGHT = 98;
         int layout = R.layout.alert;

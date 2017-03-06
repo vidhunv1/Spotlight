@@ -9,24 +9,17 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -127,8 +120,10 @@ public class SettingsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if ((id == android.R.id.home)) {
+        if(id == android.R.id.home) {
             super.onBackPressed();
+        } else if(id == R.id.action_logout) {
+            showLogoutPopup();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -178,24 +173,27 @@ public class SettingsActivity extends BaseActivity {
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         parent.setOrientation(LinearLayout.VERTICAL);
-        parent.setPadding((int)AndroidUtils.px(16),(int)AndroidUtils.px(16), (int)AndroidUtils.px(16), 0);
+        parent.setPadding((int)AndroidUtils.px(16),(int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
 
         TextView textView1 = new TextView(this);
         textView1.setText("From camera");
         textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
         textView1.setTextSize(16);
+        textView1.setGravity(Gravity.CENTER_VERTICAL);
         textView1.setHeight((int)AndroidUtils.px(48));
 
         TextView textView2 = new TextView(this);
         textView2.setText("From gallery");
         textView2.setHeight((int)AndroidUtils.px(48));
         textView2.setTextSize(16);
+        textView2.setGravity(Gravity.CENTER_VERTICAL);
         textView2.setTextColor(ContextCompat.getColor(this, R.color.textColor));
 
         TextView textView3 = new TextView(this);
         textView3.setHeight((int)AndroidUtils.px(48));
         textView3.setText("Delete photo");
         textView3.setTextSize(16);
+        textView3.setGravity(Gravity.CENTER_VERTICAL);
         textView3.setTextColor(ContextCompat.getColor(this, R.color.textColor));
 
         parent.addView(textView1);
@@ -213,7 +211,7 @@ public class SettingsActivity extends BaseActivity {
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         parent.setOrientation(LinearLayout.VERTICAL);
-        parent.setPadding((int)AndroidUtils.px(16),(int)AndroidUtils.px(16), (int)AndroidUtils.px(16), 0);
+        parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(18), (int)AndroidUtils.px(24), 0);
 
         TextView textView1 = new TextView(this);
         textView1.setText("We try to respond as quickly as possible, but it may take a while.\n\nPlease take a look at\niChat FAQ: it has answers to most questions and important tips for troubleshooting.");
@@ -231,13 +229,36 @@ public class SettingsActivity extends BaseActivity {
         alertDialog.show();
     }
 
+    public void showLogoutPopup() {
+        LinearLayout parent = new LinearLayout(this);
+
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(18), (int)AndroidUtils.px(24), 0);
+
+        TextView textView1 = new TextView(this);
+        textView1.setText("Are you sure want to log out?");
+        textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView1.setTextSize(16);
+
+        parent.addView(textView1);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.app_name));
+        builder.setPositiveButton("OK", ((dialog, which) -> {}));
+        builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
+        builder.setView(parent);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     @SuppressWarnings("RestrictedApi")
     public void showVibratePopup() {
         int checkedPos = sharedPreferences.getInt(KEY_VIBRATE, 1);
         final AppCompatRadioButton[] rb = new AppCompatRadioButton[5];
         RadioGroup rg = new RadioGroup(this);
         rg.setOrientation(RadioGroup.VERTICAL);
-        rg.setPadding((int)AndroidUtils.px(16),(int)AndroidUtils.px(8),0,0);
+        rg.setPadding((int)AndroidUtils.px(18), (int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
         ColorStateList colorStateList = new ColorStateList(
                 new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
                 new int[]{Color.GRAY, ContextCompat.getColor(this, R.color.colorPrimary)});
@@ -297,46 +318,21 @@ public class SettingsActivity extends BaseActivity {
         final AppCompatRadioButton[] rb = new AppCompatRadioButton[9];
         RadioGroup rg = new RadioGroup(this);
         rg.setOrientation(RadioGroup.VERTICAL);
-        rg.setPadding((int)AndroidUtils.px(16),(int)AndroidUtils.px(8),0,0);
+        rg.setPadding((int)AndroidUtils.px(18),(int)AndroidUtils.px(8),0,0);
 
-        ColorStateList colorStateList[] = new ColorStateList[9];
-        colorStateList[0] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(255,0,0), Color.rgb(255,0,0)});
-        colorStateList[1] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(255,165,0), Color.rgb(255,165,0)});
-        colorStateList[2] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(255,255,0), Color.rgb(255,255,0)});
-        colorStateList[3] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(0,255,0), Color.rgb(0,255,0)});
-        colorStateList[4] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(0,255,255), Color.rgb(0,255,255)});
-        colorStateList[5] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(0,0,255), Color.rgb(0,0,255)});
-        colorStateList[6] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(238,130,238), Color.rgb(238,130,238)});
-        colorStateList[7] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(255, 192, 203), Color.rgb(255, 192, 203)});
-        colorStateList[8] = new ColorStateList(
-                new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
-                new int[]{Color.rgb(245, 245, 245), Color.rgb(245, 245, 245)});
+        int colorsInt[] = {Color.rgb(255,0,0), Color.rgb(255,165,0), Color.rgb(255,255,0), Color.rgb(0,255,0), Color.rgb(0,255,255), Color.rgb(0,0,255), Color.rgb(238,130,238), Color.rgb(255, 192, 203), Color.rgb(245, 245, 245)};
+        String colorsText[] = {"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Violet", "Pink", "White"};
 
-        String colors[] = {"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Violet", "Pink", "White"};
         for(int i=0; i<9; i++){
             rb[i]  = new AppCompatRadioButton(this);
-            rb[i].setText(colors[i]);
+            rb[i].setText(colorsText[i]);
             rb[i].setHeight((int)AndroidUtils.px(48));
             rb[i].setId(i + 100);
             rb[i].setTextSize(16);
             rb[i].setPadding((int)AndroidUtils.px(11),0,0,0);
-            rb[i].setSupportButtonTintList(colorStateList[i]);
+            rb[i].setSupportButtonTintList(new ColorStateList(
+                    new int[][]{ new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked} },
+                    new int[]{colorsInt[i], colorsInt[i]}));
 
             if(i == checkedPos) {
                 rb[i].setChecked(true);
@@ -346,10 +342,12 @@ public class SettingsActivity extends BaseActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Led Color");
         builder.setView(rg);
+
+        builder.setPositiveButton("SET", ((dialog, which) -> {}));
         // hack for positioning button left-right<-->
             builder.setNegativeButton(" ", ((dialog, which) -> {}));
-        builder.setPositiveButton("SET", ((dialog, which) -> {}));
         builder.setNeutralButton("DISABLED", ((dialog, which) -> {}));
+
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -377,7 +375,6 @@ public class SettingsActivity extends BaseActivity {
         if (resultCode == Activity.RESULT_OK && requestCode == 5)
         {
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-
             if (uri != null) {
                 //chosen ringtone
                  Logger.d(this, "Chosen ringtone: "+uri.toString());

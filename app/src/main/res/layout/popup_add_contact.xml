@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_width="328dp"
+        android:layout_width="302dp"
         android:layout_height="188dp"
         android:id="@+id/rl_add_contact_content"
         android:background="@drawable/bg_popup">

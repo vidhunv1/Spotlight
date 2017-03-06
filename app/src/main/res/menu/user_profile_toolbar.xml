@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Block" android:id="@+id/block_contact" />
-    <item android:title="Delete" android:id="@+id/delete_contact" />
-    <item android:title="Add Shortcut" android:id="@+id/add_shortcut" />
+    <item android:title="Block" android:id="@+id/action_block_contact" />
+    <item android:title="Delete" android:id="@+id/action_delete_contact" />
+    <item android:title="Add Shortcut" android:id="@+id/action_add_shortcut" />
 </menu>

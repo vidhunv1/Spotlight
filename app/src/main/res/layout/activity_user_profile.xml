@@ -86,9 +86,10 @@
                 android:layout_width="24dp"
                 android:layout_height="48dp"
                 android:paddingTop="5dp"
-                app:srcCompat="@drawable/ic_contact"/>
+                app:srcCompat="@drawable/ic_account_circle"/>
 
             <LinearLayout
+                android:background="?android:selectableItemBackground"
                 android:id="@+id/profile_first_line"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
@@ -132,6 +133,8 @@
                 app:srcCompat="@drawable/ic_profile_notification"/>
 
             <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/user_profile_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_below="@id/profile_first_line_divider"
@@ -156,6 +159,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/user_profile_shared_media"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_below="@id/profile_second_line"

@@ -75,7 +75,7 @@
             android:name=".screens.user_profile.UserProfileActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
         <activity
             android:name=".screens.search.SearchActivity"
             android:label="SearchActivity" />
@@ -86,6 +86,7 @@
         <activity android:name=".screens.web_view.WebViewActivity" />
 
         <activity android:name=".screens.settings.SettingsActivity" />
+        <activity android:name=".screens.shared_media.SharedMediaActivity" />
     </application>
 
 </manifest>
