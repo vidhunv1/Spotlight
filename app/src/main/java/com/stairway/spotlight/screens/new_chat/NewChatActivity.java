@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -57,7 +59,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 08/01/17.
  */
-
 public class NewChatActivity extends BaseActivity implements NewChatContract.View, NewChatAdapter.ContactClickListener{
     @Bind(R.id.rv_contact_list)
     RecyclerView contactList;
@@ -175,47 +176,61 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         }
 
         String message;
-        if(isExistingContact)
-            message = name+" is already in your contacts on iChat.";
-        else
-            message = name+" is added to your contacts on iChat.";
+        if(isExistingContact) {
+            message = "<b>" + name + "</b> is already in your contacts on iChat.";
+        } else {
+            message = "<b>" + name + "</b> is added to your contacts on iChat.";
+        }
 
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View addedContactView = inflater.inflate(R.layout.popup_contact_added, null);
-        PopupWindow addedPopupWindow = new PopupWindow(
-                addedContactView,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                true
-        );
-        if(Build.VERSION.SDK_INT>=21)
-            addedPopupWindow.setElevation(5.0f);
+        AlertDialog alertDialog = new AlertDialog.Builder(NewChatActivity.this).create();
+        alertDialog.setMessage(Html.fromHtml(message));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
 
-        addedPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
-        addedPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
-
-        RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
-        out.setOnClickListener(view -> addedPopupWindow.dismiss());
-
-        Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
-        sendMessage.setOnClickListener(v1 -> {
-            addedPopupWindow.dismiss();
-            this.navigateToMessageActivity(username);
-        });
-
-        TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
-        resultMessage.setText(message);
-        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
-        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
+//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+//        View addedContactView = inflater.inflate(R.layout.popup_contact_added, null);
+//        PopupWindow addedPopupWindow = new PopupWindow(
+//                addedContactView,
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                true
+//        );
+//        if(Build.VERSION.SDK_INT>=21)
+//            addedPopupWindow.setElevation(5.0f);
+//
+//        addedPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
+//        addedPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
+//
+//        RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
+//        out.setOnClickListener(view -> addedPopupWindow.dismiss());
+//
+//        Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
+//        sendMessage.setOnClickListener(v1 -> {
+//            addedPopupWindow.dismiss();
+//            this.navigateToMessageActivity(username);
+//        });
+//
+//        TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
+//        resultMessage.setText(message);
+//        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
+//        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
         newChatPresenter.initContactList();
     }
 
     @Override
     public void showInvalidIDError() {
+        toolbarSearch.clearFocus();
+        AndroidUtils.hideSoftInput(this);
+
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        showMessageAlertDialog("Please enter a valid iChat ID.");
+//        showMessageAlertDialog("Please enter a valid iChat ID.");
+
+        AlertDialog alertDialog = new AlertDialog.Builder(NewChatActivity.this).create();
+        alertDialog.setMessage("Please enter a valid iChat ID.");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     private void showAddContactPopup() {
@@ -243,8 +258,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         builder.setPositiveButton("ADD", ((dialog, which) -> {
 //            dialog.dismiss();
-            progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
             if(editText.getText().length()>=1) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
+
+                progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
                 newChatPresenter.addContact(editText.getText().toString(), userSession.getAccessToken());
             }
         }));
@@ -253,8 +271,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         alertDialog.show();
 
         alertDialog.setOnDismissListener(dialog -> {
-            toolbarSearch.clearFocus();
-            AndroidUtils.hideSoftInput(this);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
         });
 
         editText.requestFocus();
@@ -262,35 +280,37 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
-    public void showMessageAlertDialog(String message) {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        //TODO: Something wrong. 16?
-        final int WIDTH = 294, HEIGHT = 98;
-        int layout = R.layout.alert;
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(layout, null);
-
-        dialogBuilder.setView(dialogView);
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
-
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH+16, getResources().getDisplayMetrics());
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT+16, getResources().getDisplayMetrics());
-        alertDialog.getWindow().setLayout(width, height);
-
-        TextView messageText = (TextView) dialogView.findViewById(R.id.tv_alert_message);
-        messageText.setText(message);
-        Button ok = (Button) dialogView.findViewById(R.id.btn_alert_ok);
-        ok.setOnClickListener(v -> alertDialog.dismiss());
-    }
+//    public void showMessageAlertDialog(String message) {
+//        if(progressDialog[0].isShowing()) {
+//            progressDialog[0].dismiss();
+//        }
+//        //TODO: Something wrong. 16?
+//        final int WIDTH = 294, HEIGHT = 98;
+//        int layout = R.layout.alert;
+//
+//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        View dialogView = inflater.inflate(layout, null);
+//
+//        dialogBuilder.setView(dialogView);
+//        AlertDialog alertDialog = dialogBuilder.create();
+//        alertDialog.show();
+//
+//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH+16, getResources().getDisplayMetrics());
+//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT+16, getResources().getDisplayMetrics());
+//        alertDialog.getWindow().setLayout(width, height);
+//
+//        TextView messageText = (TextView) dialogView.findViewById(R.id.tv_alert_message);
+//        messageText.setText(message);
+//        Button ok = (Button) dialogView.findViewById(R.id.btn_alert_ok);
+//        ok.setOnClickListener(v -> alertDialog.dismiss());
+//    }
 
     @Override
     public void onContactItemClicked(String userId) {
-        AndroidUtils.hideSoftInput(this);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
+
         this.navigateToMessageActivity(userId);
     }
 

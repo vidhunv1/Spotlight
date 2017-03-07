@@ -170,7 +170,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         DateTime timeNow = DateTime.now();
         DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
         if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
-            return time.toString(timeFormat);
+            return time.toString(timeFormat).toUpperCase().replace(".", "");
         } else if(time.getDayOfMonth() > (timeNow.getDayOfMonth()-7)) {
             return time.dayOfWeek().getAsShortText().toUpperCase();
         } else if(timeNow.getYear() == time.getYear()) {

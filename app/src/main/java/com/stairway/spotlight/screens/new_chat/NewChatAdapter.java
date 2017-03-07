@@ -182,6 +182,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.view_contactItem_divider)
         View divider;
 
+        @Bind(R.id.tv_chatItem_time)
+        TextView time;
+
         ContactsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -217,6 +220,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             status.setText(contactItem.getStatus());
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             contactName.setTag(contactItem.getUserName());
+            time.setText("");
         }
     }
 

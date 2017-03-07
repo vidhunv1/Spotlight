@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/tv_chatItem_time"
                     android:paddingRight="13dp"
-                    android:paddingBottom="0.75dp"
+                    android:text="9:47 P.M."
                     android:textAlignment="viewEnd"
                     android:textSize="13sp"
                     android:textColor="#999999"
