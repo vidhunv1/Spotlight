@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,16 +21,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.stairway.spotlight.MessageController;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.message.MessageActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.search.SearchActivity;
@@ -70,6 +76,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	private List<ChatItem> chats;
 	private ChatListAdapter chatListAdapter;
 
+	private UserSession userSession;
+
 	public static Intent callingIntent(Context context) {
 		return new Intent(context, HomeActivity.class);
 	}
@@ -81,6 +89,21 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		setContentView(R.layout.activity_home);
 		ButterKnife.bind(this);
 
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+		this.presenter = new HomePresenter(MessageController.getInstance());
+		userSession = UserSessionManager.getInstance().load();
+
+		View header = navigationView.getHeaderView(0);
+		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
+		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
+		ImageView profileDp = (ImageView)header.findViewById(R.id.profile_image);
+		profileNameView.setText(userSession.getName());
+		profileIdView.setText("ID: "+userSession.getUserId());
+
+		profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
+
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
 		if (animator instanceof SimpleItemAnimator)
@@ -88,10 +111,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		chatListAdapter = new ChatListAdapter(this, this);
 		chatList.setAdapter(chatListAdapter);
 
-		this.presenter = new HomePresenter(MessageController.getInstance());
-
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 		toggle.setDrawerIndicatorEnabled(false);
@@ -195,20 +214,17 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
 		int id = item.getItemId();
+		final Activity homeActivity = this;
 		switch(id) {
 			case R.id.nav_settings:
-				startActivity(SettingsActivity.callingIntent(this));
-				drawer.closeDrawer(GravityCompat.START, false);
-				overridePendingTransition(R.anim.enter, R.anim.exit);
-				fab.setVisibility(View.INVISIBLE);
+				new Handler().postDelayed(() -> startActivity(SettingsActivity.callingIntent(homeActivity)), 250);
+				drawer.closeDrawer(GravityCompat.START, true);
 				break;
 			case R.id.nav_faq:
 				break;
 			case R.id.nav_contacts:
-				startActivity(NewChatActivity.callingIntent(this, false));
-				drawer.closeDrawer(GravityCompat.START, false);
-				overridePendingTransition(R.anim.enter, R.anim.exit);
-				fab.setVisibility(View.INVISIBLE);
+				new Handler().postDelayed(() -> startActivity(NewChatActivity.callingIntent(homeActivity, false)), 250);
+				drawer.closeDrawer(GravityCompat.START, true);
 				break;
 			case android.R.id.home:
 				onBackPressed();

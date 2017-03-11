@@ -43,7 +43,7 @@
             android:name=".screens.message.MessageActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".screens.register.RegisterActivity"
+            android:name=".screens.register__remove__.RegisterActivity"
             android:label="@string/title_activity_register" />
         <activity
             android:name=".screens.sign_up.SignUpActivity"
@@ -87,6 +87,7 @@
 
         <activity android:name=".screens.settings.SettingsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
+        <activity android:name=".screens.user_id.SetUserIdActivity" />
     </application>
 
 </manifest>

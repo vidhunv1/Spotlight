@@ -2,6 +2,7 @@ package com.stairway.spotlight.api.user;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.stairway.spotlight.api.ErrorResponse;
 
 import java.util.Date;
 
@@ -10,6 +11,8 @@ import java.util.Date;
  */
 
 public class UserResponse {
+    @SerializedName("error")
+    ErrorResponse error;
     @SerializedName("user")
     @Expose
     private _User user;
@@ -25,6 +28,14 @@ public class UserResponse {
     @SerializedName("access_token")
     @Expose
     private String accessToken;
+
+    public ErrorResponse getError() {
+        return error;
+    }
+
+    public boolean isSuccess() {
+        return error==null;
+    }
 
     public _User getUser() {
         return user;

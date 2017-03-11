@@ -1,20 +1,20 @@
 package com.stairway.spotlight.screens.launcher;
 
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 /**
  * Created by vidhun on 21/07/16.
  */
 public class LauncherPresenter implements LauncherContract.Presenter {
     private LauncherContract.View launcherView;
-    private AccessTokenManager accessTokenManager;
+    private UserSessionManager userSessionManager;
 
-    public LauncherPresenter(AccessTokenManager accessTokenManager) {
-        this.accessTokenManager = accessTokenManager;
+    public LauncherPresenter(UserSessionManager userSessionManager) {
+        this.userSessionManager = userSessionManager;
     }
 
     @Override
     public void getUserSession() {
-        if(accessTokenManager.hasAccessToken()) {
+        if(userSessionManager.hasAccessToken()) {
             launcherView.navigateToHomeActivity();
         } else {
             launcherView.navigateToWelcomeActivity();

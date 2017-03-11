@@ -63,9 +63,9 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:maxLines="1"
@@ -73,6 +73,26 @@
                     android:id="@+id/tv_chatItem_message"
                     android:text="message"
                     android:paddingRight="20dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp">
+                    <TextView
+                        android:id="@+id/tv_chatlist_notification"
+                        android:layout_width="23dp"
+                        android:layout_height="23dp"
+                        tools:ignore="MissingPrefix"
+                        android:layout_alignParentRight="true"
+                        android:textAppearance="@style/FontRobotoMedium"
+                        android:layout_marginRight="13.5dp"
+                        android:text="11"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:layout_gravity="center_vertical|right"
+                        android:textSize="11sp"
+                        android:textColor="#ffffff"
+                        android:maxLines="1"
+                        android:background="@drawable/bg_chat_notification" />
+                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

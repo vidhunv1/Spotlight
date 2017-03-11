@@ -17,6 +17,18 @@ public class _User {
         return userType;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setUserTypeRegular() {
         this.userType = UserType.regular;
     }
@@ -30,6 +42,12 @@ public class _User {
     @SerializedName("country_code")
     @Expose
     private String countryCode;
+    @SerializedName("email")
+    @Expose
+    private String email;
+    @SerializedName("password")
+    @Expose
+    private String password;
     @SerializedName("verification_code")
     @Expose
     private String verificationCode;

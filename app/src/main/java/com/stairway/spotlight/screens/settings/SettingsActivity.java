@@ -25,12 +25,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.components.CustomNumberPicker;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
 import butterknife.Bind;
@@ -63,6 +65,12 @@ public class SettingsActivity extends BaseActivity {
     @Bind(R.id.settings_in_app_browser)
     Switch inAppBrowserSwitch;
 
+    @Bind(R.id.tv_user_profile_id)
+    TextView profileIdText;
+
+    @Bind(R.id.title)
+    TextView profileNameText;
+
     static final String PREFS_FILE = "settings";
     static final String KEY_ALERT = "alert";
     static final String KEY_SOUND = "sound";
@@ -78,6 +86,8 @@ public class SettingsActivity extends BaseActivity {
 
     private SharedPreferences sharedPreferences;
 
+    UserSession userSession;
+
     public static Intent callingIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
@@ -88,6 +98,8 @@ public class SettingsActivity extends BaseActivity {
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
 
+        userSession = UserSessionManager.getInstance().load();
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -95,7 +107,9 @@ public class SettingsActivity extends BaseActivity {
         toolbar.setTitle("");
         toolbar.setSubtitle("");
 
-        profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage("Vidhun Vinod", "vidhun", 18));
+        profileNameText.setText(userSession.getName());
+        profileIdText.setText(userSession.getUserId());
+        profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
 
         this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
 

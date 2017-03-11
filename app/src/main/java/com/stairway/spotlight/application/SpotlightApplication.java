@@ -6,9 +6,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.facebook.stetho.Stetho;
-import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.ForegroundDetector;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.XMPPManager;
@@ -16,14 +14,12 @@ import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
-import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.core.EventBus;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.db.core.DatabaseManager;
-import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.models.UserSession;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -48,8 +44,9 @@ public class SpotlightApplication extends Application implements ForegroundDetec
         super.onCreate();
 
         instance = this;
+
         DatabaseManager.init(this);
-        AccessTokenManager.init();
+        UserSessionManager.init();
 
         if(com.stairway.spotlight.BuildConfig.DEBUG) {
             // Initialize facebook Stetho
@@ -63,18 +60,18 @@ public class SpotlightApplication extends Application implements ForegroundDetec
         }
         initSession();
 
+        new ForegroundDetector(this);
         ForegroundDetector.getInstance().addListener(this);
     }
 
     public void initSession() {
-        Logger.d(this, "initUserSession");
-        if(AccessTokenManager.getInstance().hasAccessToken()) {
-            AccessToken accessToken = AccessTokenManager.getInstance().load();
-            XMPPManager.init(accessToken.getUserName(), accessToken.getAccessToken());
-            ApiManager.getInstance().setAuthorization(accessToken.getAccessToken());
+        if(UserSessionManager.getInstance().hasAccessToken()) {
+            Logger.d(this, "initUserSession");
+            UserSession userSession = UserSessionManager.getInstance().load();
+            XMPPManager.init(userSession.getUserName(), userSession.getPassword());
+            ApiManager.getInstance().setAuthorization(userSession.getAccessToken());
             MessageController.init(XMPPManager.getInstance().getConnection(), MessageStore.getInstance(), ContactStore.getInstance());
             JodaTimeAndroid.init(this);
-            new ForegroundDetector(this);
 
             checkUploadFCMToken();
         }
@@ -91,8 +88,8 @@ public class SpotlightApplication extends Application implements ForegroundDetec
             updateUser.setNotificationToken(pushString);
             UserRequest userRequest = new UserRequest();
             userRequest.setUser(updateUser);
-            Logger.d(this, "Access token:"+AccessTokenManager.getInstance().load().getAccessToken());
-            ApiManager.getInstance().setAuthorization(AccessTokenManager.getInstance().load().getAccessToken());
+            Logger.d(this, "Access token:"+ UserSessionManager.getInstance().load().getAccessToken());
+            ApiManager.getInstance().setAuthorization(UserSessionManager.getInstance().load().getAccessToken());
             ApiManager.getUserApi().updateUser(userRequest)
                     .subscribe(new Subscriber<UserResponse>() {
                         @Override
@@ -113,15 +110,19 @@ public class SpotlightApplication extends Application implements ForegroundDetec
 
     @Override
     public void onBecameForeground() {
-        Logger.d(this, "Starting MessageService");
-        Intent intent = new Intent(this, MessageService.class);
-        intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
-        startService(intent);
+        if(UserSessionManager.getInstance().hasAccessToken()) {
+            Logger.d(this, "Starting MessageService");
+            Intent intent = new Intent(this, MessageService.class);
+            intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
+            startService(intent);
+        }
     }
 
     @Override
     public void onBecameBackground() {
-        Logger.d(this, "Stopping MessageService");
-        stopService(new Intent(this, MessageService.class));
+        if(UserSessionManager.getInstance().hasAccessToken()) {
+            Logger.d(this, "Stopping MessageService");
+            stopService(new Intent(this, MessageService.class));
+        }
     }
 }

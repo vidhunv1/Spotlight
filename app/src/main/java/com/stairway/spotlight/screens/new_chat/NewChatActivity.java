@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -17,30 +15,22 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
-import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.lib.AndroidUtils;
@@ -81,7 +71,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     private PopupWindow addContactPopupWindow;
     private View addContactPopupView;
-    private AccessToken userSession;
+    private UserSession userSession;
     private boolean showSoftInput;
 
     NewChatPresenter newChatPresenter;
@@ -112,7 +102,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         newChatAdapter = new NewChatAdapter(this, this);
         contactList.setAdapter(newChatAdapter);
 
-        userSession = AccessTokenManager.getInstance().load();
+        userSession = UserSessionManager.getInstance().load();
         newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
         Intent receivedIntent = getIntent();

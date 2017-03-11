@@ -14,19 +14,17 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
-import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
-import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.screens.home.ChatListAdapter;
 import com.stairway.spotlight.screens.home.ChatItem;
-import com.stairway.spotlight.screens.home.HomeActivity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -49,7 +47,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     private EditText searchQuery;
 
-    private AccessToken userSession;
+    private UserSession userSession;
     private SearchAdapter searchAdapter;
     private boolean isAdapterSet = false;
     private static final String KEY_CHATS = "CHATS";
@@ -68,7 +66,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
 
-        userSession = AccessTokenManager.getInstance().load();
+        userSession = UserSessionManager.getInstance().load();
         ContactStore contactStore = new ContactStore();
         MessageStore messageStore = new MessageStore();
         UserApi userApi = ApiManager.getUserApi();

@@ -48,6 +48,7 @@ public class ApiManager {
     }
 
     public void setAuthorization(String authToken) {
+        Logger.d(this, "Setting auth: "+authToken);
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
@@ -63,6 +64,11 @@ public class ApiManager {
                 .addCallAdapterFactory(rxAdapter)
                 .client(httpClient.build())
                 .build();
+
+        //TODO: Ugly. Need to do after access token is available.
+        getInstance().contactsApi = null;
+        getInstance().userApi = null;
+        getInstance().botApi = null;
     }
 
     public static ContactsApi getContactsApi() {

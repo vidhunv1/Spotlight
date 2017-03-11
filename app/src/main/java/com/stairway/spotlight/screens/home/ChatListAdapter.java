@@ -30,7 +30,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<ChatItem> chatList;
     private List<ChatItem> temp;
     private ChatClickListener chatClickListener;
-    private final int VIEW_WITH_NOTIFICATION=0, VIEW_WITHOUT_NOTIFICATION=1;
+    private final int VIEW_CHAT = 0;
 
     public ChatListAdapter(Context context, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
@@ -110,11 +110,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if(chatList.get(position).getNotificationCount()==0) {
-            return VIEW_WITHOUT_NOTIFICATION;
-        } else {
-            return VIEW_WITH_NOTIFICATION;
-        }
+        return VIEW_CHAT;
     }
 
     @Override
@@ -128,13 +124,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
-            case VIEW_WITH_NOTIFICATION:
-                View notificationView = inflater.inflate(R.layout.item_chat_notification, parent, false);
-                viewHolder = new NotificationViewHolder(notificationView);
-                break;
-            case VIEW_WITHOUT_NOTIFICATION:
+            case VIEW_CHAT:
                 View withoutNotificationView = inflater.inflate(R.layout.item_chat, parent, false);
-                viewHolder = new WithoutNotificationViewHolder(withoutNotificationView);
+                viewHolder = new ChatItemViewHolder(withoutNotificationView);
                 break;
             default:
                 return null;
@@ -145,20 +137,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
-            case VIEW_WITH_NOTIFICATION:
-                NotificationViewHolder notificationViewHolder = (NotificationViewHolder) holder;
+            case VIEW_CHAT:
+                ChatItemViewHolder chatItemViewHolder = (ChatItemViewHolder) holder;
                 if(position < (chatList.size()-1)) {
-                    notificationViewHolder.renderItem(chatList.get(position), true);
+                    chatItemViewHolder.renderItem(chatList.get(position), true);
                 } else {
-                    notificationViewHolder.renderItem(chatList.get(position), false);
-                }
-                break;
-            case VIEW_WITHOUT_NOTIFICATION:
-                WithoutNotificationViewHolder withoutNotificationViewHolder = (WithoutNotificationViewHolder) holder;
-                if(position < (chatList.size()-1)) {
-                    withoutNotificationViewHolder.renderItem(chatList.get(position), true);
-                } else {
-                    withoutNotificationViewHolder.renderItem(chatList.get(position), false);
+                    chatItemViewHolder.renderItem(chatList.get(position), false);
                 }
                 break;
             default:
@@ -180,78 +164,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class NotificationViewHolder extends RecyclerView.ViewHolder {
-
-        @Bind(R.id.ll_item_chat_notification)
-        LinearLayout chatListContent;
-
-        @Bind(R.id.iv_chatItem_profileImage)
-        ImageView profileImage;
-
-        @Bind(R.id.tv_chatItem_contactName)
-        TextView contactName;
-
-        @Bind(R.id.tv_chatItem_message)
-        TextView lastMessage;
-
-        @Bind(R.id.tv_chatItem_time)
-        TextView time;
-
-        @Bind(R.id.tv_chatlist_notification)
-        TextView notificationCount;
-
-        @Bind(R.id.view_contactItem_divider)
-        View dividerLine;
-
-        public NotificationViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-
-            chatListContent.setOnClickListener(view -> {
-                if(chatClickListener != null)
-                    chatClickListener.onChatItemClicked(contactName.getTag().toString());
-            });
-
-            chatListContent.setOnLongClickListener(v -> {
-                if(chatClickListener != null)
-                    chatClickListener.onChatItemLongClicked(contactName.getTag().toString());
-                return true;
-            });
-        }
-
-        public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
-            contactName.setText(chatListItem.getChatName());
-
-            if(isLineVisible) {
-                dividerLine.setVisibility(View.VISIBLE);
-            } else {
-                dividerLine.setVisibility(View.GONE);
-            }
-
-            try {
-                Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
-
-                if(message.getMessageType() == Message.MessageType.generic_template) {
-                    lastMessage.setText(message.getGenericTemplate().getTitle());
-                } else if(message.getMessageType() == Message.MessageType.button_template) {
-                    lastMessage.setText(message.getButtonTemplate().getText());
-                } else if(message.getMessageType() == Message.MessageType.text) {
-                    lastMessage.setText(message.getText());
-                }
-            } catch(JsonSyntaxException e) {
-                lastMessage.setText(chatListItem.getLastMessage());
-            }
-
-            time.setText(getFormattedTime(chatListItem.getTime()));
-            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
-            notificationCount.setText(Integer.toString(chatListItem.getNotificationCount()));
-
-            // Set userId to pass through onClick.
-            contactName.setTag(chatListItem.getChatId());
-        }
-    }
-
-    public class WithoutNotificationViewHolder extends RecyclerView.ViewHolder {
+    public class ChatItemViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
@@ -271,7 +184,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.view_contactItem_divider)
         View dividerLine;
 
-        public WithoutNotificationViewHolder(View itemView) {
+        @Bind(R.id.tv_chatlist_notification)
+        TextView notification;
+
+        public ChatItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -288,6 +204,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
+            if(chatListItem.getNotificationCount()==0) {
+                notification.setVisibility(View.GONE);
+            } else {
+                notification.setVisibility(View.VISIBLE);
+                notification.setText(chatListItem.getNotificationCount()+"");
+            }
+
             contactName.setText(chatListItem.getChatName());
 
             if(isLineVisible) {

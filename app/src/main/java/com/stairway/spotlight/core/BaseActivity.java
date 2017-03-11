@@ -12,11 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.core.lib.AndroidUtils;
-import com.stairway.spotlight.models.AccessToken;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smack.packet.Presence;
@@ -34,8 +34,8 @@ public class BaseActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AccessToken accessToken = AccessTokenManager.getInstance().load();
-        if(accessToken==null)
+        UserSession userSession = UserSessionManager.getInstance().load();
+        if(userSession ==null)
             throw new IllegalStateException("Base activity should be only initialized on user session");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

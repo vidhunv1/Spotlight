@@ -16,10 +16,10 @@ import rx.Observable;
 
 public interface UserApi {
     @POST("users")
-    Observable<StatusResponse> createUser(@Body UserRequest userRequest);
+    Observable<UserResponse> createUser(@Body UserRequest userRequest);
 
-    @POST("users/verify")
-    Observable<UserResponse> verifyUser(@Body UserRequest userRequest);
+//    @POST("users/verify")
+//    Observable<UserResponse> verifyUser(@Body UserRequest userRequest);
 
     @PUT("users")
     Observable<UserResponse> updateUser(@Body UserRequest userRequest);

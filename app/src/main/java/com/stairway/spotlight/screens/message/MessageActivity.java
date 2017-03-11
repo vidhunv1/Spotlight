@@ -1,8 +1,10 @@
 package com.stairway.spotlight.screens.message;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.stairway.spotlight.AccessTokenManager;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.bot.PersistentMenu;
@@ -116,7 +118,7 @@ public class MessageActivity extends BaseActivity
         title.setText(chatContactName);
 
         currentChatState = ChatState.inactive;
-        currentUser = AccessTokenManager.getInstance().load().getUserName();
+        currentUser = UserSessionManager.getInstance().load().getUserName();
 
         linearLayoutManager = new WrapContentLinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
@@ -459,9 +461,9 @@ public class MessageActivity extends BaseActivity
     public void onChatStateReceived(String from, ChatState chatState) {
         super.onChatStateReceived(from, chatState);
         if(from.equals(chatUserName)) {
-            if(chatState == ChatState.composing)
+            if(chatState == ChatState.composing) {
                 presenceView.setText("Typing...");
-            else {
+            } else {
                 updatePresence(presence);
             }
         }

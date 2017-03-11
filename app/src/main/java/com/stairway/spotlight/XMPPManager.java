@@ -17,10 +17,9 @@ import java.io.Serializable;
 public class XMPPManager implements Serializable {
     private static XMPPManager instance;
     private String userName;
-    private String password = "spotlight";
     private XMPPTCPConnection connection = null;
 
-    public XMPPManager(String userName, String pass) {
+    public XMPPManager(String userName, String password) {
         XMPPTCPConnectionConfiguration.Builder config;
         this.userName = userName;
 

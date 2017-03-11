@@ -1,6 +1,7 @@
 package com.stairway.spotlight.api.bot;
 
 import com.google.gson.annotations.SerializedName;
+import com.stairway.spotlight.api.ErrorResponse;
 
 import java.util.List;
 
@@ -12,13 +13,13 @@ public class BotResponse {
     @SerializedName("data")
     Data data;
     @SerializedName("error")
-    Error error;
+    ErrorResponse error;
 
     public Data getData() {
         return data;
     }
 
-    public Error getError() {
+    public ErrorResponse getError() {
         return error;
     }
 
@@ -70,21 +71,6 @@ public class BotResponse {
                     "username='" + username + '\'' +
                     ", userId='" + userId + '\'' +
                     ", persistentMenus=" + menusString +
-                    '}';
-        }
-    }
-
-    public class Error {
-        @SerializedName("code")
-        private String code;
-        @SerializedName("message")
-        private String message;
-
-        @Override
-        public String toString() {
-            return "Error{" +
-                    "code='" + code + '\'' +
-                    ", message='" + message + '\'' +
                     '}';
         }
     }

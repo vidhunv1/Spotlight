@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.stairway.spotlight.R;
-import com.stairway.spotlight.screens.register.RegisterActivity;
+
 import com.stairway.spotlight.screens.sign_up.SignUpActivity;
 
 import butterknife.ButterKnife;
@@ -27,6 +27,6 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
 
     @OnClick(R.id.btn_welcome_signup)
     public void signUpClicked() {
-        startActivity(RegisterActivity.callingIntent(this));
+        startActivity(SignUpActivity.callingIntent(this));
     }
 }

@@ -36,6 +36,10 @@
     <item name="android:textStyle">bold</item>
 </style>
 
+<style name="EditTextStyle" parent="@android:style/Widget.EditText">
+    <item name="colorControlNormal">#c9c9c9</item>
+</style>
+
 <style name="AlertDialogMessage">
     <item name="android:textColor">#212121</item>
 </style>

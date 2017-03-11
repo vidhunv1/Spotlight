@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.new_chat;
 
+import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.bot.BotApi;
 import com.stairway.spotlight.api.bot.BotResponse;
@@ -10,6 +11,10 @@ import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.models.ContactResult;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.Roster;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +125,30 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                     @Override
                                     public void onNext(ContactResult contactResult) {
                                         Logger.d(this, contactResult.toString());
+
+                                        Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
+                                        if (!roster.isLoaded())
+                                            try {
+                                                roster.reloadAndWait();
+                                            } catch (SmackException.NotLoggedInException e) {
+                                                e.printStackTrace();
+                                            } catch (SmackException.NotConnectedException e) {
+                                                e.printStackTrace();
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        try {
+                                            roster.createEntry(XMPPManager.getJidFromUserName(contactResult.getUsername()), contactResult.getContactName(), null);
+                                        } catch (SmackException.NotLoggedInException e) {
+                                            e.printStackTrace();
+                                        } catch (SmackException.NoResponseException e) {
+                                            e.printStackTrace();
+                                        } catch (XMPPException.XMPPErrorException e) {
+                                            e.printStackTrace();
+                                        } catch (SmackException.NotConnectedException e) {
+                                            e.printStackTrace();
+                                        }
+
                                         contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                             @Override
                                             public void onCompleted() {}

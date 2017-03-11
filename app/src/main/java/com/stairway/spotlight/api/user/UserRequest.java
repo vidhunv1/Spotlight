@@ -12,11 +12,8 @@ public class UserRequest {
     @Expose
     private _User user;
 
-    public UserRequest(String countryCode, String mobile) {
-        this.user = new _User(countryCode, mobile);
-    }
-
     public UserRequest(){
+        this.user = new _User();
     }
 
     public _User getUser() {
