@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -28,6 +30,7 @@ import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 
 public class SignUpActivity extends AppCompatActivity implements SignUpContract.View{
@@ -64,9 +67,24 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.sign_up_btn)
     Button signupButton;
 
+    @Bind(R.id.sign_up_name_divider)
+    View nameDivider;
+
+    @Bind(R.id.sign_up_email_divider)
+    View emailDivider;
+
+    @Bind(R.id.sign_up_password_divider)
+    View passwordDivider;
+
+    @Bind(R.id.sign_up_mobile_divider)
+    View mobileDivider;
+
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     SignUpPresenter signUpPresenter;
+
+    private String dividerColor = "#c9c9c9";
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -114,94 +132,58 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @OnTextChanged(R.id.sign_up_email)
     public void onEmailTextChanged() {
         changeSignUpButton();
-//        if(isEmailValid(emailET.getText())) {
-//            emailTIL.setErrorEnabled(false);
-//            emailTIL.setError(null);
-//        }
     }
-//
-//    @OnFocusChange(R.id.sign_up_email)
-//    public void onEmailFocusChanged() {
-//        if(emailET.isFocused()) {
-//        } else {
-//            if (!isEmailValid(emailET.getText()) && emailET.getText().length()>0) {
-//                emailTIL.setErrorEnabled(true);
-//                emailTIL.setError("Please enter a valid email.");
-//            } else {
-//                emailTIL.setError(null);
-//                emailTIL.setErrorEnabled(false);
-//            }
-//        }
-//    }
-//
+
+    @OnFocusChange(R.id.sign_up_email)
+    public void onEmailFocusChanged() {
+        if(emailET.isFocused()) {
+            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else {
+            emailDivider.setBackgroundColor(Color.parseColor(dividerColor));
+        }
+    }
+
     @OnTextChanged(R.id.sign_up_password)
     public void onPasswordTextChanged() {
         changeSignUpButton();
-//        if(isPasswordValid(passwordET.getText())) {
-//            passwordTIL.setErrorEnabled(false);
-//            passwordTIL.setError(null);
-//        }
     }
-//
-//    @OnFocusChange(R.id.sign_up_password)
-//    public void onPasswordFocuChanged() {
-//        if(passwordET.isFocused()) {
-//        } else {
-//            if(!isPasswordValid(passwordET.getText()) && passwordET.getText().length()>0) {
-//                passwordTIL.setErrorEnabled(true);
-//                passwordTIL.setError("Minimum 5 characters required.");
-//            } else {
-//                passwordTIL.setError(null);
-//                passwordTIL.setErrorEnabled(false);
-//            }
-//        }
-//    }
-//
+
+    @OnFocusChange(R.id.sign_up_password)
+    public void onPasswordFocuChanged() {
+        if(passwordET.isFocused()) {
+            passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else {
+            passwordDivider.setBackgroundColor(Color.parseColor(dividerColor));
+        }
+    }
+
     @OnTextChanged(R.id.sign_up_name)
     public void onNameTextChanged() {
         changeSignUpButton();
-//        if(isNameValid(nameET.getText())) {
-//            nameTIL.setErrorEnabled(false);
-//            nameTIL.setError(null);
-//        }
     }
-//
-//    @OnFocusChange(R.id.sign_up_name)
-//    public void onNameFocusChanged() {
-//        if(nameET.isFocused()) {
-//        } else {
-//            if(!isNameValid(nameET.getText()) && nameET.getText().length()>0) {
-//                nameTIL.setErrorEnabled(true);
-//                nameTIL.setError("Please enter your full name.");
-//            } else {
-//                nameTIL.setError(null);
-//                nameTIL.setErrorEnabled(false);
-//            }
-//        }
-//    }
-//
+
+    @OnFocusChange(R.id.sign_up_name)
+    public void onNameFocusChanged() {
+        if(nameET.isFocused()) {
+            nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else {
+            nameDivider.setBackgroundColor(Color.parseColor(dividerColor));
+        }
+    }
+
     @OnTextChanged(R.id.sign_up_mobile_number)
     public void onMobileTextChanged() {
         changeSignUpButton();
-//        if(isMobileNumberValid(mobileNumberET.getText())) {
-//            mobileTIL.setErrorEnabled(false);
-//            mobileTIL.setError(null);
-//        }
     }
-//
-//    @OnFocusChange(R.id.sign_up_tilMobile)
-//    public void onMobileFocusChanged() {
-//        if(mobileNumberET.isFocused()) {
-//        } else {
-//            if(!isMobileNumberValid(mobileNumberET.getText()) && mobileNumberET.getText().length()>0) {
-//                mobileTIL.setErrorEnabled(true);
-//                mobileTIL.setError("Please enter a valid mobile number.");
-//            } else {
-//                mobileTIL.setError(null);
-//                mobileTIL.setErrorEnabled(false);
-//            }
-//        }
-//    }
+
+    @OnFocusChange(R.id.sign_up_mobile_number)
+    public void onMobileFocusChanged() {
+        if(mobileNumberET.isFocused()) {
+            mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else {
+            mobileDivider.setBackgroundColor(Color.parseColor(dividerColor));
+        }
+    }
 
     @OnClick(R.id.sign_up_btn)
     public void onSignUpClicked() {

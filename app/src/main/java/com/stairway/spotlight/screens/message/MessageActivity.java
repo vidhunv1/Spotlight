@@ -35,6 +35,7 @@ import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.emoji.EmojiViewHelper;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
@@ -447,7 +448,7 @@ public class MessageActivity extends BaseActivity
 //    }
 
     @Override
-    public void onMessageReceived(MessageResult messageResult) {
+    public void onMessageReceived(MessageResult messageResult, ContactResult contactResult) {
         if(messageResult.getChatId().equals(chatUserName)) {
             messagesAdapter.addMessage(messageResult);
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);

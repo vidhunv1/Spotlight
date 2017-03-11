@@ -96,7 +96,7 @@
             android:layout_height="17dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="30dp"
-            app:srcCompat="@drawable/ic_wallet" />
+            />
 
         <TextView
             android:id="@+id/textView33"
@@ -124,8 +124,7 @@
             android:layout_width="17dp"
             android:layout_height="17dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="30dp"
-            app:srcCompat="@drawable/ic_account_settings" />
+            android:layout_marginLeft="30dp" />
 
         <TextView
             android:id="@+id/textView36"
@@ -155,7 +154,7 @@
             android:layout_height="17dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="30dp"
-            app:srcCompat="@drawable/ic_help_faq_icon" />
+            />
 
         <TextView
             android:id="@+id/textView37"

@@ -69,7 +69,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                         List<NewChatItemModel> newChatItemModels = new ArrayList<NewChatItemModel>(contactsResults.size());
                         for(ContactResult contactsResult: contactsResults) {
                             NewChatItemModel newChatItemModel = new NewChatItemModel(
-                                    contactsResult.getDisplayName(),
+                                    contactsResult.getContactName(),
                                     contactsResult.getUsername(),
                                     contactsResult.getUserId());
 
@@ -92,9 +92,9 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                 .subscribeOn(Schedulers.io())
                 .subscribe(contact -> {
                     if(contact!=null) {
-                        contactsView.showContactAddedSuccess(contact.getDisplayName(), contact.getUsername(), true);
+                        contactsView.showContactAddedSuccess(contact.getContactName(), contact.getUsername(), true);
                     } else {
-                        userApi.findUser(userId)
+                        userApi.findUserByUserId(userId)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
                                 .map(userResponse -> {
@@ -104,6 +104,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                     contactResult.setDisplayName(userResponse.getUser().getName());
                                     contactResult.setUserType(userResponse.getUser().getUserType());
                                     contactResult.setAdded(true);
+                                    contactResult.setBlocked(false);
 
                                     return contactResult;
                                 })
@@ -130,22 +131,12 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         if (!roster.isLoaded())
                                             try {
                                                 roster.reloadAndWait();
-                                            } catch (SmackException.NotLoggedInException e) {
-                                                e.printStackTrace();
-                                            } catch (SmackException.NotConnectedException e) {
-                                                e.printStackTrace();
-                                            } catch (InterruptedException e) {
+                                            } catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
                                                 e.printStackTrace();
                                             }
                                         try {
                                             roster.createEntry(XMPPManager.getJidFromUserName(contactResult.getUsername()), contactResult.getContactName(), null);
-                                        } catch (SmackException.NotLoggedInException e) {
-                                            e.printStackTrace();
-                                        } catch (SmackException.NoResponseException e) {
-                                            e.printStackTrace();
-                                        } catch (XMPPException.XMPPErrorException e) {
-                                            e.printStackTrace();
-                                        } catch (SmackException.NotConnectedException e) {
+                                        } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
                                             e.printStackTrace();
                                         }
 
@@ -159,7 +150,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                             @Override
                                             public void onNext(Boolean b) {
                                                 if(contactResult.getUserType()== _User.UserType.regular) {
-                                                    contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                    contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
                                                 } else if(contactResult.getUserType() == _User.UserType.official){
                                                     botApi.getBotDetails(contactResult.getUsername())
                                                             .subscribeOn(Schedulers.io())
@@ -191,12 +182,12 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
                                                                                     @Override
                                                                                     public void onError(Throwable e) {
-                                                                                        contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                                                        contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
                                                                                     }
 
                                                                                     @Override
                                                                                     public void onNext(Boolean aBoolean) {
-                                                                                        contactsView.showContactAddedSuccess(contactResult.getDisplayName(), contactResult.getUsername(), false);
+                                                                                        contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
                                                                                     }
                                                                                 });
                                                                     } else {

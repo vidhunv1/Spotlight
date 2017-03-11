@@ -86,7 +86,7 @@
                 android:layout_width="24dp"
                 android:layout_height="48dp"
                 android:paddingTop="5dp"
-                app:srcCompat="@drawable/ic_account_circle"/>
+                app:srcCompat="@drawable/ic_info_dark"/>
 
             <LinearLayout
                 android:background="?android:selectableItemBackground"
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:text="airtel"
                     android:textSize="16sp"
-                    android:textColor="#212121"
+                    android:textColor="@color/textColor"
                     android:id="@+id/tv_user_profile_id"
                     android:paddingLeft="55dp"/>
 
@@ -146,6 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="Notifications"
+                    android:textColor="@color/textColor"
                     android:textSize="16sp"
                     android:gravity="center_vertical" />
 
@@ -171,6 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="Shared Media"
+                    android:textColor="@color/textColor"
                     android:textSize="16sp"
                     android:gravity="center_vertical" />
 

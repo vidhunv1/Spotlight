@@ -13,9 +13,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.sm.StreamManagementException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -77,7 +74,7 @@ public class MessageController {
                                 public void onNext(ContactResult contactResult) {
                                     String name;
                                     if (contactResult != null)
-                                        name = contactResult.getDisplayName();
+                                        name = contactResult.getContactName();
                                     else {
                                         //TODO: get user details from server
                                         name = messageResult.getChatId();

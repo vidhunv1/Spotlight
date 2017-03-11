@@ -13,6 +13,7 @@ public class ContactResult implements Serializable {
     private String contactName;
     private String username;
     private boolean isAdded;
+    private boolean isBlocked;
     private String userId;
     private _User.UserType userType;
 
@@ -24,6 +25,14 @@ public class ContactResult implements Serializable {
     }
 
     public ContactResult() {
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 
     public String getUserId() {
@@ -76,10 +85,6 @@ public class ContactResult implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getDisplayName() {
-        return contactName;
     }
 
 

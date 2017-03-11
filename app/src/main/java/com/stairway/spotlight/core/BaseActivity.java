@@ -16,6 +16,7 @@ import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.models.MessageResult;
 
@@ -51,7 +52,8 @@ public class BaseActivity extends AppCompatActivity{
             public void onReceive(Context context, Intent intent) {
                 if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_MSG)) {
                     MessageResult s = (MessageResult) intent.getSerializableExtra(MessageService.XMPP_RESULT_MESSAGE);
-                    onMessageReceived(s);
+                    ContactResult from = (ContactResult) intent.getSerializableExtra(MessageService.XMPP_RESULT_CONTACT);
+                    onMessageReceived(s, from);
                 } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_STATE)) {
                     String from = intent.getStringExtra(MessageService.XMPP_RESULT_FROM);
                     ChatState chatState = (ChatState) intent.getSerializableExtra(MessageService.XMPP_RESULT_STATE);
@@ -106,7 +108,7 @@ public class BaseActivity extends AppCompatActivity{
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    public void onMessageReceived(MessageResult messageId){
+    public void onMessageReceived(MessageResult messageId, ContactResult from) {
         Logger.d(this, "MessageId "+messageId);
         NotificationController.getInstance().showNotification(true);
     }

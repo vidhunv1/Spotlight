@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.Message;
 
@@ -51,7 +52,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 chatItem.setNotificationCount(chatItem.getNotificationCount() + chatList.get(i).getNotificationCount());
                 chatItem.setChatName(chatList.get(i).getChatName());
 
-                if(i==0){
+                if(i==0) {
                     chatList.set(0, chatItem);
                     notifyItemChanged(0);
                 } else {
@@ -65,7 +66,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
         if(i==chatList.size()) {
             chatList.add(0, chatItem);
-            notifyItemChanged(0);
+            notifyItemInserted(0);
         }
     }
 

@@ -4,11 +4,18 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.ReadReceiptExtension;
+import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.packet.ExtensionElement;
@@ -37,6 +44,7 @@ public class MessageService extends Service {
     public static String TAG_ACTIVITY_NAME = "activity_name";
 
     static final public String XMPP_ACTION_RCV_MSG = "com.stairway.spotlight.MessageService.MESSAGE_RECEIVED";
+    static final public String XMPP_RESULT_CONTACT = "com.stairway.spotlight.MessageService.XMPP_CONTACT";
     static final public String XMPP_RESULT_MESSAGE = "com.stairway.spotlight.MessageService.XMPP_MSG";
 
     static final public String XMPP_ACTION_RCV_STATE = "com.stairway.spotlight.MessageService.CHAT_STATE_RECEIVED";
@@ -62,7 +70,9 @@ public class MessageService extends Service {
     private Timer mTimer = null;
 
     private MessageStore messageStore;
+    private ContactStore contactStore;
     private MessageController messageApi;
+    private UserApi userApi;
     private XMPPTCPConnection connection;
 
     private ChatManagerListener chatListener;
@@ -82,7 +92,9 @@ public class MessageService extends Service {
         super.onCreate();
         Logger.d(this, "onCreate");
         messageStore = MessageStore.getInstance();
+        contactStore = ContactStore.getInstance();
         messageApi = MessageController.getInstance();
+        userApi = ApiManager.getUserApi();
         connection = XMPPManager.getInstance().getConnection();
         broadcaster = LocalBroadcastManager.getInstance(this);
 
@@ -103,7 +115,6 @@ public class MessageService extends Service {
         this.presenceStateListener = new RosterListener() {
             @Override
             public void entriesAdded(Collection<String> addresses) {
-
             }
 
             @Override
@@ -134,16 +145,68 @@ public class MessageService extends Service {
                     MessageResult receivedMessage = new MessageResult(participant, participant, messageBody);
                     receivedMessage.setReceiptId(message.getStanzaId());
                     receivedMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
-                    messageStore.storeMessage(receivedMessage).subscribe(new Subscriber<MessageResult>() {
+
+                    contactStore.getContactByUserName(receivedMessage.getChatId()).subscribe(new Subscriber<ContactResult>() {
                         @Override
                         public void onCompleted() {}
+
                         @Override
                         public void onError(Throwable e) {}
 
                         @Override
-                        public void onNext(MessageResult messageResult) {
-                            if(messageResult!=null)
-                                broadcastReceivedMessage(receivedMessage);
+                        public void onNext(ContactResult contactResult) {
+                            if(contactResult == null) {
+                                userApi.findUserByUserName(receivedMessage.getChatId()).subscribe(new Subscriber<UserResponse>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(UserResponse userResponse) {
+                                        ContactResult contactResult1 = new ContactResult();
+                                        contactResult1.setUserId(userResponse.getUser().getUserId());
+                                        contactResult1.setContactName(userResponse.getUser().getName());
+                                        contactResult1.setUsername(userResponse.getUser().getUsername());
+                                        contactResult1.setAdded(false);
+                                        contactResult1.setBlocked(false);
+
+                                        Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
+                                        if (!roster.isLoaded())
+                                            try {
+                                                roster.reloadAndWait();
+                                            } catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        try {
+                                            roster.createEntry(XMPPManager.getJidFromUserName(contactResult1.getUsername()), contactResult1.getContactName(), null);
+                                        } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        contactStore.storeContact(contactResult1)
+                                                .subscribe(new Subscriber<Boolean>() {
+                                                    @Override
+                                                    public void onCompleted() {}
+
+                                                    @Override
+                                                    public void onError(Throwable e) {}
+
+                                                    @Override
+                                                    public void onNext(Boolean aBoolean) {
+                                                        storeAndbroadcastReceivedMessage(receivedMessage, contactResult1);
+                                                    }
+                                                });
+                                    }
+                                });
+                            } else {
+                                if(contactResult.isBlocked()) {
+                                    // do nothing
+                                } else {
+                                    storeAndbroadcastReceivedMessage(receivedMessage, contactResult);
+                                }
+                            }
                         }
                     });
                 } else{
@@ -297,11 +360,23 @@ public class MessageService extends Service {
                 });
     }
 
-    private void broadcastReceivedMessage(MessageResult messageId) {
-        Intent intent = new Intent(XMPP_ACTION_RCV_MSG);
-        if(messageId != null)
-            intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
-        broadcaster.sendBroadcast(intent);
+    private void storeAndbroadcastReceivedMessage(MessageResult messageId, ContactResult from) {
+        messageStore.storeMessage(messageId).subscribe(new Subscriber<MessageResult>() {
+            @Override
+            public void onCompleted() {}
+            @Override
+            public void onError(Throwable e) {}
+
+            @Override
+            public void onNext(MessageResult messageResult) {
+                if(messageResult!=null) {
+                    Intent intent = new Intent(XMPP_ACTION_RCV_MSG);
+                    intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
+                    intent.putExtra(XMPP_RESULT_CONTACT, from);
+                    broadcaster.sendBroadcast(intent);
+                }
+            }
+        });
     }
 
     private void broadcastTypingState(String participant, ChatState state) {

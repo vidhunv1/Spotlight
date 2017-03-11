@@ -198,12 +198,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
-	public void addNewMessage(MessageResult messageResult) {
-		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getChatId(), messageResult.getMessage(), messageResult.getTime(), 1);
-		chatListAdapter.newChatMessage(item);
-	}
-
-	@Override
 	public void showChatState(String from, ChatState chatState) {
 		if(chatState == ChatState.composing || chatState == ChatState.active)
 			chatListAdapter.setChatState(from, "Typing...");
@@ -265,8 +259,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
-	public void onMessageReceived(MessageResult messageId) {
-		addNewMessage(messageId);
+	public void onMessageReceived(MessageResult messageResult, ContactResult from) {
+		messageResult.setName(from.getContactName());
+		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), 1);
+		chatListAdapter.newChatMessage(item);
 		chatList.scrollToPosition(0);
 		NotificationController.getInstance().showNotification(true);
 	}

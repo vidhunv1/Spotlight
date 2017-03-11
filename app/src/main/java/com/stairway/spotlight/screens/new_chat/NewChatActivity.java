@@ -331,8 +331,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
                         String name = "";
                         if(!contactResult.getContactName().isEmpty())
                             name = contactResult.getContactName();
-                        if(!contactResult.getDisplayName().isEmpty())
-                            name = contactResult.getDisplayName();
+                        if(!contactResult.getContactName().isEmpty())
+                            name = contactResult.getContactName();
                         startActivity(MessageActivity.callingIntent(activity, username, name));
                     }
                 });

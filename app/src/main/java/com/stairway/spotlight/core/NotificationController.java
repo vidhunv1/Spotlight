@@ -9,6 +9,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.XMPPManager;
+import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.user.UserApi;
+import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
@@ -16,6 +20,10 @@ import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.Roster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,9 +50,11 @@ public class NotificationController {
 
     private ContactStore contactStore;
     private MessageStore messageStore;
+    private UserApi userApi;
     private NotificationController() {
         this.contactStore = ContactStore.getInstance();
         this.messageStore = MessageStore.getInstance();
+        this.userApi = ApiManager.getUserApi();
     }
 
     public void handleNewMessageNotification(String username, String messageJson, String messageId) {
@@ -53,18 +63,92 @@ public class NotificationController {
         newMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
         newMessage.setReceiptId(messageId);
 
-        messageStore.storeMessage(newMessage)
-                .subscribe(new Subscriber<MessageResult>() {
-                    @Override
-                    public void onCompleted() {
-                        showNotification(true);
-                    }
-                    @Override
-                    public void onError(Throwable e) {}
+        contactStore.getContactByUserName(newMessage.getChatId()).subscribe(new Subscriber<ContactResult>() {
+            @Override
+            public void onCompleted() {}
 
-                    @Override
-                    public void onNext(MessageResult messageResult) {}
-                });
+            @Override
+            public void onError(Throwable e) {}
+
+            @Override
+            public void onNext(ContactResult contactResult) {
+                if(contactResult == null) {
+
+                    userApi.findUserByUserName(newMessage.getChatId()).subscribe(new Subscriber<UserResponse>() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {}
+
+                        @Override
+                        public void onNext(UserResponse userResponse) {
+                            ContactResult contactResult1 = new ContactResult();
+                            contactResult1.setUserId(userResponse.getUser().getUserId());
+                            contactResult1.setContactName(userResponse.getUser().getName());
+                            contactResult1.setUsername(userResponse.getUser().getUsername());
+                            contactResult1.setAdded(false);
+                            contactResult1.setBlocked(false);
+
+                            Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
+                            if (!roster.isLoaded())
+                                try {
+                                    roster.reloadAndWait();
+                                } catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            try {
+                                roster.createEntry(XMPPManager.getJidFromUserName(contactResult1.getUsername()), contactResult1.getContactName(), null);
+                            } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
+                                e.printStackTrace();
+                            }
+
+                            contactStore.storeContact(contactResult1)
+                                    .subscribe(new Subscriber<Boolean>() {
+                                        @Override
+                                        public void onCompleted() {}
+
+                                        @Override
+                                        public void onError(Throwable e) {}
+
+                                        @Override
+                                        public void onNext(Boolean aBoolean) {
+                                            messageStore.storeMessage(newMessage)
+                                                    .subscribe(new Subscriber<MessageResult>() {
+                                                        @Override
+                                                        public void onCompleted() {
+                                                            showNotification(true);
+                                                        }
+                                                        @Override
+                                                        public void onError(Throwable e) {}
+
+                                                        @Override
+                                                        public void onNext(MessageResult messageResult) {}
+                                                    });
+                                        }
+                                    });
+                        }
+                    });
+                } else {
+                    if(contactResult.isBlocked()) {
+                        // do nothing
+                    } else {
+                        messageStore.storeMessage(newMessage)
+                                .subscribe(new Subscriber<MessageResult>() {
+                                    @Override
+                                    public void onCompleted() {
+                                        showNotification(true);
+                                    }
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(MessageResult messageResult) {}
+                                });
+                    }
+                }
+            }
+        });
     }
 
     public void showNotification(boolean shouldAlert) {
@@ -137,6 +221,20 @@ public class NotificationController {
                                                 .setContentIntent(pendingIntent)
                                                 .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                                                 .setPriority(Notification.PRIORITY_HIGH);
+
+                                        if(uniqueUsernames.size() == 1) {
+                                            PendingIntent replyPendingIntent = PendingIntent.getBroadcast(
+                                                    SpotlightApplication.getContext(),
+                                                    0,
+                                                    MessageActivity.callingIntent(SpotlightApplication.getContext(), uniqueUsernames.get(0), contactNames.get(uniqueUsernames.get(0))),
+                                                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(R.drawable.ic_reply,
+                                                    "Reply", replyPendingIntent)
+                                                    .build();
+
+                                            mBuilder.addAction(replyAction);
+                                        }
                                     } else {
                                         mBuilder = new NotificationCompat.Builder(context)
                                                 .setSmallIcon(R.mipmap.ic_launcher)

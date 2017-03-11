@@ -96,7 +96,7 @@ public class ContactsContent {
                         Collections.sort(res, new Comparator<ContactResult>() {
                             @Override
                             public int compare(ContactResult contactsResult, ContactResult t1) {
-                                return contactsResult.getDisplayName().compareTo(t1.getDisplayName());
+                                return contactsResult.getContactName().compareTo(t1.getContactName());
                             }
                         });
 

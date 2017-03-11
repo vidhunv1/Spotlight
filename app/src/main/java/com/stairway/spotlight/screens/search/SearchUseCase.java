@@ -65,8 +65,8 @@ public class SearchUseCase {
 
                                                 @Override
                                                 public void onNext(ContactResult contactResult) {
-                                                    Logger.d(this, contactResult.getDisplayName());
-                                                    messagesModelList.add(new MessagesModel(messageResult.getChatId(), contactResult.getDisplayName(), messageResult.getMessage(), messageResult.getTime()));
+                                                    Logger.d(this, contactResult.getContactName());
+                                                    messagesModelList.add(new MessagesModel(messageResult.getChatId(), contactResult.getContactName(), messageResult.getMessage(), messageResult.getTime()));
                                                 }
                                             });
                                     }

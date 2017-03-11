@@ -51,7 +51,7 @@ public class ContactStore {
 
             for (ContactResult contactResult : contactResults) {
                 values.put(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
-                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getDisplayName());
+                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
                 values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
@@ -81,7 +81,9 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID,
-                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE,
+                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
+                    SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED
             };
 
             try {
@@ -95,11 +97,15 @@ public class ContactStore {
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
                     String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
+                    boolean isAdded = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1;
+                    boolean isBlocked = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED)) == 1;
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
                     contactResult.setUserType(_User.UserType.valueOf(userType));
+                    contactResult.setAdded(isAdded);
+                    contactResult.setBlocked(isBlocked);
                     result.add(contactResult);
 
                     cursor.moveToNext();
@@ -135,7 +141,9 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID,
-                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE,
+                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
+                    SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED
             };
 
             try {
@@ -150,10 +158,14 @@ public class ContactStore {
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
                     String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
+                    boolean isAdded = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1;
+                    boolean isBlocked = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED)) == 1;
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
+                    contactResult.setAdded(isAdded);
+                    contactResult.setBlocked(isBlocked);
                     contactResult.setUserType(_User.UserType.valueOf(userType));
                     result.add(contactResult);
 
@@ -203,7 +215,9 @@ public class ContactStore {
                     SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER,
                     SQLiteContract.ContactsContract.COLUMN_USERNAME,
                     SQLiteContract.ContactsContract.COLUMN_USER_ID,
-                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE
+                    SQLiteContract.ContactsContract.COLUMN_USER_TYPE,
+                    SQLiteContract.ContactsContract.COLUMN_IS_ADDED,
+                    SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED
             };
 
             try {
@@ -220,10 +234,14 @@ public class ContactStore {
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
                     //String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
                     String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
+                    boolean isAdded = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1;
+                    boolean isBlocked = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED)) == 1;
 
                     ContactResult contactResult = new ContactResult(countryCode, phoneNumber, contactName);
                     contactResult.setUsername(username);
                     contactResult.setUserId(userId);
+                    contactResult.setAdded(isAdded);
+                    contactResult.setBlocked(isBlocked);
                     contactResult.setUserType(_User.UserType.valueOf(userType));
 
                     cursor.close();

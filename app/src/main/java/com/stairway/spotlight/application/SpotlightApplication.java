@@ -58,10 +58,10 @@ public class SpotlightApplication extends Application implements ForegroundDetec
 
             Logger.init();
         }
-        initSession();
 
         new ForegroundDetector(this);
         ForegroundDetector.getInstance().addListener(this);
+        initSession();
     }
 
     public void initSession() {
@@ -74,6 +74,9 @@ public class SpotlightApplication extends Application implements ForegroundDetec
             JodaTimeAndroid.init(this);
 
             checkUploadFCMToken();
+            if(ForegroundDetector.getInstance().isForeground()) {
+                onBecameForeground();
+            }
         }
     }
 

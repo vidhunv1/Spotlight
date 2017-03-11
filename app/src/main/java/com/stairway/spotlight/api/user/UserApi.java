@@ -28,6 +28,9 @@ public interface UserApi {
     @PUT("users")
     Observable<UserResponse> uploadProfileDP(@Part MultipartBody.Part profileDP);
 
-    @GET("users/{user_id}")
-    Observable<UserResponse> findUser(@Path("user_id") String userId);
+    @GET("users/username/{username}")
+    Observable<UserResponse> findUserByUserName(@Path("username") String username);
+
+    @GET("users/id/{user_id}")
+    Observable<UserResponse> findUserByUserId(@Path("user_id") String userId);
 }

@@ -23,7 +23,6 @@ public interface HomeContract {
         void setDeliveryStatus(int status, int chatId);
 
         void displayChatList(List<ChatItem> chatList);
-        void addNewMessage(MessageResult messageResult);
         void showChatState(String from, ChatState chatState);
     }
 
