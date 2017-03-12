@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stairway.spotlight">
 
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -43,11 +41,11 @@
             android:name=".screens.message.MessageActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".screens.register__remove__.RegisterActivity"
-            android:label="@string/title_activity_register" />
-        <activity
             android:name=".screens.sign_up.SignUpActivity"
             android:label="@string/title_activity_sign_up" />
+        <activity
+            android:name=".screens.login.LoginActivity"
+            android:label="LoginActivity" />
         <activity
             android:name=".screens.welcome.WelcomeActivity"
             android:label="WelcomActivity" />

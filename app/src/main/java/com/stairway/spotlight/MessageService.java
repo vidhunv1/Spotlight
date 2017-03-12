@@ -115,6 +115,7 @@ public class MessageService extends Service {
         this.presenceStateListener = new RosterListener() {
             @Override
             public void entriesAdded(Collection<String> addresses) {
+                Logger.d(this, "entries added");
             }
 
             @Override
@@ -130,6 +131,8 @@ public class MessageService extends Service {
             @Override
             public void presenceChanged(Presence presence) {
                 broadcastPresenceState(presence.getFrom().split("/")[0], presence.getType());
+
+                Logger.d(this, "Received Presence"+presence.getType().name());
             }
         };
 

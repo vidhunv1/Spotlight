@@ -14,6 +14,7 @@ import com.stairway.spotlight.models.ContactResult;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 
 import java.util.ArrayList;

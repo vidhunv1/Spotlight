@@ -59,8 +59,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                     public void onNext(UserResponse userResponse) {
                         UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), fullName, email, password);
                         userSessionManager.save(userSession);
-                        ApiManager.getInstance().setAuthorization(userSession.getAccessToken());
-                        XMPPManager.init(userSession.getUserName(), userSession.getAccessToken());
                         SpotlightApplication.getContext().initSession();
 
                         signUpView.navigateToSetUserID();

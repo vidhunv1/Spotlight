@@ -33,4 +33,7 @@ public interface UserApi {
 
     @GET("users/id/{user_id}")
     Observable<UserResponse> findUserByUserId(@Path("user_id") String userId);
+
+    @POST("users/login")
+    Observable<UserResponse> loginUser(@Body UserRequest userRequest);
 }

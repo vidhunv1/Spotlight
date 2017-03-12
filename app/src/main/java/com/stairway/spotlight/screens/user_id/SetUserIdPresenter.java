@@ -53,7 +53,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                     @Override
                     public void onNext(UserResponse userResponse) {
                         if(!userResponse.isSuccess()) {
-                            if(userResponse.getError().getCode().equals("409")) {
+                            if(userResponse.getError().getCode() == 409) {
                                 setUserIdView.showUserIdNotAvailableError();
                             }
                         } else {
