@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
+import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -112,6 +114,18 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 //                requestForSpecificPermission();
 //            }
 //        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            startActivity(WelcomeActivity.callingIntent(this));
+            this.overridePendingTransition(0,0);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

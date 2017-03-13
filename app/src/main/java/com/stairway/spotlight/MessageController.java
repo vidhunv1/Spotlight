@@ -7,7 +7,6 @@ import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.ChatItem;
-
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
@@ -20,13 +19,11 @@ import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.iqlast.LastActivityManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
-
 /**
  * Created by vidhun on 29/01/17.
  */

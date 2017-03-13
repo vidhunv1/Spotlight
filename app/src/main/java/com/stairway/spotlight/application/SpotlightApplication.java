@@ -3,9 +3,14 @@ package com.stairway.spotlight.application;
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.stetho.Stetho;
+import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.ForegroundDetector;
 import com.stairway.spotlight.MessageController;

@@ -32,10 +32,12 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
     @OnClick(R.id.welcome_signup)
     public void signUpClicked() {
         startActivity(SignUpActivity.callingIntent(this));
+        finish();
     }
 
     @OnClick(R.id.welcome_login)
     public void loginClicked() {
         startActivity(LoginActivity.callingIntent(this));
+        finish();
     }
 }

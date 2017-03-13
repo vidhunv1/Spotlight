@@ -39,13 +39,6 @@ public class BaseActivity extends AppCompatActivity{
         if(userSession ==null)
             throw new IllegalStateException("Base activity should be only initialized on user session");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.statusBar));
-        }
-
         //Register MessageReceiver
         receiver = new BroadcastReceiver() {
             @Override

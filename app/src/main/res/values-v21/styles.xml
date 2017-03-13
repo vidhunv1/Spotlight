@@ -1,1 +1,19 @@
-<resources></resources>
+<resources>
+    <style name="BaseTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryLight</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- Action Bar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- android:textColorSecondary is the color of the menu overflow icon (three vertical dots) -->
+        <item name="android:textColorSecondary">#FFFFFF</item>
+
+        <item name="android:windowBackground">@color/background_default</item>
+
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+        <item name="android:statusBarColor">@color/statusBar</item>
+    </style>
+</resources>

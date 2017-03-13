@@ -34,6 +34,7 @@ import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
+import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -259,7 +260,11 @@ public class SettingsActivity extends BaseActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.app_name));
-        builder.setPositiveButton("OK", ((dialog, which) -> {}));
+        builder.setPositiveButton("OK", ((dialog, which) -> {
+            UserSessionManager.getInstance().clear();
+            startActivity(WelcomeActivity.callingIntent(this));
+            finish();
+        }));
         builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
         builder.setView(parent);
         AlertDialog alertDialog = builder.create();

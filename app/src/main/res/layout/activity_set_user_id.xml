@@ -15,7 +15,7 @@
             android:minHeight="?attr/actionBarSize"
             android:background="@color/colorPrimary">
             <TextView
-                android:text="Set ID"
+                android:text="Set iChat ID"
                 android:textSize="19.5dp"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textColor="@color/textPrimaryLight"
@@ -26,33 +26,49 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/set_user_id_tilId"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        app:hintEnabled="false"
-        android:layout_marginTop="100dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:id="@+id/set_user_id_tilId">
+        android:layout_height="48dp"
+        android:layout_marginTop="60dp"
+        android:layout_centerVertical="true"
+        app:hintEnabled="false">
+
         <android.support.design.widget.TextInputEditText
             android:id="@+id/set_user_id_et"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:hint="Enter ID"
+            android:hint="User ID"
+            android:paddingLeft="24dp"
             android:textColor="#353535"
-            android:textSize="16sp">
-            <requestFocus />
-            </android.support.design.widget.TextInputEditText>
+            android:textSize="18sp" />
     </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:layout_margin="12dp"
-        android:id="@+id/set_user_id_btn"
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/set_user_id_divider"
+        android:background="#c9c9c9" />
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:background="@color/colorPrimary"
-        android:text="Continue"
-        android:textColor="#ffffff"
-        android:textSize="17.5sp" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:textSize="15sp"
+        android:textColor="#999999"
+        android:text="iChat ID can be set only once."/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:textSize="15sp"
+        android:textColor="#999999"
+        android:text="Other people will be able to find you using your ID and contact you without knowing your number."/>
 </LinearLayout>

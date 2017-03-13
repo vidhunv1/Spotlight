@@ -49,46 +49,40 @@ public class UserSessionManager {
         return userSession;
     }
 
-    public void save(UserSession userSession) {
+    public void save(UserSession us) {
         this.userSession = null;
-        Observable.defer(new Func0<Observable<Integer>>() {
-            @Override
-            public Observable<Integer> call() {
-                return Observable.create(subscriber -> {
-                    if(userSession.getAccessToken()!=null && !userSession.getAccessToken().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_ACCESS_TOKEN, userSession.getAccessToken()).apply();
-                    }
-                    if(userSession.getUserName()!=null && !userSession.getUserName().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_USER_NAME, userSession.getUserName()).apply();
-                    }
-                    if(userSession.getExpires()!=null) {
-                        sharedPreferences.edit().putLong(KEY_EXPIRES_AT, userSession.getExpires().getTime()).apply();
-                    }
-                    if(userSession.getExpires()!=null) {
-                        sharedPreferences.edit().putLong(KEY_LAST_REFRESH, userSession.getExpires().getTime()).apply();
-                    }
-                    if(userSession.getName()!=null && !userSession.getName().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_NAME, userSession.getName()).apply();
-                    }
-                    if(userSession.getEmail()!=null && !userSession.getEmail().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_EMAIL, userSession.getEmail()).apply();
-                    }
-                    if(userSession.getPassword()!=null && !userSession.getPassword().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_PASSWORD, userSession.getPassword()).apply();
-                    }
-                    if(userSession.getCountryCode()!=null && !userSession.getCountryCode().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_COUNTRY_CODE, userSession.getCountryCode()).apply();
-                    }
-                    if(userSession.getMobile()!=null && !userSession.getMobile().isEmpty()) {
-                        sharedPreferences.edit().putString(KEY_MOBILE, userSession.getMobile()).apply();
-                    }
-                    if(userSession.getUserId()!=null && !userSession.getUserId().isEmpty()) {
-                        Logger.d(this, "UserId Saved");
-                        sharedPreferences.edit().putString(KEY_USER_ID, userSession.getUserId()).apply();
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io()).subscribe();
+
+        if(us.getAccessToken()!=null && !us.getAccessToken().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_ACCESS_TOKEN, us.getAccessToken()).apply();
+        }
+        if(us.getUserName()!=null && !us.getUserName().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_USER_NAME, us.getUserName()).apply();
+        }
+        if(us.getExpires()!=null) {
+            sharedPreferences.edit().putLong(KEY_EXPIRES_AT, us.getExpires().getTime()).apply();
+        }
+        if(us.getExpires()!=null) {
+            sharedPreferences.edit().putLong(KEY_LAST_REFRESH, us.getExpires().getTime()).apply();
+        }
+        if(us.getName()!=null && !us.getName().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_NAME, us.getName()).apply();
+        }
+        if(us.getEmail()!=null && !us.getEmail().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_EMAIL, us.getEmail()).apply();
+        }
+        if(us.getPassword()!=null && !us.getPassword().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_PASSWORD, us.getPassword()).apply();
+        }
+        if(us.getCountryCode()!=null && !us.getCountryCode().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_COUNTRY_CODE, us.getCountryCode()).apply();
+        }
+        if(us.getMobile()!=null && !us.getMobile().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_MOBILE, us.getMobile()).apply();
+        }
+        if(us.getUserId()!=null && !us.getUserId().isEmpty()) {
+            Logger.d(this, "UserId Saved");
+            sharedPreferences.edit().putString(KEY_USER_ID, us.getUserId()).apply();
+        }
     }
 
     public void clear() {
@@ -100,6 +94,12 @@ public class UserSessionManager {
                     sharedPreferences.edit().remove(KEY_USER_NAME).apply();
                     sharedPreferences.edit().remove(KEY_EXPIRES_AT).apply();
                     sharedPreferences.edit().remove(KEY_LAST_REFRESH).apply();
+                    sharedPreferences.edit().remove(KEY_USER_ID).apply();
+                    sharedPreferences.edit().remove(KEY_EMAIL).apply();
+                    sharedPreferences.edit().remove(KEY_COUNTRY_CODE).apply();
+                    sharedPreferences.edit().remove(KEY_MOBILE).apply();
+                    sharedPreferences.edit().remove(KEY_PASSWORD).apply();
+                    sharedPreferences.edit().remove(KEY_NAME).apply();
                 });
             }
         }).subscribeOn(Schedulers.io()).subscribe();

@@ -63,31 +63,26 @@ public class LoginPresenter implements LoginContract.Presenter {
 
                     @Override
                     public void onNext(UserResponse userResponse) {
-                        if(!userResponse.isSuccess()) {
-                            if(userResponse.getError().getCode() == 401) {
+                        if (!userResponse.isSuccess()) {
+                            if (userResponse.getError().getCode() == 401) {
                                 loginView.showInvalidPasswordError();
                             }
-                        }
-
-                        UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), userResponse.getUser().getName(), userResponse.getUser().getEmail(), password);
-                        userSession.setUserId(userResponse.getUser().getUserId());
-                        userSessionManager.save(userSession);
-
-                        UserSession us = UserSessionManager.getInstance().load();
-                        XMPPManager.init(us.getUserName(), us.getPassword());
-                        ApiManager.getInstance().setAuthorization(us.getAccessToken());
-                        MessageController.init(XMPPManager.getInstance().getConnection(), MessageStore.getInstance(), ContactStore.getInstance());
-
-                        SpotlightApplication.getContext().initSession();
-
-                        if(userResponse.getUser().getUserId() == null) {
-                            loginView.navigateToSetUserId();
                         } else {
-                            loginView.navigateToHome();
+
+                            UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), userResponse.getUser().getName(), userResponse.getUser().getEmail(), password);
+                            userSession.setUserId(userResponse.getUser().getUserId());
+                            userSessionManager.save(userSession);
+
+                            SpotlightApplication.getContext().initSession();
+
+                            if (userResponse.getUser().getUserId() == null) {
+                                loginView.navigateToSetUserId();
+                            } else {
+                                loginView.navigateToHome();
+                            }
                         }
                     }
                 });
-
         subscriptions.add(subscription);
     }
 

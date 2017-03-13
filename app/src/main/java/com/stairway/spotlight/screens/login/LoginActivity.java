@@ -11,6 +11,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,8 @@ import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
+import com.stairway.spotlight.screens.welcome.WelcomeActivity;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -28,7 +31,6 @@ import butterknife.OnTextChanged;
 /**
  * Created by vidhun on 12/03/17.
  */
-
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
     @Bind(R.id.tb_login)
     Toolbar toolbar;
@@ -78,6 +80,19 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
+        changeLoginButton();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            startActivity(WelcomeActivity.callingIntent(this));
+            this.overridePendingTransition(0,0);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

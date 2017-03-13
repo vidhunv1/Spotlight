@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.sign_up;
 
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
@@ -8,6 +9,8 @@ import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.UserSession;
 
 import rx.Subscriber;
@@ -59,6 +62,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                     public void onNext(UserResponse userResponse) {
                         UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), fullName, email, password);
                         userSessionManager.save(userSession);
+
                         SpotlightApplication.getContext().initSession();
 
                         signUpView.navigateToSetUserID();
