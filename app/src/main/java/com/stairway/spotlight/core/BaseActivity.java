@@ -1,6 +1,7 @@
 package com.stairway.spotlight.core;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.screens.login.LoginActivity;
 import com.stairway.spotlight.screens.sign_up.SignUpActivity;
 
 import org.jivesoftware.smack.packet.Presence;
@@ -32,6 +34,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  */
 public class BaseActivity extends AppCompatActivity{
     BroadcastReceiver receiver;
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +102,27 @@ public class BaseActivity extends AppCompatActivity{
     }
 
     public void showError(String title, String message) {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
+    }
+
+    public void showProgressDialog() {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        progressDialog[0] = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+    }
+
+    public void dismissProgressDialog() {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
     }
 
     @Override

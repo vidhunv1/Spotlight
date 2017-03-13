@@ -2,6 +2,7 @@ package com.stairway.spotlight.screens.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatRadioButton;
@@ -26,6 +28,8 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.api.ApiError;
+import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.components.CustomNumberPicker;
 import com.stairway.spotlight.core.BaseActivity;
@@ -39,8 +43,11 @@ import com.stairway.spotlight.screens.welcome.WelcomeActivity;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Response;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends BaseActivity implements SettingsContract.View{
 
     @Bind(R.id.tb_settings)
     Toolbar toolbar;
@@ -89,6 +96,8 @@ public class SettingsActivity extends BaseActivity {
 
     UserSession userSession;
 
+    SettingsPresenter settingsPresenter;
+
     public static Intent callingIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
@@ -100,6 +109,7 @@ public class SettingsActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         userSession = UserSessionManager.getInstance().load();
+        settingsPresenter = new SettingsPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -142,6 +152,20 @@ public class SettingsActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        settingsPresenter.attachView(this);
+    }
+
+    @Override
+    public void onLogoutSuccess() {
+        super.dismissProgressDialog();
+        startActivity(WelcomeActivity.callingIntent(this));
+        finish();
+    }
+
 
     @OnClick(R.id.settings_vibrate_row)
     public void onVibrateClicked() {
@@ -261,9 +285,8 @@ public class SettingsActivity extends BaseActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.app_name));
         builder.setPositiveButton("OK", ((dialog, which) -> {
-            UserSessionManager.getInstance().clear();
-            startActivity(WelcomeActivity.callingIntent(this));
-            finish();
+            super.showProgressDialog();
+            settingsPresenter.logoutUser();
         }));
         builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
         builder.setView(parent);

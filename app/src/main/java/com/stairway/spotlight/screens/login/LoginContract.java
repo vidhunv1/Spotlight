@@ -13,7 +13,7 @@ public interface LoginContract {
         void navigateToSetUserId();
     }
 
-    interface Presenter extends BasePresenter<View> {
+    interface Presenter extends BasePresenter<LoginContract.View> {
         void loginUser(String account, String password);
     }
 }

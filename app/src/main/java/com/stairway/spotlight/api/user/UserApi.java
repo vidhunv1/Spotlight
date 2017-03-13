@@ -1,6 +1,10 @@
 package com.stairway.spotlight.api.user;
 
+import com.stairway.spotlight.api.StatusResponse;
+
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
@@ -30,6 +34,9 @@ public interface UserApi {
 
     @GET("users/username/{username}")
     Observable<UserResponse> findUserByUserName(@Path("username") String username);
+
+    @GET("users/logout")
+    Observable<StatusResponse> logout();
 
     @GET("users/id/{user_id}")
     Observable<UserResponse> findUserByUserId(@Path("user_id") String userId);
