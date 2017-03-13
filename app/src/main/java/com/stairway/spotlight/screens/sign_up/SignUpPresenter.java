@@ -3,14 +3,18 @@ package com.stairway.spotlight.screens.sign_up;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.XMPPManager;
+import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.db.core.DatabaseManager;
+import com.stairway.spotlight.db.core.SQLiteHelper;
 import com.stairway.spotlight.models.UserSession;
 
 import rx.Subscriber;
@@ -56,16 +60,23 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        ApiError error = new ApiError(e);
+                        signUpView.showError(error.getTitle(), error.getMessage());
+                    }
 
                     @Override
                     public void onNext(UserResponse userResponse) {
-                        UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), fullName, email, password);
-                        userSessionManager.save(userSession);
+                        if(!userResponse.isSuccess()) {
+                            signUpView.showError(userResponse.getError().getTitle(), userResponse.getError().getMessage());
+                        } else {
+                            UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), fullName, email, password);
+                            userSessionManager.save(userSession);
+                            SpotlightApplication.getContext().initSession();
 
-                        SpotlightApplication.getContext().initSession();
-
-                        signUpView.navigateToSetUserID();
+                            DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
+                            signUpView.navigateToSetUserID();
+                        }
                     }
                 });
 

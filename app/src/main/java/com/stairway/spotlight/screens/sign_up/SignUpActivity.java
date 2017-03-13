@@ -1,6 +1,8 @@
 package com.stairway.spotlight.screens.sign_up;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -25,9 +28,12 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.screens.home.HomeActivity;
+import com.stairway.spotlight.screens.login.LoginActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
 import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
+
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -109,20 +115,27 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
 
         // Permissions
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-//            if (!checkIfAlreadyhavePermission()) {
-//                requestForSpecificPermission();
-//            }
-//        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (!checkIfAlreadyhavePermission()) {
+                requestForSpecificPermission();
+            } else {
+                getEmailAddress();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(WelcomeActivity.callingIntent(this));
+        this.overridePendingTransition(0,0);
+        finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            startActivity(WelcomeActivity.callingIntent(this));
-            this.overridePendingTransition(0,0);
-            finish();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -141,6 +154,18 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         }
         startActivity(SetUserIdActivity.callingIntent(this));
         finish();
+    }
+
+    @Override
+    public void showError(String title, String message) {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @OnTextChanged(R.id.sign_up_email)
@@ -261,32 +286,41 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         return name.length()>=3;
     }
 
-//    private boolean checkIfAlreadyhavePermission() {
-//        int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-//        int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
-//        int permission = PackageManager.PERMISSION_GRANTED;
-//
-//        return result1 == permission && result2 == permission;
-//    }
-//
-//    private void requestForSpecificPermission() {
-//        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS,
-//                Manifest.permission.RECEIVE_SMS,
-//                Manifest.permission.READ_SMS}, 101);
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        switch (requestCode) {
-//            case 101:
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    //granted
-//                } else {
-//                    //not granted
-//                }
-//                break;
-//            default:
-//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        }
-//    }
+    private void getEmailAddress() {
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
+        Account[] accounts = AccountManager.get(this).getAccounts();
+        for (Account account : accounts) {
+            if (emailPattern.matcher(account.name).matches()) {
+                String possibleEmail = account.name;
+                emailET.setText(possibleEmail);
+            }
+        }
+    }
+
+    private boolean checkIfAlreadyhavePermission() {
+        int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        int permission = PackageManager.PERMISSION_GRANTED;
+
+        return result1 == permission;
+    }
+
+    private void requestForSpecificPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, 101);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    getEmailAddress();
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }

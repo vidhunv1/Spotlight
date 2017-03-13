@@ -1,18 +1,19 @@
 package com.stairway.spotlight.screens.login;
 
-import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
-import com.stairway.spotlight.XMPPManager;
-import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.application.SpotlightApplication;
-import com.stairway.spotlight.db.ContactStore;
-import com.stairway.spotlight.db.MessageStore;
+import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.models.UserSession;
 
+import java.io.IOException;
+
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -59,16 +60,20 @@ public class LoginPresenter implements LoginContract.Presenter {
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        ApiError error = new ApiError(e);
+                        loginView.showError(error.getTitle(), error.getMessage());
+                    }
 
                     @Override
                     public void onNext(UserResponse userResponse) {
                         if (!userResponse.isSuccess()) {
-                            if (userResponse.getError().getCode() == 401) {
-                                loginView.showInvalidPasswordError();
-                            }
+                            loginView.showError(userResponse.getError().getTitle(), userResponse.getError().getMessage());
                         } else {
-
+                            UserSession us = userSessionManager.load();
+                            if(us!=null && !us.getUserId().equals(userResponse.getUser().getUserId())) {
+                                DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
+                            }
                             UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), userResponse.getUser().getName(), userResponse.getUser().getEmail(), password);
                             userSession.setUserId(userResponse.getUser().getUserId());
                             userSessionManager.save(userSession);

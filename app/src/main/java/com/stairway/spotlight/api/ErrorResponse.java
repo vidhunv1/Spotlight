@@ -11,6 +11,8 @@ public class ErrorResponse {
     private int code;
     @SerializedName("message")
     private String message;
+    @SerializedName("title")
+    private String title;
 
     public int getCode() {
         return code;
@@ -26,6 +28,14 @@ public class ErrorResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

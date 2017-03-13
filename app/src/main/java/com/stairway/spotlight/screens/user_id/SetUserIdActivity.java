@@ -69,8 +69,8 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         presenter = new SetUserIdPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
@@ -87,6 +87,19 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         this.menu = menu;
         getMenuInflater().inflate(R.menu.set_user_id_toolbar, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
+    public void showError(String title, String message) {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        super.showError(title, message);
     }
 
     @Override
@@ -123,8 +136,10 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @Override
     public void showUserIdNotAvailableError() {
-        userIdTIL.setErrorEnabled(true);
-        userIdTIL.setError("User ID is taken.");
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        super.showError("User ID", "This User ID is not available.");
     }
 
     @Override

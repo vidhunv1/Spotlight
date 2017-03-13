@@ -189,6 +189,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
+	public void showError(String title, String message) {
+		super.showError(title, message);
+	}
+
+	@Override
 	public void setDeliveryStatus(int status, int chatId) {}
 
 	@Override

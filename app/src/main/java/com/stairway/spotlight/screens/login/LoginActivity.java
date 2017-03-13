@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
@@ -81,15 +82,24 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
         loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
         changeLoginButton();
+        if(UserSessionManager.getInstance().getCacheID()!=null) {
+            accountET.setText(UserSessionManager.getInstance().getCacheID());
+            passwordET.requestFocus();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(WelcomeActivity.callingIntent(this));
+        this.overridePendingTransition(0,0);
+        finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            startActivity(WelcomeActivity.callingIntent(this));
-            this.overridePendingTransition(0,0);
-            finish();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -120,13 +130,13 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     }
 
     @Override
-    public void showInvalidPasswordError() {
+    public void showError(String title, String message) {
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
         AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
-        alertDialog.setTitle("Invalid Password");
-        alertDialog.setMessage("\nThe password you entered is invalid.");
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
     }

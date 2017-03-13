@@ -45,5 +45,19 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         onCreate(db);
         Logger.d(this, "Sqlite Cache database upgraded");
     }
+
+    public void clearData(SQLiteDatabase db) {
+        db.execSQL(SQLiteContract.GenericCacheContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.MessagesContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.ContactsContract.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteContract.BotDetailsContract.SQL_DELETE_TABLE);
+
+        db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteContract.BotDetailsContract.SQL_CREATE_TABLE);
+
+        Logger.d("Sqlite Cache database cleared");
+    }
 }
 

@@ -11,7 +11,6 @@ public interface LoginContract {
     interface View extends BaseView {
         void navigateToHome();
         void navigateToSetUserId();
-        void showInvalidPasswordError();
     }
 
     interface Presenter extends BasePresenter<View> {

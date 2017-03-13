@@ -48,6 +48,9 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
     }
 
     @Override
+    public void showError(String title, String message) {}
+
+    @Override
     protected void onResume() {
         super.onResume();
     }

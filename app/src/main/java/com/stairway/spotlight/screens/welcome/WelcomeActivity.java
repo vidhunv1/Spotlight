@@ -19,6 +19,7 @@ import butterknife.OnClick;
 public class WelcomeActivity extends AppCompatActivity implements WelcomeContract.View {
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
 
@@ -40,4 +41,7 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
         startActivity(LoginActivity.callingIntent(this));
         finish();
     }
+
+    @Override
+    public void showError(String title, String message) {}
 }

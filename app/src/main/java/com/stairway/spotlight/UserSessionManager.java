@@ -24,6 +24,7 @@ public class UserSessionManager {
     static final String KEY_MOBILE = "Mobile";
     static final String KEY_COUNTRY_CODE = "CountryCode";
     static final String KEY_USER_ID = "UserId";
+    static final String KEY_USER_ID_LOGIN = "UserIdLogin";
 
     private static UserSessionManager instance;
     private UserSession userSession;
@@ -82,27 +83,21 @@ public class UserSessionManager {
         if(us.getUserId()!=null && !us.getUserId().isEmpty()) {
             Logger.d(this, "UserId Saved");
             sharedPreferences.edit().putString(KEY_USER_ID, us.getUserId()).apply();
+            sharedPreferences.edit().putString(KEY_USER_ID_LOGIN, us.getUserId()).apply();
         }
     }
 
     public void clear() {
-        Observable.defer(new Func0<Observable<Integer>>() {
-            @Override
-            public Observable<Integer> call() {
-                return Observable.create(subscriber -> {
-                    sharedPreferences.edit().remove(KEY_ACCESS_TOKEN).apply();
-                    sharedPreferences.edit().remove(KEY_USER_NAME).apply();
-                    sharedPreferences.edit().remove(KEY_EXPIRES_AT).apply();
-                    sharedPreferences.edit().remove(KEY_LAST_REFRESH).apply();
-                    sharedPreferences.edit().remove(KEY_USER_ID).apply();
-                    sharedPreferences.edit().remove(KEY_EMAIL).apply();
-                    sharedPreferences.edit().remove(KEY_COUNTRY_CODE).apply();
-                    sharedPreferences.edit().remove(KEY_MOBILE).apply();
-                    sharedPreferences.edit().remove(KEY_PASSWORD).apply();
-                    sharedPreferences.edit().remove(KEY_NAME).apply();
-                });
-            }
-        }).subscribeOn(Schedulers.io()).subscribe();
+        sharedPreferences.edit().remove(KEY_ACCESS_TOKEN).apply();
+        sharedPreferences.edit().remove(KEY_USER_NAME).apply();
+        sharedPreferences.edit().remove(KEY_EXPIRES_AT).apply();
+        sharedPreferences.edit().remove(KEY_LAST_REFRESH).apply();
+        sharedPreferences.edit().remove(KEY_EMAIL).apply();
+        sharedPreferences.edit().remove(KEY_COUNTRY_CODE).apply();
+        sharedPreferences.edit().remove(KEY_MOBILE).apply();
+        sharedPreferences.edit().remove(KEY_PASSWORD).apply();
+        sharedPreferences.edit().remove(KEY_NAME).apply();
+        sharedPreferences.edit().remove(KEY_USER_ID).apply();
     }
 
     public boolean hasAccessToken() {
@@ -137,5 +132,9 @@ public class UserSessionManager {
         }
 
         return null;
+    }
+
+    public String getCacheID() {
+        return sharedPreferences.getString(KEY_USER_ID_LOGIN, null);
     }
 }

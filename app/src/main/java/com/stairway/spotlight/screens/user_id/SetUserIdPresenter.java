@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.user_id;
 import android.os.Handler;
 
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
@@ -48,13 +49,18 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        ApiError error = new ApiError(e);
+                        setUserIdView.showError(error.getTitle(), error.getMessage());
+                    }
 
                     @Override
                     public void onNext(UserResponse userResponse) {
                         if(!userResponse.isSuccess()) {
                             if(userResponse.getError().getCode() == 409) {
                                 setUserIdView.showUserIdNotAvailableError();
+                            } else {
+                                setUserIdView.showError(userResponse.getError().getTitle(), userResponse.getError().getTitle());
                             }
                         } else {
                             UserSession userSession = new UserSession();

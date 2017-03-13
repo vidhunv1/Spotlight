@@ -1,5 +1,6 @@
 package com.stairway.spotlight.core;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.screens.sign_up.SignUpActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -94,6 +96,14 @@ public class BaseActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    public void showError(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @Override
