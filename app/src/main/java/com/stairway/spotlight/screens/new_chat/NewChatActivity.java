@@ -68,10 +68,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     LinearLayout newChatLayout;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
-
-    private PopupWindow addContactPopupWindow;
-    private View addContactPopupView;
-    private UserSession userSession;
     private boolean showSoftInput;
 
     NewChatPresenter newChatPresenter;
@@ -102,7 +98,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         newChatAdapter = new NewChatAdapter(this, this);
         contactList.setAdapter(newChatAdapter);
 
-        userSession = UserSessionManager.getInstance().load();
         newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
         Intent receivedIntent = getIntent();
@@ -253,7 +248,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
                 imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
 
                 progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
-                newChatPresenter.addContact(editText.getText().toString(), userSession.getAccessToken());
+                newChatPresenter.addContact(editText.getText().toString());
             }
         }));
         builder.setView(parent);
@@ -269,32 +264,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
-
-//    public void showMessageAlertDialog(String message) {
-//        if(progressDialog[0].isShowing()) {
-//            progressDialog[0].dismiss();
-//        }
-//        //TODO: Something wrong. 16?
-//        final int WIDTH = 294, HEIGHT = 98;
-//        int layout = R.layout.alert;
-//
-//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-//        LayoutInflater inflater = this.getLayoutInflater();
-//        View dialogView = inflater.inflate(layout, null);
-//
-//        dialogBuilder.setView(dialogView);
-//        AlertDialog alertDialog = dialogBuilder.create();
-//        alertDialog.show();
-//
-//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH+16, getResources().getDisplayMetrics());
-//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT+16, getResources().getDisplayMetrics());
-//        alertDialog.getWindow().setLayout(width, height);
-//
-//        TextView messageText = (TextView) dialogView.findViewById(R.id.tv_alert_message);
-//        messageText.setText(message);
-//        Button ok = (Button) dialogView.findViewById(R.id.btn_alert_ok);
-//        ok.setOnClickListener(v -> alertDialog.dismiss());
-//    }
 
     @Override
     public void onContactItemClicked(String userId) {
@@ -315,26 +284,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     }
 
     private void navigateToMessageActivity(String username) {
-        Activity activity = this;
-        ContactStore.getInstance().getContactByUserName(username)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ContactResult>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {}
-
-                    @Override
-                    public void onNext(ContactResult contactResult) {
-                        Logger.d(this, contactResult.toString());
-                        String name = "";
-                        if(!contactResult.getContactName().isEmpty())
-                            name = contactResult.getContactName();
-                        if(!contactResult.getContactName().isEmpty())
-                            name = contactResult.getContactName();
-                        startActivity(MessageActivity.callingIntent(activity, username, name));
-                    }
-                });
+        startActivity(MessageActivity.callingIntent(this, username));
     }
 }

@@ -13,7 +13,7 @@
     </string-array>
 
     <!-- MessageService -->
-    <string name="service_message_description">Send and receive menssages.</string>
+    <string name="service_message_description">Send and receive messages.</string>
 
     <!-- Register-->
     <string name="title_activity_sign_up">SignUpActivity</string>
@@ -38,4 +38,9 @@
 
     <string name="keyboard_hint">Write a message…</string>
     <string name="search">Search</string>
+
+    <!-- Chat states -->
+    <string name="chat_presence_online">Online</string>
+    <string name="chat_presence_away">Last seen at %1$s</string>
+    <string name="chat_state_typing">Typing…</string>
 </resources>

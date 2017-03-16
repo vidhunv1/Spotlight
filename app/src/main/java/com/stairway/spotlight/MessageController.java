@@ -1,7 +1,11 @@
 package com.stairway.spotlight;
 
+import android.content.res.Resources;
+
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.ReadReceiptExtension;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -18,6 +22,10 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.iqlast.LastActivityManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,13 +143,21 @@ public class MessageController {
         });
     }
 
-    public Observable<Long> getLastActivity(String userId) {
+    public Observable<String> getLastActivity(String userId) {
         Logger.d(this, "Getting last activity");
-        String jid = XMPPManager.getJidFromUserName(userId);
         return Observable.create(subscriber -> {
+            String jid = XMPPManager.getJidFromUserName(userId);
             LastActivityManager activity = LastActivityManager.getInstanceFor(this.conn);
+            Resources res = SpotlightApplication.getContext().getResources();
             try {
-                subscriber.onNext(activity.getLastActivity(jid).lastActivity);
+                long secAgo = activity.getLastActivity(jid).lastActivity;
+                Logger.d(this, "lastActivity: "+secAgo);
+                if(secAgo == 0) {
+                    subscriber.onNext(res.getString(R.string.chat_presence_online));
+                } else {
+                    DateTime time = DateTime.now().minusSeconds((int) secAgo);
+                    subscriber.onNext(res.getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(time)));
+                }
                 subscriber.onCompleted();
             } catch (SmackException.NoResponseException e) {
                 e.printStackTrace();

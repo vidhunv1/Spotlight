@@ -28,52 +28,20 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ll_chatItem_content"
-            android:paddingTop="10.75dp">
+            android:gravity="center_vertical"
+            android:id="@+id/ll_chatItem_content">
 
-            <LinearLayout
-                android:orientation="horizontal"
+            <TextView
                 android:layout_width="match_parent"
+                tools:ignore="MissingPrefix"
                 android:layout_height="wrap_content"
-                android:paddingBottom="4.25dp">
+                android:text="Name"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textColor="#212121"
+                android:textSize="17sp"
+                android:id="@+id/tv_chatItem_contactName"
+                android:maxWidth="190dp" />
 
-                <TextView
-                    android:layout_width="190dp"
-                    tools:ignore="MissingPrefix"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textAppearance="@style/FontRobotoMedium"
-                    android:textColor="#212121"
-                    android:textSize="17sp"
-                    android:id="@+id/tv_chatItem_contactName"
-                    android:maxWidth="190dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tv_chatItem_time"
-                    android:paddingRight="13dp"
-                    android:text="9:47 P.M."
-                    android:textAlignment="viewEnd"
-                    android:textSize="13sp"
-                    android:textColor="#999999"
-                    android:layout_gravity="bottom" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:maxLines="1"
-                    android:textColor="#8f8f8f"
-                    android:id="@+id/tv_chatItem_message"
-                    android:text="message"
-                    android:paddingRight="20dp" />
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
     <View

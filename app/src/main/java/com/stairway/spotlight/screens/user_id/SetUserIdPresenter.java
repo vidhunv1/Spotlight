@@ -65,13 +65,13 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                         } else {
                             UserSession userSession = new UserSession();
                             userSession.setUserId(userResponse.getUser().getUserId());
+                            userSession.setUserName(userResponse.getUser().getUsername());
                             userSessionManager.save(userSession);
 
                             setUserIdView.navigateToHome();
                         }
                     }
                 });
-
         subscriptions.add(subscription);
     }
 

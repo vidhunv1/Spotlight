@@ -1,16 +1,16 @@
 package com.stairway.spotlight.screens.message;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,13 +29,15 @@ import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.AndroidUtils;
-import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
+import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
+import com.stairway.spotlight.models.Message;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.message.emoji.EmojiViewHelper;
 import com.stairway.spotlight.screens.user_profile.UserProfileActivity;
@@ -43,6 +45,9 @@ import com.stairway.spotlight.screens.web_view.WebViewActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +56,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MessageActivity extends BaseActivity
-        implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener, QuickRepliesAdapter.QuickReplyClickListener{
+        implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener{
     private MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem)
@@ -73,6 +78,9 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.container)
     RelativeLayout rootLayout;
 
+    @Bind(R.id.message_add_block)
+    LinearLayout addBlockView;
+
     private EmojiViewHelper emojiPicker;
     private List<PersistentMenu> persistentMenus;
 
@@ -85,21 +93,17 @@ public class MessageActivity extends BaseActivity
     public static int top = -1;
 
     private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
-    private static final String KEY_CHAT_CONTACT_NAME = "MessageActivity.CHAT_CONTACT_NAME";
     private String chatUserName; // contact user
-    private String chatContactName;
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
-
-    private Presence.Type presence;
+    private String contactName;
 
     // userName: id for ejabberd xmpp. userId: id set by user
-    public static Intent callingIntent(Context context, String chatUserName, String chatContactName) {
+    public static Intent callingIntent(Context context, String chatUserName) {
         Intent intent = new Intent(context, MessageActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
-        intent.putExtra(KEY_CHAT_CONTACT_NAME, chatContactName);
 
         return intent;
     }
@@ -109,37 +113,20 @@ public class MessageActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
-        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance());
+        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance(), ContactStore.getInstance());
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_CHAT_USER_NAME))
             return;
         this.chatUserName = receivedIntent.getStringExtra(KEY_CHAT_USER_NAME);
-        this.chatContactName = receivedIntent.getStringExtra(KEY_CHAT_CONTACT_NAME);
-        title.setText(chatContactName);
 
         currentChatState = ChatState.inactive;
         currentUser = UserSessionManager.getInstance().load().getUserName();
-
-        linearLayoutManager = new WrapContentLinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, chatUserName, chatContactName, this, this, this);
-        messageList.setLayoutManager(linearLayoutManager);
-
-        RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
-        if (animator instanceof SimpleItemAnimator) {
-            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
-        }
-        messageList.setAdapter(messagesAdapter);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        toolbar.setTitle("vidhun vinod");
-        toolbar.setSubtitle("online");
-        toolbar.setLogo(ImageUtils.getDefaultProfileImage("Vidhun Vinod", "vidhunvinod", 18));
 
         index = -1;
         top = -1;
@@ -156,7 +143,9 @@ public class MessageActivity extends BaseActivity
 
     @Override
     protected void onResume() {
+        Logger.d(this, "onResume");
         super.onResume();
+        messagePresenter.loadContactDetails(chatUserName);
         messagePresenter.loadMessages(chatUserName);
         if(index != -1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
@@ -204,7 +193,7 @@ public class MessageActivity extends BaseActivity
         }
         else if(id == R.id.view_contact) {
             AndroidUtils.hideSoftInput(this);
-            startActivity(UserProfileActivity.callingIntent(this, chatUserName, chatContactName));
+            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactName));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -214,7 +203,9 @@ public class MessageActivity extends BaseActivity
 
         if(message.length()>=1) {
             messageBox.setText("");
-            messagePresenter.sendTextMessage(chatUserName, currentUser, message);
+            Message m = new Message();
+            m.setText(message);
+            messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
         }
     }
 
@@ -268,7 +259,7 @@ public class MessageActivity extends BaseActivity
                 itemsLL.get(i).setOnClickListener(v -> {
                     bottomSheetDialog.dismiss();
                     if(menu.getType() == PersistentMenu.Type.postback) {
-                        messagePresenter.sendTextMessage(chatUserName, currentUser, menu.getTitle());
+                        this.sendPostbackMessage(menu.getTitle(), menu.getPayload());
                     } else if(menu.getType() == PersistentMenu.Type.web_url) {
                         startActivity(WebViewActivity.callingIntent(this, menu.getUrl()));
                     }
@@ -282,6 +273,83 @@ public class MessageActivity extends BaseActivity
             });
             bottomSheetDialog.show();
         }
+    }
+
+    @Override
+    public void setContactName(String contactName) {
+        contactName = AndroidUtils.toTitleCase(contactName);
+        this.contactName = contactName;
+
+        title.setText(contactName);
+
+        linearLayoutManager = new WrapContentLinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        messagesAdapter = new MessagesAdapter(this, chatUserName, contactName, this, this);
+        messageList.setLayoutManager(linearLayoutManager);
+
+        RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
+        messageList.setAdapter(messagesAdapter);
+    }
+
+    @Override
+    public void showAddBlock(boolean shouldShow) {
+        Logger.d(this, "showAddBlock: "+shouldShow);
+        if(shouldShow) {
+            TextView addView = (TextView) findViewById(R.id.message_add);
+            TextView blockView = (TextView) findViewById(R.id.message_block);
+            addBlockView.setVisibility(View.VISIBLE);
+            addView.setOnClickListener(v -> {
+                messagePresenter.addContact(chatUserName);
+            });
+            blockView.setOnClickListener(v -> {
+                String message = "Are you sure you want to block <b>" + contactName + "</b>?";;
+                AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
+                alertDialog.setMessage(Html.fromHtml(message));
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", (dialog, which) -> {
+                    messagePresenter.blockContact(chatUserName);
+                    dialog.dismiss();
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", (dialog, which) -> {
+                    dialog.cancel();
+                });
+                alertDialog.show();
+            });
+        } else {
+            addBlockView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void showContactAddedSuccess() {
+        String message;
+        message = "<b>" + contactName + "</b> is added to your contacts on iChat.";
+
+        AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
+        alertDialog.setMessage(Html.fromHtml(message));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+
+        alertDialog.setOnDismissListener(dialog -> {
+            showAddBlock(false);
+        });
+    }
+
+    @Override
+    public void showContactBlockedSuccess() {
+        String message;
+        message = "This contact has been blocked.";
+
+        AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
+        alertDialog.setMessage(Html.fromHtml(message));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+
+        alertDialog.setOnDismissListener(dialog -> {
+            showAddBlock(false);
+        });
     }
 
     @Override
@@ -413,39 +481,29 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
-    public void updatePresence(Presence.Type presence) {
-        Logger.d(this, "Presence: "+presence);
-        if(presence == Presence.Type.available)
-            presenceView.setText("Active now");
-        else {
-            messagePresenter.getLastActivity(chatUserName);
+    public void updateLastActivity(String time) {
+        if(time != null && !time.isEmpty()) {
+            presenceView.setVisibility(View.VISIBLE);
+            presenceView.setText(time);
+        } else {
+            presenceView.setVisibility(View.GONE);
         }
     }
 
     @Override
-    public void updateLastActivity(long secAgo) {
-        presenceView.setText("Active "+secAgo+"s ago");
-    }
-
-    @Override
-    public void sendPostbackMessage(String message) {
-        messagePresenter.sendTextMessage(chatUserName, currentUser, message);
+    public void sendPostbackMessage(String message, String payload) {
+        Message m = new Message();
+        m.setText(message);
+        if(payload!=null && !payload.isEmpty()) {
+            m.setPayload(payload);
+        }
+        messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
     }
 
     @Override
     public void urlButtonClicked(String url) {
         startActivity(WebViewActivity.callingIntent(this, url));
     }
-
-    @Override
-    public void onQuickReplyClicked(String text) {
-        messagePresenter.sendTextMessage(chatUserName, currentUser, text);
-    }
-
-//    @Override
-//    public void onMessageLongClicked(String messageId) {
-//        showMessageActionPopup();
-//    }
 
     @Override
     public void onMessageReceived(MessageResult messageResult, ContactResult contactResult) {
@@ -463,9 +521,9 @@ public class MessageActivity extends BaseActivity
         super.onChatStateReceived(from, chatState);
         if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing) {
-                presenceView.setText("Typing...");
+                presenceView.setText(getResources().getString(R.string.chat_state_typing));
             } else {
-                updatePresence(presence);
+                messagePresenter.getLastActivity(this.chatUserName);
             }
         }
     }
@@ -474,13 +532,12 @@ public class MessageActivity extends BaseActivity
     public void onPresenceChanged(String username, Presence.Type type) {
         super.onPresenceChanged(username, type);
         if(username.equals(chatUserName)) {
+            presenceView.setVisibility(View.VISIBLE);
             if(type == Presence.Type.available) {
-                presence = Presence.Type.available;
-                updatePresence(presence);
-            } else {
-                if(presence!= Presence.Type.unavailable)
-                    presenceView.setText("Active a while ago");
-                presence = Presence.Type.unavailable;
+                presenceView.setText(getResources().getString(R.string.chat_presence_online));
+            } else if(type == Presence.Type.unavailable) {
+                DateTime timeNow = DateTime.now();
+                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
             }
         }
     }

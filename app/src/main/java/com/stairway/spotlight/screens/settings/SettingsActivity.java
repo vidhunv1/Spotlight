@@ -79,6 +79,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Bind(R.id.title)
     TextView profileNameText;
 
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
+
     static final String PREFS_FILE = "settings";
     static final String KEY_ALERT = "alert";
     static final String KEY_SOUND = "sound";
@@ -161,7 +163,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     @Override
     public void onLogoutSuccess() {
-        super.dismissProgressDialog();
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
         startActivity(WelcomeActivity.callingIntent(this));
         finish();
     }
@@ -285,7 +289,10 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.app_name));
         builder.setPositiveButton("OK", ((dialog, which) -> {
-            super.showProgressDialog();
+            if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+                progressDialog[0].dismiss();
+            }
+            progressDialog[0] = ProgressDialog.show(this, "", "Loading. Please wait...", true);
             settingsPresenter.logoutUser();
         }));
         builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));

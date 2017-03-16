@@ -11,6 +11,8 @@ import java.util.List;
 public class Message {
     @SerializedName("text")
     private String text;
+    @SerializedName("payload")
+    private String payload;
     @SerializedName("button_template")
     private ButtonTemplate buttonTemplate;
     @SerializedName("generic_template")
@@ -64,6 +66,14 @@ public class Message {
 
     public String getText() {
         return text;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
     }
 
     public String getDisplayText() {

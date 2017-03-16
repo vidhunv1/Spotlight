@@ -69,12 +69,13 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                     public void onNext(List<ContactResult> contactsResults) {
                         List<NewChatItemModel> newChatItemModels = new ArrayList<NewChatItemModel>(contactsResults.size());
                         for(ContactResult contactsResult: contactsResults) {
-                            NewChatItemModel newChatItemModel = new NewChatItemModel(
-                                    contactsResult.getContactName(),
-                                    contactsResult.getUsername(),
-                                    contactsResult.getUserId());
-
-                            newChatItemModels.add(newChatItemModel);
+                            if(contactsResult.isAdded()) {
+                                NewChatItemModel newChatItemModel = new NewChatItemModel(
+                                        contactsResult.getContactName(),
+                                        contactsResult.getUsername(),
+                                        contactsResult.getUserId());
+                                newChatItemModels.add(newChatItemModel);
+                            }
                         }
 
                         contactsView.displayContacts(newChatItemModels);
@@ -86,7 +87,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
     // failed, already in contacts, added succesfully
     @Override
-    public void addContact(String userId, String accessToken) {
+    public void addContact(String userId) {
         Logger.d(this);
         Subscription subscription = contactStore.getContactByUserId(userId)
                 .observeOn(AndroidSchedulers.mainThread())

@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -17,15 +18,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.screens.shared_media.SharedMediaActivity;
 
+import org.jivesoftware.smack.packet.Presence;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscriber;
+
 public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.iv_userprofile_dp)
     ImageView profileDP;
@@ -41,6 +54,9 @@ public class UserProfileActivity extends BaseActivity {
 
     @Bind(R.id.tv_user_profile_id)
     TextView userIdView;
+
+    @Bind(R.id.profile_presence)
+    TextView presenceView;
 
     private static int RESULT_LOAD_IMAGE = 1;
     private String username;
@@ -78,6 +94,19 @@ public class UserProfileActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
+
+        MessageController messageController = MessageController.getInstance();
+        messageController.getLastActivity(this.username).subscribe(new Subscriber<String>() {
+            @Override
+            public void onCompleted() {}
+            @Override
+            public void onError(Throwable e) {}
+
+            @Override
+            public void onNext(String time) {
+                presenceView.setText(time);
+            }
+        });
     }
 
     @Override
@@ -204,27 +233,6 @@ public class UserProfileActivity extends BaseActivity {
         t1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_volume_up_dark, 0, 0, 0);
         t1.setCompoundDrawablePadding((int)AndroidUtils.px(24));
 
-//        t2 = new TextView(this);
-//        t2.setText("Mute for 1 hour");
-//        t2.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-//        t2.setTextSize(16);
-//        t2.setHeight((int)AndroidUtils.px(48));
-//        t2.setGravity(Gravity.CENTER_VERTICAL);
-//
-//        t3 = new TextView(this);
-//        t3.setText("Mute for 2 days");
-//        t3.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-//        t3.setTextSize(16);
-//        t3.setHeight((int)AndroidUtils.px(48));
-//        t3.setGravity(Gravity.CENTER_VERTICAL);
-//
-//        t4 = new TextView(this);
-//        t4.setText("Customize");
-//        t4.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-//        t4.setTextSize(16);
-//        t4.setHeight((int)AndroidUtils.px(48));
-//        t4.setGravity(Gravity.CENTER_VERTICAL);
-
         t5 = new TextView(this);
         t5.setText("Turn Off");
         t5.setTextColor(ContextCompat.getColor(this, R.color.textColor));
@@ -236,9 +244,6 @@ public class UserProfileActivity extends BaseActivity {
 
         parent.addView(t1);
         parent.addView(t5);
-//        parent.addView(t3);
-//        parent.addView(t4);
-//        parent.addView(t5);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Notifications");
@@ -252,18 +257,22 @@ public class UserProfileActivity extends BaseActivity {
         t5.setOnClickListener(v -> {
             alertDialog.dismiss();
         });
-//        t3.setOnClickListener(v -> {
-//            alertDialog.dismiss();
-//        });
-//        t4.setOnClickListener(v -> {
-//            alertDialog.dismiss();
-//        });
-//        t5.setOnClickListener(v -> {
-//
-//        });
     }
 
-//    @OnClick(R.id.iv_userprofile_dp)
+    @Override
+    public void onPresenceChanged(String username, Presence.Type type) {
+        if(this.username.equals(username)) {
+            Resources res = getResources();
+            if(type == Presence.Type.available) {
+                presenceView.setText(res.getString(R.string.chat_presence_online));
+            } else if(type == Presence.Type.unavailable) {
+                DateTime timeNow = DateTime.now();
+                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
+            }
+        }
+    }
+
+    //    @OnClick(R.id.iv_userprofile_dp)
 //    public void onProfileClicked() {
 //        Logger.d(this, "Profile clicked");
 //        Intent loadIntent = new Intent(Intent.ACTION_PICK,

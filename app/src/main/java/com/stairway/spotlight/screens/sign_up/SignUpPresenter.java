@@ -70,7 +70,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                         if(!userResponse.isSuccess()) {
                             signUpView.showError(userResponse.getError().getTitle(), userResponse.getError().getMessage());
                         } else {
-                            UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), fullName, email, password);
+                            UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getExpires(), password);
+                            userSession.setName(userResponse.getUser().getName());
+                            userSession.setEmail(userResponse.getUser().getEmail());
                             userSessionManager.save(userSession);
                             SpotlightApplication.getContext().initSession();
 

@@ -17,15 +17,13 @@ public class ContactResult implements Serializable {
     private String userId;
     private _User.UserType userType;
 
-
     public ContactResult(String countryCode, String phoneNumber, String displayName) {
         this.phoneNumber = phoneNumber;
         this.contactName = displayName;
         this.countryCode = countryCode;
     }
 
-    public ContactResult() {
-    }
+    public ContactResult() {}
 
     public boolean isBlocked() {
         return isBlocked;
@@ -97,19 +95,6 @@ public class ContactResult implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "ContactResult{" +
-                "phoneNumber='" + phoneNumber + '\'' +
-                ", countryCode='" + countryCode + '\'' +
-                ", contactName='" + contactName + '\'' +
-                ", username='" + username + '\'' +
-                ", isAdded=" + isAdded +
-                ", userId='" + userId + '\'' +
-                ", userType=" + userType.name() +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if(o instanceof ContactResult) {
             ContactResult temp = (ContactResult) o;
@@ -119,6 +104,20 @@ public class ContactResult implements Serializable {
         }
 
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "ContactResult{" +
+                "phoneNumber='" + phoneNumber + '\'' +
+                ", countryCode='" + countryCode + '\'' +
+                ", contactName='" + contactName + '\'' +
+                ", username='" + username + '\'' +
+                ", isAdded=" + isAdded +
+                ", isBlocked=" + isBlocked +
+                ", userId='" + userId + '\'' +
+                ", userType=" + userType +
+                '}';
     }
 }
 

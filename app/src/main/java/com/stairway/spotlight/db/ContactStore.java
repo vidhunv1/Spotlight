@@ -55,6 +55,8 @@ public class ContactStore {
                 values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
+                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
+                values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
                 if(contactResult.getUserType()==null) {
                     values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, _User.UserType.regular.name());
                 } else {
@@ -258,15 +260,29 @@ public class ContactStore {
             }
         });
     }
-//
-//    public Observable<ContactResult> update(ContactResult contactResult) {
-//        return Observable.create(subscriber -> {
-//            SQLiteDatabase db = databaseManager.openConnection();
-//            ContentValues values = new ContentValues();
-//            db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME+"='"+contactResult.getUsername()+"'", null);
-//            subscriber.onNext(contactResult);
-//            subscriber.onCompleted();
-//            databaseManager.closeConnection();
-//        });
-//    }
+
+    public Observable<ContactResult> update(ContactResult contactResult) {
+        return Observable.create(subscriber -> {
+            SQLiteDatabase db = databaseManager.openConnection();
+            ContentValues values = new ContentValues();
+            values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
+            values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
+            if(contactResult.getContactName()!=null && !contactResult.getContactName().isEmpty()) {
+                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.isAdded());
+            }
+            if(contactResult.getUsername()!=null && !contactResult.getUsername().isEmpty()) {
+                db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME + "='" + contactResult.getUsername() + "'", null);
+                subscriber.onNext(contactResult);
+                subscriber.onCompleted();
+            } else if(contactResult.getUserId()!=null && !contactResult.getUserId().isEmpty()) {
+                db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USER_ID + "='" + contactResult.getUserId() + "'", null);
+                subscriber.onNext(contactResult);
+                subscriber.onCompleted();
+            } else {
+                subscriber.onNext(null);
+                subscriber.onCompleted();
+            }
+            databaseManager.closeConnection();
+        });
+    }
 }

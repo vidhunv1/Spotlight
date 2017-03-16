@@ -34,7 +34,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  */
 public class BaseActivity extends AppCompatActivity{
     BroadcastReceiver receiver;
-    final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,27 +101,11 @@ public class BaseActivity extends AppCompatActivity{
     }
 
     public void showError(String title, String message) {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-    }
-
-    public void showProgressDialog() {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        progressDialog[0] = ProgressDialog.show(this, "", "Loading. Please wait...", true);
-    }
-
-    public void dismissProgressDialog() {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
     }
 
     @Override

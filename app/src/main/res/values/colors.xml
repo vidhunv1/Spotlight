@@ -2,12 +2,12 @@
 <resources>
 
     <!--App-->
-    <color name="colorPrimary">#3688ad</color>
+    <color name="colorPrimary">#0f9d58</color>
     <color name="colorPrimaryDark">#1A7ECE</color>
     <color name="colorPrimaryLight">#61B2F3</color>
     <color name="colorAccent">@color/colorPrimary</color>
     <color name="background_default">#FFFFFF</color>
-    <color name="statusBar">#2c6d8a</color>
+    <color name="statusBar">#0B8043</color>
     <color name="activeIndicator">#2A97F0</color>
 
     <!--chat-->

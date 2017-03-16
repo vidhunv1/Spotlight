@@ -32,7 +32,17 @@ public class UserSession {
         this.password = password;
     }
 
+    public UserSession(String accessToken, Date expires, String password) {
+        this.accessToken = accessToken;
+        this.expires = expires;
+        this.password = password;
+    }
+
     public UserSession() {
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getUserId() {

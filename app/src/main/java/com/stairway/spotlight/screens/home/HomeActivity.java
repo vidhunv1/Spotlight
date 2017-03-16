@@ -235,24 +235,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onChatItemClicked(String userName) {
-		//get chat name
-		Activity activity = this;
-		ContactStore.getInstance().getContactByUserName(userName)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Subscriber<ContactResult>() {
-					@Override
-					public void onCompleted() {}
-					@Override
-					public void onError(Throwable e) {}
-
-					@Override
-					public void onNext(ContactResult contactResult) {
-						String name = "";
-						name = contactResult.getContactName();
-						startActivity(MessageActivity.callingIntent(activity, contactResult.getUsername(), name));
-					}
-				});
+		startActivity(MessageActivity.callingIntent(this, userName));
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.Message;
 
@@ -212,7 +213,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 notification.setText(chatListItem.getNotificationCount()+"");
             }
 
-            contactName.setText(chatListItem.getChatName());
+            contactName.setText(AndroidUtils.toTitleCase(chatListItem.getChatName()));
 
             if(isLineVisible) {
                 dividerLine.setVisibility(View.VISIBLE);

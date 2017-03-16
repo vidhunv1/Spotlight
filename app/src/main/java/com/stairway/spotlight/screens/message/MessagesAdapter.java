@@ -75,13 +75,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
-    private QuickRepliesAdapter.QuickReplyClickListener quickReplyClickListener;
     private Drawable textProfileDrawable;
 
     private int lastClickedPosition;
 
-    public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickRepliesAdapter.QuickReplyClickListener qrListener) {
-        this.quickReplyClickListener = qrListener;
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.context = context;
@@ -183,34 +181,46 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(position == messageList.size())
             return VIEW_TYPE_QUICK_REPLIES;
 
-        if(messageList.get(position).isMe()) {
-            if(isAllEmoticon(messageList.get(position).getMessage())) {
-                return VIEW_TYPE_SEND_EMOTICON;
+        Message parsedMessage;
+        try {
+            if(messageCache.get(position, null)==null) {
+                parsedMessage = GsonProvider.getGson().fromJson(messageList.get(position).getMessage(), Message.class);
+                messageCache.put(position, parsedMessage);
             } else {
-                return VIEW_TYPE_SEND_TEXT;
+                parsedMessage = messageCache.get(position);
             }
-        } else {
-            Message parsedMessage;
-            try {
-                if(messageCache.get(position, null)==null) {
-                    parsedMessage = GsonProvider.getGson().fromJson(messageList.get(position).getMessage(), Message.class);
-                    messageCache.put(position, parsedMessage);
+        } catch (JsonSyntaxException e) {
+            //TODO: Should fallback to text?
+            parsedMessage = new Message();
+            parsedMessage.setText(messageList.get(position).getMessage());
+            messageCache.put(position, parsedMessage);
+            Logger.e(this, "JsonSyntaxError, falling back to text");
+            if(isAllEmoticon(parsedMessage.getText())) {
+                return VIEW_TYPE_RECV_EMOTICON;
+            } else {
+                return VIEW_TYPE_RECV_TEXT;
+            }
+        }
+
+        if(messageList.get(position).isMe()) {
+            Logger.d(this, "Parsed Message: "+parsedMessage.getMessageType().name());
+            if(parsedMessage.getMessageType() == Message.MessageType.text) {
+                if(isAllEmoticon(parsedMessage.getText())) {
+                    return VIEW_TYPE_SEND_EMOTICON;
                 } else {
-                    parsedMessage = messageCache.get(position);
+                    return VIEW_TYPE_SEND_TEXT;
                 }
-            } catch (JsonSyntaxException e) {
-                //TODO: Should fallback to text?
+            } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
                 messageCache.put(position, parsedMessage);
-                Logger.e(this, "JsonSyntaxError, falling back to text");
                 if(isAllEmoticon(parsedMessage.getText())) {
-                    return VIEW_TYPE_RECV_EMOTICON;
+                    return VIEW_TYPE_SEND_EMOTICON;
                 } else {
-                    return VIEW_TYPE_RECV_TEXT;
+                    return VIEW_TYPE_SEND_TEXT;
                 }
             }
-
+        } else {
             if(parsedMessage.getMessageType() == Message.MessageType.generic_template)
                 return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
             else if(parsedMessage.getMessageType() == Message.MessageType.button_template)
@@ -221,8 +231,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     return VIEW_TYPE_RECV_TEXT;
                 }
-            }
-            else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
+            } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
                 messageCache.put(position, parsedMessage);
@@ -293,7 +302,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SEND_TEXT:
                 SendTextViewHolder sendViewHolder = (SendTextViewHolder) holder;
-                sendViewHolder.renderItem(messageList.get(position).getMessage(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                sendViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
                 break;
             case VIEW_TYPE_RECV_TEXT:
                 ReceiveTextViewHolder receiveViewHolder = (ReceiveTextViewHolder) holder;
@@ -318,14 +327,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_SEND_EMOTICON:
                 SendEmoticonViewHolder sendEmoticonViewHolder = (SendEmoticonViewHolder) holder;
-                sendEmoticonViewHolder.renderItem(messageList.get(position).getMessage(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                sendEmoticonViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
         }
     }
 
     private boolean isAllEmoticon(String message) {
         final String emo_regex = "(^[\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee ]+$)";
-        boolean isAll = Pattern.compile(emo_regex).matcher(message).find();
-        return isAll;
+        return Pattern.compile(emo_regex).matcher(message).find();
     }
 
     private boolean hasProfileDP(int position) {
@@ -465,7 +473,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(List<QuickReply> quickReplies) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             quickRepliesListView.setLayoutManager(layoutManager);
-            quickRepliesListView.setAdapter(new QuickRepliesAdapter(quickReplyClickListener, quickReplies));
+            quickRepliesListView.setAdapter(new QuickRepliesAdapter(postbackClickListener, quickReplies));
             OverScrollDecoratorHelper.setUpOverScroll(quickRepliesListView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         }
     }
@@ -902,12 +910,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.postback) {
                     templateImage.setOnClickListener(v -> {
                         if (postbackClickListener != null) {
-                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
+                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle(), null);
                         }
                     });
                     textContent.setOnClickListener(v -> {
                         if (postbackClickListener != null) {
-                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle());
+                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle(), null);
                         }
                     });
                 }
@@ -924,7 +932,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                     buttons[i].setOnClickListener(v -> {
                         if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
-                            postbackClickListener.sendPostbackMessage(btn.getTitle());
+                            postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
                         else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
                             urlClickListener.urlButtonClicked(btn.getUrl());
                     });
@@ -1011,7 +1019,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                     buttons[i].setOnClickListener(v -> {
                         if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
-                            postbackClickListener.sendPostbackMessage(btn.getTitle());
+                            postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
                         else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
                             urlClickListener.urlButtonClicked(btn.getUrl());
                     });
@@ -1028,7 +1036,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     interface PostbackClickListener {
-        void sendPostbackMessage(String message);
+        void sendPostbackMessage(String message, String payload);
     }
 
     interface UrlClickListener {

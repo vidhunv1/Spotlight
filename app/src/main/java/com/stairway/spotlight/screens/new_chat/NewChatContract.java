@@ -18,6 +18,6 @@ public class NewChatContract {
 
     interface Presenter extends BasePresenter<NewChatContract.View> {
         void initContactList();
-        void addContact(String userId, String accessToken);
+        void addContact(String userId);
     }
 }

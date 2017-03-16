@@ -45,16 +45,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void setContactList(List<NewChatItemModel> contactItems) {
         this.itemList = contactItems;
-        //test
-        String statusTest[] = {"Available", "Busy", "Can't talk", "In a meeting"};
-        int pos = 0;
-        for (NewChatItemModel newChatItemModel : itemList) {
-            if(!(pos<statusTest.length)) {
-                pos = 0;
-            }
-            newChatItemModel.setStatus(statusTest[pos]);
-            pos++;
-        }
         this.notifyItemRangeChanged(0, contactItems.size());
     }
 
@@ -176,14 +166,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.tv_chatItem_contactName)
         TextView contactName;
 
-        @Bind(R.id.tv_chatItem_message)
-        TextView status;
-
         @Bind(R.id.view_contactItem_divider)
         View divider;
-
-        @Bind(R.id.tv_chatItem_time)
-        TextView time;
 
         ContactsViewHolder(View itemView) {
             super(itemView);
@@ -201,14 +185,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             String contactNameLower = contactItem.getContactName().toLowerCase();
             int startPos = contactNameLower.indexOf(query.toLowerCase());
             if(!query.isEmpty() && startPos>=0) {
-                //color
                 String textHTML = contactItem.getContactName().substring(0,startPos)
                         +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
                         +contactItem.getContactName().substring(startPos+query.length());
-
-//                String textHTML = contactItem.getContactName().substring(0,startPos)
-//                        +"<b>"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</b>"
-//                        +contactItem.getContactName().substring(startPos+query.length());
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                     contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
@@ -217,10 +196,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else
                 contactName.setText(contactItem.getContactName());
 
-            status.setText(contactItem.getStatus());
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             contactName.setTag(contactItem.getUserName());
-            time.setText("");
         }
     }
 

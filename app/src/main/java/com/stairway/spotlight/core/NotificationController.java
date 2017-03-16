@@ -73,7 +73,6 @@ public class NotificationController {
             @Override
             public void onNext(ContactResult contactResult) {
                 if(contactResult == null) {
-
                     userApi.findUserByUserName(newMessage.getChatId()).subscribe(new Subscriber<UserResponse>() {
                         @Override
                         public void onCompleted() {}
@@ -191,7 +190,7 @@ public class NotificationController {
                                     PendingIntent pendingIntent;
 
                                     if(uniqueUsernames.size() == 1) {
-                                        intent = MessageActivity.callingIntent(context, uniqueUsernames.get(0), contactNames.get(uniqueUsernames.get(0)));
+                                        intent = MessageActivity.callingIntent(context, uniqueUsernames.get(0));
                                         pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
                                         if(messageCount==1) {
                                             conv = messageCount + " new message";
@@ -226,7 +225,7 @@ public class NotificationController {
                                             PendingIntent replyPendingIntent = PendingIntent.getBroadcast(
                                                     SpotlightApplication.getContext(),
                                                     0,
-                                                    MessageActivity.callingIntent(SpotlightApplication.getContext(), uniqueUsernames.get(0), contactNames.get(uniqueUsernames.get(0))),
+                                                    MessageActivity.callingIntent(SpotlightApplication.getContext(), uniqueUsernames.get(0)),
                                                     PendingIntent.FLAG_UPDATE_CURRENT);
 
                                             NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(R.drawable.ic_reply,
