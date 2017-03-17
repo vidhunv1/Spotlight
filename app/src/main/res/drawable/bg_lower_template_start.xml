@@ -8,5 +8,5 @@
 
     <corners
         android:bottomLeftRadius="@dimen/bubble_full_corner_radius"
-        android:bottomRightRadius="@dimen/bubble_full_corner_radius" />
+        android:bottomRightRadius="@dimen/bubble_mid_corner_radius" />
 </shape>

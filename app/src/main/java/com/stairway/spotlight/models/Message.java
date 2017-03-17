@@ -1,13 +1,12 @@
 package com.stairway.spotlight.models;
 
 import com.google.gson.annotations.SerializedName;
-
+import com.stairway.spotlight.core.Logger;
 import java.util.List;
 
 /**
  * Created by vidhun on 08/02/17.
  */
-
 public class Message {
     @SerializedName("text")
     private String text;
@@ -16,8 +15,7 @@ public class Message {
     @SerializedName("button_template")
     private ButtonTemplate buttonTemplate;
     @SerializedName("generic_template")
-    private GenericTemplate genericTemplate;
-
+    private List<GenericTemplate> genericTemplate;
     @SerializedName("quick_replies")
     private List<QuickReply> quickReplies;
 
@@ -32,30 +30,15 @@ public class Message {
         unknown
     }
 
-    @Override
-    public String toString() {
-        String quickRepliesString = "";
-        if(quickReplies!=null && !quickReplies.isEmpty()) {
-            for (QuickReply q : quickReplies) {
-                quickRepliesString = quickRepliesString + "\n" + q.toString();
-            }
-        }
-
-        return "Message{" +
-                "text='" + text + '\'' +
-                ", buttonTemplate=" + buttonTemplate +
-                ", genericTemplate=" + genericTemplate +
-                ", quickReplies=" + quickRepliesString +
-                '}';
-    }
-
     public MessageType getMessageType() {
         if(this.text!=null)
             return MessageType.text;
         else if (this.buttonTemplate!=null)
             return MessageType.button_template;
-        else if(this.genericTemplate!=null)
+        else if(this.genericTemplate!=null) {
+            Logger.d(this, "Type =  GenericTemplate");
             return MessageType.generic_template;
+        }
         else
             return MessageType.unknown;
     }
@@ -80,9 +63,9 @@ public class Message {
         if(getMessageType() == MessageType.text)
             return getText();
         else if(getMessageType() == MessageType.button_template)
-            return getButtonTemplate().getText();
+            return "Template";
         else if(getMessageType() == MessageType.generic_template)
-            return getGenericTemplate().getTitle();
+            return "Template";
         else
             return "";
     }
@@ -91,11 +74,28 @@ public class Message {
         return buttonTemplate;
     }
 
-    public GenericTemplate getGenericTemplate() {
+    public List<GenericTemplate> getGenericTemplate() {
         return genericTemplate;
     }
 
     public List<QuickReply> getQuickReplies() {
         return quickReplies;
+    }
+
+    @Override
+    public String toString() {
+        String quickRepliesString = "";
+        if(quickReplies!=null && !quickReplies.isEmpty()) {
+            for (QuickReply q : quickReplies) {
+                quickRepliesString = quickRepliesString + "\n" + q.toString();
+            }
+        }
+
+        return "Message{" +
+                "text='" + text + '\'' +
+                ", buttonTemplate=" + buttonTemplate +
+                ", genericTemplate=" + genericTemplate +
+                ", quickReplies=" + quickRepliesString +
+                '}';
     }
 }

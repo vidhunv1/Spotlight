@@ -203,7 +203,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         if(messageList.get(position).isMe()) {
-            Logger.d(this, "Parsed Message: "+parsedMessage.getMessageType().name());
             if(parsedMessage.getMessageType() == Message.MessageType.text) {
                 if(isAllEmoticon(parsedMessage.getText())) {
                     return VIEW_TYPE_SEND_EMOTICON;
@@ -272,11 +271,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 viewHolder = new SendTextViewHolder(view2);
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_GENERIC:
-                View view3 = inflater.inflate(R.layout.item_message_receive_template_generic, parent, false);
+                View view3 = inflater.inflate(R.layout.item_message_receive_template, parent, false);
                 viewHolder = new ReceiveTemplateGenericViewHolder(view3);
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_BUTTON:
-                View view4 = inflater.inflate(R.layout.item_message_receive_template_button, parent, false);
+                View view4 = inflater.inflate(R.layout.item_message_receive_template, parent, false);
                 viewHolder = new ReceiveTemplateButtonViewHolder(view4);
                 break;
             case VIEW_TYPE_QUICK_REPLIES:
@@ -318,7 +317,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_QUICK_REPLIES:
                 QuickRepliesViewHolder qrVH = (QuickRepliesViewHolder) holder;
-                Logger.d(this, messageCache.get(position-1).toString());
                 qrVH.renderItem(messageCache.get(position-1).getQuickReplies());
                 break;
             case VIEW_TYPE_RECV_EMOTICON:
@@ -475,6 +473,51 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             quickRepliesListView.setLayoutManager(layoutManager);
             quickRepliesListView.setAdapter(new QuickRepliesAdapter(postbackClickListener, quickReplies));
             OverScrollDecoratorHelper.setUpOverScroll(quickRepliesListView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
+        }
+    }
+
+    class ReceiveTemplateGenericViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.rv_template)
+        RecyclerView templateView;
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImage;
+        @Bind(R.id.fl_profileImageLayout)
+        FrameLayout profileImageLayout;
+
+        public ReceiveTemplateGenericViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(List<GenericTemplate> genericTemplates, int position) {
+            int bubbleType = bubbleType(position);
+            boolean displayProfileDP = hasProfileDP(position);
+
+            if(displayProfileDP) {
+                profileImage.setVisibility(View.VISIBLE);
+                profileImage.setImageDrawable(textProfileDrawable);
+            } else {
+                profileImage.setVisibility(View.INVISIBLE);
+            }
+
+            switch (bubbleType) {
+                case 0:
+                    profileImageLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+                case 1:
+                    profileImageLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 2:
+                    profileImageLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 3:
+                    profileImageLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+            }
+
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+            templateView.setLayoutManager(layoutManager);
+            templateView.setAdapter(new GenericTemplateAdapter(context, genericTemplates, bubbleType(position), postbackClickListener, urlClickListener));
         }
     }
 
@@ -734,12 +777,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_time)
         TextView timeView;
 
+        private int position;
+
         ReceiveTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String message, String time, int position) {
+            this.position = position;
             int bubbleType = bubbleType(position);
             boolean displayProfileDP = hasProfileDP(position);
             boolean shouldShowTime = shouldShowTime(position);
@@ -801,150 +847,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             });
         }
-    }
 
-    class ReceiveTemplateGenericViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.iv_rcv_template_image)
-        ImageView templateImage;
-        @Bind(R.id.tv_rcv_template_title)
-        TextView title;
-        @Bind(R.id.tv_rcv_template_subtitle)
-        TextView subtitle;
-        @Bind(R.id.tv_rcv_template_url)
-        TextView url;
-        @Bind(R.id.iv_profileImage)
-        ImageView profileImage;
-        @Bind(R.id.ll_bubble)
-        LinearLayout bubble;
-        @Bind(R.id.rl_message_receive_generic)
-        RelativeLayout bubbleLayout;
-        @Bind(R.id.ll_rcv_template_text)
-        LinearLayout textContent;
-
-        TextView buttons[];
-
-        ReceiveTemplateGenericViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            buttons = new TextView[3];
-            buttons[0] = (TextView) itemView.findViewById(R.id.tv_rcv_button1);
-            buttons[1] = (TextView) itemView.findViewById(R.id.tv_rcv_button2);
-            buttons[2] = (TextView) itemView.findViewById(R.id.tv_rcv_button3);
-
-            buttons[0].setVisibility(View.GONE);
-            buttons[1].setVisibility(View.GONE);
-            buttons[2].setVisibility(View.GONE);
-        }
-
-        void renderItem(GenericTemplate genericTemplate, int position) {
-            int bubbleType = bubbleType(position);
-            boolean displayProfileDP = hasProfileDP(position);
-
-            switch (bubbleType) {
-                case 0:
-                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    bubble.setBackgroundResource(R.drawable.bg_template_full);
-                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
-                    } else {
-                        templateImage.setVisibility(View.GONE);
-                    }
-                    break;
-                case 1:
-                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    bubble.setBackgroundResource(R.drawable.bg_template_top);
-                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
-                    } else {
-                        templateImage.setVisibility(View.GONE);
-                    }
-                    break;
-                case 2:
-                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    bubble.setBackgroundResource(R.drawable.bg_template_middle);
-                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
-                        Glide.with(context)
-                                .load(genericTemplate.getImageUrl())
-                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
-                                .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
-                                .into(templateImage);
-                    } else {
-                        templateImage.setVisibility(View.GONE);
-                    }
-                    break;
-                case 3:
-                    bubbleLayout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    bubble.setBackgroundResource(R.drawable.bg_template_bottom);
-                    if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
-                        Glide.with(context)
-                                .load(genericTemplate.getImageUrl())
-                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP_LEFT))
-                                .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
-                                .into(templateImage);
-                    } else {
-                        templateImage.setVisibility(View.GONE);
-                    }
-                    break;
-            }
-
-            title.setText(genericTemplate.getTitle());
-
-            if(genericTemplate.getDefaultAction()!=null) {
-                if (genericTemplate.getSubtitle() != null && !genericTemplate.getSubtitle().isEmpty()) {
-                    subtitle.setText(genericTemplate.getSubtitle());
-                } else {
-                    subtitle.setVisibility(View.GONE);
-                }
-                if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
-                    url.setText(genericTemplate.getDefaultAction().getUrl());
-                    templateImage.setOnClickListener(v -> {
-                        if (urlClickListener != null) {
-                            urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
-                        }
-                    });
-                    textContent.setOnClickListener(v -> {
-                        if (urlClickListener != null) {
-                            urlClickListener.urlButtonClicked(genericTemplate.getDefaultAction().getUrl());
-                        }
-                    });
-                } else if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.postback) {
-                    templateImage.setOnClickListener(v -> {
-                        if (postbackClickListener != null) {
-                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle(), null);
-                        }
-                    });
-                    textContent.setOnClickListener(v -> {
-                        if (postbackClickListener != null) {
-                            postbackClickListener.sendPostbackMessage(genericTemplate.getTitle(), null);
-                        }
-                    });
-                }
-            } else {
-                subtitle.setVisibility(View.GONE);
-                url.setVisibility(View.GONE);
-            }
-
-            for (int i = 0; i < genericTemplate.getButtons().size(); i++) {
-                _Button btn = genericTemplate.getButtons().get(i);
-                if (!btn.getTitle().isEmpty()) {
-                    buttons[i].setVisibility(View.VISIBLE);
-                    buttons[i].setText(btn.getTitle());
-
-                    buttons[i].setOnClickListener(v -> {
-                        if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
-                            postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
-                        else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
-                            urlClickListener.urlButtonClicked(btn.getUrl());
-                    });
-                }
-            }
-            if(displayProfileDP) {
-                profileImage.setVisibility(View.VISIBLE);
-                profileImage.setImageDrawable(textProfileDrawable);
-            }
-            else {
-                profileImage.setVisibility(View.INVISIBLE);
-            }
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            showMessageActionPopup(this, position, messageView.getText().toString());
+            return true;
         }
     }
 
@@ -1009,7 +916,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
             }
-
 
             for (int i = 0; i < buttonTemplate.getButtons().size(); i++) {
                 _Button btn = buttonTemplate.getButtons().get(i);

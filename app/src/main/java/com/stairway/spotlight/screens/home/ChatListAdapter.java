@@ -223,14 +223,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             try {
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
-
-                if(message.getMessageType() == Message.MessageType.generic_template) {
-                    lastMessage.setText(message.getGenericTemplate().getTitle());
-                } else if(message.getMessageType() == Message.MessageType.button_template) {
-                    lastMessage.setText(message.getButtonTemplate().getText());
-                } else if(message.getMessageType() == Message.MessageType.text) {
-                    lastMessage.setText(message.getText());
-                }
+                lastMessage.setText(message.getDisplayText());
             } catch(JsonSyntaxException e) {
                 lastMessage.setText(chatListItem.getLastMessage());
             }
