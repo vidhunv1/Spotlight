@@ -24,8 +24,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.ImageUtils;
@@ -102,7 +105,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		profileNameView.setText(userSession.getName());
 		profileIdView.setText("ID: "+userSession.getUserId());
 
-		profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
+		if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
+			Glide.with(this).load(userSession.getProfilePicPath())
+					.diskCacheStrategy(DiskCacheStrategy.ALL)
+					.skipMemoryCache(true)
+					.into(profileDp);
+		} else {
+			profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
+		}
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();

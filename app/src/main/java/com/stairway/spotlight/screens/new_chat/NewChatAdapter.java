@@ -27,7 +27,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
-    private final int INVITE_FRIENDS = 2;
+    private final int ContactsNumber = 2;
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
     private Context context;
@@ -79,9 +79,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(filteredList.size()==0 && !filterQuery.isEmpty()) {
             return NO_RESULT;
         } if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
-            return INVITE_FRIENDS;
+            return ContactsNumber;
         } if(position == itemList.size()+1 && filterQuery.isEmpty() && filteredList.size()==0) {
-            return INVITE_FRIENDS;
+            return ContactsNumber;
         } if(position == 0 && filterQuery.isEmpty()) {
             Logger.d(this, "NewGroup");
             return HEADER;
@@ -99,9 +99,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
-            case INVITE_FRIENDS:
-                View categoryView = inflater.inflate(R.layout.item_invite_friends, parent, false);
-                viewHolder = new InviteFriendsViewHolder(categoryView);
+            case ContactsNumber:
+                View categoryView = inflater.inflate(R.layout.item_contacts_number, parent, false);
+                viewHolder = new ContactsNumber(categoryView);
                 break;
             case NO_RESULT:
                 View noResultView = inflater.inflate(R.layout.item_no_result, parent, false);
@@ -131,8 +131,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem(itemList.get(position), filterQuery);
                 break;
-            case INVITE_FRIENDS:
-//                InviteFriendsViewHolder catVH = (InviteFriendsViewHolder) holder;
+            case ContactsNumber:
+                ContactsNumber iVH = (ContactsNumber) holder;
+                iVH.renderItem(itemList.size());
                 break;
             case NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
@@ -189,12 +190,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+query.length()) +"</font>"
                         +contactItem.getContactName().substring(startPos+query.length());
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     contactName.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
-                else
+                } else {
                     contactName.setText(Html.fromHtml(textHTML));
-            } else
+                }
+            } else {
                 contactName.setText(contactItem.getContactName());
+            }
 
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             contactName.setTag(contactItem.getUserName());
@@ -208,9 +211,17 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
-        public InviteFriendsViewHolder(View itemView) {
+    class ContactsNumber extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_chatItem_contact)
+        TextView contactNumber;
+
+        public ContactsNumber(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void renderItem(int number) {
+            contactNumber.setText(number+" contacts");
         }
     }
 

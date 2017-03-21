@@ -10,8 +10,11 @@ import android.util.TypedValue;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.bumptech.glide.Glide;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.models.UserSession;
 
 import java.io.File;
 import java.io.IOException;

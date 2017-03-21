@@ -28,25 +28,48 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:id="@+id/ll_chatItem_content">
+            android:id="@+id/ll_chatItem_content"
+            android:paddingTop="10.75dp">
 
-            <TextView
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                tools:ignore="MissingPrefix"
                 android:layout_height="wrap_content"
-                android:text="Name"
-                android:textAppearance="@style/FontRobotoMedium"
-                android:textColor="#212121"
-                android:textSize="17sp"
-                android:id="@+id/tv_chatItem_contactName"
-                android:maxWidth="190dp" />
+                android:paddingBottom="4.25dp">
 
+                <TextView
+                    android:layout_width="190dp"
+                    tools:ignore="MissingPrefix"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textColor="#212121"
+                    android:textSize="17sp"
+                    android:id="@+id/tv_chatItem_contactName"
+                    android:maxWidth="190dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:maxLines="1"
+                    android:textColor="#8f8f8f"
+                    android:id="@+id/tv_chatItem_message"
+                    android:text="message"
+                    android:paddingRight="20dp" />
+
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
     <View
         android:layout_width="fill_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="1px"
         android:id="@+id/view_contactItem_divider"
         android:layout_marginLeft="72dp"
         android:background="@color/divider" />

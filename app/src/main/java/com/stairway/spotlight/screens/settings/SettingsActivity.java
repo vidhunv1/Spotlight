@@ -6,14 +6,18 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +30,8 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiError;
@@ -39,6 +45,9 @@ import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
+
+import java.io.File;
+import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -79,6 +88,10 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Bind(R.id.title)
     TextView profileNameText;
 
+    private static final int REQUEST_GALLERY = 1;
+    private static final int REQUEST_CAMERA = 2;
+    private String currentPhotoPath;
+
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     static final String PREFS_FILE = "settings";
@@ -99,6 +112,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     UserSession userSession;
 
     SettingsPresenter settingsPresenter;
+
+    AlertDialog alertDialogPic = null;
 
     public static Intent callingIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
@@ -140,7 +155,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings_toolbar, menu);
-
         return true;
     }
 
@@ -158,6 +172,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Override
     protected void onResume() {
         super.onResume();
+        if(alertDialogPic!=null) {
+            alertDialogPic.dismiss();
+        }
         settingsPresenter.attachView(this);
     }
 
@@ -224,6 +241,25 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView1.setTextSize(16);
         textView1.setGravity(Gravity.CENTER_VERTICAL);
         textView1.setHeight((int)AndroidUtils.px(48));
+        textView1.setOnClickListener(v -> {
+            // ** Load image from camera **
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            PackageManager pm = this.getPackageManager();
+            if (cameraIntent.resolveActivity(this.getPackageManager()) != null && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+                File photoFile = null;
+                try {
+                    photoFile = ImageUtils.createImageFile(this);
+                } catch (IOException ex) {
+                    Logger.d(this, "Error creating image file.");
+                }
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(this, "com.stairway.spotlight.fileprovider", photoFile);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    currentPhotoPath = photoFile.getAbsolutePath();
+                    startActivityForResult(cameraIntent, REQUEST_CAMERA);
+                }
+            }
+        });
 
         TextView textView2 = new TextView(this);
         textView2.setText("From gallery");
@@ -231,6 +267,12 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView2.setTextSize(16);
         textView2.setGravity(Gravity.CENTER_VERTICAL);
         textView2.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView2.setOnClickListener(v -> {
+            // ** Load image from gallery **
+            Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(loadIntent, REQUEST_GALLERY);
+        });
 
         TextView textView3 = new TextView(this);
         textView3.setHeight((int)AndroidUtils.px(48));
@@ -245,8 +287,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(parent);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        alertDialogPic = builder.create();
+        alertDialogPic.show();
     }
 
     public void showAskAQuestionPopup() {
@@ -372,7 +414,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         int colorsInt[] = {Color.rgb(255,0,0), Color.rgb(255,165,0), Color.rgb(255,255,0), Color.rgb(0,255,0), Color.rgb(0,255,255), Color.rgb(0,0,255), Color.rgb(238,130,238), Color.rgb(255, 192, 203), Color.rgb(245, 245, 245)};
         String colorsText[] = {"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Violet", "Pink", "White"};
 
-        for(int i=0; i<9; i++){
+        for(int i=0; i<9; i++) {
             rb[i]  = new AppCompatRadioButton(this);
             rb[i].setText(colorsText[i]);
             rb[i].setHeight((int)AndroidUtils.px(48));
@@ -394,7 +436,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
         builder.setPositiveButton("SET", ((dialog, which) -> {}));
         // hack for positioning button left-right<-->
-            builder.setNegativeButton(" ", ((dialog, which) -> {}));
+        builder.setNegativeButton(" ", ((dialog, which) -> {}));
         builder.setNeutralButton("DISABLED", ((dialog, which) -> {}));
 
         AlertDialog alertDialog = builder.create();
@@ -420,18 +462,56 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     }
 
     @Override
+    public void updateProfileDP(String url) {
+        Logger.d(this, "set dp:"+url);
+        Glide.with(this).load(url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .skipMemoryCache(true)
+                .into(profileDp);
+    }
+
+    @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
-        if (resultCode == Activity.RESULT_OK && requestCode == 5)
-        {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (resultCode == Activity.RESULT_OK && requestCode == 5) {
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             if (uri != null) {
                 //chosen ringtone
-                 Logger.d(this, "Chosen ringtone: "+uri.toString());
-            }
-            else
-            {
+                Logger.d(this, "Chosen ringtone: "+uri.toString());
+            } else {
                 //chosen ringtone null
             }
+        } else if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && intent!=null) {
+            if(alertDialogPic!=null)
+                alertDialogPic.dismiss();
+            Uri selectedImage = intent.getData();
+            Logger.d(this, selectedImage.toString());
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = this.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            Logger.d(this, "Got gallery pic: "+picturePath);
+            cursor.close();
+            settingsPresenter.uploadProfileDP(new File(picturePath));
+
+        } else if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
+            if(alertDialogPic!=null)
+                alertDialogPic.dismiss();
+            if(currentPhotoPath!=null) {
+                settingsPresenter.uploadProfileDP(new File(currentPhotoPath));
+                Logger.d(this, "got camClick:"+currentPhotoPath);
+                galleryAddPic(currentPhotoPath);
+            }
         }
+    }
+
+    private void galleryAddPic(String path) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(path);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 }

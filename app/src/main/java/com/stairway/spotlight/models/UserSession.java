@@ -22,6 +22,7 @@ public class UserSession {
     private String countryCode;
     private String mobile;
     private String userId;
+    private String profilePicPath;
 
     public UserSession(String accessToken, String userName, Date expires, String name, String email, String password) {
         this.expires = expires;
@@ -39,6 +40,14 @@ public class UserSession {
     }
 
     public UserSession() {
+    }
+
+    public String getProfilePicPath() {
+        return profilePicPath;
+    }
+
+    public void setProfilePicPath(String profilePicPath) {
+        this.profilePicPath = profilePicPath;
     }
 
     public void setUserName(String userName) {

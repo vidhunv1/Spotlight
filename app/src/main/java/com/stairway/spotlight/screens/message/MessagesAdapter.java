@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,24 +18,20 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
-import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
 import com.stairway.spotlight.models.ButtonTemplate;
 import com.stairway.spotlight.models.GenericTemplate;
 import com.stairway.spotlight.models.Message;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.models.QuickReply;
 import com.stairway.spotlight.models._Button;
-import com.stairway.spotlight.models._DefaultAction;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -51,9 +46,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-
 /**
  * Created by vidhun on 07/08/16.
  */
@@ -345,7 +337,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
             return time.toString(timeFormat).toUpperCase();
         } else if((time.getDayOfMonth() > timeNow.getDayOfMonth()-7)) {
-            return time.dayOfWeek().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat);
+            return time.dayOfWeek().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat).toUpperCase();
         } else if(timeNow.getMonthOfYear() == time.getMonthOfYear()) {
             return time.getDayOfMonth()+" "+time.monthOfYear().getAsShortText().toUpperCase()+" AT "+time.toString(timeFormat).toUpperCase();
         } else {

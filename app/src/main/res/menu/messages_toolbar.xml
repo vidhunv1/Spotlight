@@ -5,5 +5,20 @@
         android:id="@+id/view_contact"
         android:icon="@drawable/ic_info"
         android:title="View Contact"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_block"
+        android:title="Block"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_delete"
+        android:title="Delete"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_attach_files"
+        android:icon="@drawable/ic_attach_file_tilted"
         app:showAsAction="always" />
 </menu>

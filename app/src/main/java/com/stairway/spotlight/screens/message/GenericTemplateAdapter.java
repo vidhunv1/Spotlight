@@ -210,18 +210,20 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                 url.setVisibility(View.GONE);
             }
 
-            for (int i = 0; i < genericTemplate.getButtons().size(); i++) {
-                _Button btn = genericTemplate.getButtons().get(i);
-                if (!btn.getTitle().isEmpty()) {
-                    buttons[i].setVisibility(View.VISIBLE);
-                    buttons[i].setText(btn.getTitle());
+            if(genericTemplate.getButtons()!=null) {
+                for (int i = 0; i < genericTemplate.getButtons().size(); i++) {
+                    _Button btn = genericTemplate.getButtons().get(i);
+                    if (!btn.getTitle().isEmpty()) {
+                        buttons[i].setVisibility(View.VISIBLE);
+                        buttons[i].setText(btn.getTitle());
 
-                    buttons[i].setOnClickListener(v -> {
-                        if(postbackClickListener!=null && btn.getType() == _Button.Type.postback)
-                            postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
-                        else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
-                            urlClickListener.urlButtonClicked(btn.getUrl());
-                    });
+                        buttons[i].setOnClickListener(v -> {
+                            if (postbackClickListener != null && btn.getType() == _Button.Type.postback)
+                                postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
+                            else if (urlClickListener != null && btn.getType() == _Button.Type.web_url)
+                                urlClickListener.urlButtonClicked(btn.getUrl());
+                        });
+                    }
                 }
             }
         }

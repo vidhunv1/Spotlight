@@ -22,21 +22,23 @@
             android:paddingTop="19.25dp"
             android:paddingBottom="19.25dp"
             android:paddingLeft="9dp"
+            android:visibility="gone"
             android:paddingRight="11dp"/>
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ll_chatItem_content"
-            android:gravity="center_vertical">
+            android:id="@+id/ll_chatItem_content">
                 <TextView
-                    android:layout_width="190dp"
+                    android:paddingTop="10.75dp"
+                    android:layout_width="match_parent"
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
                     android:text="Invite Friends"
-                    android:textColor="#333333"
-                    android:textSize="17.5sp"
-                    android:id="@+id/tv_chatItem_contactName" />
+                    android:textAlignment="center"
+                    android:textColor="#6b6f72"
+                    android:textSize="16sp"
+                    android:id="@+id/tv_chatItem_contact" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

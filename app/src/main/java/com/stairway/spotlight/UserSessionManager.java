@@ -25,6 +25,7 @@ public class UserSessionManager {
     static final String KEY_COUNTRY_CODE = "CountryCode";
     static final String KEY_USER_ID = "UserId";
     static final String KEY_USER_ID_LOGIN = "UserIdLogin";
+    static final String KEY_PROFILE_PIC_PATH = "ProfilePicPath";
 
     private static UserSessionManager instance;
     private UserSession userSession;
@@ -85,6 +86,9 @@ public class UserSessionManager {
             sharedPreferences.edit().putString(KEY_USER_ID, us.getUserId()).apply();
             sharedPreferences.edit().putString(KEY_USER_ID_LOGIN, us.getUserId()).apply();
         }
+        if(us.getProfilePicPath()!=null && !us.getProfilePicPath().isEmpty()) {
+            sharedPreferences.edit().putString(KEY_PROFILE_PIC_PATH, us.getProfilePicPath()).apply();
+        }
     }
 
     public void clear() {
@@ -98,6 +102,7 @@ public class UserSessionManager {
         sharedPreferences.edit().remove(KEY_PASSWORD).apply();
         sharedPreferences.edit().remove(KEY_NAME).apply();
         sharedPreferences.edit().remove(KEY_USER_ID).apply();
+        sharedPreferences.edit().remove(KEY_PROFILE_PIC_PATH).apply();
     }
 
     public boolean hasAccessToken() {
@@ -108,9 +113,6 @@ public class UserSessionManager {
     }
 
     private UserSession getUserSession() {
-        if (userSession != null)
-            return userSession;
-
         String access = sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
         Date expiresAt = new Date(sharedPreferences.getLong(KEY_EXPIRES_AT, 0));
 //        Date lastRefresh = new Date(sharedPreferences.getLong(KEY_LAST_REFRESH, 0));
@@ -121,12 +123,14 @@ public class UserSessionManager {
         String mobile = sharedPreferences.getString(KEY_MOBILE, null);
         String countryCode = sharedPreferences.getString(KEY_COUNTRY_CODE, null);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
+        String profilePicPath = sharedPreferences.getString(KEY_PROFILE_PIC_PATH, null);
 
         if(access!=null && !access.isEmpty()) {
             UserSession userSession = new UserSession(access, userName, expiresAt, name, email, password);
             userSession.setCountryCode(countryCode);
             userSession.setMobile(mobile);
             userSession.setUserId(userId);
+            userSession.setProfilePicPath(profilePicPath);
 
             return userSession;
         }

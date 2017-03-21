@@ -2,8 +2,12 @@ package com.stairway.spotlight.screens.message;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +37,7 @@ import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.AndroidUtils;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
@@ -46,9 +51,9 @@ import com.stairway.spotlight.screens.web_view.WebViewActivity;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +93,10 @@ public class MessageActivity extends BaseActivity
 
     private ChatState currentChatState;
     private boolean shouldHandleBack = true;
+
+    private final int RESULT_TAKE_PICTURE = 1;
+    private String currentPhotoPath;
+    private Uri imageUri;
 
     public static int index = -1;
     public static int top = -1;
@@ -377,6 +386,7 @@ public class MessageActivity extends BaseActivity
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
             sendImageButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
             ImageButton emojiButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_message_smiley);
+            ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
 
             MessageEditText messageEditText = (MessageEditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
             FrameLayout smileyLayout = (FrameLayout) regularKeyboardView.findViewById(R.id.smiley_layout);
@@ -431,6 +441,25 @@ public class MessageActivity extends BaseActivity
                 String text = messageEditText.getText() + v.getEmoji();
                 messageEditText.setText(text);
                 messageEditText.setSelection(text.length());
+            });
+
+            cameraButton.setOnClickListener(v -> {
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                PackageManager pm = this.getPackageManager();
+                if (cameraIntent.resolveActivity(this.getPackageManager()) != null && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+                    File photoFile = null;
+                    try {
+                        photoFile = ImageUtils.createImageFile(this);
+                    } catch (IOException ex) {
+                        Logger.d(this, "Error creating image file.");
+                    }
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(this, "com.stairway.spotlight.fileprovider", photoFile);
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        currentPhotoPath = photoFile.getAbsolutePath();
+                        startActivityForResult(cameraIntent, RESULT_TAKE_PICTURE);
+                    }
+                }
             });
 
         }
@@ -548,6 +577,20 @@ public class MessageActivity extends BaseActivity
 
         if(this.chatUserName.equals(chatId)) {
             updateDeliveryStatus(deliveryReceiptId, messageStatus);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_TAKE_PICTURE && resultCode == RESULT_OK && data!=null) {
+            if(currentPhotoPath!=null) {
+                Logger.d(this, "Got image");
+//                setProfileDP(new File(currentPhotoPath));
+//                presenter.uploadProfileDP(new File(currentPhotoPath), userSession);
+//                galleryAddPic(currentPhotoPath);
+            }
+
         }
     }
 

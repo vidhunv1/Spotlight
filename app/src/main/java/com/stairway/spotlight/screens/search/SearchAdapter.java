@@ -183,7 +183,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             status.setText("ID: "+contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());
             divider.setVisibility(View.GONE);
-            profileImage.setImageResource(R.drawable.default_profile_image);
+//            profileImage.setImageResource(R.drawable.default_profile_image);
 
             contactListContent.setOnClickListener(view -> {
                 if(contactClickListener != null)
