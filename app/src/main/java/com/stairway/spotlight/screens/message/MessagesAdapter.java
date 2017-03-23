@@ -267,7 +267,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 viewHolder = new ReceiveTemplateGenericViewHolder(view3);
                 break;
             case VIEW_TYPE_RECV_TEMPLATE_BUTTON:
-                View view4 = inflater.inflate(R.layout.item_message_receive_template, parent, false);
+                View view4 = inflater.inflate(R.layout.item_message_receive_template_button, parent, false);
                 viewHolder = new ReceiveTemplateButtonViewHolder(view4);
                 break;
             case VIEW_TYPE_QUICK_REPLIES:
