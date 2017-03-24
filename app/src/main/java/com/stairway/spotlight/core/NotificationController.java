@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
+import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
@@ -17,6 +18,7 @@ import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
+import com.stairway.spotlight.models.Message;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
@@ -178,9 +180,9 @@ public class NotificationController {
                                         for (int j = 0; j < messageResults.size(); j++) {
                                             if(messageResults.get(j).getChatId().equals(uniqueUsernames.get(i))) {
                                                 if(uniqueUsernames.size()==1) {
-                                                    content = content + messageResults.get(j).getMessage() + "\n";
+                                                    content = content + getDisplayMessage(messageResults.get(j).getMessage()) + "\n";
                                                 } else {
-                                                    content = content + contactNames.get(messageResults.get(i).getChatId()) + ": " + messageResults.get(j).getMessage() + "\n";
+                                                    content = content + contactNames.get(messageResults.get(i).getChatId()) + ": " +getDisplayMessage(messageResults.get(j).getMessage()) + "\n";
                                                 }
                                             }
                                         }
@@ -264,6 +266,15 @@ public class NotificationController {
         NotificationManager mNotificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(MESSAGE_NOTIFICATION_ID);
+    }
+
+    private String getDisplayMessage(String message) {
+        try {
+            Message parsedMessage = GsonProvider.getGson().fromJson(message, Message.class);
+            return parsedMessage.getDisplayText();
+        } catch (JsonSyntaxException e) {
+            return message;
+        }
     }
 
     private List<String> getUniqueUsernames(List<MessageResult> messageResults) {
