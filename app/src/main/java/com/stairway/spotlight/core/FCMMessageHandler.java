@@ -17,7 +17,7 @@ public class FCMMessageHandler extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Map<String, String> data = remoteMessage.getData();
 //        String from = remoteMessage.getFrom();
-
+        Logger.d(this, "Received FCM");
         NotificationController.getInstance().handleNewMessageNotification(data.get("username"), data.get("message"), data.get("message_id"));
     }
 }

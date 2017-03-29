@@ -196,9 +196,9 @@ public class ContactStore {
         return getContact(userName, false);
     }
 
-    private Observable<ContactResult> getContact(String userId, boolean isId) {
+    private Observable<ContactResult> getContact(String id, boolean isId) {
         return Observable.create(subscriber -> {
-            if(userId.length()==0) {
+            if(id.length()==0) {
                 subscriber.onNext(new ContactResult());
                 subscriber.onCompleted();
             }
@@ -210,7 +210,7 @@ public class ContactStore {
                 selection= SQLiteContract.ContactsContract.COLUMN_USER_ID + " =? ";
             else
                 selection= SQLiteContract.ContactsContract.COLUMN_USERNAME + " =? ";
-            String[] selectionArgs = {userId};
+            String[] selectionArgs = {id};
             String[] columns = {
                     SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME,
                     SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE,
@@ -234,7 +234,7 @@ public class ContactStore {
                     String countryCode = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE));
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER));
                     String username = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USERNAME));
-                    //String userId = cursor.getString(cursor.getColumnIndex(ContactsContract.COLUMN_USER_ID));
+                    String userId = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_ID));
                     String userType = cursor.getString(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_USER_TYPE));
                     boolean isAdded = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_ADDED)) == 1;
                     boolean isBlocked = cursor.getInt(cursor.getColumnIndex(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED)) == 1;

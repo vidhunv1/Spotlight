@@ -3,12 +3,16 @@ package com.stairway.spotlight.core;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.JsonSyntaxException;
+import com.stairway.spotlight.ForegroundDetector;
+import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
@@ -34,6 +38,10 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
+
+import static com.stairway.spotlight.MessageService.XMPP_ACTION_RCV_MSG;
+import static com.stairway.spotlight.MessageService.XMPP_RESULT_CONTACT;
+import static com.stairway.spotlight.MessageService.XMPP_RESULT_MESSAGE;
 
 /**
  * Created by vidhun on 24/02/17.
@@ -114,18 +122,7 @@ public class NotificationController {
 
                                         @Override
                                         public void onNext(Boolean aBoolean) {
-                                            messageStore.storeMessage(newMessage)
-                                                    .subscribe(new Subscriber<MessageResult>() {
-                                                        @Override
-                                                        public void onCompleted() {
-                                                            showNotification(true);
-                                                        }
-                                                        @Override
-                                                        public void onError(Throwable e) {}
-
-                                                        @Override
-                                                        public void onNext(MessageResult messageResult) {}
-                                                    });
+                                            storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult1);
                                         }
                                     });
                         }
@@ -134,18 +131,7 @@ public class NotificationController {
                     if(contactResult.isBlocked()) {
                         // do nothing
                     } else {
-                        messageStore.storeMessage(newMessage)
-                                .subscribe(new Subscriber<MessageResult>() {
-                                    @Override
-                                    public void onCompleted() {
-                                        showNotification(true);
-                                    }
-                                    @Override
-                                    public void onError(Throwable e) {}
-
-                                    @Override
-                                    public void onNext(MessageResult messageResult) {}
-                                });
+                        storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult);
                     }
                 }
             }
@@ -212,7 +198,7 @@ public class NotificationController {
 
                                     if(shouldAlert) {
                                         mBuilder = new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.mipmap.ic_launcher)
+                                                .setSmallIcon(R.drawable.ic_logo)
                                                 .setAutoCancel(true)
                                                 .setContentTitle(contentTitle)
                                                 .setDefaults(Notification.DEFAULT_ALL)
@@ -238,7 +224,7 @@ public class NotificationController {
                                         }
                                     } else {
                                         mBuilder = new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.mipmap.ic_launcher)
+                                                .setSmallIcon(R.drawable.ic_logo)
                                                 .setAutoCancel(true)
                                                 .setContentTitle(contentTitle)
                                                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
@@ -308,5 +294,31 @@ public class NotificationController {
             }
             return map;
         });
+    }
+
+    public void storeAndBroadcastReceivedMessage(MessageStore messageStore, MessageResult messageId, ContactResult from) {
+        Logger.d("[NotificationControllerBroadcast]");
+
+        messageStore.storeMessage(messageId)
+                .subscribe(new Subscriber<MessageResult>() {
+                    @Override
+                    public void onCompleted() {
+                        showNotification(true);
+                    }
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        if(ForegroundDetector.getInstance().isForeground()) {
+                            Logger.d("[NotifiationController] Application in foregorund. Broadcasting message");
+                            LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(SpotlightApplication.getContext());
+                            Intent intent = new Intent(XMPP_ACTION_RCV_MSG);
+                            intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
+                            intent.putExtra(XMPP_RESULT_CONTACT, from);
+                            broadcaster.sendBroadcast(intent);
+                        }
+                    }
+                });
     }
 }

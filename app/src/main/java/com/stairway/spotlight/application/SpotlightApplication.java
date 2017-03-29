@@ -28,6 +28,11 @@ import com.stairway.spotlight.models.UserSession;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
+
 import rx.Subscriber;
 
 import static com.stairway.spotlight.core.FCMRegistrationIntentService.FCM_TOKEN;
@@ -79,9 +84,7 @@ public class SpotlightApplication extends Application implements ForegroundDetec
             JodaTimeAndroid.init(this);
 
             checkUploadFCMToken();
-            if(ForegroundDetector.getInstance().isForeground()) {
-                onBecameForeground();
-            }
+            onBecameForeground();
         }
     }
 
@@ -119,6 +122,7 @@ public class SpotlightApplication extends Application implements ForegroundDetec
     @Override
     public void onBecameForeground() {
         if(UserSessionManager.getInstance().hasAccessToken()) {
+            XMPPManager.getInstance().getConnection();
             Logger.d(this, "Starting MessageService");
             Intent intent = new Intent(this, MessageService.class);
             intent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());

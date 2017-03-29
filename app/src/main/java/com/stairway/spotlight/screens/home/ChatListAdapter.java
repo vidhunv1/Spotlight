@@ -46,7 +46,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.notifyItemRangeChanged(0, chatItems.size());
     }
 
-    public void newChatMessage(ChatItem chatItem){
+    public List<ChatItem> newChatMessage(ChatItem chatItem){
         int i;
         for (i = 0; i < chatList.size(); i++) {
             if(chatItem.getChatId().equals(chatList.get(i).getChatId())){
@@ -69,6 +69,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatList.add(0, chatItem);
             notifyItemInserted(0);
         }
+
+        return chatList;
     }
 
     public void setChatState(String fromId, String chatState){

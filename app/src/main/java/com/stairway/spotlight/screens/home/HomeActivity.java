@@ -258,9 +258,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onMessageReceived(MessageResult messageResult, ContactResult from) {
+		Logger.d(this, "MessageReceived");
 		messageResult.setName(from.getContactName());
 		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), 1);
-		chatListAdapter.newChatMessage(item);
+		this.chats = chatListAdapter.newChatMessage(item);
 		chatList.scrollToPosition(0);
 		NotificationController.getInstance().showNotification(true);
 	}

@@ -114,7 +114,7 @@ public class BaseActivity extends AppCompatActivity{
     }
 
     public void onMessageReceived(MessageResult messageId, ContactResult from) {
-        Logger.d(this, "MessageId "+messageId);
+        Logger.d(this, "[Base]Message Received "+messageId);
         NotificationController.getInstance().showNotification(true);
     }
 

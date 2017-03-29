@@ -111,7 +111,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
                     @Override
                     public void onNext(ContactResult contactResult) {
-                        messageView.setContactName(contactResult.getContactName());
+                        messageView.setContactDetails(contactResult);
                         messageView.showAddBlock(!contactResult.isAdded());
                     }
                 });

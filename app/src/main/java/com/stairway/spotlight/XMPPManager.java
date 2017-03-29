@@ -1,14 +1,19 @@
 package com.stairway.spotlight;
 
+import android.os.AsyncTask;
+
 import com.stairway.spotlight.config.AppConfig;
 import com.stairway.spotlight.core.ReadReceiptExtension;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -45,11 +50,13 @@ public class XMPPManager implements Serializable {
         if (instance == null) {
             throw new IllegalStateException();
         }
+
         return instance;
     }
 
     public static void init(String userName, String pass) {
         instance = new XMPPManager(userName, pass);
+        instance.getConnection();
     }
 
     public static String getJidFromUserName(String userName) {
@@ -61,6 +68,36 @@ public class XMPPManager implements Serializable {
     }
 
     public XMPPTCPConnection getConnection() {
+        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if(!connection.isConnected()) {
+                    try {
+                        connection.connect();
+                    } catch (SmackException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(!connection.isAuthenticated()) {
+                    try {
+                        connection.login();
+                    } catch (XMPPException e) {
+                        e.printStackTrace();
+                    } catch (SmackException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        };
+        connectionThread.execute();
+
         return connection;
     }
 

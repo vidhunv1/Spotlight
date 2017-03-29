@@ -3,6 +3,7 @@ package com.stairway.spotlight.screens.message;
 import com.stairway.spotlight.api.bot.PersistentMenu;
 import com.stairway.spotlight.core.BasePresenter;
 import com.stairway.spotlight.core.BaseView;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
 
 import org.jivesoftware.smack.packet.Presence;
@@ -17,7 +18,7 @@ public interface MessageContract {
     interface View extends BaseView {
         void showContactAddedSuccess();
         void showContactBlockedSuccess();
-        void setContactName(String contactName);
+        void setContactDetails(ContactResult contactName);
         void showAddBlock(boolean shouldShow);
         void displayMessages(List<MessageResult> result);
         void addMessageToList(MessageResult message);

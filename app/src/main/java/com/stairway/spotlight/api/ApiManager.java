@@ -1,5 +1,6 @@
 package com.stairway.spotlight.api;
 
+import com.stairway.spotlight.api.app.AppApi;
 import com.stairway.spotlight.api.bot.BotApi;
 import com.stairway.spotlight.api.contacts.ContactsApi;
 import com.stairway.spotlight.api.user.UserApi;
@@ -33,6 +34,7 @@ public class ApiManager {
     private ContactsApi contactsApi;
     private UserApi userApi;
     private BotApi botApi;
+    private AppApi appApi;
 
     public ApiManager() {
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -69,6 +71,7 @@ public class ApiManager {
         getInstance().contactsApi = null;
         getInstance().userApi = null;
         getInstance().botApi = null;
+        getInstance().appApi = null;
     }
 
     public static ContactsApi getContactsApi() {
@@ -89,6 +92,13 @@ public class ApiManager {
             getInstance().botApi = getInstance().retrofitClient.create(BotApi.class);
         }
         return getInstance().botApi;
+    }
+
+    public static AppApi getAppApi() {
+        if(getInstance().appApi == null) {
+            getInstance().appApi = getInstance().retrofitClient.create(AppApi.class);
+        }
+        return getInstance().appApi;
     }
 }
 

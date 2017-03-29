@@ -106,6 +106,7 @@ public class MessageActivity extends BaseActivity
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
     private String contactName;
+    private String contactUserId;
 
     // userName: id for ejabberd xmpp. userId: id set by user
     public static Intent callingIntent(Context context, String chatUserName) {
@@ -202,7 +203,7 @@ public class MessageActivity extends BaseActivity
         }
         else if(id == R.id.view_contact) {
             AndroidUtils.hideSoftInput(this);
-            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactName));
+            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -285,9 +286,10 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
-    public void setContactName(String contactName) {
-        contactName = AndroidUtils.toTitleCase(contactName);
-        this.contactName = contactName;
+    public void setContactDetails(ContactResult contact) {
+        contactName = AndroidUtils.toTitleCase(contact.getContactName());
+        this.contactName = contact.getContactName();
+        this.contactUserId = contact.getUserId();
 
         title.setText(contactName);
 

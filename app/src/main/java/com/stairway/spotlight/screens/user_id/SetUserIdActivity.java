@@ -73,7 +73,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        presenter = new SetUserIdPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
+        presenter = new SetUserIdPresenter(ApiManager.getUserApi(), ApiManager.getAppApi(), UserSessionManager.getInstance());
     }
 
     @Override
@@ -90,6 +90,12 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        presenter.detachView();
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
@@ -99,7 +105,11 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        super.showError(title, message);
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @Override
@@ -126,7 +136,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     }
 
     @OnFocusChange(R.id.set_user_id_et)
-    public void onPasswordChanged() {
+    public void onuserIdFocusChanged() {
         if(userIdEt.isFocused()) {
             divider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         } else {

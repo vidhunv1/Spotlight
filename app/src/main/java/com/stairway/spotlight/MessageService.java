@@ -14,7 +14,10 @@ import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.MessageResult;
+
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
@@ -78,6 +81,7 @@ public class MessageService extends Service {
     private ChatManagerListener chatListener;
     private ReceiptReceivedListener receiptReceivedListener;
     private RosterListener presenceStateListener;
+    private ConnectionListener connectionListener;
 
     private LocalBroadcastManager broadcaster;
     Roster roster;
@@ -258,6 +262,33 @@ public class MessageService extends Service {
             });
         };
 
+        this.connectionListener = new ConnectionListener() {
+            @Override
+            public void connected(XMPPConnection connection) {
+                Logger.d(this, "Connected XMPP");
+            }
+
+            @Override
+            public void authenticated(XMPPConnection connection, boolean resumed) {
+            }
+
+            @Override
+            public void connectionClosed() {
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception e) {
+            }
+            @Override
+            public void reconnectionSuccessful() {
+
+            }
+            @Override
+            public void reconnectingIn(int seconds) {}
+            @Override
+            public void reconnectionFailed(Exception e) {}
+        };
+
         ChatManager.getInstanceFor(connection).addChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection)
                 .addReceiptReceivedListener(receiptReceivedListener);
@@ -282,6 +313,7 @@ public class MessageService extends Service {
         ChatManager.getInstanceFor(connection).removeChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection).removeReceiptReceivedListener(receiptReceivedListener);
         Roster.getInstanceFor(connection).removeRosterListener(presenceStateListener);
+        XMPPManager.getInstance().getConnection().removeConnectionListener(connectionListener);
 
         try {
             connection.disconnect(new Presence(Presence.Type.unavailable));
@@ -299,32 +331,17 @@ public class MessageService extends Service {
     }
 
     private boolean tryConnect() {
-        try {
-            // TODO: BUGGY
-            if(!connection.isConnected()) {
-                connection.connect().login();
-            }
-            if(!isOnlineNotified) {
-                retryInterval = RETRY_ONLINE;
-                broadcastConnectionStatus(true);
-                isOnlineNotified = true;
-                sendUnsentMessages();
-            }
-            return true;
-        } catch (SmackException.ConnectionException e) {
-            retryInterval = RETRY_OFFLINE;
-            broadcastConnectionStatus(false);
-            isOnlineNotified = false;
-            e.printStackTrace();
-            return false;
-        } catch (SmackException.AlreadyConnectedException e) {
-            return true;
-        } catch (SmackException.AlreadyLoggedInException e) {
-            return true;
-        } catch (Exception e) {
-            Logger.e(this, e.getMessage());
-            return false;
+        // TODO: BUGGY
+        if(XMPPManager.getInstance().getConnection().isConnected() && XMPPManager.getInstance().getConnection().isConnected()) {
+            connection = XMPPManager.getInstance().getConnection();
         }
+        if(!isOnlineNotified) {
+            retryInterval = RETRY_ONLINE;
+            broadcastConnectionStatus(true);
+            isOnlineNotified = true;
+            sendUnsentMessages();
+        }
+        return true;
     }
 
     private void sendUnsentMessages() {

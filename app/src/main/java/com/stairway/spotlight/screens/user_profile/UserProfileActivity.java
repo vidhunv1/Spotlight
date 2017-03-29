@@ -65,11 +65,14 @@ public class UserProfileActivity extends BaseActivity {
 
     private static String KEY_USER_NAME = "UserProfileActivity.USER_NAME";
     private static String KEY_CONTACT_NAME = "UserProfileActivity.CONTACT_NAME";
-    public static Intent callingIntent(Context context, String userId, String contactName) {
+    private static String KEY_CONTACT_USER_ID = "UserProfileActivity.USER_ID";
+
+    public static Intent callingIntent(Context context, String username, String userid, String contactName) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(KEY_USER_NAME, userId);
+        intent.putExtra(KEY_USER_NAME, username);
         intent.putExtra(KEY_CONTACT_NAME, contactName);
+        intent.putExtra(KEY_CONTACT_USER_ID, userid);
         return intent;
     }
 
@@ -84,7 +87,7 @@ public class UserProfileActivity extends BaseActivity {
 
         username = receivedIntent.getStringExtra(KEY_USER_NAME);
         contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
-        userId = "airtel";
+        userId = receivedIntent.getStringExtra(KEY_CONTACT_USER_ID);
 
         contactNameView.setText(contactName);
         userIdView.setText(userId);

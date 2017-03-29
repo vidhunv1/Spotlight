@@ -39,7 +39,7 @@
             android:background="@android:color/transparent"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:hint="User ID"
+            android:hint="Your User ID"
             android:paddingLeft="24dp"
             android:textColor="#353535"
             android:textSize="18sp" />
@@ -47,10 +47,12 @@
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1px"
+        android:layout_height="2dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/set_user_id_divider"
-        android:background="#c9c9c9" />
+        android:background="@color/colorPrimary" />
 
     <TextView
         android:layout_width="match_parent"
@@ -59,7 +61,7 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:textSize="15sp"
-        android:textColor="#999999"
+        android:textColor="#6D726D"
         android:text="iChat ID can be set only once."/>
 
     <TextView
@@ -69,6 +71,6 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:textSize="15sp"
-        android:textColor="#999999"
+        android:textColor="#6D726D"
         android:text="Other people will be able to find you using your ID and contact you without knowing your number."/>
 </LinearLayout>
