@@ -4,6 +4,7 @@
     <!--App-->
     <color name="colorPrimary">#0f9d58</color>
     <color name="colorPrimaryDark">#1A7ECE</color>
+    <color name="colorPrimaryInactive">#800f9d58</color>
     <color name="colorPrimaryLight">#61B2F3</color>
     <color name="colorAccent">@color/colorPrimary</color>
     <color name="background_default">#FFFFFF</color>
@@ -19,7 +20,7 @@
     <!--text-->
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textColor">#212121</color>
-    <color name="textSecondary">#64b0d2</color>
+    <color name="textSecondary">#C1D4C6</color>
     <color name="textHintColor">#cbd9d7</color>
     <color name="drawerText">#212121</color>
     <color name="buttonText">@color/colorPrimary</color>

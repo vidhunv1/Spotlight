@@ -59,7 +59,6 @@
             android:id="@+id/tv_delivery_status"
             android:layout_marginRight="38dp"
             android:gravity="right" />
-
     </LinearLayout>
 
     <ImageView
@@ -73,5 +72,4 @@
         android:layout_marginBottom="1dp"
         android:baselineAlignBottom="false"
         android:layout_alignParentTop="false" />
-
 </RelativeLayout>

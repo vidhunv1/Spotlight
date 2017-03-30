@@ -3,13 +3,26 @@ package com.stairway.spotlight.screens.user_id;
 import android.os.Handler;
 
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiError;
+import com.stairway.spotlight.api.StatusResponse;
+import com.stairway.spotlight.api.app.AppApi;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
+import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.home.HomeActivity;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+
+import java.io.IOException;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -26,10 +39,12 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
     private CompositeSubscription subscriptions;
 
     private UserApi userApi;
+    private AppApi appApi;
     private UserSessionManager userSessionManager;
 
-    public SetUserIdPresenter(UserApi userApi, UserSessionManager userSessionManager) {
+    public SetUserIdPresenter(UserApi userApi, AppApi appApi, UserSessionManager userSessionManager) {
         this.userApi = userApi;
+        this.appApi = appApi;
         this.userSessionManager = userSessionManager;
         subscriptions = new CompositeSubscription();
     }
@@ -67,8 +82,27 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                             userSession.setUserId(userResponse.getUser().getUserId());
                             userSession.setUserName(userResponse.getUser().getUsername());
                             userSessionManager.save(userSession);
+                            SpotlightApplication.getContext().initSession();
 
-                            setUserIdView.navigateToHome();
+                            appApi.appInit()
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Subscriber<StatusResponse>() {
+                                        @Override
+                                        public void onCompleted() {
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            ApiError error = new ApiError(e);
+                                            setUserIdView.showError(error.getTitle(), error.getMessage());
+                                        }
+
+                                        @Override
+                                        public void onNext(StatusResponse statusResponse) {
+                                            setUserIdView.navigateToHome();
+                                        }
+                                    });
                         }
                     }
                 });
@@ -83,5 +117,6 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
     @Override
     public void detachView() {
         this.setUserIdView = null;
+        subscriptions.clear();
     }
 }

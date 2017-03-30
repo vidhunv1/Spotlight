@@ -17,20 +17,34 @@
             android:id="@+id/tb_web_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:minHeight="?attr/actionBarSize">
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorPrimary">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:background="@color/colorPrimary"
+                android:layout_height="?attr/actionBarSize"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:paddingRight="24dp"
+                    android:layout_height="?attr/actionBarSize"
+                    android:id="@+id/close"
+                    app:srcCompat="@drawable/ic_close_active" />
+
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:gravity="center_vertical"
                     android:id="@+id/web_view_url"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="16sp"
+                    android:text="https://google.com"
                     android:textColor="@color/textPrimaryLight" />
             </LinearLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
-
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

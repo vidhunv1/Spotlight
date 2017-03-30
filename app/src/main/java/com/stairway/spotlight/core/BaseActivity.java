@@ -100,14 +100,6 @@ public class BaseActivity extends AppCompatActivity{
         super.onBackPressed();
     }
 
-    public void showError(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage("\n"+message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
-        alertDialog.show();
-    }
-
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));

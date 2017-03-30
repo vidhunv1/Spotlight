@@ -48,7 +48,6 @@ public class MessageController {
             Logger.d(MessageController.class, "[MessageController Not Initialized]");
             throw new IllegalStateException("[MessageController Not Initialized]");
         }
-
         return instance;
     }
 
@@ -90,6 +89,7 @@ public class MessageController {
                                             name,
                                             messageResult.getMessage(),
                                             messageResult.getTime(),
+                                            messageResult.getMessageStatus(),
                                             messageResult.getUnSeenCount()));
                                 }
                             });

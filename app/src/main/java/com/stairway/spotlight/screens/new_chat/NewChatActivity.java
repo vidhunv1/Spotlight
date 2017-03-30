@@ -152,6 +152,19 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         return true;
     }
 
+    @Override
+    public void showError(String title, String message) {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+    }
+
     public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
         toolbarSearch.clearFocus();
         AndroidUtils.hideSoftInput(this);

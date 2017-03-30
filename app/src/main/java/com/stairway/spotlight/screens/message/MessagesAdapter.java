@@ -541,10 +541,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0,(int)AndroidUtils.px(22),0,(int)AndroidUtils.px(2));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
             } else {
                 timeView.setVisibility(View.GONE);
-                timeView.setPadding(0,(int)AndroidUtils.px(2),0,0);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
@@ -616,10 +616,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0,(int)AndroidUtils.px(22),0,(int)AndroidUtils.px(2));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
             } else {
                 timeView.setVisibility(View.GONE);
-                timeView.setPadding(0,(int)AndroidUtils.px(2),0,0);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
             if(displayProfileDP) {
@@ -691,10 +691,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0, (int)AndroidUtils.px(22),0,(int)AndroidUtils.px(2));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
             } else {
                 timeView.setVisibility(View.GONE);
-                timeView.setPadding(0,(int)AndroidUtils.px(2),0,0);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
             switch (bubbleType) {
@@ -788,10 +788,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             timeView.setText(time);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0,(int)AndroidUtils.px(22),0,(int)AndroidUtils.px(2));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.5f),0,(int)AndroidUtils.px(8.75f));
             } else {
                 timeView.setVisibility(View.GONE);
-                timeView.setPadding(0,(int)AndroidUtils.px(2),0,0);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
             switch (bubbleType) {

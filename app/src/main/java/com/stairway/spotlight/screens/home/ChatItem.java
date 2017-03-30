@@ -2,6 +2,8 @@ package com.stairway.spotlight.screens.home;
 
 import android.os.Parcelable;
 
+import com.stairway.spotlight.models.MessageResult;
+
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -15,16 +17,26 @@ public class ChatItem implements Serializable{
     private String lastMessage;
     private DateTime time;
     private int notificationCount;
+    private MessageResult.MessageStatus messageStatus;
 
-    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, int notificationCount) {
+    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, int notificationCount) {
         this.chatId = chatId;
         this.chatName = chatName;
         this.lastMessage = lastMessage;
         this.time = time;
         this.notificationCount = notificationCount;
+        this.messageStatus = messageStatus;
     }
 
     public ChatItem() {
+    }
+
+    public MessageResult.MessageStatus getMessageStatus() {
+        return messageStatus;
+    }
+
+    public void setMessageStatus(MessageResult.MessageStatus messageStatus) {
+        this.messageStatus = messageStatus;
     }
 
     public String getChatId() {

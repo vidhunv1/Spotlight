@@ -188,7 +188,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     }
 
     @OnFocusChange(R.id.sign_up_password)
-    public void onPasswordFocuChanged() {
+    public void onPasswordFocusChanged() {
         if(passwordET.isFocused()) {
             passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         } else {

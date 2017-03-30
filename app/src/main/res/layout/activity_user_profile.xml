@@ -142,16 +142,19 @@
                 android:paddingRight="24dp"
                 android:orientation="horizontal">
                 <TextView
+                    android:layout_marginBottom="0.5dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:text="Notifications"
+                    android:layout_gravity="center_vertical"
                     android:textColor="@color/textColor"
                     android:textSize="16sp"
                     android:gravity="center_vertical" />
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="On"
                     android:textColor="@color/activeIndicator"
                     android:textSize="16sp"
@@ -168,8 +171,10 @@
                 android:paddingRight="24dp"
                 android:orientation="horizontal">
                 <TextView
+                    android:layout_marginBottom="0.5dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="Shared Media"
                     android:textColor="@color/textColor"
                     android:textSize="16sp"
@@ -177,7 +182,8 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="0"
                     android:textColor="@color/activeIndicator"
                     android:textSize="16sp"
@@ -194,6 +200,7 @@
         android:clickable="true"
         app:srcCompat="@drawable/ic_message"
         app:backgroundTint="#ffffff"
+        app:fabSize="mini"
         app:layout_anchor="@id/viewA"
         app:layout_anchorGravity="bottom|right|end" />
 </android.support.design.widget.CoordinatorLayout>

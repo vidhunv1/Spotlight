@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.search;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -134,6 +135,15 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
             searchQuery.setText("");
         else
             onBackPressed();
+    }
+
+    @Override
+    public void showError(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @Override

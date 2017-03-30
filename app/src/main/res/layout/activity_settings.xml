@@ -32,16 +32,16 @@
                 android:gravity="left|center_vertical"
                 android:minHeight="?attr/actionBarSize"
                 app:sctl_avatar_id="@+id/settings_dp"
-                app:sctl_collapsed_avatarSize="42dp"
-                app:sctl_collapsed_offsetX="72dp"
+                app:sctl_collapsed_avatarSize="37dp"
+                app:sctl_collapsed_offsetX="76dp"
                 app:sctl_collapsed_offsetY="18dp"
                 app:sctl_collapsed_subtitleTextSize="14dp"
                 app:sctl_collapsed_titleTextSize="18dp"
                 app:sctl_expanded_avatarSize="60dp"
-                app:sctl_expanded_offsetX="16dp"
-                app:sctl_expanded_offsetY="40dp"
+                app:sctl_expanded_offsetX="15dp"
+                app:sctl_expanded_offsetY="46dp"
                 app:sctl_expanded_subtitleTextSize="14dp"
-                app:sctl_expanded_titleTextSize="18.5dp"
+                app:sctl_expanded_titleTextSize="20dp"
                 app:sctl_subtitle_id="@+id/subtitle"
                 app:sctl_title_id="@+id/title">
 
@@ -54,7 +54,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="14dp"
+                    android:layout_marginLeft="17.25dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -77,60 +77,75 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/settings_take_pic"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom|right|end"
+        app:srcCompat="@drawable/ic_camera_dark"
+        app:fabSize="mini"
+        android:backgroundTint="#FFFFFF"
+        android:layout_marginRight="16dp"
+        app:borderWidth="0dp"
+        android:clickable="true"/>
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingTop="16dp">
+            android:layout_marginTop="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="11.5dp"
+                android:orientation="vertical"
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="17dp"
                 android:layout_marginTop="15dp"
-                android:orientation="vertical">
+                android:paddingBottom="11.5dp">
+
                 <TextView
-                    android:paddingLeft="17dp"
-                    android:paddingRight="17dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="23dp"
+                    android:gravity="center_vertical"
                     android:text="Info"
                     android:textAppearance="@style/FontRobotoMedium"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorAccent"/>
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
+
                     <TextView
-                        android:paddingLeft="17dp"
-                        android:paddingRight="17dp"
+                        android:id="@+id/tv_user_profile_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:text="airtel"
-                        android:textSize="16sp"
                         android:textColor="#212121"
-                        android:id="@+id/tv_user_profile_id" />
+                        android:textSize="16sp" />
+
                     <TextView
-                        android:paddingLeft="17dp"
-                        android:paddingRight="17dp"
-                        android:layout_marginTop="3.5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#8A8A8A"
+                        android:layout_marginTop="3.5dp"
                         android:text="ID"
+                        android:textColor="#8A8A8A"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
+
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="12dp"
@@ -141,221 +156,232 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical">
+
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:text="Notifications"
                     android:textAppearance="@style/FontRobotoMedium"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorAccent"/>
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp" />
 
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:stretchColumns="1">
-                    <TableRow android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
-                            android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_height="48.25dp"
-                            android:text="Alert"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
-                        <Switch
-                            android:id="@+id/settings_alert"
-                            android:paddingRight="10dp"
-                            android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
-                            android:layout_height="48.25dp"
-                            android:switchMinWidth="37.5dp"/>
-                    </TableRow>
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
-                        android:background="#f0f0f0" />
+
                     <TableRow
                         android:background="?android:selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:id="@+id/settings_sound_row">
+                        android:focusable="true">
+
                         <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
                             android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
                             android:layout_height="48.25dp"
-                            android:text="Sound"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
-                        <TextView
+                            android:gravity="center_vertical"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
+                            android:text="Alert"
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
+                        <Switch
+                            android:id="@+id/settings_alert"
                             android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
                             android:layout_height="48.25dp"
-                            android:text="Default"
-                            android:textSize="16sp"
-                            android:textColor="#2f8cc9" />
+                            android:gravity="center_vertical|right"
+                            android:paddingRight="10dp"
+                            android:switchMinWidth="37.5dp" />
                     </TableRow>
+
                     <View
                         android:layout_width="fill_parent"
                         android:layout_height="0.5dp"
                         android:background="#f0f0f0" />
-                    <TableRow android:id="@+id/settings_vibrate_row"
+
+                    <TableRow
+                        android:id="@+id/settings_sound_row"
                         android:background="?android:selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
+
                         <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
                             android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
                             android:layout_height="48.25dp"
-                            android:text="Vibrate"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
-                        <TextView
-                            android:id="@+id/settings_vibrate_option"
+                            android:gravity="center_vertical"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
+                            android:text="Sound"
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
+                        <TextView
                             android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
                             android:layout_height="48.25dp"
+                            android:gravity="center_vertical|right"
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
                             android:text="Default"
-                            android:textSize="16sp"
-                            android:textColor="#2f8cc9" />
+                            android:textColor="#2f8cc9"
+                            android:textSize="16sp" />
                     </TableRow>
+
                     <View
                         android:layout_width="fill_parent"
                         android:layout_height="0.5dp"
                         android:background="#f0f0f0" />
-                    <TableRow android:background="?android:selectableItemBackground"
+
+                    <TableRow
+                        android:id="@+id/settings_vibrate_row"
+                        android:background="?android:selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:id="@+id/settings_ledcolor_row">
+                        android:focusable="true">
+
                         <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
                             android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
                             android:layout_height="48.25dp"
-                            android:text="LED color"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
-                        <ImageView
+                            android:gravity="center_vertical"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
-                            android:layout_height="48.25dp"
+                            android:text="Vibrate"
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/settings_vibrate_option"
                             android:layout_width="match_parent"
+                            android:layout_height="48.25dp"
                             android:gravity="center_vertical|right"
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:text="Default"
+                            android:textColor="#2f8cc9"
+                            android:textSize="16sp" />
+                    </TableRow>
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0.5dp"
+                        android:background="#f0f0f0" />
+
+                    <TableRow
+                        android:id="@+id/settings_ledcolor_row"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="48.25dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
+                            android:text="LED color"
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="48.25dp"
+                            android:gravity="center_vertical|right"
+                            android:paddingLeft="17dp"
+                            android:paddingRight="17dp"
                             android:text="Default" />
                     </TableRow>
                 </TableLayout>
             </LinearLayout>
+
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="12dp"
                 android:background="#f0f0f0" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical">
+
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:text="Chats"
                     android:textAppearance="@style/FontRobotoMedium"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorAccent"/>
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp" />
 
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:stretchColumns="1">
-                    <TableRow android:background="?android:selectableItemBackground"
+
+                    <TableRow
+                        android:background="?android:selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
+
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="48.25dp"
+                            android:gravity="center_vertical"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
-                            android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_height="48.25dp"
                             android:text="In-app Browser"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
                         <Switch
                             android:id="@+id/settings_in_app_browser"
-                            android:paddingRight="10dp"
-                            android:checked="true"
                             android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
                             android:layout_height="48.25dp"
-                            android:switchMinWidth="37.5dp"/>
+                            android:checked="true"
+                            android:gravity="center_vertical|right"
+                            android:paddingRight="10dp"
+                            android:switchMinWidth="37.5dp" />
                     </TableRow>
+
                     <View
                         android:layout_width="fill_parent"
                         android:layout_height="0.5dp"
                         android:background="#f0f0f0" />
-                    <TableRow android:background="?android:selectableItemBackground"
+
+                    <TableRow
+                        android:background="?android:selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
+
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="48.25dp"
+                            android:gravity="center_vertical"
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
-                            android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_height="48.25dp"
                             android:text="Send by Enter"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
+                            android:textColor="#212121"
+                            android:textSize="16sp" />
+
                         <Switch
                             android:id="@+id/settings_send_by_enter"
-                            android:paddingRight="10dp"
                             android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
                             android:layout_height="48.25dp"
-                            android:switchMinWidth="37.5dp"/>
+                            android:gravity="center_vertical|right"
+                            android:paddingRight="10dp"
+                            android:switchMinWidth="37.5dp" />
                     </TableRow>
+
                     <View
                         android:layout_width="fill_parent"
                         android:layout_height="0.5dp"
                         android:background="#f0f0f0" />
-                    <TableRow android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:id="@+id/settings_texsize_row"
-                        android:focusable="true">
-                        <TextView
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
-                            android:layout_width="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_height="48.25dp"
-                            android:text="Text Size"
-                            android:textSize="16sp"
-                            android:textColor="#212121" />
-                        <TextView
-                            android:id="@+id/settings_text_size"
-                            android:paddingLeft="17dp"
-                            android:paddingRight="17dp"
-                            android:layout_width="match_parent"
-                            android:gravity="center_vertical|right"
-                            android:layout_height="48.25dp"
-                            android:text="16"
-                            android:textSize="16sp"
-                            android:textColor="#2f8cc9" />
-                    </TableRow>
                 </TableLayout>
             </LinearLayout>
+
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="12dp"
@@ -366,29 +392,31 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical">
+
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:text="Support"
                     android:textAppearance="@style/FontRobotoMedium"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorAccent"/>
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/settings_askquestion_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="48.25dp"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_height="48.25dp"
                     android:text="Ask a Question"
-                    android:textSize="16sp"
-                    android:textColor="#212121" />
+                    android:textColor="#212121"
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="fill_parent"
@@ -396,18 +424,18 @@
                     android:background="#f0f0f0" />
 
                 <TextView
+                    android:id="@+id/settings_faq_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="48.25dp"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_height="48.25dp"
-                    android:id="@+id/settings_faq_row"
                     android:text="iChat FAQ"
-                    android:textSize="16sp"
-                    android:textColor="#212121" />
+                    android:textColor="#212121"
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="fill_parent"
@@ -416,17 +444,17 @@
 
                 <TextView
                     android:id="@+id/settings_privacy_policy_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="48.25dp"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center_vertical"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_height="48.25dp"
                     android:text="Privacy Policy"
-                    android:textSize="16sp"
-                    android:textColor="#212121" />
+                    android:textColor="#212121"
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="fill_parent"
@@ -434,30 +462,18 @@
                     android:background="#f0f0f0" />
 
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="55.5dp"
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center_horizontal|top"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
-                    android:layout_width="match_parent"
-                    android:gravity="center"
-                    android:layout_height="55.55dp"
                     android:text="iChat for Android v1.0.0"
-                    android:textSize="13sp"
-                    android:textColor="#A3A3A3" />
+                    android:textColor="#A3A3A3"
+                    android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/settings_take_pic"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom|right|end"
-        app:srcCompat="@drawable/ic_camera_dark"
-        android:backgroundTint="#FFFFFF"
-        android:layout_marginRight="16dp"
-        app:borderWidth="0dp"
-        android:clickable="true"/>
 </android.support.design.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -50,6 +51,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -72,6 +74,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
+
+	@Bind(R.id.header)
+	View header;
 
 	private ActionBarDrawerToggle toggle;
 
@@ -98,7 +103,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		this.presenter = new HomePresenter(MessageController.getInstance());
 		userSession = UserSessionManager.getInstance().load();
 
-		View header = navigationView.getHeaderView(0);
 		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
 		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
 		ImageView profileDp = (ImageView)header.findViewById(R.id.profile_image);
@@ -123,6 +127,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 
 		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
 		toggle.setDrawerIndicatorEnabled(false);
 		Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_menu, this.getTheme());
 		toggle.setHomeAsUpIndicator(drawable);
@@ -178,6 +183,23 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onPause();
 	}
 
+	@OnClick(R.id.nav_item_contacts)
+	public void onNavigationContactsClicked() {
+		final Activity homeActivity = this;
+		new Handler().postDelayed(() -> startActivity(NewChatActivity.callingIntent(homeActivity, false)), 250);
+		drawer.closeDrawer(GravityCompat.START, true);
+	}
+
+	@OnClick(R.id.nav_item_settings)
+	public void onNavigationSettingsClicked() {
+		final Activity homeActivity = this;
+		new Handler().postDelayed(() -> startActivity(SettingsActivity.callingIntent(homeActivity)), 250);
+		drawer.closeDrawer(GravityCompat.START, true);
+	}
+
+	@OnClick(R.id.nav_item_faq)
+	public void onNavigationFAQClicked() {}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.home_toolbar, menu);
@@ -200,7 +222,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void showError(String title, String message) {
-		super.showError(title, message);
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+		alertDialog.setTitle(title);
+		alertDialog.setMessage("\n"+message);
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+		alertDialog.show();
 	}
 
 	@Override
@@ -225,16 +251,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		int id = item.getItemId();
 		final Activity homeActivity = this;
 		switch(id) {
-			case R.id.nav_settings:
-				new Handler().postDelayed(() -> startActivity(SettingsActivity.callingIntent(homeActivity)), 250);
-				drawer.closeDrawer(GravityCompat.START, true);
-				break;
-			case R.id.nav_faq:
-				break;
-			case R.id.nav_contacts:
-				new Handler().postDelayed(() -> startActivity(NewChatActivity.callingIntent(homeActivity, false)), 250);
-				drawer.closeDrawer(GravityCompat.START, true);
-				break;
 			case android.R.id.home:
 				onBackPressed();
 				drawer.closeDrawer(GravityCompat.START);
@@ -260,7 +276,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void onMessageReceived(MessageResult messageResult, ContactResult from) {
 		Logger.d(this, "MessageReceived");
 		messageResult.setName(from.getContactName());
-		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), 1);
+		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), messageResult.getMessageStatus(), 1);
 		this.chats = chatListAdapter.newChatMessage(item);
 		chatList.scrollToPosition(0);
 		NotificationController.getInstance().showNotification(true);

@@ -149,7 +149,11 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        super.showError("User ID", "This User ID is not available.");
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("User ID");
+        alertDialog.setMessage("\n"+"This User ID is not available.");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @Override

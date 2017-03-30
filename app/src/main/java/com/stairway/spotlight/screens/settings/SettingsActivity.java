@@ -70,9 +70,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Bind(R.id.settings_vibrate_option)
     TextView vibrateOptionView;
 
-    @Bind(R.id.settings_text_size)
-    TextView textSizeView;
-
     @Bind(R.id.settings_send_by_enter)
     Switch sendByEnterSwitch;
 
@@ -142,7 +139,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
 
         vibrateOptionView.setText(vibrateOptionsNames[sharedPreferences.getInt(KEY_VIBRATE,1)]);
-        textSizeView.setText(sharedPreferences.getInt(KEY_TEXT_SIZE, 16)+"");
         sendByEnterSwitch.setChecked(sharedPreferences.getBoolean(KEY_SEND_BY_ENTER, false));
         alertSwitch.setChecked(sharedPreferences.getBoolean(KEY_ALERT, true));
         inAppBrowserSwitch.setChecked(sharedPreferences.getBoolean(KEY_IN_APP_BROWSER, true));
@@ -178,6 +174,18 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         settingsPresenter.attachView(this);
     }
 
+    public void showError(String title, String message) {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+    }
+
     @Override
     public void onLogoutSuccess() {
         if(progressDialog[0].isShowing()) {
@@ -196,11 +204,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @OnClick(R.id.settings_ledcolor_row)
     public void onLedColorClicked() {
         showLedColorPopup();
-    }
-
-    @OnClick(R.id.settings_texsize_row)
-    public void onTextSizeClicked() {
-        showTextSizePopup();
     }
 
     @OnClick(R.id.settings_askquestion_row)
@@ -301,6 +304,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         TextView textView1 = new TextView(this);
         textView1.setText("We try to respond as quickly as possible, but it may take a while.\n\nPlease take a look at\niChat FAQ: it has answers to most questions and important tips for troubleshooting.");
         textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView1.setPadding(0,0,0,(int) AndroidUtils.px(6));
         textView1.setTextSize(18);
 
         parent.addView(textView1);
@@ -409,7 +413,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         final AppCompatRadioButton[] rb = new AppCompatRadioButton[9];
         RadioGroup rg = new RadioGroup(this);
         rg.setOrientation(RadioGroup.VERTICAL);
-        rg.setPadding((int)AndroidUtils.px(18),(int)AndroidUtils.px(8),0,0);
+        rg.setPadding((int)AndroidUtils.px(18),(int)AndroidUtils.px(8),0,(int)AndroidUtils.px(8));
 
         int colorsInt[] = {Color.rgb(255,0,0), Color.rgb(255,165,0), Color.rgb(255,255,0), Color.rgb(0,255,0), Color.rgb(0,255,255), Color.rgb(0,0,255), Color.rgb(238,130,238), Color.rgb(255, 192, 203), Color.rgb(245, 245, 245)};
         String colorsText[] = {"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Violet", "Pink", "White"};
@@ -439,24 +443,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         builder.setNegativeButton(" ", ((dialog, which) -> {}));
         builder.setNeutralButton("DISABLED", ((dialog, which) -> {}));
 
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    public void showTextSizePopup() {
-        int textSize = sharedPreferences.getInt(KEY_TEXT_SIZE, 16);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Messages Text Size");
-        final CustomNumberPicker numberPicker = new CustomNumberPicker(this, null);
-        numberPicker.setMinValue(12);
-        numberPicker.setMaxValue(30);
-        numberPicker.setValue(textSize);
-        builder.setView(numberPicker);
-        builder.setPositiveButton("Done", ((dialog, which) -> {
-            sharedPreferences.edit().putInt(KEY_TEXT_SIZE, numberPicker.getValue()).apply();
-            textSizeView.setText(String.valueOf(numberPicker.getValue()));
-        }));
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }

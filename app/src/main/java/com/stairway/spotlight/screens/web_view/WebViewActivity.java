@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
@@ -13,12 +15,16 @@ import com.stairway.spotlight.core.Logger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class WebViewActivity extends BaseActivity {
     private static String KEY_WEB_URL = "WEB_URL";
 
     @Bind(R.id.web_view)
     WebView webView;
+
+    @Bind(R.id.web_view_url)
+    TextView webViewUrl;
 
     public static Intent callingIntent(Context context, String url) {
         Intent intent = new Intent(context, WebViewActivity.class);
@@ -37,9 +43,10 @@ public class WebViewActivity extends BaseActivity {
         setContentView(R.layout.activity_web_view);
 
         ButterKnife.bind(this);
-
+        String url = receivedIntent.getStringExtra(KEY_WEB_URL);
+        webViewUrl.setText(url);
         Logger.d(this, "Loading Url:"+receivedIntent.getStringExtra(KEY_WEB_URL));
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new CustomWebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setLoadWithOverviewMode(true);
@@ -48,6 +55,19 @@ public class WebViewActivity extends BaseActivity {
         webView.getSettings().setSupportMultipleWindows(true);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.loadUrl(receivedIntent.getStringExtra(KEY_WEB_URL));
+    }
+
+    @OnClick(R.id.close)
+    public void onCloseClicked() {
+        this.finish();
+    }
+
+    private class CustomWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            webViewUrl.setText(url);
+            return false;
+        }
     }
 
 }

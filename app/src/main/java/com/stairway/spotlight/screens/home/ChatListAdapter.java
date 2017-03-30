@@ -16,6 +16,7 @@ import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.models.Message;
+import com.stairway.spotlight.models.MessageResult;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -84,6 +85,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         item.getChatName(),
                         item.getLastMessage(),
                         item.getTime(),
+                        item.getMessageStatus(),
                         item.getNotificationCount()
                 ));
                 item.setLastMessage(chatState);
@@ -191,6 +193,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_chatlist_notification)
         TextView notification;
 
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatus;
+
         public ChatItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -210,7 +215,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
             if(chatListItem.getNotificationCount()==0) {
                 notification.setVisibility(View.GONE);
+                lastMessage.setMaxWidth((int)AndroidUtils.px(256));
             } else {
+                lastMessage.setMaxWidth((int)AndroidUtils.px(226));
                 notification.setVisibility(View.VISIBLE);
                 notification.setText(chatListItem.getNotificationCount()+"");
             }
@@ -231,6 +238,22 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             time.setText(getFormattedTime(chatListItem.getTime()));
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
+
+            if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatus.setVisibility(View.VISIBLE);
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
+            }
+            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT) {
+                deliveryStatus.setVisibility(View.VISIBLE);
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
+            }
+            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.READ) {
+                deliveryStatus.setVisibility(View.VISIBLE);
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
+            } else {
+                deliveryStatus.setVisibility(View.GONE);
+            }
+
             contactName.setTag(chatListItem.getChatId());
         }
     }

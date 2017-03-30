@@ -2,9 +2,13 @@ package com.stairway.spotlight.screens.welcome;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.stairway.spotlight.R;
 
@@ -28,6 +32,13 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(0xffcfd0d4);
+        }
     }
 
     @OnClick(R.id.welcome_signup)

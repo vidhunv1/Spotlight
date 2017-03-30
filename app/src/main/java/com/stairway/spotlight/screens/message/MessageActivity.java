@@ -24,6 +24,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -59,6 +60,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MessageActivity extends BaseActivity
         implements MessageContract.View, MessagesAdapter.PostbackClickListener, MessagesAdapter.UrlClickListener{
@@ -77,14 +79,17 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message_title)
     TextView title;
 
-    @Bind(R.id.tb_message_presence)
-    TextView presenceView;
+//    @Bind(R.id.tb_message_presence)
+//    TextView presenceView;
 
     @Bind(R.id.container)
     RelativeLayout rootLayout;
 
     @Bind(R.id.message_add_block)
     LinearLayout addBlockView;
+
+    @Bind(R.id.iv_profile_image)
+    ImageView profileImage;
 
     private EmojiViewHelper emojiPicker;
     private List<PersistentMenu> persistentMenus;
@@ -155,20 +160,20 @@ public class MessageActivity extends BaseActivity
     protected void onResume() {
         Logger.d(this, "onResume");
         super.onResume();
-        messagePresenter.loadContactDetails(chatUserName);
-        messagePresenter.loadMessages(chatUserName);
         if(index != -1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
         }
+        messagePresenter.loadMessages(chatUserName);
         messagePresenter.getLastActivity(chatUserName);
-        messagePresenter.sendReadReceipt(chatUserName);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         messagePresenter.attachView(this);
+        messagePresenter.loadContactDetails(chatUserName);
         messagePresenter.loadKeyboard(chatUserName);
+
     }
 
     @Override
@@ -187,11 +192,22 @@ public class MessageActivity extends BaseActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.messages_toolbar, menu);
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.messages_toolbar, menu);
+//
+//        return true;
+//    }
+//
 
-        return true;
+
+    @Override
+    public void showError(String title, String message) {
+        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("\n"+message);
+        alertDialog.setButton(android.app.AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
     }
 
     @Override
@@ -201,11 +217,17 @@ public class MessageActivity extends BaseActivity
             AndroidUtils.hideSoftInput(this);
             this.finish();
         }
-        else if(id == R.id.view_contact) {
-            AndroidUtils.hideSoftInput(this);
-            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName));
-        }
+//        else if(id == R.id.view_contact) {
+//            AndroidUtils.hideSoftInput(this);
+//            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName));
+//        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.tb_message_title)
+    public void onNameClicked() {
+        AndroidUtils.hideSoftInput(this);
+        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName));
     }
 
     public void onSendClicked() {
@@ -288,7 +310,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void setContactDetails(ContactResult contact) {
         contactName = AndroidUtils.toTitleCase(contact.getContactName());
-        this.contactName = contact.getContactName();
+        this.contactName = AndroidUtils.toTitleCase(contact.getContactName());
         this.contactUserId = contact.getUserId();
 
         title.setText(contactName);
@@ -303,6 +325,8 @@ public class MessageActivity extends BaseActivity
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
         messageList.setAdapter(messagesAdapter);
+        showAddBlock(!contact.isAdded());
+        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
     }
 
     @Override
@@ -372,6 +396,7 @@ public class MessageActivity extends BaseActivity
     public void displayMessages(List<MessageResult> messages) {
         NotificationController.getInstance().updateNotification();
         messagesAdapter.setMessages(messages);
+        messagePresenter.sendReadReceipt(chatUserName);
     }
 
     @Override
@@ -383,6 +408,27 @@ public class MessageActivity extends BaseActivity
             sendImageButton = (ImageButton) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
             botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
+
+            // remove later after regular keyboard change. -------------------------------------------------------
+            messageBox.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() >= 1) {
+                        sendImageButton.setVisibility(View.VISIBLE);
+                        sendImageButton.setImageResource(R.drawable.ic_send_active);
+                    } else {
+                        sendImageButton.setVisibility(View.GONE);
+                    }
+                    onMessageChanged();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+            // remove later after regular keyboard change. -------------------------------------------------------
         } else {
             // regular keyboard
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
@@ -464,35 +510,28 @@ public class MessageActivity extends BaseActivity
                 }
             });
 
+            messageBox.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() >= 1) {
+                        sendImageButton.setImageResource(R.drawable.ic_send_active);
+                        cameraButton.setVisibility(View.GONE);
+                    } else {
+                        sendImageButton.setImageResource(R.drawable.ic_send_inactive);
+                        cameraButton.setVisibility(View.VISIBLE);
+                    }
+                    onMessageChanged();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
         }
 
         sendImageButton.setOnClickListener(v -> onSendClicked());
-        messageBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(isBotKeyboard) {
-                    if (s.length() >= 1) {
-                        sendImageButton.setVisibility(View.VISIBLE);
-                        sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
-                    } else {
-                        sendImageButton.setVisibility(View.GONE);
-                    }
-                } else {
-                    if (s.length() >= 1) {
-                        sendImageButton.setImageResource(R.drawable.ic_keyboard_send);
-                    } else {
-                        sendImageButton.setImageResource(R.drawable.ic_mic);
-                    }
-                }
-                onMessageChanged();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
     }
 
     @Override
@@ -513,12 +552,12 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void updateLastActivity(String time) {
-        if(time != null && !time.isEmpty()) {
-            presenceView.setVisibility(View.VISIBLE);
-            presenceView.setText(time);
-        } else {
-            presenceView.setVisibility(View.GONE);
-        }
+//        if(time != null && !time.isEmpty()) {
+//            presenceView.setVisibility(View.VISIBLE);
+//            presenceView.setText(time);
+//        } else {
+//            presenceView.setVisibility(View.GONE);
+//        }
     }
 
     @Override
@@ -552,7 +591,7 @@ public class MessageActivity extends BaseActivity
         super.onChatStateReceived(from, chatState);
         if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing) {
-                presenceView.setText(getResources().getString(R.string.chat_state_typing));
+//                presenceView.setText(getResources().getString(R.string.chat_state_typing));
             } else {
                 messagePresenter.getLastActivity(this.chatUserName);
             }
@@ -563,12 +602,12 @@ public class MessageActivity extends BaseActivity
     public void onPresenceChanged(String username, Presence.Type type) {
         super.onPresenceChanged(username, type);
         if(username.equals(chatUserName)) {
-            presenceView.setVisibility(View.VISIBLE);
+//            presenceView.setVisibility(View.VISIBLE);
             if(type == Presence.Type.available) {
-                presenceView.setText(getResources().getString(R.string.chat_presence_online));
+//                presenceView.setText(getResources().getString(R.string.chat_presence_online));
             } else if(type == Presence.Type.unavailable) {
                 DateTime timeNow = DateTime.now();
-                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
+//                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
             }
         }
     }
@@ -592,7 +631,6 @@ public class MessageActivity extends BaseActivity
 //                presenter.uploadProfileDP(new File(currentPhotoPath), userSession);
 //                galleryAddPic(currentPhotoPath);
             }
-
         }
     }
 
