@@ -74,6 +74,19 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return chatList;
     }
 
+    public List<ChatItem> updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
+        for (int i = 0; i < chatList.size(); i++) {
+            if(chatList.get(i).getReceiptId().equals(deliveryReceiptId)) {
+                ChatItem tt = chatList.get(i);
+                tt.setMessageStatus(deliveryStatus);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+
+        return chatList;
+    }
+
     public void setChatState(String fromId, String chatState){
         for (int i = 0; i < chatList.size(); i++) {
             if(fromId.equals(chatList.get(i).getChatId())){
@@ -86,6 +99,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         item.getLastMessage(),
                         item.getTime(),
                         item.getMessageStatus(),
+                        item.getReceiptId(),
                         item.getNotificationCount()
                 ));
                 item.setLastMessage(chatState);
@@ -243,7 +257,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
             }
-            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT) {
+            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT || chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
                 deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
             }

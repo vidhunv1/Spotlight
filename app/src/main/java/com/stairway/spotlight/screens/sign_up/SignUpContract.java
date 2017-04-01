@@ -13,6 +13,6 @@ public interface SignUpContract {
     }
 
     interface Presenter extends BasePresenter<SignUpContract.View> {
-        void registerUser(String fullName, String email, String password, String countryCode, String mobile);
+        void registerUser(String fullName, String email, String password, String countryCode, String mobile, String imei, String carrierName);
     }
 }

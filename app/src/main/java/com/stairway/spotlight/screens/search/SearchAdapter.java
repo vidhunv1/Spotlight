@@ -12,6 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.core.Logger;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,6 +46,8 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void displaySearch(SearchModel searchModel) {
+        Logger.d(this, "Search Contacts: "+searchModel.getContactsModelList().size());
+        Logger.d(this, "Search Messages: "+searchModel.getContactsModelList().size());
         searchList = searchModel;
         this.notifyDataSetChanged();
     }
@@ -50,8 +57,23 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return searchList.getContactsModelList().size()+1;
         return -1;
     }
+
     private int getContactLastPos() { // VIEW_TYPE_FIND
         return searchList.getContactsModelList().size();
+    }
+
+    private String getFormattedTime(DateTime time) {
+        DateTime timeNow = DateTime.now();
+        DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
+        if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
+            return time.toString(timeFormat).toUpperCase().replace(".", "");
+        } else if(time.getDayOfMonth() > (timeNow.getDayOfMonth()-7)) {
+            return time.dayOfWeek().getAsShortText();
+        } else if(timeNow.getYear() == time.getYear()) {
+            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth();
+        } else {
+            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth()+" AT "+time.toString(timeFormat)+" "+time.getYear();
+        }
     }
 
     @Override
@@ -65,7 +87,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new MessageViewHolder(messageView);
                 break;
             case VIEW_TYPE_CONTACT:
-                View contactView = inflater.inflate(R.layout.item_chat, parent, false);
+                View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactViewHolder(contactView);
                 break;
             case VIEW_TYPE_CATEGORY_CONTACTS:
@@ -222,6 +244,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             name.setText(messagesModel.getContactName());
             time.setText(messagesModel.getTime().toString());
+            time.setText(getFormattedTime(messagesModel.getTime()));
             String messageLower = messagesModel.getMessage().toLowerCase();
             int startPos = messageLower.indexOf(searchQuery.toLowerCase());
             if(!searchQuery.isEmpty() && startPos>=0) {

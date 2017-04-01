@@ -11,12 +11,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,7 +115,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         changeSignUpButton();
-        signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance());
+        signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
 
         // Permissions
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -257,7 +260,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             return;
         }
 
-        signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), countryCodeET.getText().toString(), mobileNumberET.getText().toString());
+        String imei = "";
+        String carrierName = "";
+        imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), countryCodeET.getText().toString(), mobileNumberET.getText().toString(), imei, carrierName);
 
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
     }

@@ -549,8 +549,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
-            }
-            else if(messageStatus == MessageResult.MessageStatus.SENT) {
+            } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
             }
             else if(messageStatus == MessageResult.MessageStatus.READ) {
@@ -718,11 +717,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             messageView.setText(message);
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
-            }
-            else if(messageStatus == MessageResult.MessageStatus.SENT) {
+            } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
-            }
-            else if(messageStatus == MessageResult.MessageStatus.READ) {
+            } else if(messageStatus == MessageResult.MessageStatus.READ) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
             }
 

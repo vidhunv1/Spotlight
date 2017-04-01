@@ -90,6 +90,7 @@ public class MessageController {
                                             messageResult.getMessage(),
                                             messageResult.getTime(),
                                             messageResult.getMessageStatus(),
+                                            messageResult.getReceiptId(),
                                             messageResult.getUnSeenCount()));
                                 }
                             });
@@ -125,7 +126,13 @@ public class MessageController {
                     //Acknowledgement
                     if(this.conn.isSmEnabled()) {
                         this.conn.addStanzaIdAcknowledgedListener(sendMessage.getStanzaId(), packet -> {
-                            message.setMessageStatus(MessageResult.MessageStatus.SENT);
+                            //TODO: Hack!
+                            // hack for official account read receipts. Remove ASAP.
+                            if(message.getChatId().toLowerCase().startsWith("o_") && message.isMe()) {
+                                message.setMessageStatus(MessageResult.MessageStatus.READ);
+                            } else {
+                                message.setMessageStatus(MessageResult.MessageStatus.SENT);
+                            }
                             subscriber.onNext(message);
                         });
                     }

@@ -1,5 +1,8 @@
 package com.stairway.spotlight.screens.login;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.user.UserApi;
@@ -20,6 +23,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+import static com.stairway.spotlight.core.FCMRegistrationIntentService.FCM_TOKEN;
+
 /**
  * Created by vidhun on 12/03/17.
  */
@@ -30,27 +35,28 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     private UserApi userApi;
     private UserSessionManager userSessionManager;
+    private SharedPreferences defaultSP;
 
-    public LoginPresenter(UserApi userApi, UserSessionManager userSessionManager) {
+    public LoginPresenter(UserApi userApi, UserSessionManager userSessionManager, SharedPreferences defaultSP) {
         this.userApi = userApi;
         this.userSessionManager = userSessionManager;
+        this.defaultSP = defaultSP;
         subscriptions = new CompositeSubscription();
     }
 
     @Override
     public void loginUser(String account, String password) {
         UserRequest request = new UserRequest();
+        _User user = new _User();
         if(android.util.Patterns.EMAIL_ADDRESS.matcher(account).matches()) { //is email
-            _User user = new _User();
             user.setEmail(account);
             user.setPassword(password);
-            request.setUser(user);
         } else { // is userId
-            _User user = new _User();
             user.setUserId(account);
             user.setPassword(password);
-            request.setUser(user);
         }
+        user.setNotificationToken(defaultSP.getString(FCM_TOKEN, ""));
+        request.setUser(user);
 
         Subscription subscription = userApi.loginUser(request)
                 .subscribeOn(Schedulers.io())

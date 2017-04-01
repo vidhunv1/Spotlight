@@ -9,6 +9,7 @@ import com.stairway.spotlight.db.core.DatabaseManager;
 import com.stairway.spotlight.db.core.SQLiteContract;
 import com.stairway.spotlight.db.core.SQLiteContract.MessagesContract;
 import com.stairway.spotlight.models.MessageResult;
+import com.stairway.spotlight.screens.home.ChatItem;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

@@ -17,18 +17,28 @@ public class ChatItem implements Serializable{
     private String lastMessage;
     private DateTime time;
     private int notificationCount;
+    private String receiptId;
     private MessageResult.MessageStatus messageStatus;
 
-    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, int notificationCount) {
+    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, String receiptId, int notificationCount) {
         this.chatId = chatId;
         this.chatName = chatName;
         this.lastMessage = lastMessage;
         this.time = time;
         this.notificationCount = notificationCount;
         this.messageStatus = messageStatus;
+        this.receiptId = receiptId;
     }
 
     public ChatItem() {
+    }
+
+    public String getReceiptId() {
+        return receiptId;
+    }
+
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
     }
 
     public MessageResult.MessageStatus getMessageStatus() {

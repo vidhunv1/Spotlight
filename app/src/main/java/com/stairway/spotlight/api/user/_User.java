@@ -75,6 +75,12 @@ public class _User {
     @SerializedName("notification_token")
     @Expose
     private String notificationToken;
+    @SerializedName("imei")
+    @Expose
+    private String imei;
+    @SerializedName("mobile_carrier")
+    @Expose
+    private String mobileCarrier;
 
     public static enum UserType {
         @SerializedName("official")
@@ -83,12 +89,20 @@ public class _User {
         regular
     }
 
+    public void setIMEI(String imei) {
+        this.imei = imei;
+    }
+
     public String getNotificationToken() {
         return notificationToken;
     }
 
     public void setNotificationToken(String notificationToken) {
         this.notificationToken = notificationToken;
+    }
+
+    public void setMobileCarrier(String mobileCarrier) {
+        this.mobileCarrier = mobileCarrier;
     }
 
     public String getProfileDP() {

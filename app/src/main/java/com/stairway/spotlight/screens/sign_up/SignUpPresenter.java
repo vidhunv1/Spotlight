@@ -1,5 +1,7 @@
 package com.stairway.spotlight.screens.sign_up;
 
+import android.content.SharedPreferences;
+
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.XMPPManager;
@@ -23,6 +25,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+import static com.stairway.spotlight.core.FCMRegistrationIntentService.FCM_TOKEN;
+
 /**
  * Created by vidhun on 08/03/17.
  */
@@ -33,15 +37,17 @@ public class SignUpPresenter implements SignUpContract.Presenter {
 
     private UserApi userApi;
     private UserSessionManager userSessionManager;
+    private SharedPreferences defaultSP;
 
-    public SignUpPresenter(UserApi userApi, UserSessionManager userSessionManager) {
+    public SignUpPresenter(UserApi userApi, UserSessionManager userSessionManager, SharedPreferences defaultSP) {
         this.userApi = userApi;
         this.userSessionManager = userSessionManager;
+        this.defaultSP = defaultSP;
         this.subscriptions = new CompositeSubscription();
     }
 
     @Override
-    public void registerUser(String fullName, String email, String password, String countryCode, String mobile) {
+    public void registerUser(String fullName, String email, String password, String countryCode, String mobile, String imei, String carrierName) {
         UserRequest request = new UserRequest();
         _User user = new _User();
         user.setName(fullName);
@@ -50,6 +56,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         user.setCountryCode(countryCode);
         user.setPhone(mobile);
         user.setUserType(_User.UserType.regular);
+        user.setIMEI(imei);
+        user.setMobileCarrier(carrierName);
+        user.setNotificationToken(defaultSP.getString(FCM_TOKEN, ""));
         request.setUser(user);
 
         Subscription subscription = userApi.createUser(request)
