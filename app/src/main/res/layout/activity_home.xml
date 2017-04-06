@@ -33,12 +33,12 @@
 
             <TextView
                 android:id="@+id/nav_item_contacts"
-                android:paddingLeft="18dp"
+                android:paddingLeft="14dp"
                 android:layout_marginTop="6dp"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="45dp"
                 android:drawableLeft="@drawable/ic_contacts"
-                android:drawablePadding="30dp"
+                android:drawablePadding="34dp"
                 android:text="Contacts"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
@@ -46,26 +46,26 @@
 
             <TextView
                 android:id="@+id/nav_item_settings"
-                android:paddingLeft="18dp"
+                android:paddingLeft="14dp"
                 android:layout_marginTop="3dp"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="45dp"
                 android:fontFamily="sans-serif-medium"
                 android:drawableLeft="@drawable/ic_settings"
-                android:drawablePadding="30dp"
+                android:drawablePadding="34dp"
                 android:text="Settings"
                 android:gravity="center_vertical"
                 android:textColor="#444444"/>
 
             <TextView
                 android:id="@+id/nav_item_faq"
-                android:paddingLeft="18dp"
+                android:paddingLeft="14dp"
                 android:layout_marginTop="3dp"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="45dp"
                 android:fontFamily="sans-serif-medium"
                 android:drawableLeft="@drawable/ic_help"
-                android:drawablePadding="30dp"
+                android:drawablePadding="34dp"
                 android:text="iChat FAQ"
                 android:gravity="center_vertical"
                 android:textColor="#444444"/>

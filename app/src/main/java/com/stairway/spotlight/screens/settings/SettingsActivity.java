@@ -91,14 +91,14 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
-    static final String PREFS_FILE = "settings";
-    static final String KEY_ALERT = "alert";
-    static final String KEY_SOUND = "sound";
-    static final String KEY_VIBRATE = "vibrate";
-    static final String KEY_LED_COLOR = "led_color";
-    static final String KEY_IN_APP_BROWSER = "in_app_browser";
-    static final String KEY_SEND_BY_ENTER = "send_by_enter";
-    static final String KEY_TEXT_SIZE = "text_size";
+    public static final String PREFS_FILE = "settings";
+    public static final String KEY_ALERT = "alert";
+    public static final String KEY_SOUND = "sound";
+    public static final String KEY_VIBRATE = "vibrate";
+    public static final String KEY_LED_COLOR = "led_color";
+    public static final String KEY_IN_APP_BROWSER = "in_app_browser";
+    public static final String KEY_SEND_BY_ENTER = "send_by_enter";
+    public static final String KEY_TEXT_SIZE = "text_size";
 
     static enum VibrateOptions {DISABLED, DEFAULT, SHORT, LONG, ONLY_IF_SILENT};
     static enum LedOptions {RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, VIOLET, PINK, WHITE};

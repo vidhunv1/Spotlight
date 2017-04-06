@@ -541,7 +541,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
             } else {
                 timeView.setVisibility(View.GONE);
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
@@ -615,7 +615,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
             } else {
                 timeView.setVisibility(View.GONE);
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
@@ -690,7 +690,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(8.25f));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
             } else {
                 timeView.setVisibility(View.GONE);
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));

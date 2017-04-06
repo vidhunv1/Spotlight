@@ -21,6 +21,8 @@ import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.ContactsContent;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.login.LoginActivity;
 import com.stairway.spotlight.screens.sign_up.SignUpActivity;
@@ -73,7 +75,12 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        presenter = new SetUserIdPresenter(ApiManager.getUserApi(), ApiManager.getAppApi(), UserSessionManager.getInstance());
+        presenter = new SetUserIdPresenter(ApiManager.getUserApi(),
+                ApiManager.getAppApi(),
+                UserSessionManager.getInstance(),
+                ApiManager.getContactsApi(),
+                new ContactsContent(this),
+                new ContactStore());
     }
 
     @Override
@@ -118,7 +125,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         if(id == R.id.action_done) {
             if(!isUserIdValid(userIdEt.getText())) {
             } else {
-                progressDialog[0] = ProgressDialog.show(SetUserIdActivity.this, "", "Loading. Please wait...", true);
+                progressDialog[0] = ProgressDialog.show(SetUserIdActivity.this, "", "Setting your ID. Please wait...", true);
                 presenter.setUserId(userIdEt.getText().toString());
             }
         }
@@ -161,8 +168,15 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        startActivity(HomeActivity.callingIntent(this));
+        startActivity(HomeActivity.callingIntent(this,0,null));
         finish();
+    }
+
+    @Override
+    public void onSetUserIdSuccess() {
+        progressDialog[0].setMessage("Initializing...");
+        presenter.initialize();
+        new Handler().postDelayed(this::navigateToHome, 3000);
     }
 
     private boolean isUserIdValid(CharSequence userId) {

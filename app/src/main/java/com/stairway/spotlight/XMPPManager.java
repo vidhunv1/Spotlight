@@ -1,7 +1,9 @@
 package com.stairway.spotlight;
 
 import android.os.AsyncTask;
+import android.widget.Toast;
 
+import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.config.AppConfig;
 import com.stairway.spotlight.core.ReadReceiptExtension;
 

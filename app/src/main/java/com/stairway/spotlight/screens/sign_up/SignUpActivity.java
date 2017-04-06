@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -30,6 +31,8 @@ import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.ContactsContent;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.login.LoginActivity;
 import com.stairway.spotlight.screens.new_chat.NewChatActivity;
@@ -72,9 +75,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.sign_up_tilPassword)
     TextInputLayout passwordTIL;
 
-    @Bind(R.id.sign_up_country_code)
-    EditText countryCodeET;
-
     @Bind(R.id.sign_up_btn)
     Button signupButton;
 
@@ -115,7 +115,10 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         changeSignUpButton();
-        signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
+
+        signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(),
+                UserSessionManager.getInstance(),
+                PreferenceManager.getDefaultSharedPreferences(this));
 
         // Permissions
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -264,7 +267,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         String carrierName = "";
         imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), countryCodeET.getText().toString(), mobileNumberET.getText().toString(), imei, carrierName);
+        signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), "+91", mobileNumberET.getText().toString(), imei, carrierName);
 
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
     }
@@ -306,13 +309,14 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     private boolean checkIfAlreadyhavePermission() {
         int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         int permission = PackageManager.PERMISSION_GRANTED;
 
-        return result1 == permission;
+        return result1 == permission && result2 == permission;
     }
 
     private void requestForSpecificPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, 101);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
     }
 
     @Override

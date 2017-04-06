@@ -62,7 +62,7 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
 
     @Override
     public void navigateToHomeActivity() {
-        startActivity(HomeActivity.callingIntent(this));
+        startActivity(HomeActivity.callingIntent(this,0,null));
         this.overridePendingTransition(0,0);
         finish();
     }

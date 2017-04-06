@@ -7,12 +7,18 @@ import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.StatusResponse;
 import com.stairway.spotlight.api.app.AppApi;
+import com.stairway.spotlight.api.contacts.ContactRequest;
+import com.stairway.spotlight.api.contacts.ContactsApi;
+import com.stairway.spotlight.api.contacts._Contact;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.db.ContactStore;
+import com.stairway.spotlight.db.ContactsContent;
+import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.home.HomeActivity;
 
@@ -23,6 +29,8 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -41,10 +49,16 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
     private UserApi userApi;
     private AppApi appApi;
     private UserSessionManager userSessionManager;
+    private ContactsApi contactApi;
+    private ContactsContent contactContent;
+    private ContactStore appContactStore;
 
-    public SetUserIdPresenter(UserApi userApi, AppApi appApi, UserSessionManager userSessionManager) {
+    public SetUserIdPresenter(UserApi userApi, AppApi appApi, UserSessionManager userSessionManager, ContactsApi contactApi, ContactsContent contactContent, ContactStore appContactStore) {
         this.userApi = userApi;
         this.appApi = appApi;
+        this.contactApi = contactApi;
+        this.contactContent = contactContent;
+        this.appContactStore = appContactStore;
         this.userSessionManager = userSessionManager;
         subscriptions = new CompositeSubscription();
     }
@@ -100,10 +114,74 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
 
                                         @Override
                                         public void onNext(StatusResponse statusResponse) {
-                                            setUserIdView.navigateToHome();
+                                            setUserIdView.onSetUserIdSuccess();
                                         }
                                     });
                         }
+                    }
+                });
+        subscriptions.add(subscription);
+    }
+
+    @Override
+    public void initialize() {
+        Subscription subscription = contactContent.getContacts()
+                .subscribe(new Subscriber<List<ContactResult>>() {
+                    @Override
+                    public void onCompleted() {}
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(List<ContactResult> contactResults) {
+                        contactApi.createContacts(new ContactRequest(contactResults))
+                                .map(contactResponse -> {
+                                    List<ContactResult>  contacts = new ArrayList<>(contactResponse.getContacts().size());
+                                    Logger.d(this,contactResponse.getContacts().size()+"");
+                                    for (_Contact contact : contactResponse.getContacts()) {
+                                        Logger.d(this, contact.toString());
+                                        ContactResult contactResult = new ContactResult(contact.getCountryCode(), contact.getPhone(), contact.getName());
+                                        contactResult.setUsername(contact.getUsername());
+                                        contactResult.setUserId(contact.getUserId());
+
+                                        // default behaviour, we auto add phone contacts
+                                        if(contact.isRegistered())
+                                            contacts.add(contactResult);
+                                    }
+                                    return contacts; })
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<List<ContactResult>>() {
+                                    @Override
+                                    public void onCompleted() {}
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        Logger.d(this, "error: "+e.getMessage());
+                                        setUserIdView.navigateToHome();
+                                    }
+
+                                    @Override
+                                    public void onNext(List<ContactResult> contacts) {
+                                        appContactStore.storeContacts(contacts)
+                                                .subscribe(new Subscriber<Boolean>() {
+                                                    @Override
+                                                    public void onCompleted() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        setUserIdView.navigateToHome();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(Boolean aBoolean) {
+                                                        setUserIdView.navigateToHome();
+                                                    }
+                                                });
+                                    }
+                                });
                     }
                 });
         subscriptions.add(subscription);

@@ -84,14 +84,16 @@ public class MessageController {
                                         name = messageResult.getChatId();
                                     }
 
-                                    chatItems.add(new ChatItem(
+                                    ChatItem t = new ChatItem(
                                             messageResult.getChatId(),
                                             name,
                                             messageResult.getMessage(),
                                             messageResult.getTime(),
                                             messageResult.getMessageStatus(),
                                             messageResult.getReceiptId(),
-                                            messageResult.getUnSeenCount()));
+                                            messageResult.getUnSeenCount());
+                                    t.setMe(messageResult.isMe());
+                                    chatItems.add(t);
                                 }
                             });
                         }

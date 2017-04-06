@@ -19,6 +19,7 @@ public class ChatItem implements Serializable{
     private int notificationCount;
     private String receiptId;
     private MessageResult.MessageStatus messageStatus;
+    private boolean isMe;
 
     public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, String receiptId, int notificationCount) {
         this.chatId = chatId;
@@ -31,6 +32,14 @@ public class ChatItem implements Serializable{
     }
 
     public ChatItem() {
+    }
+
+    public boolean isMe() {
+        return isMe;
+    }
+
+    public void setMe(boolean me) {
+        isMe = me;
     }
 
     public String getReceiptId() {

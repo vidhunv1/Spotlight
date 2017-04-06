@@ -29,11 +29,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
-import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.ImageUtils;
-import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.BaseActivity;
 
@@ -52,9 +50,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener {
 	@Bind(R.id.fab)
@@ -86,8 +81,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	private UserSession userSession;
 
-	public static Intent callingIntent(Context context) {
-		return new Intent(context, HomeActivity.class);
+	private static final String KEY_CHAT_USER_NAME = "HomeActivity.CHAT_USERNAME";
+	private static final String KEY_ENTRY = "HomeActivity.Entry";
+
+	public static Intent callingIntent(Context context, int entry, String chatUserName) {
+		Intent intent = new Intent(context, HomeActivity.class);
+		intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
+		intent.putExtra(KEY_ENTRY, entry);
+		return intent;
 	}
 
 	@Override
@@ -96,6 +97,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ButterKnife.bind(this);
+
+		Intent receivedIntent = getIntent();
+		if(receivedIntent.getIntExtra(KEY_ENTRY, 0) == 1) {
+			startActivity(MessageActivity.callingIntent(this, receivedIntent.getStringExtra(KEY_CHAT_USER_NAME)));
+		}
 
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -172,6 +178,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onResume() {
 		super.onResume();
+		NotificationController.getInstance().showNotificationAndAlert(false);
 		if(fab!=null) {
 			fab.setVisibility(View.VISIBLE);
 		}
@@ -279,7 +286,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), messageResult.getMessageStatus(), messageResult.getReceiptId(), 1);
 		this.chats = chatListAdapter.newChatMessage(item);
 		chatList.scrollToPosition(0);
-		NotificationController.getInstance().showNotification(true);
+		NotificationController.getInstance().showNotificationAndAlert(true);
 	}
 
 	@Override

@@ -3,7 +3,7 @@
     <solid android:color="#FFFFFFFF" />
 
     <stroke
-        android:width="0.33dp"
+        android:width="1dp"
         android:color="@color/sendMessageBubble" />
 
     <corners

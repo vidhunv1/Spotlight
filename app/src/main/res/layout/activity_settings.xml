@@ -85,8 +85,11 @@
         app:layout_anchorGravity="bottom|right|end"
         app:srcCompat="@drawable/ic_camera_dark"
         app:fabSize="mini"
-        android:backgroundTint="#FFFFFF"
+        android:layout_marginTop="14.5dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#FFFFFF"
         app:borderWidth="0dp"
         android:clickable="true"/>
 
@@ -199,7 +202,7 @@
 
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
+                        android:layout_height="0.25dp"
                         android:background="#f0f0f0" />
 
                     <TableRow
@@ -231,7 +234,7 @@
 
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
+                        android:layout_height="0.25dp"
                         android:background="#f0f0f0" />
 
                     <TableRow
@@ -264,7 +267,7 @@
 
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
+                        android:layout_height="0.25dp"
                         android:background="#f0f0f0" />
 
                     <TableRow
@@ -348,7 +351,7 @@
 
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
+                        android:layout_height="0.25dp"
                         android:background="#f0f0f0" />
 
                     <TableRow
@@ -377,7 +380,7 @@
 
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="0.5dp"
+                        android:layout_height="0.25dp"
                         android:background="#f0f0f0" />
                 </TableLayout>
             </LinearLayout>
@@ -420,7 +423,7 @@
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="0.5dp"
+                    android:layout_height="0.25dp"
                     android:background="#f0f0f0" />
 
                 <TextView
@@ -439,7 +442,7 @@
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="0.5dp"
+                    android:layout_height="0.25dp"
                     android:background="#f0f0f0" />
 
                 <TextView
@@ -458,7 +461,7 @@
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="0.5dp"
+                    android:layout_height="0.25dp"
                     android:background="#f0f0f0" />
 
                 <TextView
@@ -467,7 +470,7 @@
                     android:background="?android:selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_horizontal|top"
+                    android:gravity="center"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
                     android:text="iChat for Android v1.0.0"

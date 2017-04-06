@@ -1,28 +1,19 @@
 package com.stairway.spotlight.core;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.stairway.spotlight.UserSessionManager;
-import com.stairway.spotlight.R;
 import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.models.MessageResult;
-import com.stairway.spotlight.screens.login.LoginActivity;
-import com.stairway.spotlight.screens.sign_up.SignUpActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -107,7 +98,7 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onMessageReceived(MessageResult messageId, ContactResult from) {
         Logger.d(this, "[Base]Message Received "+messageId);
-        NotificationController.getInstance().showNotification(true);
+        NotificationController.getInstance().showNotificationAndAlert(true);
     }
 
     public void onPresenceChanged(String username, Presence.Type type) {

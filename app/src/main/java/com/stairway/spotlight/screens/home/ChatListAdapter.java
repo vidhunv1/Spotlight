@@ -76,7 +76,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public List<ChatItem> updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
         for (int i = 0; i < chatList.size(); i++) {
-            if(chatList.get(i).getReceiptId().equals(deliveryReceiptId)) {
+            if(chatList.get(i).isMe() && chatList.get(i).getReceiptId()!=null && chatList.get(i).getReceiptId().equals(deliveryReceiptId)) {
                 ChatItem tt = chatList.get(i);
                 tt.setMessageStatus(deliveryStatus);
                 notifyItemChanged(i);

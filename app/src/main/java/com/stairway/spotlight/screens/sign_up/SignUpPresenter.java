@@ -2,21 +2,14 @@ package com.stairway.spotlight.screens.sign_up;
 
 import android.content.SharedPreferences;
 
-import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
-import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserRequest;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.api.user._User;
-import com.stairway.spotlight.application.SpotlightApplication;
-import com.stairway.spotlight.core.Logger;
-import com.stairway.spotlight.db.ContactStore;
-import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.db.core.DatabaseManager;
-import com.stairway.spotlight.db.core.SQLiteHelper;
 import com.stairway.spotlight.models.UserSession;
 
 import rx.Subscriber;

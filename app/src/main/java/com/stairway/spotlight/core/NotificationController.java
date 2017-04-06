@@ -1,18 +1,24 @@
 package com.stairway.spotlight.core;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.MediaController;
 
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.ForegroundDetector;
-import com.stairway.spotlight.MessageService;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
@@ -26,11 +32,14 @@ import com.stairway.spotlight.models.Message;
 import com.stairway.spotlight.models.MessageResult;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.message.MessageActivity;
+import com.stairway.spotlight.screens.settings.SettingsActivity;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.Roster;
+import org.joda.time.DateTime;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +81,7 @@ public class NotificationController {
         MessageResult newMessage = new MessageResult(username, username, messageJson);
         newMessage.setMessageStatus(MessageResult.MessageStatus.UNSEEN);
         newMessage.setReceiptId(messageId);
+        newMessage.setTime(DateTime.now());
 
         contactStore.getContactByUserName(newMessage.getChatId()).subscribe(new Subscriber<ContactResult>() {
             @Override
@@ -100,12 +110,13 @@ public class NotificationController {
                             contactResult1.setBlocked(false);
 
                             Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
-                            if (!roster.isLoaded())
+                            if (!roster.isLoaded()) {
                                 try {
                                     roster.reloadAndWait();
                                 } catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
                                     e.printStackTrace();
                                 }
+                            }
                             try {
                                 roster.createEntry(XMPPManager.getJidFromUserName(contactResult1.getUsername()), contactResult1.getContactName(), null);
                             } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
@@ -138,7 +149,7 @@ public class NotificationController {
         });
     }
 
-    public void showNotification(boolean shouldAlert) {
+    public void showNotificationAndAlert(boolean shouldAlert) {
         messageStore.getUnseenMessages()
                 .subscribe(messageResults -> {
                     if(messageResults==null || messageResults.size()==0) {
@@ -157,82 +168,77 @@ public class NotificationController {
 
                                 @Override
                                 public void onNext(Map<String, String> contactNames) {
+
                                     int messageCount = messageResults.size();
-                                    String content = "";
                                     String conv = "";
                                     String contentTitle = "";
+                                    int MAX_COUNT = 7;
+
+                                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(SpotlightApplication.getContext());
+                                    NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+                                    if(uniqueUsernames.size() == 1) {
+                                        Intent intent;
+                                        if(ForegroundDetector.getInstance().isForeground()) {
+                                             intent = MessageActivity.callingIntent(context, uniqueUsernames.get(0));
+                                        } else  {
+                                             intent = HomeActivity.callingIntent(context, 1, uniqueUsernames.get(0));
+                                        }
+                                        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+                                        mBuilder.setContentIntent(pendingIntent);
+                                        if(messageCount==1) {
+                                            conv = messageCount + " new message";
+                                            mBuilder.setContentText(getDisplayMessage(messageResults.get(0).getMessage()));
+                                        } else if(messageCount>1) {
+                                            conv = messageCount + " new messages";
+                                            mBuilder.setContentText(conv);
+                                        }
+                                        contentTitle = contactNames.get(uniqueUsernames.get(0));
+
+                                        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(R.drawable.ic_reply,
+                                                "Reply", pendingIntent)
+                                                .build();
+
+                                        mBuilder.addAction(replyAction);
+                                    } else {
+                                        Intent intent = HomeActivity.callingIntent(context, 0, null);
+                                        mBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT));
+                                        conv = messageCount+" messages from "+uniqueUsernames.size()+" chats";
+                                        contentTitle = SpotlightApplication.getContext().getString(R.string.app_name);
+                                        inboxStyle.setSummaryText(conv);
+                                        mBuilder.setContentText(conv);
+                                    }
+
+                                    mBuilder.setContentTitle(contentTitle)
+                                            .setSmallIcon(R.drawable.ic_logo)
+                                            .setAutoCancel(true)
+                                            .setNumber(messageCount)
+                                            .setGroup("messages")
+                                            .setGroupSummary(true)
+                                            .setColor(0xff2ca5e0);
+
+                                    mBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE);
+                                    inboxStyle.setBigContentTitle(contentTitle);
 
                                     for (int i = 0; i < uniqueUsernames.size(); i++) {
-                                        for (int j = 0; j < messageResults.size(); j++) {
+                                        for (int j = 0; j <= (MAX_COUNT-1) && j < messageResults.size(); j++) {
                                             if(messageResults.get(j).getChatId().equals(uniqueUsernames.get(i))) {
                                                 if(uniqueUsernames.size()==1) {
-                                                    content = content + getDisplayMessage(messageResults.get(j).getMessage()) + "\n";
+                                                    inboxStyle.addLine(getDisplayMessage(messageResults.get(j).getMessage()));
                                                 } else {
-                                                    content = content + contactNames.get(messageResults.get(i).getChatId()) + ": " +getDisplayMessage(messageResults.get(j).getMessage()) + "\n";
+                                                    inboxStyle.addLine(contactNames.get(uniqueUsernames.get(i)) + ": " +getDisplayMessage(messageResults.get(j).getMessage()));
                                                 }
                                             }
                                         }
                                     }
 
-                                    Intent intent;
-                                    PendingIntent pendingIntent;
+                                    mBuilder.setStyle(inboxStyle);
 
-                                    if(uniqueUsernames.size() == 1) {
-                                        intent = MessageActivity.callingIntent(context, uniqueUsernames.get(0));
-                                        pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-                                        if(messageCount==1) {
-                                            conv = messageCount + " new message";
-                                        } else if(messageCount>1) {
-                                            conv = messageCount + " new messages";
-                                        }
-                                        contentTitle = contactNames.get(uniqueUsernames.get(0));
+                                    if (!shouldAlert) {
+                                        mBuilder.setPriority(NotificationCompat.PRIORITY_LOW);
                                     } else {
-                                        intent = HomeActivity.callingIntent(context);
-                                        pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
-                                        conv = messageCount+" messages from "+uniqueUsernames.size()+" conversations";
-                                        contentTitle = "iChat";
-                                    }
-
-                                    NotificationCompat.Builder mBuilder;
-
-                                    if(shouldAlert) {
-                                        mBuilder = new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_logo)
-                                                .setAutoCancel(true)
-                                                .setContentTitle(contentTitle)
-                                                .setDefaults(Notification.DEFAULT_ALL)
-                                                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                                                .setSubText(conv)
-                                                .setContentText(content)
-                                                .setContentIntent(pendingIntent)
-                                                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
-                                                .setPriority(Notification.PRIORITY_HIGH);
-
-                                        if(uniqueUsernames.size() == 1) {
-                                            PendingIntent replyPendingIntent = PendingIntent.getBroadcast(
-                                                    SpotlightApplication.getContext(),
-                                                    0,
-                                                    MessageActivity.callingIntent(SpotlightApplication.getContext(), uniqueUsernames.get(0)),
-                                                    PendingIntent.FLAG_UPDATE_CURRENT);
-
-                                            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(R.drawable.ic_reply,
-                                                    "Reply", replyPendingIntent)
-                                                    .build();
-
-                                            mBuilder.addAction(replyAction);
-                                        }
-                                    } else {
-                                        mBuilder = new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_logo)
-                                                .setAutoCancel(true)
-                                                .setContentTitle(contentTitle)
-                                                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                                                .setSubText(conv)
-                                                .setContentText(content)
-                                                .setContentIntent(pendingIntent)
-                                                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
-                                                .setPriority(Notification.PRIORITY_LOW);
+                                        mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
+                                                .setDefaults(Notification.DEFAULT_ALL);
                                     }
 
                                     NotificationManager notificationManager = (NotificationManager) context
@@ -244,7 +250,7 @@ public class NotificationController {
     }
 
     public void updateNotification() {
-        showNotification(false);
+        showNotificationAndAlert(false);
     }
 
     public void dismissNotification() {
@@ -303,7 +309,7 @@ public class NotificationController {
                 .subscribe(new Subscriber<MessageResult>() {
                     @Override
                     public void onCompleted() {
-                        showNotification(true);
+                        showNotificationAndAlert(true);
                     }
                     @Override
                     public void onError(Throwable e) {}

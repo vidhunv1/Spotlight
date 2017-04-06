@@ -3,8 +3,8 @@
     <solid android:color="#ffffff" />
 
     <stroke
-        android:width="0.33dp"
-        android:color="#ffffff" />
+        android:width="1dp"
+        android:color="@color/receiveMessageBubble" />
 
     <corners
         android:bottomLeftRadius="@dimen/bubble_full_corner_radius"

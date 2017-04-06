@@ -64,7 +64,8 @@
                 android:text="TextView"
                 android:textAllCaps="true"
                 android:textColor="@color/buttonText"
-                android:textSize="15dp" />
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tv_rcv_button2"
@@ -76,7 +77,8 @@
                 android:text="TextView"
                 android:textAllCaps="true"
                 android:textColor="@color/buttonText"
-                android:textSize="15dp" />
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tv_rcv_button3"
@@ -88,7 +90,8 @@
                 android:text="TextView"
                 android:textAllCaps="true"
                 android:textColor="@color/buttonText"
-                android:textSize="15dp" />
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 

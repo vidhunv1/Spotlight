@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        startActivity(HomeActivity.callingIntent(this));
+        startActivity(HomeActivity.callingIntent(this, 0 ,null));
         finish();
     }
 

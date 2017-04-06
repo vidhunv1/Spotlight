@@ -9,6 +9,7 @@ import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.ReadReceiptExtension;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
@@ -313,13 +314,14 @@ public class MessageService extends Service {
         ChatManager.getInstanceFor(connection).removeChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection).removeReceiptReceivedListener(receiptReceivedListener);
         Roster.getInstanceFor(connection).removeRosterListener(presenceStateListener);
-        XMPPManager.getInstance().getConnection().removeConnectionListener(connectionListener);
+        connection.removeConnectionListener(connectionListener);
 
         try {
             connection.disconnect(new Presence(Presence.Type.unavailable));
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+
         super.onDestroy();
     }
 
@@ -394,6 +396,10 @@ public class MessageService extends Service {
                     intent.putExtra(XMPP_RESULT_MESSAGE, messageId);
                     intent.putExtra(XMPP_RESULT_CONTACT, from);
                     broadcaster.sendBroadcast(intent);
+
+                    if(ForegroundDetector.getInstance().isBackground()) {
+                        NotificationController.getInstance().showNotificationAndAlert(true);
+                    }
                 }
             }
         });

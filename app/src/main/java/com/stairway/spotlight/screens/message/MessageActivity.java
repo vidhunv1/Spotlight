@@ -17,7 +17,6 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -115,6 +114,7 @@ public class MessageActivity extends BaseActivity
 
     // userName: id for ejabberd xmpp. userId: id set by user
     public static Intent callingIntent(Context context, String chatUserName) {
+        Logger.d("[MessageActivity] "+chatUserName);
         Intent intent = new Intent(context, MessageActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -582,7 +582,7 @@ public class MessageActivity extends BaseActivity
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
         } else {
-            NotificationController.getInstance().showNotification(true);
+            NotificationController.getInstance().showNotificationAndAlert(true);
         }
     }
 
