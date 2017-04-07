@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
@@ -20,6 +21,9 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
 
     UserSessionManager userSessionManager;
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "launcher";
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, LauncherActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -29,6 +33,7 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
@@ -45,6 +50,11 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         }
 
         ButterKnife.bind(this);
+
+        /*              Analytics           */
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.setUserId(userSessionManager.load().getUserName());
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override

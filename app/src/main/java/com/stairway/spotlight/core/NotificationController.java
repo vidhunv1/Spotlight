@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -180,9 +182,9 @@ public class NotificationController {
                                     if(uniqueUsernames.size() == 1) {
                                         Intent intent;
                                         if(ForegroundDetector.getInstance().isForeground()) {
-                                             intent = MessageActivity.callingIntent(context, uniqueUsernames.get(0));
+                                             intent = MessageActivity.callingIntent(context, messageResults.get(0).getChatId());
                                         } else  {
-                                             intent = HomeActivity.callingIntent(context, 1, uniqueUsernames.get(0));
+                                             intent = HomeActivity.callingIntent(context, 1, messageResults.get(0).getChatId());
                                         }
                                         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
                                         mBuilder.setContentIntent(pendingIntent);

@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,8 +21,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
@@ -56,6 +60,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<MessageResult> messageList;
     private SparseArray<Message> messageCache;
     private List<QuickReply> quickReplies;
+    private String chatUserName;
 
     private final int VIEW_TYPE_SEND_TEXT = 0;
     private final int VIEW_TYPE_RECV_TEXT = 1;
@@ -78,6 +83,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messageList = new ArrayList<>();
         this.messageCache = new SparseArray<>();
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
+        this.chatUserName = chatUserName;
 
         lastClickedPosition=-1;
     }
@@ -449,6 +455,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             alertDialog.dismiss();
         });
+
+
+        /*              Analytics           */
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.SELECT_MESSAGE, bundle);
     }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {

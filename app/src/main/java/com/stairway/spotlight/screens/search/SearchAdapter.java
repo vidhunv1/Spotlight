@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
+import com.stairway.spotlight.core.lib.ImageUtils;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -20,11 +21,9 @@ import org.joda.time.format.DateTimeFormatter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
 /**
  * Created by vidhun on 17/12/16.
  */
-
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private SearchModel searchList;
     private Context context;
@@ -205,7 +204,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             status.setText("ID: "+contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());
             divider.setVisibility(View.GONE);
-//            profileImage.setImageResource(R.drawable.default_profile_image);
+            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18));
 
             contactListContent.setOnClickListener(view -> {
                 if(contactClickListener != null)

@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.MessageService;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.ContactResult;
 import com.stairway.spotlight.models.UserSession;
@@ -26,6 +28,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class BaseActivity extends AppCompatActivity{
     BroadcastReceiver receiver;
 
+    private FirebaseAnalytics firebaseAnalytics;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +64,8 @@ public class BaseActivity extends AppCompatActivity{
                 }
             }
         };
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -99,10 +104,20 @@ public class BaseActivity extends AppCompatActivity{
     public void onMessageReceived(MessageResult messageId, ContactResult from) {
         Logger.d(this, "[Base]Message Received "+messageId);
         NotificationController.getInstance().showNotificationAndAlert(true);
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, from.getUsername());
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_MESSAGE, bundle);
     }
 
     public void onPresenceChanged(String username, Presence.Type type) {
         Logger.d(this, "Received Presence: "+username+", Type: "+type);
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_PRESENCE, bundle);
     }
 
     public void onNetworkStatus(boolean isAvailable) {
@@ -112,7 +127,19 @@ public class BaseActivity extends AppCompatActivity{
             Logger.d(this, "Internet not available");
     }
 
-    public void onChatStateReceived(String from, ChatState chatState) { Logger.d(this, "chatState: "+chatState.name()+", from "+from);}
+    public void onChatStateReceived(String from, ChatState chatState) {
+        Logger.d(this, "chatState: "+chatState.name()+", from "+from);
 
-    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {}
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, from);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_CHAT_STATE, bundle);
+    }
+
+    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatId);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_MESSAGE_STATUS, bundle);
+    }
 }

@@ -1,9 +1,12 @@
 package com.stairway.spotlight;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.config.AppConfig;
 import com.stairway.spotlight.core.ReadReceiptExtension;
 
@@ -73,14 +76,25 @@ public class XMPPManager implements Serializable {
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
+                Bundle bundle = new Bundle();
+                FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(SpotlightApplication.getContext());
                 if(!connection.isConnected()) {
                     try {
                         connection.connect();
+
+                        /*              Analytics           */
+                        bundle = new Bundle();
                     } catch (SmackException e) {
                         e.printStackTrace();
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                     } catch (IOException e) {
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (XMPPException e) {
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     }
                 }
@@ -88,18 +102,23 @@ public class XMPPManager implements Serializable {
                     try {
                         connection.login();
                     } catch (XMPPException e) {
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (SmackException e) {
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
+                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                     }
                 }
                 return null;
             }
         };
         connectionThread.execute();
-
         return connection;
     }
 

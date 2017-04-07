@@ -9,7 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/clear_history">
         <ImageView
             android:layout_width="24dp"
             android:layout_height="match_parent"
@@ -26,6 +27,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:id="@+id/delete_chat"
         android:orientation="horizontal">
         <ImageView
             android:layout_width="24dp"

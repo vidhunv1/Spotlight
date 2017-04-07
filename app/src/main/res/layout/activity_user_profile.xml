@@ -61,6 +61,7 @@
                     android:textSize="20sp" />
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/profile_presence"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

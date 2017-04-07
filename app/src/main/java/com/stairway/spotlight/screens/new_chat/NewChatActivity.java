@@ -25,8 +25,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
@@ -74,6 +76,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     private static final String KEY_SHOW_SOFT_INPUT = "KEY_SHOW_SOFT_INPUT";
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "new_chat";
+
     public static Intent callingIntent(Context context, boolean showSoftInput) {
         Intent intent = new Intent(context, NewChatActivity.class);
         intent.putExtra(KEY_SHOW_SOFT_INPUT, showSoftInput);
@@ -118,6 +123,16 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
         newChatPresenter.attachView(this);
         newChatPresenter.initContactList();
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -135,10 +150,16 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
             final Handler handler = new Handler();
             AndroidUtils.hideSoftInput(this);
             handler.postDelayed(() -> showAddContactPopup(), 250);
+
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.MAIN_ADD_CONTACT, null);
         } else if(id == R.id.action_search) {
             toolbarSearch.setVisibility(View.VISIBLE);
             AndroidUtils.showSoftInput(this,toolbarSearch);
             toolbarTitle.setVisibility(View.GONE);
+
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.SEARCH, null);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -213,6 +234,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 //        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
 //        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
         newChatPresenter.initContactList();
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_SUCCESS, bundle);
     }
 
     @Override
@@ -229,6 +255,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         alertDialog.setMessage("Please enter a valid iChat ID.");
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
+
+        /*              Analytics           */
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_FAILURE, null);
     }
 
     private void showAddContactPopup() {
@@ -262,6 +291,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
                 progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
                 newChatPresenter.addContact(editText.getText().toString());
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_ID, editText.getText().toString());
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_POPUP, bundle);
             }
         }));
         builder.setView(parent);
@@ -284,6 +318,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
 
         this.navigateToMessageActivity(userId);
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_ID, userId);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.SELECT_CONTACT, bundle);
     }
 
     @Override
@@ -294,6 +333,10 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @OnTextChanged(R.id.et_new_chat_search1)
     public void onSearchChanged() {
         newChatAdapter.filterList(toolbarSearch.getText().toString());
+
+                /*              Analytics           */
+        Bundle bundle = new Bundle();
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.SEARCH, bundle);
     }
 
     private void navigateToMessageActivity(String username) {

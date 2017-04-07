@@ -28,10 +28,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.api.bot.PersistentMenu;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.GsonProvider;
 import com.stairway.spotlight.core.Logger;
@@ -112,6 +114,8 @@ public class MessageActivity extends BaseActivity
     private String contactName;
     private String contactUserId;
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "message";
     // userName: id for ejabberd xmpp. userId: id set by user
     public static Intent callingIntent(Context context, String chatUserName) {
         Logger.d("[MessageActivity] "+chatUserName);
@@ -145,6 +149,8 @@ public class MessageActivity extends BaseActivity
 
         index = -1;
         top = -1;
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -165,6 +171,9 @@ public class MessageActivity extends BaseActivity
         }
         messagePresenter.loadMessages(chatUserName);
         messagePresenter.getLastActivity(chatUserName);
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -239,6 +248,12 @@ public class MessageActivity extends BaseActivity
             m.setText(message);
             messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
         }
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.MESSAGE, message);
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.SEND_MESSAGE, bundle);
     }
 
     public void onMessageChanged() {
@@ -305,6 +320,11 @@ public class MessageActivity extends BaseActivity
             });
             bottomSheetDialog.show();
         }
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.CLICK_BOT_MENU, bundle);
     }
 
     @Override
@@ -338,6 +358,11 @@ public class MessageActivity extends BaseActivity
             addBlockView.setVisibility(View.VISIBLE);
             addView.setOnClickListener(v -> {
                 messagePresenter.addContact(chatUserName);
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.OTHER_ADD_CONTACT, bundle);
             });
             blockView.setOnClickListener(v -> {
                 String message = "Are you sure you want to block <b>" + contactName + "</b>?";;
@@ -351,6 +376,11 @@ public class MessageActivity extends BaseActivity
                     dialog.cancel();
                 });
                 alertDialog.show();
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.BLOCK_USER, bundle);
             });
         } else {
             addBlockView.setVisibility(View.GONE);
@@ -429,6 +459,12 @@ public class MessageActivity extends BaseActivity
                 public void afterTextChanged(Editable s) {}
             });
             // remove later after regular keyboard change. -------------------------------------------------------
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+            bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Bot");
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
         } else {
             // regular keyboard
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
@@ -479,6 +515,11 @@ public class MessageActivity extends BaseActivity
                     InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
                 }
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_SMILEY, bundle);
             });
 
             emojiPicker.setOnEmojiconBackspaceClickedListener(v -> {
@@ -489,6 +530,11 @@ public class MessageActivity extends BaseActivity
                 String text = messageEditText.getText() + v.getEmoji();
                 messageEditText.setText(text);
                 messageEditText.setSelection(text.length());
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.SMILEY_SELECTED, bundle);
             });
 
             cameraButton.setOnClickListener(v -> {
@@ -508,6 +554,11 @@ public class MessageActivity extends BaseActivity
                         startActivityForResult(cameraIntent, RESULT_TAKE_PICTURE);
                     }
                 }
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_CAMERA, bundle);
             });
 
             messageBox.addTextChangedListener(new TextWatcher() {
@@ -529,9 +580,17 @@ public class MessageActivity extends BaseActivity
                 @Override
                 public void afterTextChanged(Editable s) {}
             });
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
+            bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Regular");
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
         }
 
-        sendImageButton.setOnClickListener(v -> onSendClicked());
+        sendImageButton.setOnClickListener(v -> {
+            onSendClicked();
+        });
     }
 
     @Override

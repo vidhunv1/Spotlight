@@ -23,12 +23,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.lib.ImageUtils;
@@ -83,6 +86,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	private static final String KEY_CHAT_USER_NAME = "HomeActivity.CHAT_USERNAME";
 	private static final String KEY_ENTRY = "HomeActivity.Entry";
+
+	private FirebaseAnalytics firebaseAnalytics;
+	private final String SCREEN_NAME = "home";
 
 	public static Intent callingIntent(Context context, int entry, String chatUserName) {
 		Intent intent = new Intent(context, HomeActivity.class);
@@ -142,6 +148,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				drawer.closeDrawer(GravityCompat.START);
 			} else {
 				drawer.openDrawer(GravityCompat.START);
+				firebaseAnalytics.logEvent(AnalyticsContants.Event.OPEN_DRAWER_MENU, null);
 			}
 		});
 		drawer.addDrawerListener(toggle);
@@ -161,6 +168,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 				super.onScrolled(recyclerView, dx, dy);
 			}
 		});
+
+		this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 	}
 
 	@Override
@@ -183,6 +192,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			fab.setVisibility(View.VISIBLE);
 		}
 		presenter.loadChatList();
+
+		/*              Analytics           */
+		firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
 	}
 
 	@Override
@@ -222,6 +234,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		} else if(id == R.id.action_search) {
 			startActivity(SearchActivity.callingIntent(this, chats));
 			this.overridePendingTransition(0, 0);
+
+			/*              Analytics           */
+			firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, null);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -268,6 +283,12 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onChatItemClicked(String userName) {
+
+		/*              Analytics           */
+		Bundle bundle = new Bundle();
+		bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, userName);
+		firebaseAnalytics.logEvent(AnalyticsContants.Event.OPEN_CHAT, bundle);
+
 		startActivity(MessageActivity.callingIntent(this, userName));
 	}
 
@@ -277,6 +298,25 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		View chatActionsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_chat_actions, null);
 		chatActionsDialog.setContentView(chatActionsView);
 		chatActionsDialog.show();
+
+		LinearLayout llClearHistory = (LinearLayout)chatActionsView.findViewById(R.id.clear_history);
+		llClearHistory.setOnClickListener(v -> {
+			Bundle bundle = new Bundle();
+			bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+			firebaseAnalytics.logEvent(AnalyticsContants.Event.CLEAR_HISTORY_CHAT, bundle);
+		});
+
+		LinearLayout llDelteChat = (LinearLayout)chatActionsView.findViewById(R.id.delete_chat);
+		llDelteChat.setOnClickListener(v -> {
+			Bundle bundle = new Bundle();
+			bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+			firebaseAnalytics.logEvent(AnalyticsContants.Event.DELETE_CHAT, bundle);
+		});
+
+		/*              Analytics           */
+		Bundle bundle = new Bundle();
+		bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+		firebaseAnalytics.logEvent(AnalyticsContants.Event.SELECT_CHAT, bundle);
 	}
 
 	@Override

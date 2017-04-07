@@ -32,12 +32,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.components.CustomNumberPicker;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
@@ -112,6 +114,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     AlertDialog alertDialogPic = null;
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "settings";
     public static Intent callingIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
@@ -146,7 +150,11 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         alertSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_ALERT, alertSwitch.isChecked()).apply());
         sendByEnterSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_SEND_BY_ENTER, sendByEnterSwitch.isChecked()).apply());
         inAppBrowserSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_IN_APP_BROWSER, inAppBrowserSwitch.isChecked()).apply());
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,6 +169,15 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             super.onBackPressed();
         } else if(id == R.id.action_logout) {
             showLogoutPopup();
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.LOGOUT, bundle);
+        } else if(id == R.id.action_edit_name) {
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.EDIT_NAME, bundle);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -172,6 +189,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             alertDialogPic.dismiss();
         }
         settingsPresenter.attachView(this);
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     public void showError(String title, String message) {

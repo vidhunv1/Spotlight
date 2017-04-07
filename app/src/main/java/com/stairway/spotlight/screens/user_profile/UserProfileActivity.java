@@ -14,12 +14,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
@@ -38,6 +41,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.iv_userprofile_dp)
@@ -67,6 +72,8 @@ public class UserProfileActivity extends BaseActivity {
     private static String KEY_CONTACT_NAME = "UserProfileActivity.CONTACT_NAME";
     private static String KEY_CONTACT_USER_ID = "UserProfileActivity.USER_ID";
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "user_profile";
     public static Intent callingIntent(Context context, String username, String userid, String contactName) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -99,17 +106,33 @@ public class UserProfileActivity extends BaseActivity {
         profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
 
         MessageController messageController = MessageController.getInstance();
-        messageController.getLastActivity(this.username).subscribe(new Subscriber<String>() {
+        messageController.getLastActivity(this.username)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<String>() {
             @Override
             public void onCompleted() {}
             @Override
-            public void onError(Throwable e) {}
+            public void onError(Throwable e) {
+                presenceView.setVisibility(View.GONE);
+            }
 
             @Override
             public void onNext(String time) {
+                presenceView.setVisibility(View.VISIBLE);
                 presenceView.setText(time);
             }
         });
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -151,6 +174,11 @@ public class UserProfileActivity extends BaseActivity {
             builder.setView(parent);
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.BLOCK_USER, bundle);
         } else if(id == R.id.action_delete_contact) {
             LinearLayout parent = new LinearLayout(this);
 
@@ -172,8 +200,16 @@ public class UserProfileActivity extends BaseActivity {
             builder.setView(parent);
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
-        } else if(id == R.id.action_add_shortcut) {
 
+                    /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.DELETE_USER, bundle);
+        } else if(id == R.id.action_add_shortcut) {
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_SHORTCUT, bundle);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -181,6 +217,11 @@ public class UserProfileActivity extends BaseActivity {
     @OnClick(R.id.user_profile_message)
     public void onMessageClicked() {
         onBackPressed();
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.PROFILE_MESSAGE_USER, bundle);
     }
 
     @OnClick(R.id.profile_first_line)
@@ -267,9 +308,11 @@ public class UserProfileActivity extends BaseActivity {
         if(this.username.equals(username)) {
             Resources res = getResources();
             if(type == Presence.Type.available) {
+                presenceView.setVisibility(View.VISIBLE);
                 presenceView.setText(res.getString(R.string.chat_presence_online));
             } else if(type == Presence.Type.unavailable) {
                 DateTime timeNow = DateTime.now();
+                presenceView.setVisibility(View.VISIBLE);
                 presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
             }
         }

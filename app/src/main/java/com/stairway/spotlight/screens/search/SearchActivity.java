@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.user.UserApi;
@@ -52,6 +53,9 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     private SearchAdapter searchAdapter;
     private boolean isAdapterSet = false;
     private static final String KEY_CHATS = "CHATS";
+
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "search";
 
     public static Intent callingIntent(Context context, List<ChatItem> chatListItemModel) {
         Intent intent = new Intent(context, SearchActivity.class);
@@ -111,6 +115,16 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         searchAdapter = new SearchAdapter(this, this, this);
         contactsSearchList.setLayoutManager(new LinearLayoutManager(this));
         contactsSearchList.setNestedScrollingEnabled(false);
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override

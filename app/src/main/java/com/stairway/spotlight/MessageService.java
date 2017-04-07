@@ -32,7 +32,6 @@ import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,7 +70,7 @@ public class MessageService extends Service {
     private final int RETRY_OFFLINE = 1;
     private final int RETRY_ONLINE = 1;
     private int retryInterval = RETRY_OFFLINE; //seconds
-    private Timer mTimer = null;
+    private Timer networkTimer = null;
 
     private MessageStore messageStore;
     private ContactStore contactStore;
@@ -297,8 +296,8 @@ public class MessageService extends Service {
         roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
         roster.addRosterListener(presenceStateListener);
 
-        mTimer = new Timer();
-        mTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
+        networkTimer = new Timer();
+        networkTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
     }
 
     @Override
@@ -309,7 +308,7 @@ public class MessageService extends Service {
     @Override
     public void onDestroy() {
         Logger.d(this, "onDestry");
-        mTimer.cancel();
+        networkTimer.cancel();
 
         ChatManager.getInstanceFor(connection).removeChatListener(this.chatListener);
         DeliveryReceiptManager.getInstanceFor(connection).removeReceiptReceivedListener(receiptReceivedListener);
