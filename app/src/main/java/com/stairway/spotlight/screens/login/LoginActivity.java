@@ -14,11 +14,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.home.HomeActivity;
 import com.stairway.spotlight.screens.user_id.SetUserIdActivity;
@@ -58,6 +62,12 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     @Bind(R.id.login_password_divider)
     View passwordDivider;
 
+    @Bind(R.id.id_error)
+    TextView idErrorView;
+
+    @Bind(R.id.password_error)
+    TextView passwordErrorView;
+
     private String dividerColor = "#c9c9c9";
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
@@ -82,10 +92,13 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
-        changeLoginButton();
         if(UserSessionManager.getInstance().getCacheID()!=null) {
             accountET.setText(UserSessionManager.getInstance().getCacheID());
+            accountDivider.setBackgroundColor(Color.parseColor(dividerColor));
+
             passwordET.requestFocus();
+        } else {
+            accountET.requestFocus();
         }
     }
 
@@ -135,21 +148,20 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
+        if(title.toLowerCase().contains("not found")) {
+            idErrorView.setVisibility(View.VISIBLE);
+            idErrorView.setText(message);
+            accountDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
+        } else if(title.toLowerCase().contains("invalid password")) {
+            passwordErrorView.setVisibility(View.VISIBLE);
+            passwordErrorView.setText(message);
+            passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
+        }
         AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-    }
-
-    @OnTextChanged(R.id.login_account)
-    public void onAccountTextChanged() {
-        changeLoginButton();
-    }
-
-    @OnTextChanged(R.id.login_password)
-    public void onPasswordTextChanged() {
-        changeLoginButton();
     }
 
     @OnFocusChange(R.id.login_account)
@@ -170,6 +182,29 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         }
     }
 
+    @OnTextChanged(R.id.login_password)
+    public void onPasswordTextChanged() {
+        passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
+        passwordErrorView.setVisibility(View.INVISIBLE);
+        // TODO: clear cross button
+    }
+
+    @OnTextChanged(R.id.login_account)
+    public void onAccountTextChanged() {
+        accountDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        idErrorView.setVisibility(View.INVISIBLE);
+
+        if(accountET.getText().length()>=1) {
+            // TODO: set clear button
+        } else {
+            // TODO: remove clear button
+        }
+
+        idErrorView.setVisibility(View.INVISIBLE);
+        // TODO: clear cross button
+    }
+
     @OnClick(R.id.login_btn)
     public void onLoginClicked() {
         if(!isEmailValid(accountET.getText()) && !isUserIdValid(accountET.getText())) {
@@ -178,20 +213,16 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
             alertDialog.setMessage("\nThis iChat ID/email is invalid.");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
+
+            idErrorView.setVisibility(View.VISIBLE);
+            idErrorView.setText("This iChat ID/email is invalid.");
+            accountDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
         }
 
         progressDialog[0] = ProgressDialog.show(LoginActivity.this, "", "Loading. Please wait...", true);
 
         loginPresenter.loginUser(accountET.getText().toString(), passwordET.getText().toString());
-    }
-
-    public void changeLoginButton() {
-        if(accountET.getText().length()>=1 && passwordET.getText().length()>=1) {
-            loginButton.setAlpha(1f);
-        } else {
-            loginButton.setAlpha(0.6f);
-        }
     }
 
     private boolean isEmailValid(CharSequence email) {

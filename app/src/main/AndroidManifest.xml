@@ -46,9 +46,11 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".screens.sign_up.SignUpActivity"
+            android:windowSoftInputMode="stateAlwaysVisible"
             android:label="@string/app_name" />
         <activity
             android:name=".screens.login.LoginActivity"
+            android:windowSoftInputMode="stateAlwaysVisible"
             android:label="@string/app_name" />
         <activity
             android:name=".screens.welcome.WelcomeActivity"

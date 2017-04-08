@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:paddingLeft="50dp"
+    android:paddingRight="50dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/no_contacts_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap         at the top of your screen to add contacts."
+        android:textAlignment="center"
+        android:textColor="#565656"
+        android:textSize="17sp" />
+
+    <ImageView
+        android:layout_alignLeft="@+id/no_contacts_text"
+        android:layout_marginLeft="40dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        app:srcCompat="@drawable/ic_contact_add_dark"/>
+</RelativeLayout>

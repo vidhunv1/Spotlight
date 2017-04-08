@@ -52,8 +52,11 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         ButterKnife.bind(this);
 
         /*              Analytics           */
+        String id = userSessionManager.getCacheID();
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        firebaseAnalytics.setUserId(userSessionManager.load().getUserName());
+        if(id!=null && !id.isEmpty()) {
+            firebaseAnalytics.setUserId(id);
+        }
         firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 

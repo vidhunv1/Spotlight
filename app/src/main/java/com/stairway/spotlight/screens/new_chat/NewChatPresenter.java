@@ -1,6 +1,7 @@
 package com.stairway.spotlight.screens.new_chat;
 
 import com.stairway.spotlight.XMPPManager;
+import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.api.bot.BotApi;
 import com.stairway.spotlight.api.bot.BotResponse;
@@ -100,15 +101,22 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
                                 .map(userResponse -> {
-                                    ContactResult contactResult = new ContactResult();
-                                    contactResult.setUserId(userResponse.getUser().getUserId());
-                                    contactResult.setUsername(userResponse.getUser().getUsername());
-                                    contactResult.setDisplayName(userResponse.getUser().getName());
-                                    contactResult.setUserType(userResponse.getUser().getUserType());
-                                    contactResult.setAdded(true);
-                                    contactResult.setBlocked(false);
+                                    if(!userResponse.isSuccess()) {
+                                        if(userResponse.getError().getCode() == 404) {
+                                            contactsView.showInvalidIDError();
+                                        }
+                                        return null;
+                                    } else {
+                                        ContactResult contactResult = new ContactResult();
+                                        contactResult.setUserId(userResponse.getUser().getUserId());
+                                        contactResult.setUsername(userResponse.getUser().getUsername());
+                                        contactResult.setDisplayName(userResponse.getUser().getName());
+                                        contactResult.setUserType(userResponse.getUser().getUserType());
+                                        contactResult.setAdded(true);
+                                        contactResult.setBlocked(false);
 
-                                    return contactResult;
+                                        return contactResult;
+                                    }
                                 })
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
@@ -119,14 +127,14 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                     @Override
                                     public void onError(Throwable e) {
                                         e.printStackTrace();
-                                        Logger.d("userApi.findUser error");
-
-                                        //TODO: remove not found user from error.
-                                        contactsView.showInvalidIDError();
+                                        ApiError error = new ApiError(e);
+                                        contactsView.showError(error.getTitle(), error.getMessage());
                                     }
 
                                     @Override
                                     public void onNext(ContactResult contactResult) {
+                                        if(contactResult == null)
+                                            return;
                                         Logger.d(this, contactResult.toString());
 
                                         Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());

@@ -6,39 +6,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF"
     android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/ll_item_chat"
+    <TextView
+        android:paddingTop="10.75dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:focusable="true"
-        android:clickable="true"
-        android:background="?android:selectableItemBackground"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="72dp"
-            android:layout_height="62dp"
-            android:id="@+id/iv_chatItem_profileImage"
-            app:srcCompat="@drawable/ic_share"
-            android:paddingTop="19.25dp"
-            android:paddingBottom="19.25dp"
-            android:paddingLeft="9dp"
-            android:visibility="gone"
-            android:paddingRight="11dp"/>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/ll_chatItem_content">
-                <TextView
-                    android:paddingTop="10.75dp"
-                    android:layout_width="match_parent"
-                    tools:ignore="MissingPrefix"
-                    android:layout_height="wrap_content"
-                    android:text="Invite Friends"
-                    android:textAlignment="center"
-                    android:textColor="#6b6f72"
-                    android:textSize="16sp"
-                    android:id="@+id/tv_chatItem_contact" />
-        </LinearLayout>
-    </LinearLayout>
+        tools:ignore="MissingPrefix"
+        android:layout_height="wrap_content"
+        android:text="AA"
+        android:textAlignment="center"
+        android:textColor="#6b6f72"
+        android:textSize="16sp"
+        android:id="@+id/tv_chatItem_contact" />
 </LinearLayout>

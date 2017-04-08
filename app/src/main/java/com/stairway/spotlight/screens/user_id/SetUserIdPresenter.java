@@ -64,6 +64,38 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
     }
 
     @Override
+    public void checkUserIdAvailable(String userId) {
+        Subscription subscription = userApi.findUserByUserId(userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<UserResponse>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        ApiError error = new ApiError(e);
+                        setUserIdView.showError(error.getTitle(), error.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(UserResponse userResponse) {
+                        if(!userResponse.isSuccess()) {
+                            if(userResponse.getError().getCode() == 404) {
+                                setUserIdView.showUserIdAvailable();
+                            }
+                        } else {
+                            setUserIdView.showUserIdNotAvailableError();
+                        }
+                    }
+                });
+        subscriptions.add(subscription);
+    }
+
+    @Override
     public void setUserId(String userId) {
         UserRequest request = new UserRequest();
         _User user = new _User();
@@ -87,7 +119,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                     public void onNext(UserResponse userResponse) {
                         if(!userResponse.isSuccess()) {
                             if(userResponse.getError().getCode() == 409) {
-                                setUserIdView.showUserIdNotAvailableError();
+                                setUserIdView.showError("User ID", "This User ID is not available.");
                             } else {
                                 setUserIdView.showError(userResponse.getError().getTitle(), userResponse.getError().getTitle());
                             }
@@ -130,7 +162,9 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                     @Override
                     public void onCompleted() {}
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        setUserIdView.navigateToHome();
+                    }
 
                     @Override
                     public void onNext(List<ContactResult> contactResults) {
@@ -157,7 +191,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                     @Override
                                     public void onError(Throwable e) {
                                         e.printStackTrace();
-                                        Logger.d(this, "error: "+e.getMessage());
+                                        Logger.d(this, "error1: "+e.getMessage());
                                         setUserIdView.navigateToHome();
                                     }
 
@@ -166,17 +200,17 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                         appContactStore.storeContacts(contacts)
                                                 .subscribe(new Subscriber<Boolean>() {
                                                     @Override
-                                                    public void onCompleted() {
-
-                                                    }
+                                                    public void onCompleted() {}
 
                                                     @Override
                                                     public void onError(Throwable e) {
+                                                        Logger.d(this, "error2: "+e.getMessage());
                                                         setUserIdView.navigateToHome();
                                                     }
 
                                                     @Override
                                                     public void onNext(Boolean aBoolean) {
+                                                        Logger.d(this, "onNext: ");
                                                         setUserIdView.navigateToHome();
                                                     }
                                                 });

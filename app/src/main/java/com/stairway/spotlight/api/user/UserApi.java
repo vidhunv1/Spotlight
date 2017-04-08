@@ -35,11 +35,11 @@ public interface UserApi {
     @GET("users/username/{username}")
     Observable<UserResponse> findUserByUserName(@Path("username") String username);
 
-    @GET("users/logout")
-    Observable<StatusResponse> logout();
-
     @GET("users/id/{user_id}")
     Observable<UserResponse> findUserByUserId(@Path("user_id") String userId);
+
+    @GET("users/logout")
+    Observable<StatusResponse> logout();
 
     @POST("users/login")
     Observable<UserResponse> loginUser(@Body UserRequest userRequest);

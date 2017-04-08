@@ -74,6 +74,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                     @Override
                     public void onNext(UserResponse userResponse) {
                         if (!userResponse.isSuccess()) {
+                            Logger.d(this, "Error Code"+userResponse.getError().getCode());
                             loginView.showError(userResponse.getError().getTitle(), userResponse.getError().getMessage());
                         } else {
                             UserSession us = userSessionManager.load();

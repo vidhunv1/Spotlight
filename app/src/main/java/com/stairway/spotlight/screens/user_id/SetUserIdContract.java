@@ -10,12 +10,14 @@ import com.stairway.spotlight.core.BaseView;
 public interface SetUserIdContract {
     interface View extends BaseView {
         void showUserIdNotAvailableError();
+        void showUserIdAvailable();
         void onSetUserIdSuccess();
         void navigateToHome();
     }
 
     interface Presenter extends BasePresenter<View> {
         void setUserId(String userId);
+        void checkUserIdAvailable(String userId);
         void initialize();
     }
 }

@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.R;
@@ -90,6 +91,18 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.sign_up_mobile_divider)
     View mobileDivider;
 
+    @Bind(R.id.full_name_error)
+    TextView nameErrorView;
+
+    @Bind(R.id.email_error)
+    TextView emailErrorView;
+
+    @Bind(R.id.password_error)
+    TextView passwordErrorView;
+
+    @Bind(R.id.mobile_error)
+    TextView mobileErrorView;
+
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     SignUpPresenter signUpPresenter;
@@ -114,8 +127,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        changeSignUpButton();
-
         signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(),
                 UserSessionManager.getInstance(),
                 PreferenceManager.getDefaultSharedPreferences(this));
@@ -128,6 +139,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 getEmailAddress();
             }
         }
+
+        nameET.requestFocus();
+        emailET.setSelectAllOnFocus(true);
     }
 
     @Override
@@ -167,16 +181,24 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
+        Logger.d(this, "Error: "+title+", "+message);
         AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
+
+        if(message.contains("email")) {
+            emailErrorView.setVisibility(View.VISIBLE);
+            emailErrorView.setText(message);
+            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
+        }
     }
 
     @OnTextChanged(R.id.sign_up_email)
     public void onEmailTextChanged() {
-        changeSignUpButton();
+        emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        emailErrorView.setVisibility(View.INVISIBLE);
     }
 
     @OnFocusChange(R.id.sign_up_email)
@@ -190,7 +212,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnTextChanged(R.id.sign_up_password)
     public void onPasswordTextChanged() {
-        changeSignUpButton();
+
+        if(isPasswordValid(passwordET.getText())) {
+            passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            passwordErrorView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @OnFocusChange(R.id.sign_up_password)
@@ -204,7 +230,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnTextChanged(R.id.sign_up_name)
     public void onNameTextChanged() {
-        changeSignUpButton();
+        nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        nameErrorView.setVisibility(View.INVISIBLE);
     }
 
     @OnFocusChange(R.id.sign_up_name)
@@ -218,7 +245,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnTextChanged(R.id.sign_up_mobile_number)
     public void onMobileTextChanged() {
-        changeSignUpButton();
+        mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        mobileErrorView.setVisibility(View.INVISIBLE);
     }
 
     @OnFocusChange(R.id.sign_up_mobile_number)
@@ -232,11 +260,19 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnClick(R.id.sign_up_btn)
     public void onSignUpClicked() {
-        if(!(nameET.getText().length()>=1 && emailET.getText().length()>=1 && passwordET.getText().length()>=1 && mobileNumberET.getText().length()>=1)) {
-            signupButton.setActivated(false);
+        if(!isNameValid(nameET.getText())) {
+            AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
+            alertDialog.setTitle("Invalid");
+            alertDialog.setMessage("\nPlease enter your full name");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+            alertDialog.show();
+
+            nameET.requestFocus();
+
+            nameErrorView.setVisibility(View.VISIBLE);
+            nameErrorView.setText("Please enter your full name");
+            nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
-        } else {
-            signupButton.setActivated(true);
         }
         if(!isEmailValid(emailET.getText())) {
             AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
@@ -244,6 +280,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             alertDialog.setMessage("\nThis email is invalid.");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
+
+            emailET.requestFocus();
+
+            emailErrorView.setVisibility(View.VISIBLE);
+            emailErrorView.setText("Please enter a valid email");
+            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
         }
         if(!isPasswordValid(passwordET.getText())) {
@@ -252,6 +294,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             alertDialog.setMessage("\nPassword must be 8 to 16 characters long.");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
+
+            passwordET.requestFocus();
+
+            passwordErrorView.setVisibility(View.VISIBLE);
+            passwordErrorView.setText("8-16 characters long");
+            passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
         }
         if(!isMobileNumberValid(mobileNumberET.getText())) {
@@ -260,6 +308,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             alertDialog.setMessage("\nThis phone number is invalid.");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
+
+            mobileNumberET.requestFocus();
+
+            mobileErrorView.setVisibility(View.VISIBLE);
+            mobileErrorView.setText("Please enter a valid phone number");
+            mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
         }
 
@@ -270,14 +324,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), "+91", mobileNumberET.getText().toString(), imei, carrierName);
 
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
-    }
-
-    public void changeSignUpButton() {
-        if(nameET.getText().length()>=1 && emailET.getText().length()>=1 && passwordET.getText().length()>=1 && mobileNumberET.getText().length()>=1) {
-            signupButton.setAlpha(1f);
-        } else {
-            signupButton.setAlpha(0.6f);
-        }
     }
 
     private boolean isEmailValid(CharSequence email) {
@@ -303,6 +349,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             if (emailPattern.matcher(account.name).matches()) {
                 String possibleEmail = account.name;
                 emailET.setText(possibleEmail);
+                emailDivider.setBackgroundColor(Color.parseColor(dividerColor));
             }
         }
     }

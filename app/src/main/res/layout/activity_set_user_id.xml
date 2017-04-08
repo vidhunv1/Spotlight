@@ -28,8 +28,8 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/set_user_id_tilId"
         android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="60dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="24dp"
         android:layout_centerVertical="true"
         app:hintEnabled="false">
 
@@ -37,7 +37,7 @@
             android:id="@+id/set_user_id_et"
             android:layout_width="match_parent"
             android:background="@android:color/transparent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:hint="Your User ID"
             android:paddingLeft="24dp"
@@ -55,9 +55,21 @@
         android:background="@color/colorPrimary" />
 
     <TextView
+        android:id="@+id/user_id_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:textSize="15sp"
+        android:textColor="#6D726D"
+        android:visibility="invisible"
+        android:text=""/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:textSize="15sp"

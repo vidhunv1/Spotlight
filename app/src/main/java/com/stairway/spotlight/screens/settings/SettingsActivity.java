@@ -87,6 +87,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Bind(R.id.title)
     TextView profileNameText;
 
+    @Bind(R.id.android_version_name)
+    TextView versionNameText;
+
     private static final int REQUEST_GALLERY = 1;
     private static final int REQUEST_CAMERA = 2;
     private String currentPhotoPath;
@@ -150,7 +153,13 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         alertSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_ALERT, alertSwitch.isChecked()).apply());
         sendByEnterSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_SEND_BY_ENTER, sendByEnterSwitch.isChecked()).apply());
         inAppBrowserSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_IN_APP_BROWSER, inAppBrowserSwitch.isChecked()).apply());
-
+        String versionName;
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionName = "v1.0.0";
+        }
+        versionNameText.setText(this.getResources().getString(R.string.settings_app_version, this.getResources().getString(R.string.app_name), versionName));
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 

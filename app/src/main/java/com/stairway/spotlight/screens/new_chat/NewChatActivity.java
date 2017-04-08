@@ -199,6 +199,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
             message = "<b>" + name + "</b> is already in your contacts on iChat.";
         } else {
             message = "<b>" + name + "</b> is added to your contacts on iChat.";
+
+            /*              Analytics           */
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_SUCCESS, bundle);
         }
 
         AlertDialog alertDialog = new AlertDialog.Builder(NewChatActivity.this).create();
@@ -234,11 +239,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 //        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
 //        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
         newChatPresenter.initContactList();
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_SUCCESS, bundle);
     }
 
     @Override

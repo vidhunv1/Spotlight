@@ -30,6 +30,8 @@
     <color name="iconPrimary">#ffffff</color>
     <color name="iconSecondary">#B9D6D9</color>
     <color name="drawerIcon">#737373</color>
-    <color name="error">#C62828</color>
     <color name="divider">#E0E0E0</color>
+
+    <color name="error">#FFFF0000</color>
+    <color name="success">#FF25922A</color>
 </resources>

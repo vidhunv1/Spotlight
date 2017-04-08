@@ -27,9 +27,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
-    private final int ContactsNumber = 2;
+    private final int CONTACTS_NUMBER = 2;
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
+    private final int NO_CONTACTS = 5;
+
+
     private Context context;
 
     private List<Integer> filteredList;
@@ -78,15 +81,20 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if(filteredList.size()==0 && !filterQuery.isEmpty()) {
             return NO_RESULT;
-        } if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
-            return ContactsNumber;
-        } if(position == itemList.size()+1 && filterQuery.isEmpty() && filteredList.size()==0) {
-            return ContactsNumber;
-        } if(position == 0 && filterQuery.isEmpty()) {
+        } else if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
+            return CONTACTS_NUMBER;
+        } else if(position == itemList.size()+1 && filterQuery.isEmpty() && filteredList.size()==0) {
+            if(itemList.size()==0) {
+                return NO_CONTACTS;
+            } else {
+                return CONTACTS_NUMBER;
+            }
+        } else if(position == 0 && filterQuery.isEmpty()) {
             Logger.d(this, "NewGroup");
             return HEADER;
+        } else {
+            return CONTACT;
         }
-        return CONTACT;
     }
 
     @Override
@@ -99,7 +107,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
                 break;
-            case ContactsNumber:
+            case CONTACTS_NUMBER:
                 View categoryView = inflater.inflate(R.layout.item_contacts_number, parent, false);
                 viewHolder = new ContactsNumber(categoryView);
                 break;
@@ -110,6 +118,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case HEADER:
                 View newGroup = inflater.inflate(R.layout.item_header_contact, parent, false);
                 viewHolder = new HeaderViewHolder(newGroup);
+                break;
+            case NO_CONTACTS:
+                View noContacts = inflater.inflate(R.layout.item_no_contacts, parent, false);
+                viewHolder = new NoContactsViewHolder(noContacts);
                 break;
             default:
                 return null;
@@ -131,7 +143,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
                 cVH.renderItem(itemList.get(position), filterQuery);
                 break;
-            case ContactsNumber:
+            case CONTACTS_NUMBER:
                 ContactsNumber iVH = (ContactsNumber) holder;
                 iVH.renderItem(itemList.size());
                 break;
@@ -236,6 +248,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void renderItem(String filterQuery) {
             noResult.setText("No results found for '"+filterQuery+"'");
+        }
+    }
+
+    class NoContactsViewHolder extends RecyclerView.ViewHolder {
+        public NoContactsViewHolder(View itemView) {
+            super(itemView);
         }
     }
 

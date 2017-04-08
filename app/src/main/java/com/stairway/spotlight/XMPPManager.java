@@ -76,25 +76,14 @@ public class XMPPManager implements Serializable {
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                Bundle bundle = new Bundle();
-                FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(SpotlightApplication.getContext());
                 if(!connection.isConnected()) {
                     try {
                         connection.connect();
-
-                        /*              Analytics           */
-                        bundle = new Bundle();
                     } catch (SmackException e) {
                         e.printStackTrace();
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                     } catch (IOException e) {
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (XMPPException e) {
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     }
                 }
@@ -102,17 +91,11 @@ public class XMPPManager implements Serializable {
                     try {
                         connection.login();
                     } catch (XMPPException e) {
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (SmackException e) {
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        bundle.putString(AnalyticsContants.Param.EXCEPTION_STACK_TRACE, e.toString());
-                        firebaseAnalytics.logEvent(AnalyticsContants.Event.EXCEPTION_XMPP_CONNECTION, bundle);
                     }
                 }
                 return null;

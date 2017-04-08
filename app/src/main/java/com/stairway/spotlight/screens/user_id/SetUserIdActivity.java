@@ -16,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.api.ApiManager;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.ContactsContent;
 import com.stairway.spotlight.screens.home.HomeActivity;
@@ -52,11 +54,12 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     @Bind(R.id.set_user_id_divider)
     View divider;
 
+    @Bind(R.id.user_id_error)
+    TextView userIdErrorView;
+
     private Menu menu;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
-
-    private String dividerColor = "#c9c9c9";
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SetUserIdActivity.class);
@@ -109,7 +112,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @Override
     public void showError(String title, String message) {
-        if(progressDialog[0].isShowing()) {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -117,6 +120,8 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
+
+        userIdErrorView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -124,6 +129,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         int id = item.getItemId();
         if(id == R.id.action_done) {
             if(!isUserIdValid(userIdEt.getText())) {
+                showError("User ID", "User ID must have atleast 6 characters.");
             } else {
                 progressDialog[0] = ProgressDialog.show(SetUserIdActivity.this, "", "Setting your ID. Please wait...", true);
                 presenter.setUserId(userIdEt.getText().toString());
@@ -134,33 +140,27 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @OnTextChanged(R.id.set_user_id_et)
     public void onUserIdChanged() {
-        MenuItem item = menu.findItem(R.id.action_done);
+        userIdErrorView.setVisibility(View.VISIBLE);
         if(isUserIdValid(userIdEt.getText())) {
-            item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_done_active));
+            userIdErrorView.setText("Checking user ID...");
+            presenter.checkUserIdAvailable(userIdEt.getText().toString());
+            userIdErrorView.setTextColor(0xff6D726D);
         } else {
-            item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_done_inactive));
-        }
-    }
-
-    @OnFocusChange(R.id.set_user_id_et)
-    public void onuserIdFocusChanged() {
-        if(userIdEt.isFocused()) {
-            divider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        } else {
-            divider.setBackgroundColor(Color.parseColor(dividerColor));
+            userIdErrorView.setText("User ID must have atleast 6 characters.");
+            userIdErrorView.setTextColor(ContextCompat.getColor(this, R.color.error));
         }
     }
 
     @Override
     public void showUserIdNotAvailableError() {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("User ID");
-        alertDialog.setMessage("\n"+"This User ID is not available.");
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
-        alertDialog.show();
+        userIdErrorView.setText("Sorry, this user ID is already taken.");
+        userIdErrorView.setTextColor(ContextCompat.getColor(this, R.color.error));
+    }
+
+    @Override
+    public void showUserIdAvailable() {
+        userIdErrorView.setText(userIdEt.getText()+" is available.");
+        userIdErrorView.setTextColor(ContextCompat.getColor(this, R.color.success));
     }
 
     @Override
@@ -168,6 +168,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
+        Logger.d(this, "Navigate to home");
         startActivity(HomeActivity.callingIntent(this,0,null));
         finish();
     }
@@ -176,7 +177,6 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     public void onSetUserIdSuccess() {
         progressDialog[0].setMessage("Initializing...");
         presenter.initialize();
-        new Handler().postDelayed(this::navigateToHome, 3000);
     }
 
     private boolean isUserIdValid(CharSequence userId) {
