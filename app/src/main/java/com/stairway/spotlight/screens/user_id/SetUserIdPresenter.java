@@ -130,25 +130,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                             userSessionManager.save(userSession);
                             SpotlightApplication.getContext().initSession();
 
-                            appApi.appInit()
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Subscriber<StatusResponse>() {
-                                        @Override
-                                        public void onCompleted() {
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable e) {
-                                            ApiError error = new ApiError(e);
-                                            setUserIdView.showError(error.getTitle(), error.getMessage());
-                                        }
-
-                                        @Override
-                                        public void onNext(StatusResponse statusResponse) {
-                                            setUserIdView.onSetUserIdSuccess();
-                                        }
-                                    });
+                            setUserIdView.onSetUserIdSuccess();
                         }
                     }
                 });

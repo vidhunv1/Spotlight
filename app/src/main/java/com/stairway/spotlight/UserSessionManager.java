@@ -86,8 +86,8 @@ public class UserSessionManager {
             sharedPreferences.edit().putString(KEY_USER_ID, us.getUserId()).apply();
             sharedPreferences.edit().putString(KEY_USER_ID_LOGIN, us.getUserId()).apply();
         }
-        if(us.getProfilePicPath()!=null && !us.getProfilePicPath().isEmpty()) {
-            sharedPreferences.edit().putString(KEY_PROFILE_PIC_PATH, us.getProfilePicPath()).apply();
+        if(us.getProfilePicPath()!=null) {
+            sharedPreferences.edit().putString(KEY_PROFILE_PIC_PATH, us.getProfilePicPath().replace("https://", "http://")).apply();
         }
     }
 

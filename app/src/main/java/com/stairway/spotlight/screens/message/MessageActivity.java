@@ -3,11 +3,14 @@ package com.stairway.spotlight.screens.message;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.FileProvider;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +31,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.UserSessionManager;
 import com.stairway.spotlight.MessageController;
@@ -113,6 +119,7 @@ public class MessageActivity extends BaseActivity
     private MessagesAdapter messagesAdapter;
     private String contactName;
     private String contactUserId;
+    private String contactProfileDP;
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "message";
@@ -170,7 +177,6 @@ public class MessageActivity extends BaseActivity
             linearLayoutManager.scrollToPositionWithOffset( index, top);
         }
         messagePresenter.loadMessages(chatUserName);
-        messagePresenter.getLastActivity(chatUserName);
 
         /*              Analytics           */
         firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
@@ -236,7 +242,7 @@ public class MessageActivity extends BaseActivity
     @OnClick(R.id.tb_message_title)
     public void onNameClicked() {
         AndroidUtils.hideSoftInput(this);
-        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName));
+        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName, contactProfileDP));
     }
 
     public void onSendClicked() {
@@ -313,6 +319,9 @@ public class MessageActivity extends BaseActivity
                 });
             }
 
+            ImageView close = (ImageView) menuItemsView.findViewById(R.id.close);
+            close.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
             LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
             enterText.setOnClickListener(v -> {
                 bottomSheetDialog.dismiss();
@@ -332,12 +341,13 @@ public class MessageActivity extends BaseActivity
         contactName = AndroidUtils.toTitleCase(contact.getContactName());
         this.contactName = AndroidUtils.toTitleCase(contact.getContactName());
         this.contactUserId = contact.getUserId();
+        this.contactProfileDP = contact.getProfileDP();
 
         title.setText(contactName);
 
         linearLayoutManager = new WrapContentLinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, chatUserName, contactName, this, this);
+        messagesAdapter = new MessagesAdapter(this, chatUserName, contactName, contact.getProfileDP(), this, this);
         messageList.setLayoutManager(linearLayoutManager);
 
         RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
@@ -346,7 +356,25 @@ public class MessageActivity extends BaseActivity
         }
         messageList.setAdapter(messagesAdapter);
         showAddBlock(!contact.isAdded());
-        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
+
+        if(contact.getProfileDP()!=null && !contact.getProfileDP().isEmpty()) {
+            Context context = this;
+            Glide.with(this)
+                    .load(contact.getProfileDP().replace("https://", "http://"))
+                    .asBitmap().centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(new BitmapImageViewTarget(profileImage) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImage.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else {
+            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
+        }
     }
 
     @Override
@@ -427,6 +455,8 @@ public class MessageActivity extends BaseActivity
         NotificationController.getInstance().updateNotification();
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
+
+        messagePresenter.getLastActivity(chatUserName);
     }
 
     @Override

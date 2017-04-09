@@ -6,11 +6,15 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.bot.BotApi;
+import com.stairway.spotlight.api.bot.BotResponse;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.NotificationController;
 import com.stairway.spotlight.core.ReadReceiptExtension;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -36,6 +40,8 @@ import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vidhun on 11/11/16.
@@ -76,6 +82,8 @@ public class MessageService extends Service {
     private ContactStore contactStore;
     private MessageController messageApi;
     private UserApi userApi;
+    private BotDetailsStore botDetailsStore;
+    private BotApi botApi;
     private XMPPTCPConnection connection;
 
     private ChatManagerListener chatListener;
@@ -99,6 +107,8 @@ public class MessageService extends Service {
         contactStore = ContactStore.getInstance();
         messageApi = MessageController.getInstance();
         userApi = ApiManager.getUserApi();
+        this.botDetailsStore = BotDetailsStore.getInstance();
+        this.botApi = ApiManager.getBotApi();
         connection = XMPPManager.getInstance().getConnection();
         broadcaster = LocalBroadcastManager.getInstance(this);
 
@@ -178,6 +188,8 @@ public class MessageService extends Service {
                                         contactResult1.setUsername(userResponse.getUser().getUsername());
                                         contactResult1.setAdded(false);
                                         contactResult1.setBlocked(false);
+                                        contactResult1.setUserType(userResponse.getUser().getUserType());
+                                        contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
 
                                         Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
                                         if (!roster.isLoaded())
@@ -202,7 +214,55 @@ public class MessageService extends Service {
 
                                                     @Override
                                                     public void onNext(Boolean aBoolean) {
-                                                        storeAndbroadcastReceivedMessage(receivedMessage, contactResult1);
+                                                        // TODO: Move to use case file!!
+                                                        if(contactResult1.getUserType()== _User.UserType.regular) {
+                                                            storeAndbroadcastReceivedMessage(receivedMessage, contactResult1);
+                                                        } else if(contactResult1.getUserType() == _User.UserType.official){
+                                                            botApi.getBotDetails(contactResult1.getUsername())
+                                                                    .subscribeOn(Schedulers.io())
+                                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                                    .subscribe(new Subscriber<BotResponse>() {
+                                                                        @Override
+                                                                        public void onCompleted() {
+                                                                            Logger.d(this, "onComplete");
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onError(Throwable e) {
+                                                                            Logger.d(this, "Error: "+e.getMessage());
+                                                                            e.printStackTrace();
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onNext(BotResponse data) {
+                                                                            if(data.isSuccess()) {
+                                                                                BotResponse.Data botResponse = data.getData();
+                                                                                Logger.d(this, botResponse.toString());
+                                                                                botDetailsStore.putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
+                                                                                        .subscribeOn(Schedulers.newThread())
+                                                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                                                        .subscribe(new Subscriber<Boolean>() {
+                                                                                            @Override
+                                                                                            public void onCompleted() {
+                                                                                            }
+
+                                                                                            @Override
+                                                                                            public void onError(Throwable e) {
+                                                                                                storeAndbroadcastReceivedMessage(receivedMessage, contactResult1);
+                                                                                            }
+
+                                                                                            @Override
+                                                                                            public void onNext(Boolean aBoolean) {
+                                                                                                storeAndbroadcastReceivedMessage(receivedMessage, contactResult1);
+                                                                                            }
+                                                                                        });
+                                                                            } else {
+                                                                                Logger.d(this, "Error response");
+                                                                                Logger.d(this, data.getError().toString());
+                                                                            }
+                                                                        }
+                                                                    });
+                                                        }
                                                     }
                                                 });
                                     }

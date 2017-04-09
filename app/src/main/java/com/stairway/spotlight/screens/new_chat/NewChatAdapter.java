@@ -1,7 +1,10 @@
 package com.stairway.spotlight.screens.new_chat;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -11,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.ImageUtils;
@@ -211,7 +217,25 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 contactName.setText(contactItem.getContactName());
             }
 
-            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
+            if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
+                Glide.with(context)
+                        .load(contactItem.getProfileDP().replace("https://", "http://"))
+                        .asBitmap().centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .skipMemoryCache(true)
+                        .into(new BitmapImageViewTarget(profileImage) {
+                            @Override
+                            protected void setResource(Bitmap resource) {
+                                RoundedBitmapDrawable circularBitmapDrawable =
+                                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                                circularBitmapDrawable.setCircular(true);
+                                profileImage.setImageDrawable(circularBitmapDrawable);
+                            }
+                        });
+            } else {
+                profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
+            }
+
             contactName.setTag(contactItem.getUserName());
         }
     }

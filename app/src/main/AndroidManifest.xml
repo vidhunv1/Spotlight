@@ -47,6 +47,7 @@
         <activity
             android:name=".screens.sign_up.SignUpActivity"
             android:windowSoftInputMode="stateAlwaysVisible"
+            android:noHistory="false"
             android:label="@string/app_name" />
         <activity
             android:name=".screens.login.LoginActivity"
@@ -91,7 +92,8 @@
 
         <activity android:name=".screens.settings.SettingsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
-        <activity android:name=".screens.user_id.SetUserIdActivity" />
+        <activity android:name=".screens.user_id.SetUserIdActivity"
+                  android:windowSoftInputMode="stateAlwaysVisible"/>
     </application>
 
 </manifest>

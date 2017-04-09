@@ -90,7 +90,10 @@ public class SettingsPresenter implements SettingsContract.Presenter {
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), image);
         MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("profile_dp", filename, requestBody);
-        Subscription subscription = userApi.uploadProfileDP(imageFileBody).subscribe(new Subscriber<UserResponse>() {
+        Subscription subscription = userApi.uploadProfileDP(imageFileBody)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<UserResponse>() {
             @Override
             public void onCompleted() {}
             @Override

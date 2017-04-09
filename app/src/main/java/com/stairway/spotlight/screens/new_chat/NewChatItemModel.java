@@ -8,6 +8,7 @@ public class NewChatItemModel {
     private String userName;
     private String userId;
     private String status;
+    private String profileDP;
 
     public NewChatItemModel() {}
 
@@ -47,6 +48,14 @@ public class NewChatItemModel {
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
     }
 
     public void setUserId(String userId) {

@@ -15,6 +15,7 @@ public class ContactResult implements Serializable {
     private boolean isAdded;
     private boolean isBlocked;
     private String userId;
+    private String profileDP;
     private _User.UserType userType;
 
     public ContactResult(String countryCode, String phoneNumber, String displayName) {
@@ -24,6 +25,14 @@ public class ContactResult implements Serializable {
     }
 
     public ContactResult() {}
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
+    }
 
     public boolean isBlocked() {
         return isBlocked;

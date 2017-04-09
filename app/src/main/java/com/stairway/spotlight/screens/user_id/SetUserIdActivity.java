@@ -20,7 +20,9 @@ import android.widget.TextView;
 
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
+import com.stairway.spotlight.api.ApiError;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.StatusResponse;
 import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.db.ContactStore;
@@ -34,6 +36,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vidhun on 09/03/17.
@@ -56,8 +61,6 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @Bind(R.id.user_id_error)
     TextView userIdErrorView;
-
-    private Menu menu;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
@@ -94,7 +97,6 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.set_user_id_toolbar, menu);
         return true;
     }
@@ -165,12 +167,29 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     @Override
     public void navigateToHome() {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
         Logger.d(this, "Navigate to home");
-        startActivity(HomeActivity.callingIntent(this,0,null));
-        finish();
+
+        Context context = this;
+        ApiManager.getAppApi().appInit()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<StatusResponse>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startActivity(HomeActivity.callingIntent(context,0,null));
+                        finish();
+                    }
+
+                    @Override
+                    public void onNext(StatusResponse statusResponse) {
+                        startActivity(HomeActivity.callingIntent(context    ,0,null));
+                        finish();
+                    }
+                });
     }
 
     @Override

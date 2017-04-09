@@ -111,7 +111,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         return intent;
     }
 
@@ -139,9 +138,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 getEmailAddress();
             }
         }
-
-        nameET.requestFocus();
-        emailET.setSelectAllOnFocus(true);
     }
 
     @Override

@@ -23,7 +23,7 @@
             <TextView
                 android:text="@string/app_name"
                 android:textSize="20sp"
-                android:paddingBottom="1dp"
+                android:paddingBottom="2dp"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textColor="@color/textPrimaryLight"
                 android:layout_width="match_parent"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="14dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="13dp"
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_new_message"
         app:backgroundTint="@color/colorPrimary"/>

@@ -75,6 +75,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         contactsResult.getContactName(),
                                         contactsResult.getUsername(),
                                         contactsResult.getUserId());
+                                newChatItemModel.setProfileDP(contactsResult.getProfileDP());
                                 newChatItemModels.add(newChatItemModel);
                             }
                         }
@@ -112,6 +113,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         contactResult.setUsername(userResponse.getUser().getUsername());
                                         contactResult.setDisplayName(userResponse.getUser().getName());
                                         contactResult.setUserType(userResponse.getUser().getUserType());
+                                        contactResult.setProfileDP(userResponse.getUser().getProfileDP());
                                         contactResult.setAdded(true);
                                         contactResult.setBlocked(false);
 
@@ -149,7 +151,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
                                             e.printStackTrace();
                                         }
-
+                                        Logger.d(this, "b4 contactstore");
                                         contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                             @Override
                                             public void onCompleted() {}
@@ -159,7 +161,9 @@ public class NewChatPresenter implements NewChatContract.Presenter {
 
                                             @Override
                                             public void onNext(Boolean b) {
+                                                Logger.d(this, "aftr contactstore");
                                                 if(contactResult.getUserType()== _User.UserType.regular) {
+                                                    Logger.d(this, "aftr contactstore success");
                                                     contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
                                                 } else if(contactResult.getUserType() == _User.UserType.official){
                                                     botApi.getBotDetails(contactResult.getUsername())

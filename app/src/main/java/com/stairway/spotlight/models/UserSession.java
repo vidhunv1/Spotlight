@@ -47,6 +47,9 @@ public class UserSession {
     }
 
     public void setProfilePicPath(String profilePicPath) {
+        if(profilePicPath!=null && !profilePicPath.isEmpty()) {
+            profilePicPath = profilePicPath.replace("https://", "http://");
+        }
         this.profilePicPath = profilePicPath;
     }
 

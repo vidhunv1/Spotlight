@@ -32,7 +32,7 @@
                 android:gravity="left|center_vertical"
                 android:minHeight="?attr/actionBarSize"
                 app:sctl_avatar_id="@+id/settings_dp"
-                app:sctl_collapsed_avatarSize="37dp"
+                app:sctl_collapsed_avatarSize="36.75dp"
                 app:sctl_collapsed_offsetX="76dp"
                 app:sctl_collapsed_offsetY="18dp"
                 app:sctl_collapsed_subtitleTextSize="14dp"
@@ -47,14 +47,16 @@
 
                 <ImageView
                     android:id="@+id/settings_dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center_vertical"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="17.25dp"
+                    android:paddingBottom="0.75dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -467,16 +469,16 @@
                 <TextView
                     android:id="@+id/android_version_name"
                     android:layout_width="match_parent"
-                    android:layout_height="55.5dp"
-                    android:background="?android:selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20.25dp"
+                    android:layout_marginBottom="30.5dp"
                     android:gravity="center"
                     android:paddingLeft="17dp"
                     android:paddingRight="17dp"
                     android:text="iChat for Android v1.0.0"
                     android:textColor="#A3A3A3"
                     android:textSize="13sp" />
+
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

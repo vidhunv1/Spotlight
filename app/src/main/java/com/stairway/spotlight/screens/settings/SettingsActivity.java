@@ -1,5 +1,6 @@
 package com.stairway.spotlight.screens.settings;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,15 +10,22 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
@@ -29,9 +37,11 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.UserSessionManager;
@@ -44,6 +54,7 @@ import com.stairway.spotlight.core.BaseActivity;
 import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.core.lib.RoundedCornerTransformation;
 import com.stairway.spotlight.models.UserSession;
 import com.stairway.spotlight.screens.web_view.WebViewActivity;
 import com.stairway.spotlight.screens.welcome.WelcomeActivity;
@@ -161,6 +172,23 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         }
         versionNameText.setText(this.getResources().getString(R.string.settings_app_version, this.getResources().getString(R.string.app_name), versionName));
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
+            Context context = this;
+            Glide.with(this).load(userSession.getProfilePicPath().replace("https://", "http://")).asBitmap().centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .skipMemoryCache(true)
+                    .placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
+                    .into(new BitmapImageViewTarget(profileDp) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileDp.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        }
     }
 
 
@@ -301,9 +329,19 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView2.setTextColor(ContextCompat.getColor(this, R.color.textColor));
         textView2.setOnClickListener(v -> {
             // ** Load image from gallery **
-            Intent loadIntent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(loadIntent, REQUEST_GALLERY);
+            // Permissions
+            int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int permission = PackageManager.PERMISSION_GRANTED;
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                if (!(perm1 == permission && perm2 == permission)) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                } else {
+                    Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(loadIntent, REQUEST_GALLERY);
+                }
+            }
         });
 
         TextView textView3 = new TextView(this);
@@ -312,6 +350,23 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView3.setTextSize(16);
         textView3.setGravity(Gravity.CENTER_VERTICAL);
         textView3.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView3.setOnClickListener(v -> {
+            UserSession u = new UserSession();
+            u.setProfilePicPath("");
+            UserSessionManager.getInstance().save(u);
+            profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
+            Handler mainHandler = new Handler(this.getMainLooper());
+
+            Context context = this;
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    alertDialogPic.dismiss();
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                }
+            };
+            mainHandler.post(myRunnable);
+        });
 
         parent.addView(textView1);
         parent.addView(textView2);
@@ -367,7 +422,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
                 progressDialog[0].dismiss();
             }
-            progressDialog[0] = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+            progressDialog[0] = ProgressDialog.show(this, "", "Logging out. Please wait...", true);
             settingsPresenter.logoutUser();
         }));
         builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
@@ -478,11 +533,22 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     @Override
     public void updateProfileDP(String url) {
-        Logger.d(this, "set dp:"+url);
-        Glide.with(this).load(url)
+        Logger.d(this, "Setting profile DP: "+url);
+        Context context = this;
+        Glide.with(this).load(url.replace("https://", "http://")).asBitmap().centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .skipMemoryCache(true)
-                .into(profileDp);
+                .placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
+                .into(new BitmapImageViewTarget(profileDp) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        profileDp.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+        Toast.makeText(this, "Uploaded DP.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -519,6 +585,24 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
                 Logger.d(this, "got camClick:"+currentPhotoPath);
                 galleryAddPic(currentPhotoPath);
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(loadIntent, REQUEST_GALLERY);
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

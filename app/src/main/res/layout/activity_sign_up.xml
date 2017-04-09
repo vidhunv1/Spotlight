@@ -46,7 +46,8 @@
                 android:paddingBottom="7.25dp"
                 android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:inputType="textNoSuggestions|textVisiblePassword"
-                android:textColor="#353535"
+                android:textColor="#373A4B"
+                android:textColorHint="#BEC0CE"
                 android:textSize="16sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -82,10 +83,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:hint="Email"
+                android:textColor="#373A4B"
+                android:textColorHint="#BEC0CE"
                 android:paddingBottom="7.25dp"
                 android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:inputType="textEmailAddress"
-                android:textColor="#353535"
                 android:textSize="16sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -121,10 +123,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:hint="Enter Password"
+                android:textColor="#373A4B"
+                android:textColorHint="#BEC0CE"
                 android:paddingBottom="7.25dp"
                 android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:inputType="textPassword"
-                android:textColor="#353535"
                 android:textSize="16sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -161,10 +164,11 @@
                 android:background="@android:color/transparent"
                 android:layout_gravity="right"
                 android:hint="Mobile Number"
+                android:textColor="#373A4B"
+                android:textColorHint="#BEC0CE"
                 android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:inputType="phone"
                 android:paddingBottom="7.25dp"
-                android:textColor="#353535"
                 android:textSize="16sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -204,7 +208,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14.5dp"
         android:text="By tapping 'Sign Up' you agree to iChat's Terms and Privacy Policy"
-        android:textColor="#999999"
         android:textAlignment="center"
+        android:textColor="#BEC0CE"
         android:textSize="11.5sp" />
 </LinearLayout>

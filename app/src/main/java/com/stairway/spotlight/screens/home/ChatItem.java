@@ -20,6 +20,7 @@ public class ChatItem implements Serializable{
     private String receiptId;
     private MessageResult.MessageStatus messageStatus;
     private boolean isMe;
+    private String profileDP;
 
     public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, String receiptId, int notificationCount) {
         this.chatId = chatId;
@@ -32,6 +33,14 @@ public class ChatItem implements Serializable{
     }
 
     public ChatItem() {
+    }
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
     }
 
     public boolean isMe() {

@@ -23,10 +23,14 @@ import com.stairway.spotlight.ForegroundDetector;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.XMPPManager;
 import com.stairway.spotlight.api.ApiManager;
+import com.stairway.spotlight.api.bot.BotApi;
+import com.stairway.spotlight.api.bot.BotResponse;
 import com.stairway.spotlight.api.user.UserApi;
 import com.stairway.spotlight.api.user.UserResponse;
+import com.stairway.spotlight.api.user._User;
 import com.stairway.spotlight.application.SpotlightApplication;
 import com.stairway.spotlight.core.lib.ImageUtils;
+import com.stairway.spotlight.db.BotDetailsStore;
 import com.stairway.spotlight.db.ContactStore;
 import com.stairway.spotlight.db.MessageStore;
 import com.stairway.spotlight.models.ContactResult;
@@ -49,6 +53,8 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static com.stairway.spotlight.MessageService.XMPP_ACTION_RCV_MSG;
 import static com.stairway.spotlight.MessageService.XMPP_RESULT_CONTACT;
@@ -72,10 +78,14 @@ public class NotificationController {
     private ContactStore contactStore;
     private MessageStore messageStore;
     private UserApi userApi;
+    private BotDetailsStore botDetailsStore;
+    private BotApi botApi;
     private NotificationController() {
         this.contactStore = ContactStore.getInstance();
         this.messageStore = MessageStore.getInstance();
         this.userApi = ApiManager.getUserApi();
+        this.botDetailsStore = BotDetailsStore.getInstance();
+        this.botApi = ApiManager.getBotApi();
     }
 
     public void handleNewMessageNotification(String username, String messageJson, String messageId) {
@@ -110,6 +120,8 @@ public class NotificationController {
                             contactResult1.setUsername(userResponse.getUser().getUsername());
                             contactResult1.setAdded(false);
                             contactResult1.setBlocked(false);
+                            contactResult1.setUserType(userResponse.getUser().getUserType());
+                            contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
 
                             Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
                             if (!roster.isLoaded()) {
@@ -135,7 +147,55 @@ public class NotificationController {
 
                                         @Override
                                         public void onNext(Boolean aBoolean) {
-                                            storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult1);
+                                            // TODO: Move to use case file!!
+                                            if(contactResult1.getUserType()== _User.UserType.regular) {
+                                                storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult1);
+                                            } else if(contactResult1.getUserType() == _User.UserType.official){
+                                                botApi.getBotDetails(contactResult1.getUsername())
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(new Subscriber<BotResponse>() {
+                                                            @Override
+                                                            public void onCompleted() {
+                                                                Logger.d(this, "onComplete");
+                                                            }
+
+                                                            @Override
+                                                            public void onError(Throwable e) {
+                                                                Logger.d(this, "Error: "+e.getMessage());
+                                                                e.printStackTrace();
+                                                            }
+
+                                                            @Override
+                                                            public void onNext(BotResponse data) {
+                                                                if(data.isSuccess()) {
+                                                                    BotResponse.Data botResponse = data.getData();
+                                                                    Logger.d(this, botResponse.toString());
+                                                                    botDetailsStore.putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
+                                                                            .subscribeOn(Schedulers.newThread())
+                                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                                            .subscribe(new Subscriber<Boolean>() {
+                                                                                @Override
+                                                                                public void onCompleted() {
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onError(Throwable e) {
+                                                                                    storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult1);
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onNext(Boolean aBoolean) {
+                                                                                    storeAndBroadcastReceivedMessage(messageStore, newMessage, contactResult1);
+                                                                                }
+                                                                            });
+                                                                } else {
+                                                                    Logger.d(this, "Error response");
+                                                                    Logger.d(this, data.getError().toString());
+                                                                }
+                                                            }
+                                                        });
+                                            }
                                         }
                                     });
                         }
@@ -212,7 +272,7 @@ public class NotificationController {
                                     }
 
                                     mBuilder.setContentTitle(contentTitle)
-                                            .setSmallIcon(R.drawable.ic_logo)
+                                            .setSmallIcon(R.drawable.ic_logo_notif)
                                             .setAutoCancel(true)
                                             .setNumber(messageCount)
                                             .setGroup("messages")

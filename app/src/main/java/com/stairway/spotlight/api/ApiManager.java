@@ -57,7 +57,7 @@ public class ApiManager {
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addInterceptor(chain -> {
                     Request request = chain.request().newBuilder().addHeader("Authorization", authToken).build();
-                    return chain.proceed(request);
+                        return chain.proceed(request);
                 });
 
         getInstance().retrofitClient = new Retrofit.Builder()

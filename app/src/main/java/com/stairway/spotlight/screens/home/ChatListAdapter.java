@@ -1,6 +1,9 @@
 package com.stairway.spotlight.screens.home;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.core.GsonProvider;
@@ -251,7 +257,27 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 lastMessage.setText(chatListItem.getLastMessage());
             }
             time.setText(getFormattedTime(chatListItem.getTime()));
-            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
+
+            if(chatListItem.getProfileDP()!=null && !chatListItem.getProfileDP().isEmpty()) {
+                Logger.d(this, "Setting profile dp: "+chatListItem.getProfileDP());
+                Glide.with(context)
+                        .load(chatListItem.getProfileDP().replace("https://", "http://"))
+                        .asBitmap().centerCrop()
+                        .placeholder(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .skipMemoryCache(true)
+                        .into(new BitmapImageViewTarget(profileImage) {
+                            @Override
+                            protected void setResource(Bitmap resource) {
+                                RoundedBitmapDrawable circularBitmapDrawable =
+                                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                                circularBitmapDrawable.setCircular(true);
+                                profileImage.setImageDrawable(circularBitmapDrawable);
+                            }
+                        });
+            } else {
+                profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
+            }
 
             if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatus.setVisibility(View.VISIBLE);

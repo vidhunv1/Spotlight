@@ -10,16 +10,21 @@
     <LinearLayout
         android:id="@+id/ll_bottomsheet_heading"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:orientation="horizontal"
-        android:paddingLeft="16dp">
+        android:layout_height="56dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="16dp"
+            app:srcCompat="@drawable/ic_close_dark"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
             android:textAppearance="@style/FontRobotoMedium"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:text="Menu"/>
     </LinearLayout>
     <View
@@ -30,7 +35,8 @@
     <LinearLayout
         android:id="@+id/ll_bottomsheet_item1"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="9dp"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
@@ -43,12 +49,13 @@
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
             android:textSize="16sp"
+            android:textColor="@color/textColor"
             android:text="Mobile Recharge"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_bottomsheet_item2"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
@@ -60,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
+            android:textColor="@color/textColor"
             android:textSize="16sp"
             android:text="DTH Recharge"/>
     </LinearLayout>
@@ -78,13 +86,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
+            android:textColor="@color/textColor"
             android:textSize="16sp"
             android:text="Datacard Recharge"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_bottomsheet_item4"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
@@ -95,6 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:textColor="@color/textColor"
             android:layout_marginLeft="16dp"
             android:textSize="16sp"
             android:text="Postpaid Bill"/>
@@ -102,7 +112,7 @@
     <LinearLayout
         android:id="@+id/ll_bottomsheet_item5"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
@@ -114,13 +124,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="16sp"
+            android:textColor="@color/textColor"
             android:layout_marginLeft="16dp"
             android:text="Help"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_bottomsheet_entertext"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"

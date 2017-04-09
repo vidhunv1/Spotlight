@@ -71,6 +71,7 @@ public abstract class SQLiteContract {
         public static final String COLUMN_IS_ADDED = "is_added";
         public static final String COLUMN_IS_BLOCKED = "is_blocked";
         public static final String COLUMN_CREATED_AT = "created_at";
+        public static final String COLUMN_PROFILE_DP = "profile_dp";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
 //                COLUMN_CONTACT_ID + " INTEGER, " +
@@ -80,6 +81,7 @@ public abstract class SQLiteContract {
                 COLUMN_USER_ID + " TEXT, "+
                 COLUMN_USER_TYPE + " TEXT, " +
                 COLUMN_CONTACT_NAME + " TEXT, " +
+                COLUMN_PROFILE_DP + " TEXT, " +
                 COLUMN_IS_ADDED + " INTEGER DEFAULT 0, " +
                 COLUMN_IS_BLOCKED + " INTEGER DEFAULT 0, " +
                 COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +

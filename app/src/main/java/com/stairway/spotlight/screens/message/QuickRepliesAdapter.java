@@ -1,11 +1,18 @@
 package com.stairway.spotlight.screens.message;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.stairway.spotlight.R;
+import com.stairway.spotlight.application.SpotlightApplication;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.models.QuickReply;
 
 import java.util.ArrayList;
@@ -47,6 +54,12 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
         @Bind(R.id.tv_item_quick_reply)
         TextView textView;
 
+        @Bind(R.id.rl_quick_reply)
+        RelativeLayout bubbleView;
+
+        @Bind(R.id.ll_quick_reply)
+        LinearLayout quickReplyView;
+
         public QuickReplyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -54,7 +67,22 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
 
         public void renderItem(QuickReply qr) {
             textView.setText(qr.getTitle());
-            textView.setOnClickListener(v -> quickReplyClickListener.sendPostbackMessage(qr.getTitle(), qr.getPayload()));
+
+            quickReplyView.setOnTouchListener((v, event) -> {
+                Logger.d(this, "Event: "+event.getAction());
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    bubbleView.setBackgroundResource(R.drawable.bg_quick_reply_active);
+                    textView.setTextColor(0xffffffff);
+                } else if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
+                    bubbleView.setBackgroundResource(R.drawable.bg_quick_reply_inactive);
+                    textView.setTextColor(ContextCompat.getColor(SpotlightApplication.getContext(), R.color.sendMessageBubble));
+
+                    if(event.getAction() == MotionEvent.ACTION_UP) {
+                        quickReplyClickListener.sendPostbackMessage(qr.getTitle(), qr.getPayload());
+                    }
+                }
+                return true;
+            });
         }
     }
 }

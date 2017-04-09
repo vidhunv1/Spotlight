@@ -93,6 +93,7 @@ public class MessageController {
                                             messageResult.getReceiptId(),
                                             messageResult.getUnSeenCount());
                                     t.setMe(messageResult.isMe());
+                                    t.setProfileDP(contactResult.getProfileDP());
                                     chatItems.add(t);
                                 }
                             });

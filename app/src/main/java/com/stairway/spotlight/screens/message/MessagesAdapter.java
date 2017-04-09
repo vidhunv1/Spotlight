@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +25,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.BitmapRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.stairway.spotlight.R;
@@ -73,10 +80,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
     private Drawable textProfileDrawable;
+    private BitmapRequestBuilder dp;
 
     private int lastClickedPosition;
 
-    public MessagesAdapter(Context context, String chatUserName, String chatContactName, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener) {
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.context = context;
@@ -84,6 +92,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messageCache = new SparseArray<>();
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
         this.chatUserName = chatUserName;
+
+        if(dpUrl!=null && !dpUrl.isEmpty()) {
+            dp = Glide.with(context)
+                    .load(dpUrl.replace("https://", "http://"))
+                    .asBitmap().centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL);
+        }
 
         lastClickedPosition=-1;
     }
@@ -500,7 +515,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(displayProfileDP) {
                 profileImage.setVisibility(View.VISIBLE);
-                profileImage.setImageDrawable(textProfileDrawable);
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImage) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImage.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImage.setImageDrawable(textProfileDrawable);
+                }
             } else {
                 profileImage.setVisibility(View.INVISIBLE);
             }
@@ -636,7 +663,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);
-                profileImageView.setImageDrawable(textProfileDrawable);
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImageView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImageView.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImageView.setImageDrawable(textProfileDrawable);
+                }
             } else {
                 profileImageView.setVisibility(View.INVISIBLE);
             }
@@ -827,7 +866,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);
-                profileImageView.setImageDrawable(textProfileDrawable);
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImageView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImageView.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImageView.setImageDrawable(textProfileDrawable);
+                }
             } else {
                 profileImageView.setVisibility(View.INVISIBLE);
             }
@@ -936,7 +987,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if(displayDP) {
                 profileImage.setVisibility(View.VISIBLE);
-                profileImage.setImageDrawable(textProfileDrawable);
+
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImage) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImage.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImage.setImageDrawable(textProfileDrawable);
+                }
+
             } else {
                 profileImage.setVisibility(View.INVISIBLE);
             }

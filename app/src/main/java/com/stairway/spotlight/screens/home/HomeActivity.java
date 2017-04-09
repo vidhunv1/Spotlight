@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,6 +31,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.UserSessionManager;
@@ -122,10 +126,22 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		profileIdView.setText("ID: "+userSession.getUserId());
 
 		if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
-			Glide.with(this).load(userSession.getProfilePicPath())
+			Logger.d(this, "Setting DP: "+userSession.getProfilePicPath());
+			Context context = this;
+			Glide.with(this)
+					.load(userSession.getProfilePicPath())
+					.asBitmap().centerCrop()
 					.diskCacheStrategy(DiskCacheStrategy.ALL)
-					.skipMemoryCache(true)
-					.into(profileDp);
+					.placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
+					.into(new BitmapImageViewTarget(profileDp) {
+						@Override
+						protected void setResource(Bitmap resource) {
+							RoundedBitmapDrawable circularBitmapDrawable =
+									RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+							circularBitmapDrawable.setCircular(true);
+							profileDp.setImageDrawable(circularBitmapDrawable);
+						}
+					});
 		} else {
 			profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
 		}

@@ -6,9 +6,12 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -19,11 +22,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.stairway.spotlight.MessageController;
 import com.stairway.spotlight.R;
 import com.stairway.spotlight.config.AnalyticsContants;
 import com.stairway.spotlight.core.BaseActivity;
+import com.stairway.spotlight.core.Logger;
 import com.stairway.spotlight.core.lib.AndroidUtils;
 import com.stairway.spotlight.core.lib.ImageUtils;
 import com.stairway.spotlight.screens.shared_media.SharedMediaActivity;
@@ -67,19 +74,22 @@ public class UserProfileActivity extends BaseActivity {
     private String username;
     private String contactName;
     private String userId;
+    private String contactProfileDP;
 
     private static String KEY_USER_NAME = "UserProfileActivity.USER_NAME";
     private static String KEY_CONTACT_NAME = "UserProfileActivity.CONTACT_NAME";
     private static String KEY_CONTACT_USER_ID = "UserProfileActivity.USER_ID";
+    private static String KEY_PROFILE_DP = "UserProfileActivity.KEY_PROFILE_DP";
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "user_profile";
-    public static Intent callingIntent(Context context, String username, String userid, String contactName) {
+    public static Intent callingIntent(Context context, String username, String userid, String contactName, String contactDP) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(KEY_USER_NAME, username);
         intent.putExtra(KEY_CONTACT_NAME, contactName);
         intent.putExtra(KEY_CONTACT_USER_ID, userid);
+        intent.putExtra(KEY_PROFILE_DP, contactDP);
         return intent;
     }
 
@@ -95,6 +105,7 @@ public class UserProfileActivity extends BaseActivity {
         username = receivedIntent.getStringExtra(KEY_USER_NAME);
         contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
         userId = receivedIntent.getStringExtra(KEY_CONTACT_USER_ID);
+        contactProfileDP = receivedIntent.getStringExtra(KEY_PROFILE_DP);
 
         contactNameView.setText(contactName);
         userIdView.setText(userId);
@@ -103,7 +114,26 @@ public class UserProfileActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
+        if(contactProfileDP!=null && !contactProfileDP.isEmpty()) {
+            Logger.d(this, "Setting DP: "+contactProfileDP);
+            Context context = this;
+            Glide.with(this)
+                    .load(contactProfileDP)
+                    .asBitmap().centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(ImageUtils.getDefaultProfileImage(contactName, username, 25.5))
+                    .into(new BitmapImageViewTarget(profileDP) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileDP.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else {
+            profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
+        }
 
         MessageController messageController = MessageController.getInstance();
         messageController.getLastActivity(this.username)
