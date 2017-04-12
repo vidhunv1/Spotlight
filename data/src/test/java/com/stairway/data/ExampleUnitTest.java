@@ -1,4 +1,4 @@
-package com.stairway.data;
+package com.chat.data;
 
 import org.junit.Test;
 

@@ -2,26 +2,26 @@
 <resources>
 
     <!--App-->
-    <color name="colorPrimary">#0084ff</color>
-    <color name="colorPrimaryDark">#1A7ECE</color>
-    <color name="colorPrimaryInactive">#800f9d58</color>
-    <color name="colorPrimaryLight">#8ac7ff</color>
+    <color name="colorPrimary">#0084CC</color>
+    <color name="colorPrimaryDark">#00589b</color>
+    <color name="colorPrimaryInactive">#800070e0</color>
+    <color name="colorPrimaryLight">#5cb3ff</color>
     <color name="colorAccent">@color/colorPrimary</color>
     <color name="background_default">#FFFFFF</color>
-    <color name="statusBar">#006acc</color>
-    <color name="activeIndicator">#2A97F0</color>
+    <color name="statusBar">@color/colorPrimaryDark</color>
+    <color name="activeIndicator">#0097FF</color>
 
     <!--chat-->
-    <color name="sendMessageBubble">@color/colorPrimary</color>
+    <color name="sendMessageBubble">#0084EE</color>
     <color name="receiveMessageBubble">#eaeaea</color>
-    <color name="sendMessageBubblePressed">#296d8c</color>
+    <color name="sendMessageBubblePressed">#0058bb</color>
     <color name="receiveMessageBubblePressed">#BBBBBB</color>
 
     <!--text-->
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textColor">#212121</color>
-    <color name="textSecondary">#C1D4C6</color>
-    <color name="textHintColor">#cbd9d7</color>
+    <color name="textSecondary">#9ad4ff</color>
+    <color name="textHintColor">#9ad4ff</color>
     <color name="drawerText">#212121</color>
     <color name="buttonText">@color/colorPrimary</color>
     <color name="searchHighlight">#32AFFF</color>

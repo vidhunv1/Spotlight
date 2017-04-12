@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.stairway.spotlight">
+    package="com.chat.ichat">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -16,7 +16,7 @@
         android:required="false" />
 
     <application
-        android:name=".application.SpotlightApplication"
+        android:name="com.chat.ichat.application.SpotlightApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -24,7 +24,7 @@
         android:theme="@style/BaseTheme">
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.stairway.spotlight.fileprovider"
+            android:authorities="com.chat.ichat.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -33,7 +33,7 @@
         </provider>
 
         <activity
-            android:name=".screens.launcher.LauncherActivity"
+            android:name="com.chat.ichat.screens.launcher.LauncherActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,57 +42,57 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".screens.message.MessageActivity"
+            android:name="com.chat.ichat.screens.message.MessageActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".screens.sign_up.SignUpActivity"
+            android:name="com.chat.ichat.screens.sign_up.SignUpActivity"
             android:windowSoftInputMode="stateAlwaysVisible"
             android:noHistory="false"
             android:label="@string/app_name" />
         <activity
-            android:name=".screens.login.LoginActivity"
+            android:name="com.chat.ichat.screens.login.LoginActivity"
             android:windowSoftInputMode="stateAlwaysVisible"
             android:label="@string/app_name" />
         <activity
-            android:name=".screens.welcome.WelcomeActivity"
+            android:name="com.chat.ichat.screens.welcome.WelcomeActivity"
             android:label="@string/app_name" />
 
         <service
-            android:name=".core.FCMMessageHandler"
+            android:name="com.chat.ichat.core.FCMMessageHandler"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name=".core.FCMRegistrationIntentService"
+            android:name="com.chat.ichat.core.FCMRegistrationIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name=".MessageService"
+            android:name="com.chat.ichat.MessageService"
             android:description="@string/service_message_description"
             android:exported="false" />
 
         <activity
-            android:name=".screens.user_profile.UserProfileActivity" />
+            android:name="com.chat.ichat.screens.user_profile.UserProfileActivity" />
         <activity
-            android:name=".screens.home.HomeActivity"
+            android:name="com.chat.ichat.screens.home.HomeActivity"
             android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
         <activity
-            android:name=".screens.search.SearchActivity"
+            android:name="com.chat.ichat.screens.search.SearchActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".screens.new_chat.NewChatActivity"
+            android:name="com.chat.ichat.screens.new_chat.NewChatActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".screens.web_view.WebViewActivity" />
+        <activity android:name="com.chat.ichat.screens.web_view.WebViewActivity" />
 
-        <activity android:name=".screens.settings.SettingsActivity" />
-        <activity android:name=".screens.shared_media.SharedMediaActivity" />
-        <activity android:name=".screens.user_id.SetUserIdActivity"
+        <activity android:name="com.chat.ichat.screens.settings.SettingsActivity" />
+        <activity android:name="com.chat.ichat.screens.shared_media.SharedMediaActivity" />
+        <activity android:name="com.chat.ichat.screens.user_id.SetUserIdActivity"
                   android:windowSoftInputMode="stateAlwaysVisible"/>
     </application>
 

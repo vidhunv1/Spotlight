@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/cl_home"
     android:fitsSystemWindows="true"
-    tools:context="com.stairway.spotlight.screens.home.HomeActivity">
+    tools:context="com.chat.ichat.screens.home.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
