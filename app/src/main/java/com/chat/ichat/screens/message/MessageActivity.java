@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.FileProvider;
@@ -282,7 +283,7 @@ public class MessageActivity extends BaseActivity
         String message = messageBox.getText().toString().trim();
 
         if(message.length()>=1) {
-            if(currentChatState != ChatState.composing) {
+            if(currentChatState != ChatState.composing ) {
                 messagePresenter.sendChatState(chatUserName, ChatState.composing);
                 currentChatState = ChatState.composing;
             }
@@ -702,8 +703,12 @@ public class MessageActivity extends BaseActivity
         if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing) {
 //                presenceView.setText(getResources().getString(R.string.chat_state_typing));
+                messagesAdapter.setTyping(true);
+                messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
+                final Handler handler = new Handler();
+                handler.postDelayed(() -> messagesAdapter.setTyping(false), 10000);
             } else {
-                messagePresenter.getLastActivity(this.chatUserName);
+//                messagePresenter.getLastActivity(this.chatUserName);
             }
         }
     }

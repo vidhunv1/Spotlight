@@ -2,9 +2,11 @@ package com.chat.ichat.screens.home;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +110,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         item.getReceiptId(),
                         item.getNotificationCount()
                 ));
-                item.setLastMessage(chatState);
+                String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.activeIndicator) & 0x00ffffff );
+                item.setLastMessage("<font color=\""+highlightColor+"\">"+ chatState +"</font>");
                 chatList.set(i, item);
                 notifyItemChanged(i);
                 return;
@@ -263,7 +266,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
                 lastMessage.setText(message.getDisplayText());
             } catch(JsonSyntaxException e) {
-                lastMessage.setText(chatListItem.getLastMessage());
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                    lastMessage.setText(Html.fromHtml(chatListItem.getLastMessage(), Html.FROM_HTML_MODE_LEGACY));
+                else
+                    lastMessage.setText(Html.fromHtml(chatListItem.getLastMessage()));
             }
             time.setText(getFormattedTime(chatListItem.getTime()));
 

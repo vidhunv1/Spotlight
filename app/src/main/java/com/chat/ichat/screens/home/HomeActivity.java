@@ -311,10 +311,15 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void showChatState(String from, ChatState chatState) {
-		if(chatState == ChatState.composing || chatState == ChatState.active)
+		if(chatState == ChatState.composing || chatState == ChatState.active) {
 			chatListAdapter.setChatState(from, "Typing...");
-		if(chatState == ChatState.paused || chatState == ChatState.inactive)
+			final Handler handler = new Handler();
+			handler.postDelayed(() -> chatListAdapter.resetChatState(from), 10000);
+		} else if(chatState == ChatState.gone || chatState == ChatState.inactive){
+			Logger.d(this, "ChatState: "+chatState.name());
 			chatListAdapter.resetChatState(from);
+		}
+
 	}
 
 	@Override

@@ -8,11 +8,20 @@ public class ContactsModel {
     private String contactName;
     private String userId;
     private String userName;
+    private String profileDp;
 
     public ContactsModel(String contactName, String userId, String userName) {
         this.contactName = contactName;
         this.userId = userId;
         this.userName = userName;
+    }
+
+    public String getProfileDp() {
+        return profileDp;
+    }
+
+    public void setProfileDp(String profileDp) {
+        this.profileDp = profileDp;
     }
 
     public String getContactName() {

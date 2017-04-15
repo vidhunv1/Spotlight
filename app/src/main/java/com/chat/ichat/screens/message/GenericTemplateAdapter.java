@@ -154,7 +154,6 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
 
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl())
-                                .centerCrop()
                                 .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {

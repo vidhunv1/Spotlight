@@ -46,8 +46,9 @@ public class SearchUseCase {
                             List<ContactsModel> contactsModelList = new ArrayList<>(contactResults.size());
                             List<MessagesModel> messagesModelList = new ArrayList<>();
                             for (ContactResult contactResult : contactResults) {
-                                if(contactResult.isAdded())
-                                    contactsModelList.add(new ContactsModel(contactResult.getContactName(), contactResult.getUserId(), contactResult.getUsername()));
+                                ContactsModel contactsModel = new ContactsModel(contactResult.getContactName(), contactResult.getUserId(), contactResult.getUsername());
+                                contactsModel.setProfileDp(contactResult.getProfileDP());
+                                contactsModelList.add(contactsModel);
                             }
                             messageStore.searchMessages(searchTerm).subscribe(new Subscriber<List<MessageResult>>() {
                                 @Override

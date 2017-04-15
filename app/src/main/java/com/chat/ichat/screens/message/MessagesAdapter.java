@@ -29,6 +29,7 @@ import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -81,12 +82,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_QUICK_REPLIES = 4;
     private final int VIEW_TYPE_SEND_EMOTICON = 5;
     private final int VIEW_TYPE_RECV_EMOTICON = 6;
+    private final int VIEW_TYPE_TYPING = 7;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
     private Drawable textProfileDrawable;
     private BitmapRequestBuilder dp;
 
+    private boolean isTyping;
     private int lastClickedPosition;
 
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener) {
@@ -97,6 +100,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messageCache = new SparseArray<>();
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
         this.chatUserName = chatUserName;
+        this.isTyping = false;
 
         if(dpUrl!=null && !dpUrl.isEmpty()) {
             dp = Glide.with(context)
@@ -118,6 +122,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void addMessage(MessageResult messageResult) {
+        this.setTyping(false);
         if(quickReplies!=null && quickReplies.size()>0) {
             this.notifyItemRemoved(messageList.size());
             quickReplies = null;
@@ -193,11 +198,32 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    public void setTyping(boolean isTyping) {
+        if(this.isTyping == isTyping)
+            return;
+        this.isTyping = isTyping;
+        this.notifyItemChanged(messageList.size()-1);
+
+        if (quickReplies != null && quickReplies.size() >= 1) {
+            this.notifyItemChanged(messageList.size());
+        } else {
+            if(isTyping) {
+                this.notifyItemInserted(messageList.size());
+            } else {
+                this.notifyItemRemoved(messageList.size());
+            }
+        }
+    }
 
     @Override
     public int getItemViewType(int position) {
-        if(position == messageList.size())
-            return VIEW_TYPE_QUICK_REPLIES;
+        if(position == messageList.size()) {
+            if(isTyping) {
+                return VIEW_TYPE_TYPING;
+            } else {
+                return VIEW_TYPE_QUICK_REPLIES;
+            }
+        }
 
         Message parsedMessage;
         try {
@@ -264,7 +290,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        if(quickReplies!=null && quickReplies.size()>=1)
+        if(quickReplies!=null && quickReplies.size()>=1 || isTyping)
             return messageList.size()+1;
         return messageList.size();
     }
@@ -308,6 +334,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view7 = inflater.inflate(R.layout.item_message_send_emoticon, parent, false);
                 viewHolder = new SendEmoticonViewHolder(view7);
                 break;
+            case VIEW_TYPE_TYPING:
+                View view8 = inflater.inflate(R.layout.item_typing, parent, false);
+                viewHolder = new TypingViewHolder(view8);
+                break;
             default:
                 return null;
         }
@@ -344,6 +374,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_SEND_EMOTICON:
                 SendEmoticonViewHolder sendEmoticonViewHolder = (SendEmoticonViewHolder) holder;
                 sendEmoticonViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
+            case VIEW_TYPE_TYPING:
+                TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
+                typingViewHolder.renderItem();
         }
     }
 
@@ -354,6 +388,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private boolean hasProfileDP(int position) {
 //        return !(position > 0 && messageList.get(position - 1).getChatId().equals(messageList.get(position - 1).getFromId()));
+        if(position == (messageList.size()-1) && isTyping) {
+            return false;
+        }
         return !isSameConversation(position, position+1);
     }
 
@@ -398,10 +435,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private boolean shouldShowTime(int position) {
-        if (position==0)
-            return true;
+        return position == 0 || !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(10));
 
-        return !messageList.get(position - 1).getTime().isAfter(messageList.get(position).getTime().minusMinutes(10));
     }
 
     private void toggleMessagePressed(int position, boolean isClicked) {
@@ -1046,6 +1081,46 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
     }
+
+    class TypingViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImageView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.iv_typing)
+        ImageView typingImage;
+        @Bind(R.id.ll_message_receive_text)
+        LinearLayout layout;
+
+        TypingViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem() {
+            GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(typingImage);
+            Glide.with(context).load(R.raw.loading_dots).into(imageViewTarget);
+
+            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+            drawable.setColor(ContextCompat.getColor(context, R.color.receiveMessageBubble));
+            layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+            profileImageView.setVisibility(View.VISIBLE);
+            if(dp!=null) {
+                dp.into(new BitmapImageViewTarget(profileImageView) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        profileImageView.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+            } else {
+                profileImageView.setImageDrawable(textProfileDrawable);
+            }
+        }
+    }
+
 
     interface PostbackClickListener {
         void sendPostbackMessage(String message, String payload);

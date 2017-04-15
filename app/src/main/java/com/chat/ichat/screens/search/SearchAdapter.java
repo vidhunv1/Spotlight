@@ -1,7 +1,10 @@
 package com.chat.ichat.screens.search;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -11,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.ImageUtils;
@@ -204,7 +210,24 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             status.setText("ID: "+contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());
             divider.setVisibility(View.GONE);
+
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18));
+
+            Glide.with(context)
+                    .load(contactItem.getProfileDp().replace("https://", "http://"))
+                    .asBitmap().centerCrop()
+                    .placeholder(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .skipMemoryCache(true)
+                    .into(new BitmapImageViewTarget(profileImage) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImage.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
 
             contactListContent.setOnClickListener(view -> {
                 if(contactClickListener != null)
