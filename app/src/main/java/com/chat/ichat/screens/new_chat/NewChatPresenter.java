@@ -92,7 +92,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(contact -> {
-                    if(contact!=null) {
+                    if(contact!=null && contact.isAdded()) {
                         contactsView.showContactAddedSuccess(contact.getContactName(), contact.getUsername(), true);
                     } else {
                         userApi.findUserByUserId(userId)

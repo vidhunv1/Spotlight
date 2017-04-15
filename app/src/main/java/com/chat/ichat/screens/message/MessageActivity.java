@@ -470,6 +470,9 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         NotificationController.getInstance().updateNotification();
+        if(messagesAdapter == null) {
+            messagesAdapter = new MessagesAdapter(this, chatUserName, contactName, contactProfileDP, this, this);
+        }
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
 
