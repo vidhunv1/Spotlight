@@ -22,19 +22,12 @@ public class GenericTemplate {
 
     @Override
     public String toString() {
-        String buttonString = "";
-        if(buttons!=null && !buttons.isEmpty()) {
-            for (_Button button : buttons) {
-                buttonString = buttonString + "\n" + button;
-            }
-        }
-
-        return "_GenericTemplate{" +
+        return "GenericTemplate{" +
                 "title='" + title + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", subtitle='" + subtitle + '\'' +
                 ", defaultAction=" + defaultAction +
-                ", buttons=" + buttonString +
+                ", buttons=" + buttons +
                 '}';
     }
 

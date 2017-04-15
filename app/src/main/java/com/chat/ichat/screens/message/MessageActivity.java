@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -164,9 +165,11 @@ public class MessageActivity extends BaseActivity
     protected void onPause() {
         super.onPause();
 
-        index = linearLayoutManager.findFirstVisibleItemPosition();
-        View v = messageList.getChildAt(0);
-        top = (v == null) ? 0 : (v.getTop() - messageList.getPaddingTop());
+        if(linearLayoutManager!=null) {
+            index = linearLayoutManager.findFirstVisibleItemPosition();
+            View v = messageList.getChildAt(0);
+            top = (v == null) ? 0 : (v.getTop() - messageList.getPaddingTop());
+        }
     }
 
     @Override
@@ -239,10 +242,23 @@ public class MessageActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.tb_message_title)
-    public void onNameClicked() {
+    @OnClick(R.id.message_head)
+    public void onTBClicked() {
         AndroidUtils.hideSoftInput(this);
         startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactUserId, contactName, contactProfileDP));
+
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_TITLE_CLICK, bundle);
+    }
+
+    @OnClick(R.id.iv_profile_image)
+    public void onProfileDPCLiked() {
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_TITLE_CLICK, bundle);
     }
 
     public void onSendClicked() {
@@ -626,17 +642,20 @@ public class MessageActivity extends BaseActivity
     @Override
     public void addMessageToList(MessageResult message) {
         messageList.scrollToPosition(messagesAdapter.getItemCount());
-        messagesAdapter.addMessage(message);
+        if(messagesAdapter!=null)
+            messagesAdapter.addMessage(message);
     }
 
     @Override
     public void updateDeliveryStatus(MessageResult messageResult) {
-        messagesAdapter.updateMessage(messageResult);
+        if(messagesAdapter!=null)
+            messagesAdapter.updateMessage(messageResult);
     }
 
     @Override
     public void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
-        messagesAdapter.updateDeliveryStatus(deliveryReceiptId, messageStatus);
+        if(messagesAdapter!=null)
+            messagesAdapter.updateDeliveryStatus(deliveryReceiptId, messageStatus);
     }
 
     @Override
@@ -666,10 +685,12 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void onMessageReceived(MessageResult messageResult, ContactResult contactResult) {
-        if(messageResult.getChatId().equals(chatUserName)) {
+        if(messageResult.getChatId().equals(chatUserName) && messagesAdapter!=null) {
             messagesAdapter.addMessage(messageResult);
             messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
             messagePresenter.updateMessageRead(messageResult);
+            final MediaPlayer mp = MediaPlayer.create(this, R.raw.conversation_tone);
+            mp.start();
         } else {
             NotificationController.getInstance().showNotificationAndAlert(true);
         }

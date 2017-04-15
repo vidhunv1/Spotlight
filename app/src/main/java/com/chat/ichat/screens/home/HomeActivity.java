@@ -175,7 +175,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		toggle.syncState();
 		navigationView.setNavigationItemSelectedListener(this);
 
-		fab.setOnClickListener(view -> startActivity(NewChatActivity.callingIntent(this, true)));
+		fab.setOnClickListener(view -> {
+			startActivity(NewChatActivity.callingIntent(this, true));
+			firebaseAnalytics.logEvent(AnalyticsContants.Event.START_NEW_CHAT_FAB, null);
+		});
 
 		chatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -317,7 +320,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		final Activity homeActivity = this;
 		switch(id) {
 			case android.R.id.home:
 				onBackPressed();

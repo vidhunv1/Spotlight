@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.chat.ichat.R;
 import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.Logger;
@@ -29,7 +30,6 @@ import butterknife.ButterKnife;
 /**
  * Created by vidhun on 17/03/17.
  */
-
 public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplateAdapter.ReceiveTemplateGenericViewHolder> {
     private MessagesAdapter.PostbackClickListener postbackClickListener;
     private MessagesAdapter.UrlClickListener urlClickListener;
@@ -43,6 +43,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.genericTemplateList = genericTemplates;
+        this.conversationBubbleType = conversationBubbleType;
     }
 
     @Override
@@ -111,6 +112,9 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
         }
 
         void renderItem(GenericTemplate genericTemplate, int position) {
+            int fullRadius = (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius);
+            int midRadius = (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius);
+            Logger.d(this, "GenericTemplate: "+genericTemplate.toString());
             int bubbleType = bubbleType(position);
             Resources resources = SpotlightApplication.getContext().getResources();
             int startPadding, endPadding;
@@ -125,35 +129,55 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                 startPadding = (int) AndroidUtils.px(4);
                 endPadding = (int)AndroidUtils.px(40);
             }
+
+            RoundedCornerTransformation roundedCornerTransformationL = null;
+            RoundedCornerTransformation roundedCornerTransformationR = null;
+            if(position == 0) {
+                roundedCornerTransformationR = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                if(conversationBubbleType == 0 || conversationBubbleType == 1) {
+                    roundedCornerTransformationL = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                } else {
+                    roundedCornerTransformationL = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                }
+            } else if(position<(genericTemplateList.size()-1)) {
+                roundedCornerTransformationR = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                roundedCornerTransformationL = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+            } else {
+                roundedCornerTransformationR = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                roundedCornerTransformationL = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+            }
+
             switch (bubbleType) {
-                //TODO: Need to do padding for the conversation bubble type.
                 case 0:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int) resources.getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_bottom);
 
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
-                        Glide.with(context).load(genericTemplate.getImageUrl()).bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP)).into(templateImage);
+                        Glide.with(context).load(genericTemplate.getImageUrl())
+                                .centerCrop()
+                                .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
+                                .into(templateImage);
                     } else {
                         templateImage.setVisibility(View.GONE);
                     }
                 case 1:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int) resources.getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_start);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_start);
 
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl())
-                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP))
+                                .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
                         templateImage.setVisibility(View.GONE);
                     }
                 case 2:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_center);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_center);
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
-                                .bitmapTransform(new RoundedCornerTransformation(context, 10, 0, RoundedCornerTransformation.CornerType.TOP))
+                                .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
                         templateImage.setVisibility(View.GONE);
@@ -161,11 +185,11 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     break;
                 case 3:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
+                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_middle);
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
-                                .bitmapTransform(new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT))
+                                .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
                         templateImage.setVisibility(View.GONE);
@@ -177,6 +201,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
 
             if(genericTemplate.getDefaultAction()!=null) {
                 if (genericTemplate.getSubtitle() != null && !genericTemplate.getSubtitle().isEmpty()) {
+                    Logger.d(this, "Setting Subtitle:"+genericTemplate.getSubtitle());
                     subtitle.setText(genericTemplate.getSubtitle());
                 } else {
                     subtitle.setVisibility(View.GONE);

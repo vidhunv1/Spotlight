@@ -40,6 +40,12 @@ public class AnalyticsContants {
         public static final String KEYBOARD_TYPE = "keyboard_type";
         public static final String SMILEY_SELECTED = "smiley_selected";
         public static final String EXCEPTION_XMPP_CONNECTION = "xmpp_connection_failed";
+        public static final String MESSAGE_TITLE_CLICK = "message_title_click";
+        public static final String MESSAGE_DP_CLICK = "message_dp_click";
+        public static final String SIGNUP_BUTTON_CLICK = "signup_button";
+        public static final String LOGIN_BUTTON_CLICK = "login_button";
+        public static final String SET_USERID_BUTTON_CLICK = "set_user_id_button";
+        public static final String START_NEW_CHAT_FAB = "start_new_chat_fab";
 
         protected Event() {
         }

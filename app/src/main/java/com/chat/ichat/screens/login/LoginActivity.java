@@ -21,9 +21,11 @@ import android.widget.TextView;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -71,6 +73,9 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     LoginPresenter loginPresenter;
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "login";
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -97,6 +102,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         } else {
             accountET.requestFocus();
         }
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -120,6 +126,9 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     protected void onResume() {
         super.onResume();
         loginPresenter.attachView(this);
+
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -220,6 +229,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         progressDialog[0] = ProgressDialog.show(LoginActivity.this, "", "Loading. Please wait...", true);
 
         loginPresenter.loginUser(accountET.getText().toString(), passwordET.getText().toString());
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.LOGIN_BUTTON_CLICK, null);
     }
 
     private boolean isEmailValid(CharSequence email) {

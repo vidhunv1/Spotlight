@@ -16,9 +16,9 @@
         android:layout_toEndOf="@+id/iv_profileImage">
 
         <ImageView
-            android:layout_width="258dp"
+            android:layout_width="match_parent"
             android:layout_height="135dp"
-            app:srcCompat="@android:drawable/arrow_down_float"
+            app:srcCompat="@drawable/ic_logo_notif"
             android:id="@+id/iv_rcv_template_image" />
 
         <LinearLayout
@@ -32,7 +32,10 @@
             android:paddingBottom="7.75dp">
 
             <TextView
-                android:text="TextView"
+                android:maxLines="2"
+                android:text="TextVieasasdsadasdsadasdsdasdw"
+                android:lines="2"
+                android:ellipsize="end"
                 android:textColor="#222222"
                 android:textSize="14sp"
                 android:textAppearance="@style/FontRobotoMedium"
@@ -41,7 +44,10 @@
                 android:id="@+id/tv_rcv_template_title" />
 
             <TextView
+                android:maxLines="3"
+                android:ellipsize="end"
                 android:text="TextView"
+                android:lines="3"
                 android:textColor="#757575"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,6 +56,9 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:lines="1"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="TextView"
                 android:textColor="#ACACAC"
                 android:layout_width="match_parent"

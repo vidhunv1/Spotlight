@@ -26,21 +26,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:id="@+id/message_head"
                     android:layout_centerVertical="true">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="18sp"
+                        android:textSize="20sp"
+                        android:textAppearance="@style/FontRobotoMedium"
                         android:textColor="@color/textPrimaryLight"
                         android:id="@+id/tb_message_title" />
-
-                    <ImageView
-                        android:layout_marginTop="2dp"
-                        android:layout_width="21dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center_vertical"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                     <!--<TextView-->
                         <!--android:layout_width="wrap_content"-->

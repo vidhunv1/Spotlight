@@ -18,11 +18,13 @@ import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
+import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.screens.home.HomeActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,6 +60,9 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "set_userid";
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SetUserIdActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -81,12 +86,17 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
                 ApiManager.getContactsApi(),
                 new ContactsContent(this),
                 new ContactStore());
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         presenter.attachView(this);
+
+                		/*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -124,6 +134,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_done) {
+            firebaseAnalytics.logEvent(AnalyticsContants.Event.SET_USERID_BUTTON_CLICK, null);
             if(!isUserIdValid(userIdEt.getText())) {
                 showError("User ID", "User ID must have atleast 6 characters.");
             } else {

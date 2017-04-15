@@ -29,9 +29,11 @@ import android.widget.TextView;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.regex.Pattern;
 
@@ -102,6 +104,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     private String dividerColor = "#c9c9c9";
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private final String SCREEN_NAME = "signup";
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
         return intent;
@@ -131,6 +136,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 getEmailAddress();
             }
         }
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -154,6 +160,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     protected void onResume() {
         super.onResume();
         signUpPresenter.attachView(this);
+
+        		/*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
     @Override
@@ -313,6 +322,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), "+91", mobileNumberET.getText().toString(), imei, carrierName);
 
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
+
+        firebaseAnalytics.logEvent(AnalyticsContants.Event.SIGNUP_BUTTON_CLICK, null);
     }
 
     private boolean isEmailValid(CharSequence email) {

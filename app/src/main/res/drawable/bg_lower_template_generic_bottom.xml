@@ -2,13 +2,7 @@
 
     <solid android:color="#ffffff" />
 
-    <stroke
-        android:width="0.33dp"
-        android:color="#e9e9e9" />
-
     <corners
-        android:topLeftRadius="@dimen/bubble_full_corner_radius"
-        android:topRightRadius="@dimen/bubble_full_corner_radius"
         android:bottomLeftRadius="@dimen/bubble_full_corner_radius"
         android:bottomRightRadius="@dimen/bubble_full_corner_radius" />
 </shape>
