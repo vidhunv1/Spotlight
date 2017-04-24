@@ -13,8 +13,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName "0.0.5"
+        versionCode 6
+        versionName "0.0.6"
     }
     buildTypes {
         release {
@@ -52,6 +52,8 @@ dependencies {
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
 
+    compile "com.google.android.gms:play-services-places:10.0.1"
+
     // Timber (logging)
     compile 'com.jakewharton.timber:timber:3.1.0'
     // ButterKnife
@@ -78,7 +80,7 @@ dependencies {
     compile 'net.danlew:android.joda:2.9.5.1'
 
     // Retrofit
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
@@ -97,6 +99,5 @@ dependencies {
     // Text bitmap creator
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     testCompile 'junit:junit:4.12'
-
 }
 apply plugin: 'com.google.gms.google-services'

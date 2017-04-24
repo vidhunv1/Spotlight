@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:layout_marginBottom="3dp"
@@ -11,15 +13,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_quick_reply_inactive"
-        android:paddingTop="7.25dp"
-        android:paddingBottom="7.25dp"
         android:maxWidth="258dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
         android:id="@+id/rl_quick_reply"
         android:layout_marginLeft="8dp">
 
+        <ImageView
+            android:layout_alignParentLeft="true"
+            android:id="@+id/iv_qr"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="5.25dp"
+            android:layout_marginBottom="5.25dp"
+            android:layout_width="24dp"
+            android:visibility="gone"
+            android:layout_height="24dp"
+            app:srcCompat="@drawable/ic_location_qr"/>
+
         <TextView
+            android:paddingTop="7.25dp"
+            android:paddingBottom="7.25dp"
+            android:layout_centerInParent="true"
+            android:layout_toRightOf="@+id/iv_qr"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
             android:id="@+id/tv_item_quick_reply"
             android:text="FLE : À"
             android:layout_width="wrap_content"
@@ -27,8 +42,6 @@
             android:textColor="@color/sendMessageBubble"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:maxWidth="234dp"/>
     </RelativeLayout>
 </LinearLayout>

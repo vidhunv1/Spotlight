@@ -1,10 +1,17 @@
 package com.chat.ichat.screens.home;
 
 import com.chat.ichat.MessageController;
+import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.app.AppApi;
 import com.chat.ichat.api.app.VersionResponse;
+import com.chat.ichat.api.bot.BotApi;
+import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.db.BotDetailsStore;
+import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
 import java.util.List;
 
@@ -23,11 +30,13 @@ public class HomePresenter implements HomeContract.Presenter {
     private MessageStore messageStore;
     private CompositeSubscription compositeSubscription;
     private AppApi appApi;
+    private AddContactUseCase addContactUseCase;
 
-    public HomePresenter(MessageController messageController, AppApi appApi, MessageStore messageStore) {
+    public HomePresenter(MessageController messageController, AppApi appApi, MessageStore messageStore, ContactStore contactStore, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
         this.messageController = messageController;
         this.appApi = appApi;
         this.messageStore = messageStore;
+        this.addContactUseCase = new AddContactUseCase(userApi, contactStore, botApi, botDetailsStore);
         compositeSubscription = new CompositeSubscription();
     }
 
@@ -110,6 +119,38 @@ public class HomePresenter implements HomeContract.Presenter {
                     @Override
                     public void onNext(Boolean aBoolean) {
                         contactsView.removeChatItem(chatId);
+                    }
+                });
+        compositeSubscription.add(subscription);
+    }
+
+    // failed, already in contacts, added succesfully
+    @Override
+    public void addContact(String userId) {
+        Logger.d(this);
+        Subscription subscription = addContactUseCase.execute(userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ContactResult>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        ApiError error = new ApiError(e);
+                        contactsView.showError(error.getTitle(), error.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(ContactResult contactResult) {
+                        if(contactResult == null) {
+                            contactsView.showInvalidIDError();
+                        } else {
+                            contactsView.showContactAddedSuccess(contactResult.getContactName(),contactResult.getUsername(), false);
+                        }
                     }
                 });
         compositeSubscription.add(subscription);

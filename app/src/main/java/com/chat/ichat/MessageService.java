@@ -33,9 +33,11 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
+import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -68,15 +70,17 @@ public class MessageService extends Service {
     static final public String XMPP_RESULT_MSG_STATUS = "com.stairway.spotlight.MessageService.XMPP_MSG_STATUS";
     static final public String XMPP_RESULT_CHAT_ID = "com.stairway.spotlight.MessageService.XMPP_CHAT_ID";
     static final public String XMPP_RESULT_RECEIPT_ID = "com.stairway.spotlight.MessageService.XMPP_RECEIPT_ID";
+    static final public String XMPP_RESULT_MESSAGE_ID = "com.stairway.spotlight.MessageService.XMPP_MESSAGE_ID";
 
     static final public String ACTION_INTERNET_CONNECTION_STATUS = "com.stairway.spotlight.MessageService.INTERNET_CONNECTION_STATUS";
     static final public String CONNECTION_STATE = "com.stairway.spotlight.MessageService.INTERNET_CONNECTION_STATE";
 
     private boolean isOnlineNotified = false;
     private final int RETRY_OFFLINE = 1;
-    private final int RETRY_ONLINE = 1;
-    private int retryInterval = RETRY_OFFLINE; //seconds
+    private final int RETRY_ONLINE = 3;
+    private int retryInterval = 2; //seconds
     private Timer networkTimer = null;
+    private Timer connectTimer = null;
 
     private MessageStore messageStore;
     private ContactStore contactStore;
@@ -90,6 +94,7 @@ public class MessageService extends Service {
     private ReceiptReceivedListener receiptReceivedListener;
     private RosterListener presenceStateListener;
     private ConnectionListener connectionListener;
+    private PingManager pingManager;
 
     private LocalBroadcastManager broadcaster;
     Roster roster;
@@ -117,7 +122,7 @@ public class MessageService extends Service {
             messageStore.updateMessageStatus(chatId, deliveryReceiptId, MessageResult.MessageStatus.DELIVERED).subscribe(new Subscriber<Boolean>() {
                 @Override
                 public void onCompleted() {
-                    broadcastDeliveryReceipt(XMPPManager.getUserNameFromJid(chatId), deliveryReceiptId, MessageResult.MessageStatus.DELIVERED);
+                    broadcastDeliveryReceipt("", XMPPManager.getUserNameFromJid(chatId), deliveryReceiptId, MessageResult.MessageStatus.DELIVERED);
                 }
                 @Override
                 public void onError(Throwable e) {}
@@ -301,7 +306,7 @@ public class MessageService extends Service {
                         ReadReceiptExtension readReceiptExtension = (ReadReceiptExtension)readElement;
 
                         if(readReceiptExtension!=null) {
-                            broadcastDeliveryReceipt(participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
+                            broadcastDeliveryReceipt("", participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
 
                             messageStore.updateAllMessageStatus(readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ)
                                     .subscribe(new Subscriber<Boolean>() {
@@ -325,31 +330,47 @@ public class MessageService extends Service {
         this.connectionListener = new ConnectionListener() {
             @Override
             public void connected(XMPPConnection connection) {
-                Logger.d(this, "Connected XMPP");
+                Logger.d(this, "[-]Connected XMPP");
+                Logger.d(this, "XMPP connected.");
+                retryInterval = RETRY_ONLINE;
+                broadcastConnectionStatus(true);
+                isOnlineNotified = true;
+                sendUnsentMessages();
             }
 
             @Override
             public void authenticated(XMPPConnection connection, boolean resumed) {
+                Logger.d(this, "[-]Authenticated");
             }
 
             @Override
             public void connectionClosed() {
+                Logger.d(this, "[-]ConnectionClosed");
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
+                Logger.d(this, "[-]connectionClosedOnError");
             }
             @Override
             public void reconnectionSuccessful() {
+                Logger.d(this, "[-]reconnectionSuccessful");
 
             }
             @Override
-            public void reconnectingIn(int seconds) {}
+            public void reconnectingIn(int seconds) {
+                Logger.d(this, "[-]reconnectingIn");
+            }
             @Override
-            public void reconnectionFailed(Exception e) {}
+            public void reconnectionFailed(Exception e) {
+                Logger.d(this, "[-]reconnectionFailed");
+            }
         };
 
+        pingManager = PingManager.getInstanceFor(connection);
+
         ChatManager.getInstanceFor(connection).addChatListener(this.chatListener);
+        connection.addConnectionListener(connectionListener);
         DeliveryReceiptManager.getInstanceFor(connection)
                 .addReceiptReceivedListener(receiptReceivedListener);
         roster = Roster.getInstanceFor(connection);
@@ -357,6 +378,7 @@ public class MessageService extends Service {
         roster.addRosterListener(presenceStateListener);
 
         networkTimer = new Timer();
+        connectTimer = new Timer();
         networkTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
     }
 
@@ -384,6 +406,68 @@ public class MessageService extends Service {
         super.onDestroy();
     }
 
+//    class CheckConnection extends TimerTask {
+//        @Override
+//        public void run() {
+//            checkConnection();
+//        }
+//    }
+//
+//    private boolean checkConnection() {
+//        try {
+//            if(pingManager.pingMyServer()) {
+//                connectTimer.cancel();
+//                Logger.d(this, "Ping true. ");
+//                if(ForegroundDetector.getInstance().isForeground()) {
+//                    try {
+//                        if(!connection.isConnected()) {
+//                            connection.connect();
+//                            sendUnsentMessages();
+//                        }
+//                    } catch (SmackException e) {
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    } catch (XMPPException e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    Logger.d(this, "Disconnect");
+//                    connection.disconnect(new Presence(Presence.Type.unavailable));
+//                }
+//            } else {
+//                Logger.d(this, "Ping false. ");
+//                connection.disconnect();
+//            }
+//        } catch (SmackException.NotConnectedException e) {
+//            connectTimer = new Timer();
+//            connectTimer.scheduleAtFixedRate(new TryConnect(), 0, 500);
+//            e.printStackTrace();
+//        }
+//        return true;
+//    }
+//
+//    class TryConnect extends TimerTask {
+//        @Override
+//        public void run() {
+//            tryConnect();
+//        }
+//    }
+//
+//    private boolean tryConnect() {
+//        Logger.d(this, "Try Connect");
+//        try {
+//            connection.connect();
+//        } catch (SmackException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (XMPPException e) {
+//            e.printStackTrace();
+//        }
+//        return true;
+//    }
+
     class TryXMPPConnection extends TimerTask{
         @Override
         public void run() {
@@ -393,17 +477,27 @@ public class MessageService extends Service {
 
     private boolean tryConnect() {
         // TODO: BUGGY
-        if(XMPPManager.getInstance().getConnection().isConnected() && XMPPManager.getInstance().getConnection().isConnected()) {
-            connection = XMPPManager.getInstance().getConnection();
-        }
-        if(!isOnlineNotified) {
-            retryInterval = RETRY_ONLINE;
-            broadcastConnectionStatus(true);
-            isOnlineNotified = true;
-            sendUnsentMessages();
+        if(ForegroundDetector.getInstance().isForeground()) {
+            if(!XMPPManager.getInstance().getConnection().isConnected() && XMPPManager.getInstance().getConnection().isConnected()) {
+                connection = XMPPManager.getInstance().getConnection();
+            } else {
+                if(!isOnlineNotified) {
+                    retryInterval = RETRY_ONLINE;
+                    broadcastConnectionStatus(true);
+                    isOnlineNotified = true;
+                    sendUnsentMessages();
+                }
+            }
+        } else {
+            try {
+                connection.disconnect(new Presence(Presence.Type.unavailable));
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
+
 
     private void sendUnsentMessages() {
         //send unsent messages
@@ -432,7 +526,8 @@ public class MessageService extends Service {
 
                                     @Override
                                     public void onNext(MessageResult messageResult) {
-                                        broadcastDeliveryReceipt(messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                                        Logger.d(this, "Unsent message sent: "+messageResult.toString());
+                                        broadcastDeliveryReceipt(messageResult.getMessageId(), messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
                                     }
                                 });
                             }
@@ -471,11 +566,12 @@ public class MessageService extends Service {
         broadcaster.sendBroadcast(intent);
     }
 
-    private void broadcastDeliveryReceipt(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+    private void broadcastDeliveryReceipt(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         Intent intent = new Intent(XMPP_ACTION_RCV_RECEIPT);
         intent.putExtra(XMPP_RESULT_MSG_STATUS, messageStatus.name());
         intent.putExtra(XMPP_RESULT_CHAT_ID, chatId);
         intent.putExtra(XMPP_RESULT_RECEIPT_ID, deliveryReceiptId);
+        intent.putExtra(XMPP_RESULT_MESSAGE_ID, messageId);
         broadcaster.sendBroadcast(intent);
     }
 

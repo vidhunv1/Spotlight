@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -28,8 +30,11 @@ import android.widget.TextView;
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.chat.ichat.core.lib.RoundedCornerTransformation;
+import com.chat.ichat.models.Location;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -52,6 +57,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -82,19 +88,23 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_QUICK_REPLIES = 4;
     private final int VIEW_TYPE_SEND_EMOTICON = 5;
     private final int VIEW_TYPE_RECV_EMOTICON = 6;
-    private final int VIEW_TYPE_TYPING = 7;
+    private final int VIEW_TYPE_SEND_LOCATION = 7;
+    private final int VIEW_TYPE_TYPING = 8;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
+    private QuickReplyActionListener quickReplyActionListener;
     private Drawable textProfileDrawable;
     private BitmapRequestBuilder dp;
 
     private boolean isTyping;
     private int lastClickedPosition;
 
-    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener) {
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
+        this.quickReplyActionListener = qrActionListener;
+
         this.context = context;
         this.messageList = new ArrayList<>();
         this.messageCache = new SparseArray<>();
@@ -162,34 +172,39 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+    public void updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+        Logger.d(this, "MessgeAdapter, updating."+messageStatus+", "+deliveryReceiptId+" "+messageId);
         // TODO: Might be inefficient
         MessageResult m;
         boolean isBeforeReceiptId = false;
         for(int i=messageList.size()-1; i>=0; i--) {
-            if(messageStatus == MessageResult.MessageStatus.DELIVERED)
-                return;
             m = messageList.get(i);
+            if (m.getMessageStatus() == MessageResult.MessageStatus.READ) {
+                return;
+            }
+            if (messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                return;
+            } else if (messageStatus == MessageResult.MessageStatus.SENT) {
+                if (m.getMessageStatus() == MessageResult.MessageStatus.READ) {
+                    return;
+                }
+            } else if(messageStatus == MessageResult.MessageStatus.DELIVERED) {
+                messageStatus = MessageResult.MessageStatus.SENT;
+            }
+            Logger.d(this, "Ma: "+m.toString());
             if(m.getReceiptId()!=null && !m.getReceiptId().isEmpty() && m.getReceiptId().equals(deliveryReceiptId)) {
                 isBeforeReceiptId = true;
+            } else if(m.getReceiptId() == null) {
+                if(!messageId.isEmpty() && m.getMessageId().equals(messageId)) {
+                    m.setReceiptId(deliveryReceiptId);
+                    m.setMessageStatus(messageStatus);
+                    messageList.set(i, m);
+                    this.notifyItemChanged(i);
+                }
             }
             if(isBeforeReceiptId) {
-                if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
-                    return;
-                if (messageStatus == MessageResult.MessageStatus.NOT_SENT)
-                    return;
-                if (messageStatus == MessageResult.MessageStatus.SENT)
-                    if (m.getMessageStatus() == MessageResult.MessageStatus.READ) {
-                        return;
-                    }
-
-//              if (m.getMessageStatus() == MessageResult.MessageStatus.DELIVERED || m.getMessageStatus() == MessageResult.MessageStatus.READ)
-//                        return;
-//              if (messageStatus == MessageResult.MessageStatus.DELIVERED)
-//                  if (m.getMessageStatus() == MessageResult.MessageStatus.READ)
-//                      return;
-
                 if(!m.getChatId().equals(m.getFromId())) {
+                    Logger.d(this, "Setting message status[Adapter] "+messageStatus);
                     m.setMessageStatus(messageStatus);
                     messageList.set(i, m);
                     this.notifyItemChanged(i);
@@ -253,6 +268,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     return VIEW_TYPE_SEND_TEXT;
                 }
+            } else if(parsedMessage.getMessageType() == Message.MessageType.location) {
+                return VIEW_TYPE_SEND_LOCATION;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -334,6 +351,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view7 = inflater.inflate(R.layout.item_message_send_emoticon, parent, false);
                 viewHolder = new SendEmoticonViewHolder(view7);
                 break;
+            case VIEW_TYPE_SEND_LOCATION:
+                View view9 = inflater.inflate(R.layout.item_message_send_location, parent, false);
+                viewHolder = new SendLocationViewHolder(view9);
+                break;
             case VIEW_TYPE_TYPING:
                 View view8 = inflater.inflate(R.layout.item_typing, parent, false);
                 viewHolder = new TypingViewHolder(view8);
@@ -375,9 +396,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 SendEmoticonViewHolder sendEmoticonViewHolder = (SendEmoticonViewHolder) holder;
                 sendEmoticonViewHolder.renderItem(messageCache.get(position).getText(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
                 break;
+            case VIEW_TYPE_SEND_LOCATION:
+                SendLocationViewHolder sendLocationViewHolder = (SendLocationViewHolder) holder;
+                sendLocationViewHolder.renderItem(messageCache.get(position).getLocation(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
                 typingViewHolder.renderItem();
+                break;
         }
     }
 
@@ -527,7 +553,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             alertDialog.dismiss();
         });
 
-
         /*              Analytics           */
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         Bundle bundle = new Bundle();
@@ -547,7 +572,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void renderItem(List<QuickReply> quickReplies) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             quickRepliesListView.setLayoutManager(layoutManager);
-            quickRepliesListView.setAdapter(new QuickRepliesAdapter(postbackClickListener, quickReplies));
+            quickRepliesListView.setAdapter(new QuickRepliesAdapter(context, postbackClickListener, quickReplyActionListener, quickReplies));
             OverScrollDecoratorHelper.setUpOverScroll(quickRepliesListView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         }
     }
@@ -880,6 +905,104 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    class SendLocationViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_place_name)
+        TextView placeName;
+        @Bind(R.id.tv_address)
+        TextView address;
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatusView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
+        @Bind(R.id.location_description)
+        LinearLayout locationDescription;
+        @Bind(R.id.location_image)
+        ImageView locationImage;
+
+        private int position;
+        private Location location;
+
+        SendLocationViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(Location location, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.location = location;
+            this.position = position;
+            int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+location.getLatitude()+","+location.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
+                    .into(locationImage);
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+            }
+            placeName.setText(location.getPlaceName());
+            address.setText(location.getAddress());
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
+            } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
+            } else if(messageStatus == MessageResult.MessageStatus.READ) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
+            }
+
+            deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
+        }
+
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+            // Open Maps Activity
+            String uri = String.format(Locale.ENGLISH, "geo:%f,%f", location.getLatitude(), location.getLongitude());
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            context.startActivity(intent);
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            showMessageActionPopup(this, position, placeName.getText().toString());
+            return true;
+        }
+    }
+
     class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_messageitem_message)
         TextView messageView;
@@ -1128,5 +1251,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     interface UrlClickListener {
         void urlButtonClicked(String url);
+    }
+
+    interface QuickReplyActionListener {
+        void navigateToGetLocation();
     }
 }

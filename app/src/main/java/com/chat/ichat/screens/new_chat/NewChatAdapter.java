@@ -1,6 +1,7 @@
 package com.chat.ichat.screens.new_chat;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -19,12 +20,18 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.ImageUtils;
+
+import org.jivesoftware.smack.packet.Presence;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 /**
  * Created by vidhun on 01/09/16.
@@ -38,23 +45,62 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int HEADER = 4;
     private final int NO_CONTACTS = 5;
 
-
     private Context context;
 
     private List<Integer> filteredList;
     private String filterQuery;
+    private SharedPreferences sharedPreferences;
+    private String highlightColor;
 
     public NewChatAdapter(Context context, ContactClickListener contactClickListener) {
+        this.sharedPreferences = context.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
         this.context = context;
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
         filteredList = new ArrayList<>();
+        this.highlightColor = "#"+"009dff";
         filterQuery = "";
     }
 
     public void setContactList(List<NewChatItemModel> contactItems) {
+        for (NewChatItemModel contactItem : contactItems) {
+            long millis = sharedPreferences.getLong(contactItem.getUserName(), 0);
+            if(millis == 0) {
+                if(contactItem.getUserName().startsWith("o_")) {
+                    contactItem.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
+                } else {
+                    contactItem.setPresence("Last seen recently");
+                }
+            } else if((new DateTime(millis).getSecondOfDay()+3) >= DateTime.now().getSecondOfDay()) {
+                contactItem.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
+            } else {
+                String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
+                contactItem.setPresence(context.getResources().getString(R.string.chat_presence_away, lastSeen));
+            }
+        }
         this.itemList = contactItems;
         this.notifyItemRangeChanged(0, contactItems.size());
+    }
+
+    public void onPresenceChanged(String userId, Presence.Type type) {
+        if(filterQuery.isEmpty() && itemList.size()>0) {
+            for (int i = 0; i < itemList.size(); i++) {
+                if (itemList.get(i).getUserName().equals(userId)) {
+                    if (type == Presence.Type.available) {
+                        Logger.d(this, "Online: " + userId);
+                        NewChatItemModel m = itemList.get(i);
+                        m.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
+                        itemList.set(i, m);
+                        this.notifyItemChanged(i + 1);
+                    } else if (type == Presence.Type.unavailable) {
+                        NewChatItemModel m = itemList.get(i);
+                        m.setPresence(context.getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(DateTime.now())));
+                        itemList.set(i, m);
+                        this.notifyItemChanged(i + 1);
+                    }
+                }
+            }
+        }
     }
 
     public void filterList(String query) {
@@ -220,6 +266,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 contactName.setText(contactItem.getContactName());
             }
 
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                statusView.setText(Html.fromHtml(contactItem.getPresence(), Html.FROM_HTML_MODE_LEGACY));
+            else
+                statusView.setText(Html.fromHtml(contactItem.getPresence()));
+
             if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
                 Glide.with(context)
                         .load(contactItem.getProfileDP().replace("https://", "http://"))
@@ -237,7 +288,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else {
                 profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             }
-            statusView.setText(contactItem.getUserId());
             contactName.setTag(contactItem.getUserName());
         }
     }

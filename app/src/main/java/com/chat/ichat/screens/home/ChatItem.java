@@ -19,8 +19,9 @@ public class ChatItem implements Serializable{
     private MessageResult.MessageStatus messageStatus;
     private boolean isMe;
     private String profileDP;
+    private String messageId;
 
-    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, String receiptId, int notificationCount) {
+    public ChatItem(String chatId, String chatName, String lastMessage, DateTime time, MessageResult.MessageStatus messageStatus, String receiptId, String messageId, int notificationCount) {
         this.chatId = chatId;
         this.chatName = chatName;
         this.lastMessage = lastMessage;
@@ -28,6 +29,7 @@ public class ChatItem implements Serializable{
         this.notificationCount = notificationCount;
         this.messageStatus = messageStatus;
         this.receiptId = receiptId;
+        this.messageId = messageId;
     }
 
     public ChatItem() {
@@ -51,6 +53,14 @@ public class ChatItem implements Serializable{
 
     public String getReceiptId() {
         return receiptId;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public void setReceiptId(String receiptId) {

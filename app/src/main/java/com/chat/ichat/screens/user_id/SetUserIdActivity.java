@@ -18,11 +18,13 @@ import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
+import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
+import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -87,6 +89,52 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
                 new ContactsContent(this),
                 new ContactStore());
 
+        Context context = this;
+        ApiManager.getUserApi().findUserByUserId("teamichat")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<UserResponse>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startActivity(HomeActivity.callingIntent(context,0,null));
+                        finish();
+                    }
+
+                    @Override
+                    public void onNext(UserResponse userResponse) {
+                        ContactResult contactResult1 = new ContactResult();
+                        contactResult1.setUserId(userResponse.getUser().getUserId());
+                        contactResult1.setContactName(userResponse.getUser().getName());
+                        contactResult1.setUsername(userResponse.getUser().getUsername());
+                        contactResult1.setAdded(true);
+                        contactResult1.setBlocked(false);
+                        contactResult1.setUserType(userResponse.getUser().getUserType());
+                        contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
+
+                        ContactStore.getInstance().storeContact(contactResult1)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<Boolean>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    @Override
+                                    public void onNext(Boolean aBoolean) {
+                                        Logger.d(this, "Added: "+contactResult1.toString());
+                                    }
+                                });
+                    }
+                });
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
@@ -95,7 +143,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         super.onResume();
         presenter.attachView(this);
 
-                		/*              Analytics           */
+        /*              Analytics           */
         firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
     }
 
@@ -178,6 +226,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         Logger.d(this, "Navigate to home");
 
         Context context = this;
+
         ApiManager.getAppApi().appInit()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -194,8 +243,56 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
                     @Override
                     public void onNext(StatusResponse statusResponse) {
-                        startActivity(HomeActivity.callingIntent(context    ,0,null));
-                        finish();
+                        ApiManager.getUserApi().findUserByUserId("teamichat")
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<UserResponse>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onNext(UserResponse userResponse) {
+                                        ContactResult contactResult1 = new ContactResult();
+                                        contactResult1.setUserId(userResponse.getUser().getUserId());
+                                        contactResult1.setContactName(userResponse.getUser().getName());
+                                        contactResult1.setUsername(userResponse.getUser().getUsername());
+                                        contactResult1.setAdded(true);
+                                        contactResult1.setBlocked(false);
+                                        contactResult1.setUserType(userResponse.getUser().getUserType());
+                                        contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
+
+                                        ContactStore.getInstance().storeContact(contactResult1)
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Subscriber<Boolean>() {
+                                                    @Override
+                                                    public void onCompleted() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                                        finish();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(Boolean aBoolean) {
+                                                        Logger.d(this, "Added: "+contactResult1.toString());
+                                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                                        finish();
+                                                    }
+                                                });
+                                    }
+                                });
                     }
                 });
     }

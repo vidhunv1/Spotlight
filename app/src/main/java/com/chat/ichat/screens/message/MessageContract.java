@@ -16,13 +16,13 @@ import java.util.List;
 public interface MessageContract {
     interface View extends BaseView {
         void showContactAddedSuccess();
-        void showContactBlockedSuccess();
+        void showContactBlockedSuccess(boolean isBlocked);
         void setContactDetails(ContactResult contactName);
         void showAddBlock(boolean shouldShow);
         void displayMessages(List<MessageResult> result);
         void addMessageToList(MessageResult message);
         void updateDeliveryStatus(MessageResult messageResult);
-        void updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
+        void updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus);
         void updateLastActivity(String time);
         void setKeyboardType(boolean isBotKeyboard);
         void initBotMenu(List<PersistentMenu> persistentMenus);
@@ -38,6 +38,6 @@ public interface MessageContract {
         void sendReadReceipt(String chatId);
         void loadKeyboard(String chatId);
         void addContact(String username);
-        void blockContact(String username);
+        void blockContact(String username, boolean shouldBlock);
     }
 }

@@ -25,11 +25,14 @@ public interface HomeContract {
         void showChatState(String from, ChatState chatState);
         void showUpdate(int versionCode, String versionName, boolean isMandatory);
         void removeChatItem(String chatId);
+        void showContactAddedSuccess(String contactName, String username, boolean isExistingContact);
+        void showInvalidIDError();
     }
 
     interface Presenter extends BasePresenter<HomeContract.View> {
         void loadChatList();
         void init(int currentVersionCode);
         void deleteChat(String chatId);
+        void addContact(String userId);
     }
 }

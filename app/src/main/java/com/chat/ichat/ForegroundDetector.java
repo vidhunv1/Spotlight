@@ -1,3 +1,15 @@
+/*
+ * This is the source code of Telegram for Android v. 3.x.x
+ * It is licensed under GNU GPL v. 2 or later.
+ * You should have received a copy of the license in this archive (see LICENSE).
+ *
+ * Copyright Nikolai Kudashov, 2013-2017.
+ */
+
+/*
+* https://github.com/DrKLO/Telegram/blob/6a1cf64f6f45ba0d0e7ff898e8a6c677ddc3ef33/TMessagesProj/src/main/java/org/telegram/ui/Components/ForegroundDetector.java
+* */
+
 package com.chat.ichat;
 
 import android.app.Activity;

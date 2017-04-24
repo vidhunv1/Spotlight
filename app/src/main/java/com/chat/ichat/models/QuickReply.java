@@ -1,5 +1,6 @@
 package com.chat.ichat.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -11,6 +12,18 @@ public class QuickReply {
     private String title;
     @SerializedName("payload")
     private String payload;
+    @SerializedName("image_url")
+    private String imageUrl;
+    @SerializedName("content_type")
+    @Expose
+    private ContentType contentType;
+
+    public static enum ContentType {
+        @SerializedName("text")
+        text,
+        @SerializedName("location")
+        location
+    }
 
     public String getTitle() {
         return title;
@@ -20,11 +33,25 @@ public class QuickReply {
         return payload;
     }
 
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     @Override
     public String toString() {
-        return "_QuickReplies{" +
+        return "QuickReply{" +
                 "title='" + title + '\'' +
                 ", payload='" + payload + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", contentType=" + contentType +
                 '}';
     }
 }

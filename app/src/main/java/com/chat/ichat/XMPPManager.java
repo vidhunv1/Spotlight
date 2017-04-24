@@ -8,6 +8,7 @@ import com.chat.ichat.core.ReadReceiptExtension;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -96,7 +97,15 @@ public class XMPPManager implements Serializable {
                 return null;
             }
         };
-        connectionThread.execute();
+        if(ForegroundDetector.getInstance().isForeground()) {
+            connectionThread.execute();
+        } else {
+            try {
+                connection.disconnect(new Presence(Presence.Type.unavailable));
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        }
         return connection;
     }
 

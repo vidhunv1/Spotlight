@@ -4,10 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.chat.ichat.ForegroundDetector;
+import com.chat.ichat.R;
+import com.chat.ichat.application.SpotlightApplication;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.MessageService;
@@ -19,20 +23,24 @@ import com.chat.ichat.models.MessageResult;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
+import org.joda.time.DateTime;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 /**
  * Created by vidhun on 05/07/16.
  */
 public class BaseActivity extends AppCompatActivity{
     BroadcastReceiver receiver;
+    private SharedPreferences sharedPreferences;
 
     private FirebaseAnalytics firebaseAnalytics;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
         UserSession userSession = UserSessionManager.getInstance().load();
         if(userSession ==null)
             throw new IllegalStateException("Base activity should be only initialized on user session");
@@ -52,8 +60,9 @@ public class BaseActivity extends AppCompatActivity{
                 } else if(intent.getAction().equals(MessageService.XMPP_ACTION_RCV_RECEIPT)) {
                     String chatId = intent.getStringExtra(MessageService.XMPP_RESULT_CHAT_ID);
                     String deliveryReceiptId = intent.getStringExtra(MessageService.XMPP_RESULT_RECEIPT_ID);
+                    String messageId = intent.getStringExtra(MessageService.XMPP_RESULT_MESSAGE_ID);
                     MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(intent.getStringExtra(MessageService.XMPP_RESULT_MSG_STATUS));
-                    onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
+                    onMessageStatusReceived(messageId, chatId, deliveryReceiptId, messageStatus);
                 } else if(intent.getAction().equals(MessageService.ACTION_INTERNET_CONNECTION_STATUS)) {
                     boolean isConnectionAvailable = intent.getBooleanExtra(MessageService.ACTION_INTERNET_CONNECTION_STATUS, false);
                     onNetworkStatus(isConnectionAvailable);
@@ -101,6 +110,12 @@ public class BaseActivity extends AppCompatActivity{
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ForegroundDetector.getInstance().onActivityDestroyed(this);
+    }
+
     public void onMessageReceived(MessageResult messageId, ContactResult from) {
         Logger.d(this, "[Base]Message Received "+messageId);
         NotificationController.getInstance().showNotificationAndAlert(true);
@@ -113,11 +128,10 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onPresenceChanged(String username, Presence.Type type) {
         Logger.d(this, "Received Presence: "+username+", Type: "+type);
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_PRESENCE, bundle);
+        if(type == Presence.Type.available || type == Presence.Type.unavailable) {
+            DateTime time = DateTime.now();
+            sharedPreferences.edit().putLong(username, time.getMillis()).apply();
+        }
     }
 
     public void onNetworkStatus(boolean isAvailable) {
@@ -129,17 +143,8 @@ public class BaseActivity extends AppCompatActivity{
 
     public void onChatStateReceived(String from, ChatState chatState) {
         Logger.d(this, "chatState: "+chatState.name()+", from "+from);
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, from);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_CHAT_STATE, bundle);
     }
 
-    public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatId);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_MESSAGE_STATUS, bundle);
+    public void onMessageStatusReceived(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
     }
 }

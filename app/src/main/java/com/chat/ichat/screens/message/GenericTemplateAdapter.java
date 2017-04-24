@@ -197,14 +197,13 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
             }
 
             title.setText(genericTemplate.getTitle());
-
+            if (genericTemplate.getSubtitle() != null && !genericTemplate.getSubtitle().isEmpty()) {
+                Logger.d(this, "Setting Subtitle:"+genericTemplate.getSubtitle());
+                subtitle.setText(genericTemplate.getSubtitle());
+            } else {
+                subtitle.setVisibility(View.GONE);
+            }
             if(genericTemplate.getDefaultAction()!=null) {
-                if (genericTemplate.getSubtitle() != null && !genericTemplate.getSubtitle().isEmpty()) {
-                    Logger.d(this, "Setting Subtitle:"+genericTemplate.getSubtitle());
-                    subtitle.setText(genericTemplate.getSubtitle());
-                } else {
-                    subtitle.setVisibility(View.GONE);
-                }
                 if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
                     url.setText(genericTemplate.getDefaultAction().getUrl());
                     templateImage.setOnClickListener(v -> {
@@ -230,7 +229,6 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     });
                 }
             } else {
-                subtitle.setVisibility(View.GONE);
                 url.setVisibility(View.GONE);
             }
 

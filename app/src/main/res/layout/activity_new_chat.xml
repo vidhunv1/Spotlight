@@ -20,6 +20,7 @@
             <EditText
                 android:layout_width="242dp"
                 android:layout_height="48dp"
+                android:maxLines="1"
                 android:background="@android:color/transparent"
                 android:id="@+id/et_new_chat_search1"
                 android:hint="@string/new_chat_search_hint"

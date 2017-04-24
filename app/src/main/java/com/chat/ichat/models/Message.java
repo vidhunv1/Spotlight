@@ -18,6 +18,8 @@ public class Message {
     private List<GenericTemplate> genericTemplate;
     @SerializedName("quick_replies")
     private List<QuickReply> quickReplies;
+    @SerializedName("location")
+    private Location location;
 
     public enum MessageType {
         text,
@@ -38,6 +40,8 @@ public class Message {
         else if(this.genericTemplate!=null) {
             Logger.d(this, "Type =  GenericTemplate");
             return MessageType.generic_template;
+        } else if(this.location!=null) {
+            return MessageType.location;
         }
         else
             return MessageType.unknown;
@@ -55,6 +59,14 @@ public class Message {
         return payload;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public void setPayload(String payload) {
         this.payload = payload;
     }
@@ -63,9 +75,20 @@ public class Message {
         if(getMessageType() == MessageType.text) {
             return getText();
         } else if(getMessageType() == MessageType.button_template) {
-            return "Template";
-        } else if(getMessageType() == MessageType.generic_template)
-            return "Template";
+            if(buttonTemplate.getText()!=null) {
+                return buttonTemplate.getText();
+            } else {
+                return "Template";
+            }
+        } else if(getMessageType() == MessageType.generic_template) {
+            if(genericTemplate.get(0).getTitle()!=null) {
+                return genericTemplate.get(0).getTitle();
+            } else {
+                return "Template";
+            }
+        } else if(getMessageType() == MessageType.location) {
+            return "Location: "+location.getPlaceName();
+        }
         else
             return "";
     }

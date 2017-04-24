@@ -33,6 +33,8 @@ import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.screens.message.MessageActivity;
 
+import org.jivesoftware.smack.packet.Presence;
+
 import java.util.List;
 
 import butterknife.Bind;
@@ -337,5 +339,10 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     private void navigateToMessageActivity(String username) {
         startActivity(MessageActivity.callingIntent(this, username));
+    }
+
+    @Override
+    public void onPresenceChanged(String username, Presence.Type type) {
+        newChatAdapter.onPresenceChanged(username, type);
     }
 }

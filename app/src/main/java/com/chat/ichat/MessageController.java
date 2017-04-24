@@ -1,5 +1,7 @@
 package com.chat.ichat;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import com.chat.ichat.application.SpotlightApplication;
@@ -35,6 +37,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class MessageController {
+    public static final String LAST_SEEN_PREFS_FILE = "last_seen";
     private static MessageController instance;
 
     public static void init(XMPPTCPConnection conn, MessageStore messageStore, ContactStore contactStore) {
@@ -52,11 +55,13 @@ public class MessageController {
     private XMPPTCPConnection conn;
     private MessageStore messageStore;
     private ContactStore contactStore;
+    private SharedPreferences sharedPreferences;
 
     private MessageController(XMPPTCPConnection conn, MessageStore messageStore, ContactStore contactStore) {
         this.conn = conn;
         this.messageStore = messageStore;
         this.contactStore = contactStore;
+        this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
     }
 
     public Observable<List<ChatItem>> getChatList() {
@@ -89,6 +94,7 @@ public class MessageController {
                                             messageResult.getTime(),
                                             messageResult.getMessageStatus(),
                                             messageResult.getReceiptId(),
+                                            messageResult.getMessageId(),
                                             messageResult.getUnSeenCount());
                                     t.setMe(messageResult.isMe());
                                     t.setProfileDP(contactResult.getProfileDP());
@@ -164,10 +170,12 @@ public class MessageController {
                     long secAgo = activity.getLastActivity(jid).lastActivity;
                     Logger.d(this, "lastActivity: " + secAgo);
                     if (secAgo == 0) {
+                        sharedPreferences.edit().putLong(userId, DateTime.now().getMillis()).apply();
                         subscriber.onNext(res.getString(R.string.chat_presence_online));
                     } else {
                         DateTime time = DateTime.now().minusSeconds((int) secAgo);
                         subscriber.onNext(res.getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(time)));
+                        sharedPreferences.edit().putLong(userId, time.getMillis()).apply();
                     }
                     subscriber.onCompleted();
                 } catch (SmackException.NoResponseException e) {

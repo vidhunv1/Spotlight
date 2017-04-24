@@ -82,9 +82,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return chatList;
     }
 
-    public List<ChatItem> updateDeliveryStatus(String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
+    public List<ChatItem> updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
         for (int i = 0; i < chatList.size(); i++) {
-            if(chatList.get(i).isMe() && chatList.get(i).getReceiptId()!=null && chatList.get(i).getReceiptId().equals(deliveryReceiptId)) {
+            if(chatList.get(i).isMe() && chatList.get(i).getReceiptId()!=null && (chatList.get(i).getReceiptId().equals(deliveryReceiptId) || chatList.get(i).getProfileDP().equals(deliveryReceiptId))) {
                 ChatItem tt = chatList.get(i);
                 tt.setMessageStatus(deliveryStatus);
                 notifyItemChanged(i);
@@ -108,6 +108,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         item.getTime(),
                         item.getMessageStatus(),
                         item.getReceiptId(),
+                        item.getMessageId(),
                         item.getNotificationCount()
                 ));
                 String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.activeIndicator) & 0x00ffffff );
@@ -278,7 +279,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Glide.with(context)
                         .load(chatListItem.getProfileDP().replace("https://", "http://"))
                         .asBitmap().centerCrop()
-                        .placeholder(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .skipMemoryCache(true)
                         .into(new BitmapImageViewTarget(profileImage) {

@@ -1,5 +1,8 @@
 package com.chat.ichat.screens.new_chat;
 
+import android.view.View;
+
+import com.chat.ichat.MessageController;
 import com.chat.ichat.XMPPManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.bot.BotApi;
@@ -31,16 +34,12 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     private NewChatContract.View contactsView;
     private CompositeSubscription compositeSubscription;
     private ContactStore contactStore;
-    private BotDetailsStore botDetailsStore;
-    private UserApi userApi;
-    private BotApi botApi;
+    private AddContactUseCase addContactUseCase;
 
     public NewChatPresenter(ContactStore contactStore, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
         this.contactStore = contactStore;
-        this.userApi = userApi;
-        this.botDetailsStore = botDetailsStore;
-        this.botApi = botApi;
         this.compositeSubscription = new CompositeSubscription();
+        this.addContactUseCase = new AddContactUseCase(userApi, contactStore, botApi, botDetailsStore);
     }
 
     @Override
@@ -74,6 +73,21 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         contactsResult.getUserId());
                                 newChatItemModel.setProfileDP(contactsResult.getProfileDP());
                                 newChatItemModels.add(newChatItemModel);
+
+                                MessageController messageController = MessageController.getInstance();
+                                messageController.getLastActivity(contactsResult.getUsername())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe(new Subscriber<String>() {
+                                            @Override
+                                            public void onCompleted() {}
+                                            @Override
+                                            public void onError(Throwable e) {
+                                            }
+
+                                            @Override
+                                            public void onNext(String time) {}
+                                        });
                             }
                         }
 
@@ -88,130 +102,29 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     @Override
     public void addContact(String userId) {
         Logger.d(this);
-        Subscription subscription = contactStore.getContactByUserId(userId)
-                .observeOn(AndroidSchedulers.mainThread())
+        Subscription subscription = addContactUseCase.execute(userId)
                 .subscribeOn(Schedulers.io())
-                .subscribe(contact -> {
-                    if(contact!=null && contact.isAdded()) {
-                        contactsView.showContactAddedSuccess(contact.getContactName(), contact.getUsername(), true);
-                    } else {
-                        userApi.findUserByUserId(userId)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribeOn(Schedulers.io())
-                                .map(userResponse -> {
-                                    if(!userResponse.isSuccess()) {
-                                        if(userResponse.getError().getCode() == 404) {
-                                            contactsView.showInvalidIDError();
-                                        }
-                                        return null;
-                                    } else {
-                                        ContactResult contactResult = new ContactResult();
-                                        contactResult.setUserId(userResponse.getUser().getUserId());
-                                        contactResult.setUsername(userResponse.getUser().getUsername());
-                                        contactResult.setDisplayName(userResponse.getUser().getName());
-                                        contactResult.setUserType(userResponse.getUser().getUserType());
-                                        contactResult.setProfileDP(userResponse.getUser().getProfileDP());
-                                        contactResult.setAdded(true);
-                                        contactResult.setBlocked(false);
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ContactResult>() {
+                    @Override
+                    public void onCompleted() {
 
-                                        return contactResult;
-                                    }
-                                })
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe(new Subscriber<ContactResult>() {
-                                    @Override
-                                    public void onCompleted() {}
+                    }
 
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        e.printStackTrace();
-                                        ApiError error = new ApiError(e);
-                                        contactsView.showError(error.getTitle(), error.getMessage());
-                                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        ApiError error = new ApiError(e);
+                        contactsView.showError(error.getTitle(), error.getMessage());
+                    }
 
-                                    @Override
-                                    public void onNext(ContactResult contactResult) {
-                                        if(contactResult == null)
-                                            return;
-                                        Logger.d(this, contactResult.toString());
-
-                                        Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
-                                        if (!roster.isLoaded())
-                                            try {
-                                                roster.reloadAndWait();
-                                            } catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        try {
-                                            roster.createEntry(XMPPManager.getJidFromUserName(contactResult.getUsername()), contactResult.getContactName(), null);
-                                        } catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
-                                            e.printStackTrace();
-                                        }
-                                        Logger.d(this, "b4 contactstore");
-                                        contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
-                                            @Override
-                                            public void onCompleted() {}
-
-                                            @Override
-                                            public void onError(Throwable e) {}
-
-                                            @Override
-                                            public void onNext(Boolean b) {
-                                                Logger.d(this, "aftr contactstore");
-                                                if(contactResult.getUserType()== _User.UserType.regular) {
-                                                    Logger.d(this, "aftr contactstore success");
-                                                    contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
-                                                } else if(contactResult.getUserType() == _User.UserType.official){
-                                                    botApi.getBotDetails(contactResult.getUsername())
-                                                            .subscribeOn(Schedulers.io())
-                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribe(new Subscriber<BotResponse>() {
-                                                                @Override
-                                                                public void onCompleted() {
-                                                                    Logger.d(this, "onComplete");
-                                                                }
-
-                                                                @Override
-                                                                public void onError(Throwable e) {
-                                                                    Logger.d(this, "Error: "+e.getMessage());
-                                                                    e.printStackTrace();
-                                                                }
-
-                                                                @Override
-                                                                public void onNext(BotResponse data) {
-                                                                    if(data.isSuccess()) {
-                                                                        BotResponse.Data botResponse = data.getData();
-                                                                        Logger.d(this, botResponse.toString());
-                                                                        botDetailsStore.putMenu(botResponse.getUsername(), botResponse.getPersistentMenus())
-                                                                                .subscribeOn(Schedulers.newThread())
-                                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                                .subscribe(new Subscriber<Boolean>() {
-                                                                                    @Override
-                                                                                    public void onCompleted() {
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onError(Throwable e) {
-                                                                                        contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onNext(Boolean aBoolean) {
-                                                                                        contactsView.showContactAddedSuccess(contactResult.getContactName(), contactResult.getUsername(), false);
-                                                                                    }
-                                                                                });
-                                                                    } else {
-                                                                        Logger.d(this, "Error response");
-                                                                        Logger.d(this, data.getError().toString());
-                                                                    }
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
+                    @Override
+                    public void onNext(ContactResult contactResult) {
+                        if(contactResult == null) {
+                            contactsView.showInvalidIDError();
+                        } else {
+                            contactsView.showContactAddedSuccess(contactResult.getContactName(),contactResult.getUsername(), false);
+                        }
                     }
                 });
         compositeSubscription.add(subscription);

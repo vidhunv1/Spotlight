@@ -9,6 +9,7 @@ public class NewChatItemModel {
     private String userId;
     private String status;
     private String profileDP;
+    private String presence;
 
     public NewChatItemModel() {}
 
@@ -20,6 +21,14 @@ public class NewChatItemModel {
         }
         this.userId = userId;
         this.userName = username;
+    }
+
+    public String getPresence() {
+        return presence;
+    }
+
+    public void setPresence(String presence) {
+        this.presence = presence;
     }
 
     public String getContactName() {
@@ -68,6 +77,9 @@ public class NewChatItemModel {
                 "contactName='" + contactName + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
+                ", status='" + status + '\'' +
+                ", profileDP='" + profileDP + '\'' +
+                ", presence='" + presence + '\'' +
                 '}';
     }
 }

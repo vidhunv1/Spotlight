@@ -266,12 +266,12 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     @OnClick(R.id.settings_faq_row)
     public void onFaqClicked() {
-        startActivity(WebViewActivity.callingIntent(this, "http://google.com/faq"));
+        startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq"));
     }
 
     @OnClick(R.id.settings_privacy_policy_row)
     public void onPrivacyPolicyClicked() {
-        startActivity(WebViewActivity.callingIntent(this, "http://google.com/privacy"));
+        startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/privacy"));
     }
 
     @OnClick(R.id.settings_sound_row)

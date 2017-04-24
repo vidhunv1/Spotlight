@@ -2,10 +2,12 @@ package com.chat.ichat.screens.home;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,19 +16,25 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,6 +42,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.core.lib.AndroidUtils;
+import com.chat.ichat.db.BotDetailsStore;
+import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.UserSessionManager;
@@ -86,6 +98,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	private ActionBarDrawerToggle toggle;
 
+	final ProgressDialog[] progressDialog = new ProgressDialog[1];
+
 	private HomePresenter presenter;
 	private List<ChatItem> chats;
 	private ChatListAdapter chatListAdapter;
@@ -120,35 +134,13 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-		this.presenter = new HomePresenter(MessageController.getInstance(), ApiManager.getAppApi(), MessageStore.getInstance());
+		this.presenter = new HomePresenter(MessageController.getInstance(), ApiManager.getAppApi(), MessageStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 		userSession = UserSessionManager.getInstance().load();
 
 		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
 		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
-		ImageView profileDp = (ImageView)header.findViewById(R.id.profile_image);
 		profileNameView.setText(userSession.getName());
 		profileIdView.setText("ID: "+userSession.getUserId());
-
-		if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
-			Logger.d(this, "Setting DP: "+userSession.getProfilePicPath());
-			Context context = this;
-			Glide.with(this)
-					.load(userSession.getProfilePicPath())
-					.asBitmap().centerCrop()
-					.diskCacheStrategy(DiskCacheStrategy.ALL)
-					.placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
-					.into(new BitmapImageViewTarget(profileDp) {
-						@Override
-						protected void setResource(Bitmap resource) {
-							RoundedBitmapDrawable circularBitmapDrawable =
-									RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-							circularBitmapDrawable.setCircular(true);
-							profileDp.setImageDrawable(circularBitmapDrawable);
-						}
-					});
-		} else {
-			profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
-		}
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
@@ -219,6 +211,27 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			fab.setVisibility(View.VISIBLE);
 		}
 		presenter.loadChatList();
+		userSession = UserSessionManager.getInstance().load();
+		ImageView profileDp = (ImageView)header.findViewById(R.id.profile_image);
+		if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
+			Logger.d(this, "Setting DP: "+userSession.getProfilePicPath());
+			Context context = this;
+			Glide.with(this)
+					.load(userSession.getProfilePicPath())
+					.asBitmap().centerCrop()
+					.diskCacheStrategy(DiskCacheStrategy.ALL)
+					.into(new BitmapImageViewTarget(profileDp) {
+						@Override
+						protected void setResource(Bitmap resource) {
+							RoundedBitmapDrawable circularBitmapDrawable =
+									RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+							circularBitmapDrawable.setCircular(true);
+							profileDp.setImageDrawable(circularBitmapDrawable);
+						}
+					});
+		} else {
+			profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
+		}
 
 		/*              Analytics           */
 		firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
@@ -229,11 +242,103 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onPause();
 	}
 
+	public void showAddContactPopup() {
+		LinearLayout parent = new LinearLayout(this);
+
+		parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+		parent.setOrientation(LinearLayout.VERTICAL);
+		parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(8), (int)AndroidUtils.px(24), 0);
+
+		EditText editText = new EditText(this);
+		ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		editText.setLayoutParams(lparams);
+		editText.setHint(getResources().getString(R.string.add_contact_hint));
+		editText.setHintTextColor(Color.parseColor("#9E9E9E"));
+		parent.addView(editText);
+
+		TextView tv = new TextView(this);
+		tv.setText(getResources().getString(R.string.add_contact_subtitle));
+		tv.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+		tv.setTextSize(12);
+		parent.addView(tv);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Add a contact");
+
+		builder.setPositiveButton("ADD", ((dialog, which) -> {
+//            dialog.dismiss();
+			if(editText.getText().length()>=1) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+				progressDialog[0] = ProgressDialog.show(HomeActivity.this, "", "Loading. Please wait...", true);
+				presenter.addContact(editText.getText().toString());
+
+                /*              Analytics           */
+				Bundle bundle = new Bundle();
+				bundle.putString(AnalyticsContants.Param.OTHER_USER_ID, editText.getText().toString());
+				firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_POPUP, bundle);
+			}
+		}));
+		builder.setView(parent);
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+
+		editText.requestFocus();
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+	}
+
+
+	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
+		AndroidUtils.hideSoftInput(this);
+
+		if(progressDialog[0].isShowing()) {
+			progressDialog[0].dismiss();
+		}
+
+		String message;
+		if(isExistingContact) {
+			message = "<b>" + name + "</b> is already in your contacts on iChat.";
+		} else {
+			message = "<b>" + name + "</b> is added to your contacts on iChat.";
+
+            /*              Analytics           */
+			Bundle bundle = new Bundle();
+			bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, username);
+			firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_SUCCESS, bundle);
+		}
+
+		AlertDialog alertDialog = new AlertDialog.Builder(HomeActivity.this).create();
+		alertDialog.setMessage(Html.fromHtml(message));
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+		alertDialog.show();
+
+		presenter.loadChatList();
+	}
+
+	@Override
+	public void showInvalidIDError() {
+		AndroidUtils.hideSoftInput(this);
+
+		if(progressDialog[0].isShowing()) {
+			progressDialog[0].dismiss();
+		}
+//        showMessageAlertDialog("Please enter a valid iChat ID.");
+
+		AlertDialog alertDialog = new AlertDialog.Builder(HomeActivity.this).create();
+		alertDialog.setMessage("Please enter a valid iChat ID.");
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+		alertDialog.show();
+
+        /*              Analytics           */
+		firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_CONTACT_FAILURE, null);
+	}
+
 	@Override
 	public void showUpdate(int versionCode, String versionName, boolean isMandatory) {
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setTitle("");
-		alertDialog.setMessage("\n"+"A new version of iChat is available. Please update to the latest version.");
+		alertDialog.setTitle("Update Available");
+		alertDialog.setMessage("New version contains improvements and bug fixes.\nPlease update to version "+versionName+".");
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "UPDATE", (dialog, which) -> {
 			final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
 			try {
@@ -261,7 +366,19 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@OnClick(R.id.nav_item_faq)
-	public void onNavigationFAQClicked() {}
+	public void onNavigationFAQClicked() {
+		startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq"));
+		drawer.closeDrawer(GravityCompat.START, true);
+	}
+
+	@OnClick(R.id.nav_item_add_contact)
+	public void onAddContactClicked() {
+		final Handler handler = new Handler();
+		handler.postDelayed(this::showAddContactPopup, 250);
+		drawer.closeDrawer(GravityCompat.START, true);
+		/*    Analytics    */
+		firebaseAnalytics.logEvent(AnalyticsContants.Event.HOME_ADD_CONTACT, null);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -315,11 +432,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			chatListAdapter.setChatState(from, "Typing...");
 			final Handler handler = new Handler();
 			handler.postDelayed(() -> chatListAdapter.resetChatState(from), 10000);
-		} else if(chatState == ChatState.gone || chatState == ChatState.inactive){
+		} else if(chatState == ChatState.gone || chatState == ChatState.inactive) {
 			Logger.d(this, "ChatState: "+chatState.name());
 			chatListAdapter.resetChatState(from);
 		}
-
 	}
 
 	@Override
@@ -336,7 +452,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onChatItemClicked(String userName) {
-
 		/*              Analytics           */
 		Bundle bundle = new Bundle();
 		bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, userName);
@@ -380,7 +495,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	public void onMessageReceived(MessageResult messageResult, ContactResult from) {
 		Logger.d(this, "MessageReceived");
 		messageResult.setName(from.getContactName());
-		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), messageResult.getMessageStatus(), messageResult.getReceiptId(), 1);
+		ChatItem item = new ChatItem(messageResult.getChatId(), messageResult.getName(), messageResult.getMessage(), messageResult.getTime(), messageResult.getMessageStatus(), messageResult.getReceiptId(), messageResult.getMessageId(), 1);
 		item.setProfileDP(from.getProfileDP());
 		this.chats = chatListAdapter.newChatMessage(item);
 		chatList.scrollToPosition(0);
@@ -388,10 +503,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	}
 
 	@Override
-	public void onMessageStatusReceived(String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
-		super.onMessageStatusReceived(chatId, deliveryReceiptId, messageStatus);
+	public void onMessageStatusReceived(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
+		super.onMessageStatusReceived(messageId, chatId, deliveryReceiptId, messageStatus);
 
-		chatListAdapter.updateDeliveryStatus(deliveryReceiptId, messageStatus);
+		chatListAdapter.updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus);
 	}
 
 	@Override

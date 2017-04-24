@@ -1,18 +1,24 @@
 package com.chat.ichat.screens.message;
 
 import com.chat.ichat.MessageController;
+import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.PersistentMenu;
+import com.chat.ichat.api.user.UserApi;
+import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -31,27 +37,30 @@ public class MessagePresenter implements MessageContract.Presenter {
     private MessageController messageController;
     private ContactStore contactStore;
     private BotDetailsStore botDetailsStore;
+    private UserApi userApi;
+    private AddContactUseCase addContactUseCase;
 
     private SendMessageUseCase sendMessageUseCase;
     private SendReadReceiptUseCase sendReadReceiptUseCase;
 
-    public MessagePresenter(MessageStore messageStore, MessageController messageController, BotDetailsStore botDetailsStore, ContactStore contactStore) {
+    public MessagePresenter(MessageStore messageStore, MessageController messageController, BotDetailsStore botDetailsStore, ContactStore contactStore, UserApi userApi,  BotApi botApi) {
         this.messageController = messageController;
         this.messageStore = messageStore;
         this.botDetailsStore = botDetailsStore;
         this.contactStore = contactStore;
-
+        this.userApi = userApi;
+        this.addContactUseCase = new AddContactUseCase(userApi, contactStore, botApi, botDetailsStore);
         sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
         sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
         this.compositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void addContact(String username) {
+    public void addContact(String userId) {
         ContactResult contactResult = new ContactResult();
-        contactResult.setUsername(username);
+        contactResult.setUserId(userId);
         contactResult.setAdded(true);
-        Subscription subscription = contactStore.update(contactResult)
+        Subscription subscription = addContactUseCase.execute(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResult>() {
@@ -62,35 +71,66 @@ public class MessagePresenter implements MessageContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        e.printStackTrace();
+                        ApiError error = new ApiError(e);
+                        messageView.showError(error.getTitle(), error.getMessage());
                     }
 
                     @Override
                     public void onNext(ContactResult contactResult) {
-                        messageView.showContactAddedSuccess();
+                        if(contactResult == null) {
+                            messageView.showError("Error", "There was an error adding this contact.");
+                        } else {
+                            messageView.showContactAddedSuccess();
+                        }
                     }
                 });
         compositeSubscription.add(subscription);
     }
 
     @Override
-    public void blockContact(String username) {
+    public void blockContact(String userId, boolean shouldBlock) {
         ContactResult contactResult = new ContactResult();
-        contactResult.setUsername(username);
-        contactResult.setBlocked(true);
-        Subscription subscription = contactStore.update(contactResult)
+        contactResult.setUserId(userId);
+        contactResult.setBlocked(shouldBlock);
+        Observable<UserResponse> a;
+        if(shouldBlock) {
+            a = userApi.blockContact(userId);
+        } else {
+            a = userApi.unblockContact(userId);
+        }
+        Subscription subscription = a
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ContactResult>() {
+                .subscribe(new Subscriber<UserResponse>() {
                     @Override
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        ApiError error = new ApiError(e);
+                        messageView.showError(error.getTitle(), error.getMessage());
+                    }
 
                     @Override
-                    public void onNext(ContactResult contactResult) {
-                        messageView.showContactBlockedSuccess();
+                    public void onNext(UserResponse userResponse) {
+                        contactResult.setBlocked(shouldBlock);
+                        contactStore.update(contactResult)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<ContactResult>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {}
+
+                                    @Override
+                                    public void onNext(ContactResult contactResult) {
+                                        messageView.showContactBlockedSuccess(shouldBlock);
+                                    }
+                                });
                     }
                 });
         compositeSubscription.add(subscription);
@@ -215,7 +255,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 
                                     @Override
                                     public void onNext(MessageResult messageResult) {
-                                        messageView.updateDeliveryStatus(messageResult);
+                                        messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
                                     }
                                 });
                     }

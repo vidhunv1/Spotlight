@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.chat.ichat.MessageController;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.ForegroundDetector;
 import com.chat.ichat.R;
@@ -109,6 +110,7 @@ public class NotificationController {
                             contactResult1.setBlocked(false);
                             contactResult1.setUserType(userResponse.getUser().getUserType());
                             contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
+                            MessageController.getInstance().getLastActivity(contactResult1.getUsername());
 
                             Roster roster = Roster.getInstanceFor(XMPPManager.getInstance().getConnection());
                             if (!roster.isLoaded()) {

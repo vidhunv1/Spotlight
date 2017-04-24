@@ -125,6 +125,7 @@ public class ContactResult implements Serializable {
                 ", isAdded=" + isAdded +
                 ", isBlocked=" + isBlocked +
                 ", userId='" + userId + '\'' +
+                ", profileDP='" + profileDP + '\'' +
                 ", userType=" + userType +
                 '}';
     }

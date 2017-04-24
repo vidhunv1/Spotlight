@@ -1,6 +1,8 @@
 package com.chat.ichat.screens.user_profile;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -14,6 +16,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +28,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.api.user.UserApi;
+import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.home.HomeActivity;
+import com.chat.ichat.screens.message.MessageActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
@@ -41,7 +53,9 @@ import org.joda.time.DateTime;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -64,25 +78,30 @@ public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.profile_presence)
     TextView presenceView;
 
+    private Menu menu;
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
     private static int RESULT_LOAD_IMAGE = 1;
     private String username;
     private String contactName;
     private String userId;
     private String contactProfileDP;
+    private boolean isBlocked;
 
     private static String KEY_USER_NAME = "UserProfileActivity.USER_NAME";
     private static String KEY_CONTACT_NAME = "UserProfileActivity.CONTACT_NAME";
     private static String KEY_CONTACT_USER_ID = "UserProfileActivity.USER_ID";
+    private static String KEY_CONTACT_BLOCKED = "UserProfileActivity.BLOCKED";
     private static String KEY_PROFILE_DP = "UserProfileActivity.KEY_PROFILE_DP";
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "user_profile";
-    public static Intent callingIntent(Context context, String username, String userid, String contactName, String contactDP) {
+    public static Intent callingIntent(Context context, String username, String userid, String contactName, boolean isBlocked, String contactDP) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(KEY_USER_NAME, username);
         intent.putExtra(KEY_CONTACT_NAME, contactName);
         intent.putExtra(KEY_CONTACT_USER_ID, userid);
+        intent.putExtra(KEY_CONTACT_BLOCKED, isBlocked);
         intent.putExtra(KEY_PROFILE_DP, contactDP);
         return intent;
     }
@@ -100,6 +119,7 @@ public class UserProfileActivity extends BaseActivity {
         contactName = receivedIntent.getStringExtra(KEY_CONTACT_NAME);
         userId = receivedIntent.getStringExtra(KEY_CONTACT_USER_ID);
         contactProfileDP = receivedIntent.getStringExtra(KEY_PROFILE_DP);
+        isBlocked = receivedIntent.getBooleanExtra(KEY_CONTACT_BLOCKED, false);
 
         contactNameView.setText(contactName);
         userIdView.setText(userId);
@@ -161,11 +181,100 @@ public class UserProfileActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.user_profile_toolbar, menu);
-
+        menu.findItem(R.id.action_block_contact);
+        if(isBlocked) {
+            menu.findItem(R.id.action_block_contact).setTitle("Unblock");
+        } else {
+            menu.findItem(R.id.action_block_contact).setTitle("Block");
+        }
         return true;
     }
 
+    public void blockUnblockContact(boolean shouldBlock) {
+        ContactResult contactResult = new ContactResult();
+        contactResult.setUserId(userId);
+        contactResult.setBlocked(shouldBlock);
+        Activity activity = UserProfileActivity.this;
+        ApiManager.getUserApi().blockContact(userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<UserResponse>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(UserResponse userResponse) {
+                        Observable<UserResponse> a;
+                        if(shouldBlock) {
+                            a = ApiManager.getUserApi().blockContact(userId);
+                        } else {
+                            a = ApiManager.getUserApi().unblockContact(userId);
+                        }
+                        a.subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<UserResponse>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        ApiError error = new ApiError(e);
+                                        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(activity).create();
+                                        alertDialog.setTitle(error.getTitle());
+                                        alertDialog.setMessage("\n"+error.getMessage());
+                                        alertDialog.setButton(android.app.AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+                                        alertDialog.show();
+                                    }
+
+                                    @Override
+                                    public void onNext(UserResponse userResponse) {
+                                        contactResult.setBlocked(shouldBlock);
+                                        ContactStore.getInstance().update(contactResult)
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Subscriber<ContactResult>() {
+                                                    @Override
+                                                    public void onCompleted() {}
+
+                                                    @Override
+                                                    public void onError(Throwable e) {}
+
+                                                    @Override
+                                                    public void onNext(ContactResult contactResult) {
+                                                        if(progressDialog[0].isShowing()) {
+                                                            progressDialog[0].dismiss();
+                                                        }
+                                                        String message;
+                                                        if(shouldBlock) {
+                                                            message = "This contact has been blocked.";
+                                                            menu.findItem(R.id.action_block_contact).setTitle("Unblock");
+                                                        }
+                                                        else {
+                                                            message = "This contact has been unblocked.";
+                                                            menu.findItem(R.id.action_block_contact).setTitle("Block");
+                                                        }
+                                                        isBlocked = !isBlocked;
+
+                                                        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(activity).create();
+                                                        alertDialog.setMessage(Html.fromHtml(message));
+                                                        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+                                                        alertDialog.show();
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
+
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -193,7 +302,10 @@ public class UserProfileActivity extends BaseActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getResources().getString(R.string.app_name));
-            builder.setPositiveButton("OK", ((dialog, which) -> {}));
+            builder.setPositiveButton("OK", ((dialog, which) -> {
+                blockUnblockContact(!isBlocked);
+                progressDialog[0] = ProgressDialog.show(UserProfileActivity.this, "", "Please wait a moment", true);
+            }));
             builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
             builder.setView(parent);
             AlertDialog alertDialog = builder.create();
@@ -219,7 +331,9 @@ public class UserProfileActivity extends BaseActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getResources().getString(R.string.app_name));
-            builder.setPositiveButton("OK", ((dialog, which) -> {}));
+            builder.setPositiveButton("OK", ((dialog, which) -> {
+                delete(username);
+            }));
             builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
             builder.setView(parent);
             AlertDialog alertDialog = builder.create();
@@ -340,6 +454,28 @@ public class UserProfileActivity extends BaseActivity {
                 presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
             }
         }
+    }
+
+    public void delete(String username) {
+        Activity activity = this;
+        MessageStore.getInstance().deleteChat(username)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        startActivity(HomeActivity.callingIntent(activity, 0, null));
+                    }
+                });
     }
 
     //    @OnClick(R.id.iv_userprofile_dp)

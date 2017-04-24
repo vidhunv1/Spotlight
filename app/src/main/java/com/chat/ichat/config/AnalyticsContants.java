@@ -11,6 +11,7 @@ public class AnalyticsContants {
         public static final String ADD_CONTACT_SUCCESS = "add_contact_success";
         public static final String ADD_CONTACT_FAILURE = "add_contact_failure";
         public static final String MAIN_ADD_CONTACT = "main_add_contact";
+        public static final String HOME_ADD_CONTACT = "home_add_contact";
         public static final String OTHER_ADD_CONTACT = "other_add_contact";
         public static final String SEARCH = "search";
         public static final String SEND_MESSAGE = "send_message";
@@ -33,9 +34,6 @@ public class AnalyticsContants {
         public static final String EDIT_NAME = "edit_name";
         public static final String OPEN_DRAWER_MENU = "open_drawer_menu";
         public static final String RECEIVE_MESSAGE = "receive_message";
-        public static final String RECEIVE_MESSAGE_STATUS = "receive_message_status";
-        public static final String RECEIVE_PRESENCE = "receive_presence";
-        public static final String RECEIVE_CHAT_STATE = "receive_chat_state";
         public static final String CLICK_BOT_MENU = "click_bot_menu";
         public static final String KEYBOARD_TYPE = "keyboard_type";
         public static final String SMILEY_SELECTED = "smiley_selected";

@@ -134,7 +134,18 @@ public class MessageResult implements Serializable {
 
     @Override
     public String toString() {
-        return "Message: "+message+", DS: "+messageStatus+", from: "+fromId+", chatId: "+chatId+", messageId: "+messageId+", time"+getTime();
+        return "MessageResult{" +
+                "message='" + message + '\'' +
+                ", chatId='" + chatId + '\'' +
+                ", fromId='" + fromId + '\'' +
+                ", messageStatus=" + messageStatus +
+                ", messageId='" + messageId + '\'' +
+                ", receiptId='" + receiptId + '\'' +
+                ", isReceiptSent=" + isReceiptSent +
+                ", time=" + time +
+                ", name='" + name + '\'' +
+                ", unSeenCount=" + unSeenCount +
+                '}';
     }
 
     @Override
