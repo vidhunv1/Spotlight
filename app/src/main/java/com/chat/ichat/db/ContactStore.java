@@ -93,7 +93,7 @@ public class ContactStore {
             };
 
             try {
-                Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME+" ASC");
+                Cursor cursor = db.query(SQLiteContract.ContactsContract.TABLE_NAME, columns, selection, selectionArgs, null, null, SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME+" COLLATE NOCASE ASC");
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {

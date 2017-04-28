@@ -105,12 +105,3 @@ public class ApiManager {
         instance = null;
     }
 }
-
-//    public Observable<UserResponse> uploadProfileDP(File imageFile, String fileName, String authToken) {
-//        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile);
-//        MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("profile_dp", fileName, requestBody);
-//
-//        UserEndpoint userEndpoint = ApiManager.getInstance(authToken).create(UserEndpoint.class);
-//        Observable<UserResponse> profileDp = userEndpoint.uploadProfileDP(imageFileBody);
-//        return profileDp;
-//    }
