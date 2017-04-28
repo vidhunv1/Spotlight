@@ -5,10 +5,13 @@ import android.content.SharedPreferences;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserRequest;
 import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.api.user.VerifyRequest;
 import com.chat.ichat.api.user._User;
+import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.db.core.DatabaseManager;
 import com.chat.ichat.models.UserSession;
 
@@ -19,7 +22,6 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.chat.ichat.core.FCMRegistrationIntentService.FCM_TOKEN;
-
 /**
  * Created by vidhun on 08/03/17.
  */
@@ -40,7 +42,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     }
 
     @Override
-    public void registerUser(String fullName, String email, String password, String countryCode, String mobile, String imei, String carrierName) {
+    public void registerUser(String fullName, String email, String password, String countryCode, String mobile, String imei) {
         UserRequest request = new UserRequest();
         _User user = new _User();
         user.setName(fullName);
@@ -50,7 +52,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         user.setPhone(mobile);
         user.setUserType(_User.UserType.regular);
         user.setIMEI(imei);
-        user.setMobileCarrier(carrierName);
         user.setNotificationToken(defaultSP.getString(FCM_TOKEN, ""));
         request.setUser(user);
 
@@ -76,14 +77,42 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                             userSession.setName(userResponse.getUser().getName());
                             userSession.setEmail(userResponse.getUser().getEmail());
                             userSessionManager.save(userSession);
-                            ApiManager.getInstance().setAuthorization(userSession.getAccessToken());
+                            SpotlightApplication.getContext().initSession();
 
                             DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
-                            signUpView.navigateToSetUserID();
+                            if(userResponse.isOtpSent()) {
+                                signUpView.showVerifyingOtp(userResponse.getVerificationUuid());
+                            } else {
+                                signUpView.navigateToSetUserID();
+                            }
                         }
                     }
                 });
+        subscriptions.add(subscription);
+    }
 
+    @Override
+    public void verifyOTP(String countryCode, String phone, String verificationCode, String verificationUUID) {
+        VerifyRequest verifyRequest = new VerifyRequest(countryCode, phone, verificationCode, verificationUUID);
+        Subscription subscription = userApi.verifyUser(verifyRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<StatusResponse>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(StatusResponse statusResponse) {
+                        signUpView.navigateToSetUserID();
+                    }
+                });
         subscriptions.add(subscription);
     }
 

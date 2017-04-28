@@ -20,8 +20,8 @@ public interface UserApi {
     @POST("users")
     Observable<UserResponse> createUser(@Body UserRequest userRequest);
 
-//    @POST("users/verify")
-//    Observable<UserResponse> verifyUser(@Body UserRequest userRequest);
+    @POST("users/verify")
+    Observable<StatusResponse> verifyUser(@Body VerifyRequest userRequest);
 
     @PUT("users")
     Observable<UserResponse> updateUser(@Body UserRequest userRequest);
@@ -44,6 +44,9 @@ public interface UserApi {
 
     @GET("contacts/unblock/{user_id}")
     Observable<UserResponse> unblockContact(@Path("user_id") String userId);
+
+    @GET("contacts/get")
+    Observable<ContactResponse> getContacts();
 
     @GET("users/logout")
     Observable<StatusResponse> logout();

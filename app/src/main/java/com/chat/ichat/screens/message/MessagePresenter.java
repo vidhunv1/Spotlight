@@ -193,11 +193,13 @@ public class MessagePresenter implements MessageContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
+                        e.printStackTrace();
                         messageView.setKeyboardType(false);
                     }
 
                     @Override
                     public void onNext(List<PersistentMenu> persistentMenus) {
+                        Logger.d(this, "PM "+persistentMenus.toString());
                         if(persistentMenus!=null && !persistentMenus.isEmpty()) {
                             messageView.setKeyboardType(true);
                             messageView.initBotMenu(persistentMenus);

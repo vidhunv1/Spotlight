@@ -83,13 +83,11 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         presenter = new SetUserIdPresenter(ApiManager.getUserApi(),
-                ApiManager.getAppApi(),
                 UserSessionManager.getInstance(),
-                ApiManager.getContactsApi(),
+                ApiManager.getPhoneContactsApi(),
                 new ContactsContent(this),
                 new ContactStore());
 
-        Context context = this;
         ApiManager.getUserApi().findUserByUserId("teamichat")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -101,8 +99,6 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
 
                     @Override
                     public void onError(Throwable e) {
-                        startActivity(HomeActivity.callingIntent(context,0,null));
-                        finish();
                     }
 
                     @Override

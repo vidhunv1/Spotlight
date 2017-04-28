@@ -1,11 +1,13 @@
 package com.chat.ichat.screens.user_id;
 
+import com.chat.ichat.MessageController;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.app.AppApi;
-import com.chat.ichat.api.contacts.ContactRequest;
-import com.chat.ichat.api.contacts.ContactsApi;
-import com.chat.ichat.api.contacts._Contact;
+import com.chat.ichat.api.phone_contacts.PhoneContactRequest;
+import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
+import com.chat.ichat.api.phone_contacts._PhoneContact;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserRequest;
 import com.chat.ichat.api.user.UserResponse;
@@ -35,15 +37,13 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
     private CompositeSubscription subscriptions;
 
     private UserApi userApi;
-    private AppApi appApi;
     private UserSessionManager userSessionManager;
-    private ContactsApi contactApi;
+    private PhoneContactsApi contactApi;
     private ContactsContent contactContent;
     private ContactStore appContactStore;
 
-    public SetUserIdPresenter(UserApi userApi, AppApi appApi, UserSessionManager userSessionManager, ContactsApi contactApi, ContactsContent contactContent, ContactStore appContactStore) {
+    public SetUserIdPresenter(UserApi userApi, UserSessionManager userSessionManager, PhoneContactsApi contactApi, ContactsContent contactContent, ContactStore appContactStore) {
         this.userApi = userApi;
-        this.appApi = appApi;
         this.contactApi = contactApi;
         this.contactContent = contactContent;
         this.appContactStore = appContactStore;
@@ -85,6 +85,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
 
     @Override
     public void setUserId(String userId) {
+        this.userApi = ApiManager.getUserApi();
         UserRequest request = new UserRequest();
         _User user = new _User();
         user.setUserId(userId);
@@ -100,6 +101,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                     @Override
                     public void onError(Throwable e) {
                         ApiError error = new ApiError(e);
+                        e.printStackTrace();
                         setUserIdView.showError(error.getTitle(), error.getMessage());
                     }
 
@@ -116,7 +118,6 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                             userSession.setUserId(userResponse.getUser().getUserId());
                             userSession.setUserName(userResponse.getUser().getUsername());
                             userSessionManager.save(userSession);
-                            SpotlightApplication.getContext().initSession();
 
                             setUserIdView.onSetUserIdSuccess();
                         }
@@ -138,19 +139,23 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
 
                     @Override
                     public void onNext(List<ContactResult> contactResults) {
-                        contactApi.createContacts(new ContactRequest(contactResults))
+                        contactApi.createContacts(new PhoneContactRequest(contactResults))
                                 .map(contactResponse -> {
                                     List<ContactResult>  contacts = new ArrayList<>(contactResponse.getContacts().size());
                                     Logger.d(this,contactResponse.getContacts().size()+"");
-                                    for (_Contact contact : contactResponse.getContacts()) {
+                                    for (_PhoneContact contact : contactResponse.getContacts()) {
                                         Logger.d(this, contact.toString());
                                         ContactResult contactResult = new ContactResult(contact.getCountryCode(), contact.getPhone(), contact.getName());
                                         contactResult.setUsername(contact.getUsername());
                                         contactResult.setUserId(contact.getUserId());
 
                                         // default behaviour, we auto add phone contacts
-                                        if(contact.isRegistered())
+                                        if(contact.isRegistered()) {
                                             contacts.add(contactResult);
+                                            MessageController.getInstance().getLastActivity(contactResult.getUsername());
+
+                                            Logger.d(this, "Registered_ContactResult: "+contactResult.toString());
+                                        }
                                     }
                                     return contacts; })
                                 .subscribeOn(Schedulers.io())

@@ -107,7 +107,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if(showSoftInput) {
             toolbarSearch.setVisibility(View.VISIBLE);
             toolbarTitle.setVisibility(View.GONE);
-            AndroidUtils.showSoftInput(this, toolbarSearch);
+//            AndroidUtils.showSoftInput(this, toolbarSearch);
         } else {
             AndroidUtils.hideSoftInput(this);
             toolbarSearch.setVisibility(View.GONE);

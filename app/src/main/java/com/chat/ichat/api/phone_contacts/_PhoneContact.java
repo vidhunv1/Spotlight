@@ -1,4 +1,4 @@
-package com.chat.ichat.api.contacts;
+package com.chat.ichat.api.phone_contacts;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by vidhun on 31/01/17.
  */
-public class _Contact {
+public class _PhoneContact {
     @SerializedName("phone")
     @Expose
     private String phone;
@@ -24,11 +24,29 @@ public class _Contact {
     private String userId;
     @SerializedName("id")
     private String id;
+    @SerializedName("profile_dp")
+    private String profileDP;
 
-    public _Contact(String phone, String countryCode, String name) {
+    public _PhoneContact(String phone, String countryCode, String name) {
         this.phone = phone;
         this.countryCode = countryCode;
         this.name = name;
+    }
+
+    public String getIsRegistered() {
+        return isRegistered;
+    }
+
+    public void setIsRegistered(String isRegistered) {
+        this.isRegistered = isRegistered;
+    }
+
+    public String getProfileDP() {
+        return profileDP;
+    }
+
+    public void setProfileDP(String profileDP) {
+        this.profileDP = profileDP;
     }
 
     public String getUserId() {

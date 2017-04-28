@@ -4,14 +4,21 @@ import android.content.SharedPreferences;
 
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.api.user.ContactResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserRequest;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
 import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.core.DatabaseManager;
+import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.UserSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -30,11 +37,13 @@ public class LoginPresenter implements LoginContract.Presenter {
     private CompositeSubscription subscriptions;
 
     private UserApi userApi;
+    private ContactStore contactStore;
     private UserSessionManager userSessionManager;
     private SharedPreferences defaultSP;
 
-    public LoginPresenter(UserApi userApi, UserSessionManager userSessionManager, SharedPreferences defaultSP) {
+    public LoginPresenter(UserApi userApi, UserSessionManager userSessionManager, SharedPreferences defaultSP, ContactStore contactStore) {
         this.userApi = userApi;
+        this.contactStore = contactStore;
         this.userSessionManager = userSessionManager;
         this.defaultSP = defaultSP;
         subscriptions = new CompositeSubscription();
@@ -79,16 +88,70 @@ public class LoginPresenter implements LoginContract.Presenter {
                             }
                             UserSession userSession = new UserSession(userResponse.getAccessToken(), userResponse.getUser().getUsername(), userResponse.getExpires(), userResponse.getUser().getName(), userResponse.getUser().getEmail(), password);
                             userSession.setUserId(userResponse.getUser().getUserId());
+                            userSession.setProfilePicPath(userResponse.getUser().getProfileDP());
                             userSessionManager.save(userSession);
 
                             SpotlightApplication.getContext().initSession();
 
+
                             if (userResponse.getUser().getUserId() == null) {
                                 loginView.navigateToSetUserId();
                             } else {
-                                loginView.navigateToHome();
+                                loginView.setInitializing();
                             }
                         }
+                    }
+                });
+        subscriptions.add(subscription);
+    }
+
+    @Override
+    public void fetchContacts() {
+        Subscription subscription = ApiManager.getUserApi().getContacts()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ContactResponse>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        loginView.navigateToHome();
+                    }
+
+                    @Override
+                    public void onNext(ContactResponse contactResponse) {
+                        Logger.d(this, "CONTATCTS");
+                        List<ContactResult> contactResults = new ArrayList<>();
+                        for (_User user : contactResponse.getUser()) {
+                            Logger.d(this, user.toString());
+                            ContactResult c = new ContactResult();
+                            c.setUsername(user.getUsername());
+                            c.setUserId(user.getUserId());
+                            c.setProfileDP(user.getProfileDP());
+                            c.setContactName(user.getName());
+                            c.setUserType(user.getUserType());
+                            c.setAdded(true);
+
+                            contactResults.add(c);
+                        }
+                        contactStore.storeContacts(contactResults)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<Boolean>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        loginView.navigateToHome();
+                                    }
+
+                                    @Override
+                                    public void onNext(Boolean aBoolean) {
+                                        loginView.navigateToHome();
+                                    }
+                                });
                     }
                 });
         subscriptions.add(subscription);

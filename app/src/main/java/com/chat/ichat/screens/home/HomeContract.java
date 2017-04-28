@@ -27,6 +27,7 @@ public interface HomeContract {
         void removeChatItem(String chatId);
         void showContactAddedSuccess(String contactName, String username, boolean isExistingContact);
         void showInvalidIDError();
+        void onSyncSuccess();
     }
 
     interface Presenter extends BasePresenter<HomeContract.View> {
@@ -34,5 +35,6 @@ public interface HomeContract {
         void init(int currentVersionCode);
         void deleteChat(String chatId);
         void addContact(String userId);
+        void performSync();
     }
 }

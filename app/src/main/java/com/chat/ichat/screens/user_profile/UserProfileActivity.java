@@ -132,7 +132,7 @@ public class UserProfileActivity extends BaseActivity {
             Logger.d(this, "Setting DP: "+contactProfileDP);
             Context context = this;
             Glide.with(this)
-                    .load(contactProfileDP)
+                    .load(contactProfileDP.replace("https://", "http://"))
                     .asBitmap().centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(ImageUtils.getDefaultProfileImage(contactName, username, 25.5))
@@ -477,34 +477,4 @@ public class UserProfileActivity extends BaseActivity {
                     }
                 });
     }
-
-    //    @OnClick(R.id.iv_userprofile_dp)
-//    public void onProfileClicked() {
-//        Logger.d(this, "Profile clicked");
-//        Intent loadIntent = new Intent(Intent.ACTION_PICK,
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//
-//        startActivityForResult(loadIntent, RESULT_LOAD_IMAGE);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//            Uri selectedImage = data.getData();
-//            Logger.d(this, selectedImage.toString());
-//            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//
-//            Cursor cursor = getContentResolver().query(selectedImage,
-//                    filePathColumn, null, null, null);
-//            cursor.moveToFirst();
-//
-//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//            String picturePath = cursor.getString(columnIndex);
-//            cursor.close();
-//
-//            profileDP.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-//        }
-//    }
 }

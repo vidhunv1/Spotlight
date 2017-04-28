@@ -28,6 +28,12 @@ public class UserResponse {
     @SerializedName("access_token")
     @Expose
     private String accessToken;
+    @SerializedName("is_otp_sent")
+    @Expose
+    private boolean isOtpSent;
+    @Expose
+    @SerializedName("verification_uuid")
+    private String verificationUuid;
 
     public ErrorResponse getError() {
         return error;
@@ -39,6 +45,14 @@ public class UserResponse {
 
     public _User getUser() {
         return user;
+    }
+
+    public boolean isOtpSent() {
+        return isOtpSent;
+    }
+
+    public String getVerificationUuid() {
+        return verificationUuid;
     }
 
     public void setUser(_User user) {

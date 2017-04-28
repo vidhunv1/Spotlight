@@ -1,15 +1,21 @@
 package com.chat.ichat.screens.settings;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.FCMRegistrationIntentService;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.models.UserSession;
+import com.chat.ichat.screens.home.HomeActivity;
+
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -64,7 +70,10 @@ public class SettingsPresenter implements SettingsContract.Presenter {
                             settingsView.showError(response.getError().getTitle(), response.getError().getMessage());
                         } else {
                             userSessionManager.clear();
+                            ApiManager.reset();
                             sharedPreferences.edit().putBoolean(FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER, false).apply();
+                            SharedPreferences sp = SpotlightApplication.getContext().getSharedPreferences(HomeActivity.APP_PREFS_FILE, Context.MODE_PRIVATE);
+                            sp.edit().putLong(HomeActivity.KEY_LAST_SYNC, -1).apply();
                             settingsView.onLogoutSuccess();
                         }
                     }

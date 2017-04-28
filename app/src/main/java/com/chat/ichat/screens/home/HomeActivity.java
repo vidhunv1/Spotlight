@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -38,10 +39,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
@@ -67,14 +70,21 @@ import com.chat.ichat.screens.search.SearchActivity;
 import com.chat.ichat.screens.settings.SettingsActivity;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
+import org.joda.time.DateTime;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import swarajsaaj.smscodereader.interfaces.OTPListener;
+import swarajsaaj.smscodereader.receivers.OtpReader;
 
-public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener {
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
+
+public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener{
 	@Bind(R.id.fab)
 	FloatingActionButton fab;
 
@@ -111,6 +121,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	private FirebaseAnalytics firebaseAnalytics;
 	private final String SCREEN_NAME = "home";
+	public static final String APP_PREFS_FILE = "app_prefs";
+	public static final String KEY_LAST_SYNC = "last_sync";
+
+	private SharedPreferences sharedPreferences;
 
 	public static Intent callingIntent(Context context, int entry, String chatUserName) {
 		Intent intent = new Intent(context, HomeActivity.class);
@@ -125,6 +139,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ButterKnife.bind(this);
+		this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(APP_PREFS_FILE, Context.MODE_PRIVATE);
 
 		Intent receivedIntent = getIntent();
 		if(receivedIntent.getIntExtra(KEY_ENTRY, 0) == 1) {
@@ -136,6 +151,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 		this.presenter = new HomePresenter(MessageController.getInstance(), ApiManager.getAppApi(), MessageStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 		userSession = UserSessionManager.getInstance().load();
+		Logger.d(this, "AccessToken: "+userSession.getAccessToken());
 
 		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
 		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
@@ -189,6 +205,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		} catch (PackageManager.NameNotFoundException e) {
 		}
 		this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+		Long lastSync = sharedPreferences.getLong(KEY_LAST_SYNC, -1);
+		Logger.d(this, "LastSync: "+lastSync);
+		DateTime lastSyncTime =  new DateTime(lastSync);
+		if(lastSync == -1 || lastSyncTime.plusMinutes(15).getMillis() <= DateTime.now().getMillis()) {
+			Logger.d(this, "Syncingg..");
+			presenter.performSync();
+		}
 	}
 
 	@Override
@@ -206,7 +230,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onResume() {
 		super.onResume();
-		NotificationController.getInstance().showNotificationAndAlert(false);
 		if(fab!=null) {
 			fab.setVisibility(View.VISIBLE);
 		}
@@ -220,6 +243,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 					.load(userSession.getProfilePicPath())
 					.asBitmap().centerCrop()
 					.diskCacheStrategy(DiskCacheStrategy.ALL)
+					.placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
 					.into(new BitmapImageViewTarget(profileDp) {
 						@Override
 						protected void setResource(Bitmap resource) {
@@ -523,5 +547,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			fab.setVisibility(View.VISIBLE);
 			super.onBackPressed();
 		}
+	}
+
+	@Override
+	public void onSyncSuccess() {
+		Logger.d(this, "OnSyncSuccess");
+		sharedPreferences.edit().putLong(KEY_LAST_SYNC, DateTime.now().getMillis()).apply();
 	}
 }

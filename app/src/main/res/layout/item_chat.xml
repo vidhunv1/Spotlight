@@ -54,16 +54,6 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="right">
 
-                    <ImageView
-                        android:layout_toLeftOf="@+id/tv_chatItem_time"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginTop="7.25dp"
-                        app:srcCompat="@drawable/ic_delivery_pending"
-                        android:layout_gravity="top"
-                        android:id="@+id/iv_delivery_status" />
-
                     <TextView
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
@@ -87,7 +77,6 @@
                     android:layout_height="wrap_content"
                     android:maxWidth="256dp"
                     android:textSize="16sp"
-                    android:paddingTop="0.5dp"
                     android:maxLines="1"
                     android:textColor="#8f8f8f"
                     android:id="@+id/tv_chatItem_message"
@@ -107,11 +96,21 @@
                         android:layout_marginRight="13.5dp"
                         android:text="11"
                         android:gravity="center"
+                        android:visibility="gone"
                         android:layout_gravity="center_vertical|right"
                         android:textSize="11.25sp"
                         android:textColor="#ffffff"
                         android:maxLines="1"
                         android:background="@drawable/bg_chat_notification" />
+
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="13.5dp"
+                        android:layout_width="12dp"
+                        android:layout_height="21.5dp"
+                        app:srcCompat="@drawable/ic_delivery_pending"
+                        android:layout_gravity="top"
+                        android:id="@+id/iv_delivery_status" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

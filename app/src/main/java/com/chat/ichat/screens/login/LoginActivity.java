@@ -22,6 +22,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
@@ -93,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
+        loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this), ContactStore.getInstance());
         if(UserSessionManager.getInstance().getCacheID()!=null) {
             accountET.setText(UserSessionManager.getInstance().getCacheID());
             accountDivider.setBackgroundColor(Color.parseColor(dividerColor));
@@ -230,6 +231,14 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
         loginPresenter.loginUser(accountET.getText().toString(), passwordET.getText().toString());
         firebaseAnalytics.logEvent(AnalyticsContants.Event.LOGIN_BUTTON_CLICK, null);
+    }
+
+    @Override
+    public void setInitializing() {
+        if(progressDialog[0].isShowing())
+            progressDialog[0].dismiss();
+        progressDialog[0] = ProgressDialog.show(LoginActivity.this, "", "Initializing...", true);
+        loginPresenter.fetchContacts();
     }
 
     private boolean isEmailValid(CharSequence email) {

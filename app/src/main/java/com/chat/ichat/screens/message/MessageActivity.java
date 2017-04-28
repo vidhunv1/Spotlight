@@ -92,7 +92,7 @@ public class MessageActivity extends BaseActivity
 
     EditText messageBox;
 
-    LinearLayout sendButtonView;
+    RelativeLayout sendButtonView;
 
     @Bind(R.id.tb_message)
     Toolbar toolbar;
@@ -391,6 +391,7 @@ public class MessageActivity extends BaseActivity
                     .load(contact.getProfileDP().replace("https://", "http://"))
                     .asBitmap().centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18))
                     .into(new BitmapImageViewTarget(profileImage) {
                         @Override
                         protected void setResource(Bitmap resource) {
@@ -503,7 +504,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void displayMessages(List<MessageResult> messages) {
-        NotificationController.getInstance().updateNotification();
         if(messagesAdapter == null) {
             messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this, this, this);
         }
@@ -515,11 +515,12 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void setKeyboardType(boolean isBotKeyboard) {
+        Logger.d(this, "KeyboardType: "+isBotKeyboard);
         LinearLayout rootLayout = (LinearLayout) findViewById(R.id.ll_keyboard);
         rootLayout.removeViewAt(rootLayout.getChildCount()-1);
         if(isBotKeyboard) {
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
-            sendButtonView = (LinearLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            sendButtonView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
             botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
 
@@ -552,7 +553,7 @@ public class MessageActivity extends BaseActivity
         } else {
             // regular keyboard
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
-            sendButtonView = (LinearLayout) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            sendButtonView = (RelativeLayout) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
             ImageButton emojiButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_message_smiley);
             ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
 

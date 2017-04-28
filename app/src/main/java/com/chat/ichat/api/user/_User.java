@@ -180,5 +180,26 @@ public class _User {
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
     }
+
+    @Override
+    public String toString() {
+        return "_User{" +
+                "phone='" + phone + '\'' +
+                ", countryCode='" + countryCode + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                ", name='" + name + '\'' +
+                ", isRegistered='" + isRegistered + '\'' +
+                ", username='" + username + '\'' +
+                ", phoneFormatted='" + phoneFormatted + '\'' +
+                ", userType=" + userType +
+                ", userId='" + userId + '\'' +
+                ", profileDP='" + profileDP + '\'' +
+                ", notificationToken='" + notificationToken + '\'' +
+                ", imei='" + imei + '\'' +
+                ", mobileCarrier='" + mobileCarrier + '\'' +
+                '}';
+    }
 }
 

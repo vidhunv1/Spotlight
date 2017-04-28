@@ -280,7 +280,10 @@ public class ContactStore {
             values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
             values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
             if(contactResult.getContactName()!=null && !contactResult.getContactName().isEmpty()) {
-                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.isAdded());
+                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
+            }
+            if(contactResult.getProfileDP()!=null && !contactResult.getProfileDP().isEmpty()) {
+                values.put(SQLiteContract.ContactsContract.COLUMN_PROFILE_DP, contactResult.getProfileDP());
             }
             if(contactResult.getUsername()!=null && !contactResult.getUsername().isEmpty()) {
                 db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME + "='" + contactResult.getUsername() + "'", null);

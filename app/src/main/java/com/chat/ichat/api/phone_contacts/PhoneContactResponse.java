@@ -1,4 +1,4 @@
-package com.chat.ichat.api.contacts;
+package com.chat.ichat.api.phone_contacts;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,12 +8,12 @@ import java.util.List;
 /**
  * Created by vidhun on 09/12/16.
  */
-public class ContactResponse {
+public class PhoneContactResponse {
     @SerializedName("data")
     @Expose
-    private List<_Contact> contacts;
+    private List<_PhoneContact> contacts;
 
-    public List<_Contact> getContacts() {
+    public List<_PhoneContact> getContacts() {
         return contacts;
     }
 

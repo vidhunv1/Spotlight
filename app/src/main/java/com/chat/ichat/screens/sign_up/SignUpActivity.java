@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -19,22 +20,26 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -42,8 +47,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
+import swarajsaaj.smscodereader.interfaces.OTPListener;
+import swarajsaaj.smscodereader.receivers.OtpReader;
 
-public class SignUpActivity extends AppCompatActivity implements SignUpContract.View{
+public class SignUpActivity extends AppCompatActivity implements SignUpContract.View, OTPListener {
     @Bind(R.id.tb_sign_up)
     Toolbar toolbar;
 
@@ -53,14 +60,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.sign_up_password)
     EditText passwordET;
 
-    @Bind(R.id.sign_up_email)
-    EditText emailET;
-
     @Bind(R.id.sign_up_mobile_number)
     EditText mobileNumberET;
-
-    @Bind(R.id.sign_up_tilEmail)
-    TextInputLayout emailTIL;
 
     @Bind(R.id.sign_up_tilMobile)
     TextInputLayout mobileTIL;
@@ -77,9 +78,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.sign_up_name_divider)
     View nameDivider;
 
-    @Bind(R.id.sign_up_email_divider)
-    View emailDivider;
-
     @Bind(R.id.sign_up_password_divider)
     View passwordDivider;
 
@@ -89,14 +87,16 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.full_name_error)
     TextView nameErrorView;
 
-    @Bind(R.id.email_error)
-    TextView emailErrorView;
-
     @Bind(R.id.password_error)
     TextView passwordErrorView;
 
     @Bind(R.id.mobile_error)
     TextView mobileErrorView;
+
+    @Bind(R.id.sign_up_country_code)
+    EditText countryCodeView;
+
+    private String accountEmail = "";
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
@@ -104,8 +104,14 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     private String dividerColor = "#c9c9c9";
 
+    private String countryCode;
+    private String mobile;
+    private String verificationUUID;
+
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "signup";
+
+    private boolean isInFront = false;
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
@@ -130,12 +136,28 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
         // Permissions
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            if (!checkIfAlreadyhavePermission()) {
-                requestForSpecificPermission();
-            } else {
-                getEmailAddress();
+            int permission = PackageManager.PERMISSION_GRANTED;
+            int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+            int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+
+            if(!(result1==permission && result2 == permission)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
+            }
+
+        }
+
+        TelephonyManager manager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        //getNetworkCountryIso
+        String CountryID= manager.getSimCountryIso().toUpperCase();
+        String[] rl=this.getResources().getStringArray(R.array.CountryCodes);
+        for(int i=0;i<rl.length;i++){
+            String[] g=rl[i].split(",");
+            if(g[1].trim().equals(CountryID.trim())){
+                countryCodeView.setText("+"+g[0]);
+                break;
             }
         }
+        OtpReader.bind(this,"AUT");
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
@@ -160,9 +182,16 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     protected void onResume() {
         super.onResume();
         signUpPresenter.attachView(this);
+        isInFront = true;
 
-        		/*              Analytics           */
+        /*              Analytics           */
         firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isInFront = false;
     }
 
     @Override
@@ -170,8 +199,25 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        startActivity(SetUserIdActivity.callingIntent(this));
-        finish();
+        if(isInFront) {
+            startActivity(SetUserIdActivity.callingIntent(this));
+            finish();
+        }
+    }
+
+    @Override
+    public void showVerifyingOtp(String verificationUUID) {
+        this.verificationUUID = verificationUUID;
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
+        if(hasReadSMSPermission()) {
+            progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Waiting for OTP. Please wait...", true);
+        } else {
+            navigateToSetUserID();
+        }
+
+        new Handler().postDelayed(this::navigateToSetUserID, 60000);
     }
 
     @Override
@@ -185,27 +231,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         alertDialog.setMessage("\n"+message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-
-        if(message.contains("email")) {
-            emailErrorView.setVisibility(View.VISIBLE);
-            emailErrorView.setText(message);
-            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
-        }
-    }
-
-    @OnTextChanged(R.id.sign_up_email)
-    public void onEmailTextChanged() {
-        emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        emailErrorView.setVisibility(View.INVISIBLE);
-    }
-
-    @OnFocusChange(R.id.sign_up_email)
-    public void onEmailFocusChanged() {
-        if(emailET.isFocused()) {
-            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        } else {
-            emailDivider.setBackgroundColor(Color.parseColor(dividerColor));
-        }
     }
 
     @OnTextChanged(R.id.sign_up_password)
@@ -272,20 +297,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
             return;
         }
-        if(!isEmailValid(emailET.getText())) {
-            AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
-            alertDialog.setTitle("Invalid Email ID");
-            alertDialog.setMessage("\nThis email is invalid.");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
-            alertDialog.show();
-
-            emailET.requestFocus();
-
-            emailErrorView.setVisibility(View.VISIBLE);
-            emailErrorView.setText("Please enter a valid email");
-            emailDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
-            return;
-        }
         if(!isPasswordValid(passwordET.getText())) {
             AlertDialog alertDialog = new AlertDialog.Builder(SignUpActivity.this).create();
             alertDialog.setTitle("Sign-up Failed");
@@ -315,19 +326,20 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             return;
         }
 
-        String imei = "";
-        String carrierName = "";
-        imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-
-        signUpPresenter.registerUser(nameET.getText().toString(), emailET.getText().toString(), passwordET.getText().toString(), "+91", mobileNumberET.getText().toString(), imei, carrierName);
-
-        progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
-
+        if (!hasReadSMSPermission()) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS}, 102);
+        } else {
+            registerUser();
+        }
         firebaseAnalytics.logEvent(AnalyticsContants.Event.SIGNUP_BUTTON_CLICK, null);
     }
 
-    private boolean isEmailValid(CharSequence email) {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    private void registerUser() {
+        String imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        this.mobile = mobileNumberET.getText().toString();
+        this.countryCode = countryCodeView.getText().toString();
+        signUpPresenter.registerUser(nameET.getText().toString(), accountEmail, passwordET.getText().toString(), this.countryCode, this.mobile, imei);
+        progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
     }
 
     private boolean isPasswordValid(CharSequence pass) {
@@ -342,28 +354,24 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         return name.length()>=3;
     }
 
-    private void getEmailAddress() {
+    private String getEmailAddress() {
         Pattern emailPattern = Patterns.EMAIL_ADDRESS;
         Account[] accounts = AccountManager.get(this).getAccounts();
         for (Account account : accounts) {
             if (emailPattern.matcher(account.name).matches()) {
-                String possibleEmail = account.name;
-                emailET.setText(possibleEmail);
-                emailDivider.setBackgroundColor(Color.parseColor(dividerColor));
+                return account.name;
             }
         }
+        return "";
     }
 
-    private boolean checkIfAlreadyhavePermission() {
-        int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
-        int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+    public boolean hasReadSMSPermission() {
         int permission = PackageManager.PERMISSION_GRANTED;
-
-        return result1 == permission && result2 == permission;
-    }
-
-    private void requestForSpecificPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
+        int result3 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
+        int result4 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1)
+            return (result3 == permission && result4 == permission);
+        return true;
     }
 
     @Override
@@ -372,13 +380,41 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             case 101:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
-                    getEmailAddress();
+                    accountEmail = getEmailAddress();
                 } else {
                     //not granted
                 }
                 break;
+            case 102:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    registerUser();
+                } else {
+                    //not granted
+                    registerUser();
+                }
+                break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    public void otpReceived(String messageText) {
+        Logger.d(this, "OTP MESSAGE: "+messageText);
+
+        Pattern pattern = Pattern.compile("(\\d{4,6})");
+
+        Matcher matcher = pattern.matcher(messageText);
+        String val = "";
+        if (matcher.find()) {
+            val = matcher.group(1);
+
+            if(progressDialog[0].isShowing()) {
+                progressDialog[0].dismiss();
+            }
+            progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Verifying OTP...", true);
+            signUpPresenter.verifyOTP(countryCode, mobile, val, verificationUUID);
         }
     }
 }

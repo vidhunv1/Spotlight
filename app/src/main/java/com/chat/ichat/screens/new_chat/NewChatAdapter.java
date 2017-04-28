@@ -58,7 +58,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
         filteredList = new ArrayList<>();
-        this.highlightColor = "#"+"009dff";
+        this.highlightColor = "#0088C0";
         filterQuery = "";
     }
 
@@ -71,7 +71,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 } else {
                     contactItem.setPresence("Last seen recently");
                 }
-            } else if((new DateTime(millis).getSecondOfDay()+3) >= DateTime.now().getSecondOfDay()) {
+            } else if((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
                 contactItem.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
             } else {
                 String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
@@ -276,6 +276,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .load(contactItem.getProfileDP().replace("https://", "http://"))
                         .asBitmap().centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18))
                         .into(new BitmapImageViewTarget(profileImage) {
                             @Override
                             protected void setResource(Bitmap resource) {

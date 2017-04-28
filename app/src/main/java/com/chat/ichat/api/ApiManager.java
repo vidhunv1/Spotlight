@@ -2,7 +2,7 @@ package com.chat.ichat.api;
 
 import com.chat.ichat.api.app.AppApi;
 import com.chat.ichat.api.bot.BotApi;
-import com.chat.ichat.api.contacts.ContactsApi;
+import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.config.AppConfig;
 import com.chat.ichat.core.Logger;
@@ -31,7 +31,7 @@ public class ApiManager {
 
     private Retrofit retrofitClient;
 
-    private ContactsApi contactsApi;
+    private PhoneContactsApi phoneContactsApi;
     private UserApi userApi;
     private BotApi botApi;
     private AppApi appApi;
@@ -68,16 +68,16 @@ public class ApiManager {
                 .build();
 
         //TODO: Ugly. Need to do after access token is available.
-        getInstance().contactsApi = null;
+        getInstance().phoneContactsApi = null;
         getInstance().userApi = null;
         getInstance().botApi = null;
         getInstance().appApi = null;
     }
 
-    public static ContactsApi getContactsApi() {
-        if(getInstance().contactsApi == null)
-            getInstance().contactsApi = getInstance().retrofitClient.create(ContactsApi.class);
-        return getInstance().contactsApi;
+    public static PhoneContactsApi getPhoneContactsApi() {
+        if(getInstance().phoneContactsApi == null)
+            getInstance().phoneContactsApi = getInstance().retrofitClient.create(PhoneContactsApi.class);
+        return getInstance().phoneContactsApi;
     }
 
     public static UserApi getUserApi() {
@@ -99,6 +99,10 @@ public class ApiManager {
             getInstance().appApi = getInstance().retrofitClient.create(AppApi.class);
         }
         return getInstance().appApi;
+    }
+
+    public static void reset() {
+        instance = null;
     }
 }
 

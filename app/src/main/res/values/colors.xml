@@ -2,7 +2,7 @@
 <resources>
 
     <!--App-->
-    <color name="colorPrimary">#0084CC</color>
+    <color name="colorPrimary">#0084c0</color>
     <color name="colorPrimaryDark">#00589b</color>
     <color name="colorPrimaryInactive">#800070e0</color>
     <color name="colorPrimaryLight">#5cb3ff</color>
@@ -12,7 +12,7 @@
     <color name="activeIndicator">#0097FF</color>
 
     <!--chat-->
-    <color name="sendMessageBubble">#0084EE</color>
+    <color name="sendMessageBubble">#0084dd</color>
     <color name="receiveMessageBubble">#eaeaea</color>
     <color name="sendMessageBubblePressed">#0058bb</color>
     <color name="receiveMessageBubblePressed">#BBBBBB</color>
@@ -30,7 +30,7 @@
     <color name="iconPrimary">#ffffff</color>
     <color name="iconSecondary">#B9D6D9</color>
     <color name="drawerIcon">#737373</color>
-    <color name="divider">#E0E0E0</color>
+    <color name="divider">#D9D9D9</color>
 
     <color name="error">#FFFF0000</color>
     <color name="success">#FF25922A</color>

@@ -281,6 +281,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .asBitmap().centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .skipMemoryCache(true)
+                        .placeholder(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18))
                         .into(new BitmapImageViewTarget(profileImage) {
                             @Override
                             protected void setResource(Bitmap resource) {
