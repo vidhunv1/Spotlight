@@ -3,6 +3,7 @@ package com.chat.ichat.screens.login;
 import android.content.SharedPreferences;
 
 import com.chat.ichat.UserSessionManager;
+import com.chat.ichat.XMPPManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.user.ContactResponse;
@@ -90,9 +91,10 @@ public class LoginPresenter implements LoginContract.Presenter {
                             userSession.setUserId(userResponse.getUser().getUserId());
                             userSession.setProfilePicPath(userResponse.getUser().getProfileDP());
                             userSessionManager.save(userSession);
+                            ApiManager.reset();
+                            XMPPManager.reset();
 
                             SpotlightApplication.getContext().initSession();
-
 
                             if (userResponse.getUser().getUserId() == null) {
                                 loginView.navigateToSetUserId();

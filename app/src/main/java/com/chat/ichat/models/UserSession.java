@@ -113,4 +113,20 @@ public class UserSession {
     public boolean isExpired() {
         return new Date().after(this.expires);
     }
+
+    @Override
+    public String toString() {
+        return "UserSession{" +
+                "expires=" + expires +
+                ", accessToken='" + accessToken + '\'' +
+                ", userName='" + userName + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", countryCode='" + countryCode + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", userId='" + userId + '\'' +
+                ", profilePicPath='" + profilePicPath + '\'' +
+                '}';
+    }
 }

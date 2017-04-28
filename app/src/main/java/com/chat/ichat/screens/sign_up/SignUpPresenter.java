@@ -77,7 +77,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                             userSession.setName(userResponse.getUser().getName());
                             userSession.setEmail(userResponse.getUser().getEmail());
                             userSessionManager.save(userSession);
-                            SpotlightApplication.getContext().initSession();
+                            ApiManager.getInstance().setAuthorization(userSession.getAccessToken());
 
                             DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
                             if(userResponse.isOtpSent()) {

@@ -144,6 +144,14 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if(progressDialog[0]!=null) {
+            progressDialog[0].dismiss();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.set_user_id_toolbar, menu);
         return true;

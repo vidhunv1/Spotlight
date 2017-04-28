@@ -85,7 +85,6 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
 
     @Override
     public void setUserId(String userId) {
-        this.userApi = ApiManager.getUserApi();
         UserRequest request = new UserRequest();
         _User user = new _User();
         user.setUserId(userId);
@@ -119,6 +118,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                             userSession.setUserName(userResponse.getUser().getUsername());
                             userSessionManager.save(userSession);
 
+                            SpotlightApplication.getContext().initSession();
                             setUserIdView.onSetUserIdSuccess();
                         }
                     }

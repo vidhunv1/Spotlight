@@ -55,6 +55,10 @@ public class XMPPManager implements Serializable {
         return instance;
     }
 
+    public static void reset() {
+        instance = null;
+    }
+
     public static void init(String userName, String pass) {
         instance = new XMPPManager(userName, pass);
         instance.getConnection();

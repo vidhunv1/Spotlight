@@ -68,6 +68,7 @@ public class SpotlightApplication extends Application implements ForegroundDetec
         if(UserSessionManager.getInstance().hasAccessToken()) {
             Logger.d(this, "initUserSession");
             UserSession userSession = UserSessionManager.getInstance().load();
+            Logger.d(this, "UserSession: "+userSession.toString());
             XMPPManager.init(userSession.getUserName(), userSession.getPassword());
             ApiManager.getInstance().setAuthorization(userSession.getAccessToken());
             MessageController.init(XMPPManager.getInstance().getConnection(), MessageStore.getInstance(), ContactStore.getInstance());
