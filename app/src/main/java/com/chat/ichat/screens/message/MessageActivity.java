@@ -1,17 +1,24 @@
 package com.chat.ichat.screens.message;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -35,15 +42,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.models.Location;
-import com.chat.ichat.screens.home.HomeActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -92,8 +96,6 @@ public class MessageActivity extends BaseActivity
 
     EditText messageBox;
 
-    RelativeLayout sendButtonView;
-
     @Bind(R.id.tb_message)
     Toolbar toolbar;
 
@@ -122,8 +124,9 @@ public class MessageActivity extends BaseActivity
     private ChatState currentChatState;
     private boolean shouldHandleBack = true;
 
-    private final int REQUEST_TAKE_PICTURE = 1;
-    private final int REQUEST_PLACE_PICKER = 2;
+    private final int REQUEST_CAMERA = 1;
+    private final int REQUEST_PLACE_PICKER_SEND = 2;
+    private static final int REQUEST_GALLERY = 3;
     private String currentPhotoPath;
     private Uri imageUri;
 
@@ -520,7 +523,7 @@ public class MessageActivity extends BaseActivity
         rootLayout.removeViewAt(rootLayout.getChildCount()-1);
         if(isBotKeyboard) {
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
-            sendButtonView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            RelativeLayout sendView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
             botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
 
@@ -532,10 +535,10 @@ public class MessageActivity extends BaseActivity
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (s.length() >= 1) {
-                        sendButtonView.setVisibility(View.VISIBLE);
-                        sendButtonView.setBackgroundResource(R.drawable.bg_send_active);
+                        sendView.setVisibility(View.VISIBLE);
+                        sendView.setBackgroundResource(R.drawable.bg_send_active);
                     } else {
-                        sendButtonView.setVisibility(View.GONE);
+                        sendView.setVisibility(View.GONE);
                     }
                     onMessageChanged();
                 }
@@ -550,12 +553,21 @@ public class MessageActivity extends BaseActivity
             bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
             bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Bot");
             firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
+
+            sendView.setOnClickListener(v -> {
+                onSendClicked();
+            });
+
         } else {
             // regular keyboard
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
-            sendButtonView = (RelativeLayout) regularKeyboardView.findViewById(R.id.btn_sendMessage_send);
+            FloatingActionButton sendView = (FloatingActionButton) regularKeyboardView.findViewById(R.id.fab_sendMessage_send);
             ImageButton emojiButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_message_smiley);
+            ImageButton galleryButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_gallery);
+            ImageButton audioButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_audio);
+            ImageButton locationButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_location);
             ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
+
 
             MessageEditText messageEditText = (MessageEditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
             FrameLayout smileyLayout = (FrameLayout) regularKeyboardView.findViewById(R.id.smiley_layout);
@@ -568,7 +580,7 @@ public class MessageActivity extends BaseActivity
                     if(!emojiPicker.isEmojiState()) {
                         shouldHandleBack = false;
                         emojiPicker.reset();
-                        emojiButton.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_smiley));
+                        emojiButton.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_insert_emoticon));
 
                         messageEditText.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -583,7 +595,7 @@ public class MessageActivity extends BaseActivity
 
             messageEditText.setOnTouchListener((v, event) -> {
                 shouldHandleBack = false;
-                emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+                emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
                 if(!emojiPicker.isEmojiState()) {
                     emojiPicker.emojiButtonToggle();
                 }
@@ -594,9 +606,9 @@ public class MessageActivity extends BaseActivity
                 shouldHandleBack = true;
                 emojiPicker.emojiButtonToggle();
                 if(!emojiPicker.isEmojiState()) {
-                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
+//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
                 } else {
-                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_smiley));
+                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
                     InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
                 }
@@ -636,7 +648,7 @@ public class MessageActivity extends BaseActivity
                         Uri photoURI = FileProvider.getUriForFile(this, "com.chat.ichat.fileprovider", photoFile);
                         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         currentPhotoPath = photoFile.getAbsolutePath();
-                        startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
+                        startActivityForResult(cameraIntent, REQUEST_CAMERA);
                     }
                 }
 
@@ -646,6 +658,27 @@ public class MessageActivity extends BaseActivity
                 firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_CAMERA, bundle);
             });
 
+            locationButton.setOnClickListener(v -> {
+                navigateToGetLocation();
+            });
+
+            galleryButton.setOnClickListener(v -> {
+                // ** Load image from gallery **
+                // Permissions
+                int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                int permission = PackageManager.PERMISSION_GRANTED;
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    if (!(perm1 == permission && perm2 == permission)) {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                    } else {
+                        Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(loadIntent, REQUEST_GALLERY);
+                    }
+                }
+            });
+
             messageBox.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -653,11 +686,11 @@ public class MessageActivity extends BaseActivity
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (s.length() >= 1) {
-                        sendButtonView.setBackgroundResource(R.drawable.bg_send_active);
-                        cameraButton.setVisibility(View.GONE);
+                        sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
+                        sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
                     } else {
-                        sendButtonView.setBackgroundResource(R.drawable.bg_send_inactive);
-                        cameraButton.setVisibility(View.VISIBLE);
+                        sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
+                        sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
                     }
                     onMessageChanged();
                 }
@@ -671,11 +704,11 @@ public class MessageActivity extends BaseActivity
             bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
             bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Regular");
             firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
-        }
 
-        sendButtonView.setOnClickListener(v -> {
-            onSendClicked();
-        });
+            sendView.setOnClickListener(v -> {
+                onSendClicked();
+            });
+        }
     }
 
     @Override
@@ -735,7 +768,7 @@ public class MessageActivity extends BaseActivity
         Logger.d(this, "NavigateToGetLocation");
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
-            startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER);
+            startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER_SEND);
         } catch (GooglePlayServicesRepairableException e) {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
@@ -803,13 +836,22 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_TAKE_PICTURE && resultCode == RESULT_OK && data!=null) {
+        if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data!=null) {
             if(currentPhotoPath!=null) {
                 Logger.d(this, "Got image");
             }
-        }
+        } else if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data!=null) {
+            Uri selectedImage = data.getData();
+            Logger.d(this, selectedImage.toString());
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
-        if (requestCode == REQUEST_PLACE_PICKER) {
+            Cursor cursor = this.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            Logger.d(this, "Got gallery pic: "+picturePath);
+            cursor.close();
+        } else if (requestCode == REQUEST_PLACE_PICKER_SEND) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
                 Message m = new Message();
@@ -829,6 +871,24 @@ public class MessageActivity extends BaseActivity
                     messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
                 }
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(loadIntent, REQUEST_GALLERY);
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

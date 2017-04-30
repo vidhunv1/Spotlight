@@ -86,7 +86,7 @@
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|right|end"
         app:srcCompat="@drawable/ic_camera_dark"
-        app:fabSize="mini"
+        app:fabSize="normal"
         android:layout_marginTop="14.5dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
