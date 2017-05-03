@@ -75,7 +75,6 @@ import rx.schedulers.Schedulers;
  */
 public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //TODO: Change to cursor recycler view adapter.
-
     private Context context;
     private List<MessageResult> messageList;
     private SparseArray<Message> messageCache;
@@ -1535,7 +1534,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     break;
             }
 
-            Glide.with(context).load(imageUrl)
+            Glide.with(context).load(imageUrl.replace("https://", "http://"))
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
                     .into(messageImage);
 
@@ -1560,15 +1559,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         @OnClick(R.id.rl_bubble)
-        public void onMessageClicked() {
-        }
+        public void onMessageClicked() {}
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
             return true;
         }
     }
-
 
     interface PostbackClickListener {
         void sendPostbackMessage(String message, String payload);

@@ -571,23 +571,20 @@ public class MessageActivity extends BaseActivity
             messageBox = messageEditText;
             emojiPicker = new EmojiViewHelper(this, smileyLayout, getWindow());
             Activity activity = this;
-            messageEditText.setOnEditTextImeBackListener(new MessageEditText.EditTextImeBackListener() {
-                @Override
-                public void onImeBack() {
-                    if(!emojiPicker.isEmojiState()) {
-                        shouldHandleBack = false;
-                        emojiPicker.reset();
-                        emojiButton.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_insert_emoticon));
+            messageEditText.setOnEditTextImeBackListener(() -> {
+                if(!emojiPicker.isEmojiState()) {
+                    shouldHandleBack = false;
+                    emojiPicker.reset();
+                    emojiButton.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_insert_emoticon));
 
-                        messageEditText.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
+                    messageEditText.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
 
-                    } else {
-                        shouldHandleBack = true;
-                    }
-                    emojiPicker.removeEmojiPickerView();
+                } else {
+                    shouldHandleBack = true;
                 }
+                emojiPicker.removeEmojiPickerView();
             });
 
             messageEditText.setOnTouchListener((v, event) -> {
@@ -682,14 +679,14 @@ public class MessageActivity extends BaseActivity
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (before == 0 && count >= 1) {
+                    if (s.length() == 1 && before == 0) {
                         sendView.hide();
                         new Handler().postDelayed(() -> {
                             sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
                             sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
                             sendView.show();
                         }, 125);
-                    } else if(count == 0){
+                    } else if(s.length() == 0){
                         sendView.hide();
                         new Handler().postDelayed(() -> {
                             sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
