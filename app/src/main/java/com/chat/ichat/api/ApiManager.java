@@ -2,6 +2,7 @@ package com.chat.ichat.api;
 
 import com.chat.ichat.api.app.AppApi;
 import com.chat.ichat.api.bot.BotApi;
+import com.chat.ichat.api.message.MessageApi;
 import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.config.AppConfig;
@@ -25,7 +26,6 @@ public class ApiManager {
         if (instance == null) {
             instance = new ApiManager();
         }
-
         return instance;
     }
 
@@ -35,6 +35,7 @@ public class ApiManager {
     private UserApi userApi;
     private BotApi botApi;
     private AppApi appApi;
+    private MessageApi messageApi;
 
     public ApiManager() {
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -72,6 +73,7 @@ public class ApiManager {
         getInstance().userApi = null;
         getInstance().botApi = null;
         getInstance().appApi = null;
+        getInstance().messageApi = null;
     }
 
     public static PhoneContactsApi getPhoneContactsApi() {
@@ -99,6 +101,13 @@ public class ApiManager {
             getInstance().appApi = getInstance().retrofitClient.create(AppApi.class);
         }
         return getInstance().appApi;
+    }
+
+    public static MessageApi getMessageApi() {
+        if(getInstance().messageApi == null) {
+            getInstance().messageApi = getInstance().retrofitClient.create(MessageApi.class);
+        }
+        return getInstance().messageApi;
     }
 
     public static void reset() {

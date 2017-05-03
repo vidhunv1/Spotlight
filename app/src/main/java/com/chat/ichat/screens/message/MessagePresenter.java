@@ -1,23 +1,37 @@
 package com.chat.ichat.screens.message;
 
 import com.chat.ichat.MessageController;
+import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.PersistentMenu;
+import com.chat.ichat.api.message.MessageApi;
+import com.chat.ichat.api.message.MessageDataResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.models.ImageMessage;
+import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
+import org.joda.time.DateTime;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -38,17 +52,19 @@ public class MessagePresenter implements MessageContract.Presenter {
     private ContactStore contactStore;
     private BotDetailsStore botDetailsStore;
     private UserApi userApi;
+    private MessageApi messageApi;
     private AddContactUseCase addContactUseCase;
 
     private SendMessageUseCase sendMessageUseCase;
     private SendReadReceiptUseCase sendReadReceiptUseCase;
 
-    public MessagePresenter(MessageStore messageStore, MessageController messageController, BotDetailsStore botDetailsStore, ContactStore contactStore, UserApi userApi,  BotApi botApi) {
+    public MessagePresenter(MessageStore messageStore, MessageController messageController, BotDetailsStore botDetailsStore, ContactStore contactStore, UserApi userApi,  BotApi botApi, MessageApi messageApi) {
         this.messageController = messageController;
         this.messageStore = messageStore;
         this.botDetailsStore = botDetailsStore;
         this.contactStore = contactStore;
         this.userApi = userApi;
+        this.messageApi = messageApi;
         this.addContactUseCase = new AddContactUseCase(userApi, contactStore, botApi, botDetailsStore);
         sendReadReceiptUseCase = new SendReadReceiptUseCase(messageController, messageStore);
         sendMessageUseCase = new SendMessageUseCase(messageController, messageStore);
@@ -260,6 +276,103 @@ public class MessagePresenter implements MessageContract.Presenter {
                                         messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
                                     }
                                 });
+                    }
+                });
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void sendImageMessage(String toId, String fromId, String fileUri) {
+        Message m = new Message();
+        ImageMessage imageMessage = new ImageMessage();
+        imageMessage.setFileUri(fileUri);
+        m.setImageMessage(imageMessage);
+
+        MessageResult result = new MessageResult(toId, fromId, GsonProvider.getGson().toJson(m));
+        result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+        result.setTime(DateTime.now());
+
+        Subscription subscription = messageStore.storeMessage(result)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<MessageResult>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.d(this, "Store message error");
+                    }
+
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        messageView.addMessageToList(messageResult);
+
+                        File image = new File(fileUri);
+                        Logger.d(this, "File size(MB): "+image.length()/(1024*1024));
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String filename = timeStamp;
+                        int i = image.getName().lastIndexOf('.');
+                        if (i > 0) {
+                            filename = filename + image.getName().substring(i);
+                        } else {
+                            filename = filename + "." + image.getName();
+                        }
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), image);
+                        MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("image", filename, requestBody);
+                        messageApi.uploadImageData(imageFileBody)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<MessageDataResponse>() {
+                                    @Override
+                                    public void onCompleted() {}
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        Logger.d(this, e.getMessage());
+                                    }
+                                    @Override
+                                    public void onNext(MessageDataResponse dataResponse) {
+                                        Logger.d(this, "Image uploaded: "+dataResponse);
+                                        Message m = new Message();
+                                        ImageMessage imageMessage = new ImageMessage();
+                                        imageMessage.setImageUrl(dataResponse.getDataUrl());
+                                        imageMessage.setFileUri(fileUri);
+                                        m.setImageMessage(imageMessage);
+                                        result.setMessage(GsonProvider.getGson().toJson(m));
+                                        messageStore.updateMessage(result)
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribeOn(Schedulers.io())
+                                                .subscribe(new Subscriber<MessageResult>() {
+                                                    @Override
+                                                    public void onCompleted() {}
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(MessageResult messageResult) {
+                                                        sendMessageUseCase.execute(result)
+                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribe(new Subscriber<MessageResult>() {
+                                                                    @Override
+                                                                    public void onCompleted() {}
+
+                                                                    @Override
+                                                                    public void onError(Throwable e) {}
+
+                                                                    @Override
+                                                                    public void onNext(MessageResult messageResult) {
+                                                                        Logger.d("SendMessage: "+messageResult.toString());
+                                                                        messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                    @Override
+                    public void onCompleted() {
                     }
                 });
         compositeSubscription.add(subscription);

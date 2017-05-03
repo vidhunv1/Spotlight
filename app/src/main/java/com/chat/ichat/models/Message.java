@@ -19,7 +19,9 @@ public class Message {
     @SerializedName("quick_replies")
     private List<QuickReply> quickReplies;
     @SerializedName("location")
-    private Location location;
+    private LocationMessage locationMessage;
+    @SerializedName("image")
+    private ImageMessage imageMessage;
 
     public enum MessageType {
         text,
@@ -40,8 +42,10 @@ public class Message {
         else if(this.genericTemplate!=null) {
             Logger.d(this, "Type =  GenericTemplate");
             return MessageType.generic_template;
-        } else if(this.location!=null) {
+        } else if(this.locationMessage !=null) {
             return MessageType.location;
+        } else if(this.imageMessage != null) {
+            return MessageType.image;
         }
         else
             return MessageType.unknown;
@@ -59,12 +63,20 @@ public class Message {
         return payload;
     }
 
-    public Location getLocation() {
-        return location;
+    public LocationMessage getLocationMessage() {
+        return locationMessage;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocationMessage(LocationMessage locationMessage) {
+        this.locationMessage = locationMessage;
+    }
+
+    public ImageMessage getImageMessage() {
+        return imageMessage;
+    }
+
+    public void setImageMessage(ImageMessage imageMessage) {
+        this.imageMessage = imageMessage;
     }
 
     public void setPayload(String payload) {
@@ -87,7 +99,9 @@ public class Message {
                 return "Template";
             }
         } else if(getMessageType() == MessageType.location) {
-            return "Location: "+location.getPlaceName();
+            return "Location: "+ locationMessage.getPlaceName();
+        } else if(getMessageType() == MessageType.image) {
+            return "Image";
         }
         else
             return "";

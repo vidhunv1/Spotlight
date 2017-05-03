@@ -8,6 +8,7 @@ import com.chat.ichat.models.MessageResult;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public interface MessageContract {
         void loadContactDetails(String chatUserName);
         void loadMessages(String chatUserName);
         void sendTextMessage(String toId, String fromId, String message);
+        void sendImageMessage(String toId, String fromId, String imageFileUri);
         void sendChatState(String chatId, ChatState chatState);
         void updateMessageRead(MessageResult result);
         void getLastActivity(String chatId);

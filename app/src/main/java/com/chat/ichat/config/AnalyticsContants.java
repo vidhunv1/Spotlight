@@ -35,7 +35,6 @@ public class AnalyticsContants {
         public static final String OPEN_DRAWER_MENU = "open_drawer_menu";
         public static final String RECEIVE_MESSAGE = "receive_message";
         public static final String CLICK_BOT_MENU = "click_bot_menu";
-        public static final String KEYBOARD_TYPE = "keyboard_type";
         public static final String SMILEY_SELECTED = "smiley_selected";
         public static final String EXCEPTION_XMPP_CONNECTION = "xmpp_connection_failed";
         public static final String MESSAGE_TITLE_CLICK = "message_title_click";

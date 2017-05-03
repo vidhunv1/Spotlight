@@ -34,7 +34,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
-import com.chat.ichat.models.Location;
+import com.chat.ichat.models.LocationMessage;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -55,6 +55,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -89,7 +90,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_SEND_EMOTICON = 5;
     private final int VIEW_TYPE_RECV_EMOTICON = 6;
     private final int VIEW_TYPE_SEND_LOCATION = 7;
+    private final int VIEW_TYPE_RECV_LOCATION = 9;
     private final int VIEW_TYPE_TYPING = 8;
+    private final int VIEW_TYPE_SEND_IMAGE = 10;
+    private final int VIEW_TYPE_RECV_IMAGE = 11;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -137,6 +141,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.notifyItemRemoved(messageList.size());
             quickReplies = null;
         }
+        Logger.d(this, "MEssage RESULT: "+messageResult.toString());
         messageList.add(messageResult);
         this.notifyItemInserted(messageList.size()-1);
         this.notifyItemChanged(messageList.size()-2);
@@ -270,6 +275,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             } else if(parsedMessage.getMessageType() == Message.MessageType.location) {
                 return VIEW_TYPE_SEND_LOCATION;
+            } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
+                return VIEW_TYPE_SEND_IMAGE;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -281,16 +288,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             }
         } else {
-            if(parsedMessage.getMessageType() == Message.MessageType.generic_template)
+            if(parsedMessage.getMessageType() == Message.MessageType.generic_template) {
                 return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
-            else if(parsedMessage.getMessageType() == Message.MessageType.button_template)
+            } else if(parsedMessage.getMessageType() == Message.MessageType.button_template) {
                 return VIEW_TYPE_RECV_TEMPLATE_BUTTON;
-            else if(parsedMessage.getMessageType() == Message.MessageType.text) {
+            } else if(parsedMessage.getMessageType() == Message.MessageType.text) {
                 if(isAllEmoticon(parsedMessage.getText())) {
                     return VIEW_TYPE_RECV_EMOTICON;
                 } else {
                     return VIEW_TYPE_RECV_TEXT;
                 }
+            } else if(parsedMessage.getMessageType() == Message.MessageType.location) {
+                return VIEW_TYPE_RECV_LOCATION;
+            } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
+                return VIEW_TYPE_RECV_IMAGE;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -359,6 +370,18 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view8 = inflater.inflate(R.layout.item_typing, parent, false);
                 viewHolder = new TypingViewHolder(view8);
                 break;
+            case VIEW_TYPE_RECV_LOCATION:
+                View view10 = inflater.inflate(R.layout.item_message_receive_location, parent, false);
+                viewHolder = new ReceiveLocationViewHolder(view10);
+                break;
+            case VIEW_TYPE_SEND_IMAGE:
+                View view11 = inflater.inflate(R.layout.item_message_send_image, parent, false);
+                viewHolder = new SendImageViewHolder(view11);
+                break;
+            case VIEW_TYPE_RECV_IMAGE:
+                View view12 = inflater.inflate(R.layout.item_message_receive_image, parent, false);
+                viewHolder = new ReceiveImageViewHolder(view12);
+                break;
             default:
                 return null;
         }
@@ -398,7 +421,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_SEND_LOCATION:
                 SendLocationViewHolder sendLocationViewHolder = (SendLocationViewHolder) holder;
-                sendLocationViewHolder.renderItem(messageCache.get(position).getLocation(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                sendLocationViewHolder.renderItem(messageCache.get(position).getLocationMessage(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
+            case VIEW_TYPE_RECV_LOCATION:
+                ReceiveLocationViewHolder receiveLocationViewHolder = (ReceiveLocationViewHolder) holder;
+                receiveLocationViewHolder.renderItem(messageCache.get(position).getLocationMessage(), getFormattedTime(messageList.get(position).getTime()), position);
+                break;
+            case VIEW_TYPE_SEND_IMAGE:
+                SendImageViewHolder sendImageViewHolder = (SendImageViewHolder) holder;
+                sendImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
+            case VIEW_TYPE_RECV_IMAGE:
+                ReceiveImageViewHolder receiveImageViewHolder = (ReceiveImageViewHolder) holder;
+                receiveImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getImageUrl(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
@@ -926,15 +961,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ImageView locationImage;
 
         private int position;
-        private Location location;
+        private LocationMessage locationMessage;
 
         SendLocationViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(Location location, String time, MessageResult.MessageStatus messageStatus, int position) {
-            this.location = location;
+        void renderItem(LocationMessage locationMessage, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.locationMessage = locationMessage;
             this.position = position;
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
@@ -949,7 +984,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
-            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+location.getLatitude()+","+location.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
+            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
                     .into(locationImage);
 
@@ -975,8 +1010,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
             }
-            placeName.setText(location.getPlaceName());
-            address.setText(location.getAddress());
+            placeName.setText(locationMessage.getPlaceName());
+            address.setText(locationMessage.getAddress());
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
             } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
@@ -991,8 +1026,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
             // Open Maps Activity
-            String uri = String.format(Locale.ENGLISH, "geo:%f,%f", location.getLatitude(), location.getLongitude());
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            String label = locationMessage.getPlaceName();
+            String uriBegin = "geo:"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude();
+            String query = locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"(" + label + ")";
+            String encodedQuery = Uri.encode( query  );
+            String uriString = uriBegin + "?q=" + encodedQuery;
+            Uri uri = Uri.parse( uriString );
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             context.startActivity(intent);
         }
 
@@ -1002,6 +1042,118 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return true;
         }
     }
+
+    class ReceiveLocationViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_place_name)
+        TextView placeName;
+        @Bind(R.id.tv_address)
+        TextView address;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.ll_message_receive_text)
+        LinearLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImageView;
+        @Bind(R.id.location_description)
+        LinearLayout locationDescription;
+        @Bind(R.id.location_image)
+        ImageView locationImage;
+
+        private int position;
+        private LocationMessage locationMessage;
+
+        ReceiveLocationViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(LocationMessage locationMessage, String time, int position) {
+            this.locationMessage = locationMessage;
+            this.position = position;
+            int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
+                    .into(locationImage);
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
+                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+                    break;
+            }
+            placeName.setText(locationMessage.getPlaceName());
+            address.setText(locationMessage.getAddress());
+
+            if(hasProfileDP(position)) {
+                profileImageView.setVisibility(View.VISIBLE);
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImageView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImageView.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImageView.setImageDrawable(textProfileDrawable);
+                }
+            } else {
+                profileImageView.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+            // Open Maps Activity
+            String label = locationMessage.getPlaceName();
+            String uriBegin = "geo:"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude();
+            String query = locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"(" + label + ")";
+            String encodedQuery = Uri.encode( query  );
+            String uriString = uriBegin + "?q=" + encodedQuery;
+            Uri uri = Uri.parse( uriString );
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            context.startActivity(intent);
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            showMessageActionPopup(this, position, placeName.getText().toString());
+            return true;
+        }
+    }
+
+
 
     class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_messageitem_message)
@@ -1241,6 +1393,179 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 profileImageView.setImageDrawable(textProfileDrawable);
             }
+        }
+    }
+
+    class SendImageViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatusView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
+        @Bind(R.id.message_image)
+        ImageView messageImage;
+
+        SendImageViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String localImageUri, String time, MessageResult.MessageStatus messageStatus, int position) {
+            Logger.d(this, "SendImageViewHolder: "+localImageUri+", "+time+", "+position);
+            int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            RoundedCornerTransformation roundedCornerTransformationT = null;
+            RoundedCornerTransformation roundedCornerTransformationB = null;
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+            }
+
+            Glide.with(context).load(new File(localImageUri))
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .into(messageImage);
+
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
+            } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
+            } else if(messageStatus == MessageResult.MessageStatus.READ) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
+            }
+            deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
+        }
+
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            return true;
+        }
+    }
+
+    class ReceiveImageViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.ll_message_receive_text)
+        LinearLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.message_image)
+        ImageView messageImage;
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImageView;
+
+        ReceiveImageViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String imageUrl, String time, int position) {
+            int bubbleType = bubbleType(position);
+            Logger.d(this, "URL: "+imageUrl+" TYPE:+"+bubbleType);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            RoundedCornerTransformation roundedCornerTransformationT = null;
+            RoundedCornerTransformation roundedCornerTransformationB = null;
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_LEFT);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_LEFT);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_LEFT);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_LEFT);
+                    break;
+            }
+
+            Glide.with(context).load(imageUrl)
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .into(messageImage);
+
+            if(hasProfileDP(position)) {
+                profileImageView.setVisibility(View.VISIBLE);
+                if(dp!=null) {
+                    dp.into(new BitmapImageViewTarget(profileImageView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            profileImageView.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+                } else {
+                    profileImageView.setImageDrawable(textProfileDrawable);
+                }
+            } else {
+                profileImageView.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            return true;
         }
     }
 

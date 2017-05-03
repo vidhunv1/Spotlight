@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by vidhun on 16/04/17.
  */
-public class Location {
+public class LocationMessage {
     @SerializedName("latitude")
     private double latitude;
     @SerializedName("longitude")
@@ -15,7 +15,7 @@ public class Location {
     @SerializedName("address")
     private String address;
 
-    public Location(double latitude, double longitude, String placeName, String address) {
+    public LocationMessage(double latitude, double longitude, String placeName, String address) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;

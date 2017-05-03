@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,7 +48,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.models.Location;
+import com.chat.ichat.models.ImageMessage;
+import com.chat.ichat.models.LocationMessage;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -157,7 +160,7 @@ public class MessageActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
-        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), ApiManager.getBotApi());
+        messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), ApiManager.getBotApi(), ApiManager.getMessageApi());
 
 
         Intent receivedIntent = getIntent();
@@ -548,12 +551,6 @@ public class MessageActivity extends BaseActivity
             });
             // remove later after regular keyboard change. -------------------------------------------------------
 
-            /*              Analytics           */
-            Bundle bundle = new Bundle();
-            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-            bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Bot");
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
-
             sendView.setOnClickListener(v -> {
                 onSendClicked();
             });
@@ -685,12 +682,20 @@ public class MessageActivity extends BaseActivity
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (s.length() >= 1) {
-                        sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
-                        sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
-                    } else {
-                        sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
-                        sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
+                    if (before == 0 && count >= 1) {
+                        sendView.hide();
+                        new Handler().postDelayed(() -> {
+                            sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
+                            sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
+                            sendView.show();
+                        }, 125);
+                    } else if(count == 0){
+                        sendView.hide();
+                        new Handler().postDelayed(() -> {
+                            sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
+                            sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
+                            sendView.show();
+                        }, 125);
                     }
                     onMessageChanged();
                 }
@@ -698,12 +703,6 @@ public class MessageActivity extends BaseActivity
                 @Override
                 public void afterTextChanged(Editable s) {}
             });
-
-            /*              Analytics           */
-            Bundle bundle = new Bundle();
-            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-            bundle.putString(AnalyticsContants.Param.KEYBOARD_TYPE, "Regular");
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.KEYBOARD_TYPE, bundle);
 
             sendView.setOnClickListener(v -> {
                 onSendClicked();
@@ -839,24 +838,30 @@ public class MessageActivity extends BaseActivity
         if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data!=null) {
             if(currentPhotoPath!=null) {
                 Logger.d(this, "Got image");
+                messagePresenter.sendImageMessage(chatUserName, currentUser, currentPhotoPath);
             }
         } else if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data!=null) {
+            Logger.d(this, "Gallery");
             Uri selectedImage = data.getData();
             Logger.d(this, selectedImage.toString());
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
             Cursor cursor = this.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            Logger.d(this, "Got gallery pic: "+picturePath);
-            cursor.close();
+            if(cursor!=null) {
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                Logger.d(this, "Got gallery pic: " + picturePath);
+
+                messagePresenter.sendImageMessage(chatUserName, currentUser, picturePath);
+                cursor.close();
+            }
         } else if (requestCode == REQUEST_PLACE_PICKER_SEND) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
                 Message m = new Message();
-                Location location = new Location(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString(), place.getAddress().toString());
-                m.setLocation(location);
+                LocationMessage locationMessage = new LocationMessage(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString(), place.getAddress().toString());
+                m.setLocationMessage(locationMessage);
 
                 if(contactDetails.isBlocked()) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
@@ -903,6 +908,7 @@ public class MessageActivity extends BaseActivity
             try {
                 super.onLayoutChildren(recycler, state);
             } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
                 Logger.e(this, "meet a IOOBE in RecyclerView");
             }
         }
