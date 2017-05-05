@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#D6D6D6"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
         <ImageButton
             android:background="@null"
@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             android:scaleType="center"
             android:id="@+id/emojis_tab_0_recents"
-            android:src="@drawable/ic_emoji_recent_light_activated"/>
+            android:src="@drawable/ic_emoji_recent"/>
         <ImageButton
             android:background="@null"
             android:layout_width="44dp"
@@ -69,6 +69,7 @@
         android:layout_below="@id/emojis_tab"
         android:id="@+id/emojis_pager"
         android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_above="@+id/emojis_tab" />
 </RelativeLayout>

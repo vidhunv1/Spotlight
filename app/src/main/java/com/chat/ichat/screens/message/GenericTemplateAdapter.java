@@ -123,10 +123,10 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                 startPadding = (int) AndroidUtils.px(60);
                 endPadding = 0;
             } else if(bubbleType == 2) {
-                startPadding = (int) AndroidUtils.px(4);
+                startPadding = (int) AndroidUtils.px(0);
                 endPadding = (int) AndroidUtils.px(0);
             } else {
-                startPadding = (int) AndroidUtils.px(4);
+                startPadding = (int) AndroidUtils.px(0);
                 endPadding = (int)AndroidUtils.px(40);
             }
 

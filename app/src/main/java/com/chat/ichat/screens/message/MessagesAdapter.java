@@ -58,7 +58,6 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -447,7 +446,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private boolean hasProfileDP(int position) {
-//        return !(position > 0 && messageList.get(position - 1).getChatId().equals(messageList.get(position - 1).getFromId()));
         if(position == (messageList.size()-1) && isTyping) {
             return false;
         }
@@ -619,7 +617,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.fl_profileImageLayout)
         FrameLayout profileImageLayout;
 
-        public ReceiveTemplateGenericViewHolder(View itemView) {
+        ReceiveTemplateGenericViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -684,7 +682,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         private int position;
 
-        public SendEmoticonViewHolder(View itemView) {
+        SendEmoticonViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

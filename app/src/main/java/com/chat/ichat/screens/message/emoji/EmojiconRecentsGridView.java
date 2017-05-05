@@ -8,6 +8,7 @@ import android.content.Context;
 import android.widget.GridView;
 
 import com.chat.ichat.R;
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Emojicon;
 
 /**
@@ -23,13 +24,9 @@ public class EmojiconRecentsGridView extends EmojiconGridView implements Emojico
         EmojiconRecentsManager recents1 = EmojiconRecentsManager
                 .getInstance(rootView.getContext());
         mAdapter = new EmojiAdapter(rootView.getContext(),  recents1);
-        mAdapter.setEmojiClickListener(new OnEmojiconClickedListener() {
-
-            @Override
-            public void onEmojiconClicked(Emojicon emojicon) {
-                if (emojiViewHelper.onEmojiconClickedListener != null) {
-                    emojiViewHelper.onEmojiconClickedListener.onEmojiconClicked(emojicon);
-                }
+        mAdapter.setEmojiClickListener(emojicon -> {
+            if (emojiViewHelper.onEmojiconClickedListener != null) {
+                emojiViewHelper.onEmojiconClickedListener.onEmojiconClicked(emojicon);
             }
         });
         GridView gridView = (GridView) rootView.findViewById(R.id.Emoji_GridView);
@@ -46,6 +43,5 @@ public class EmojiconRecentsGridView extends EmojiconGridView implements Emojico
         if (mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }
-
 }
 

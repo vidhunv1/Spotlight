@@ -14,6 +14,7 @@
             android:id="@+id/iv_profileImage"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:layout_marginBottom="2dp"
             android:baselineAlignBottom="true"
             android:src="@drawable/default_profile_image" />
     </FrameLayout>

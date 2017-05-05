@@ -1,7 +1,6 @@
 package com.chat.ichat.screens.message;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,18 +45,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.models.ImageMessage;
-import com.chat.ichat.models.LocationMessage;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
+import com.chat.ichat.UserSessionManager;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.PersistentMenu;
 import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.BaseActivity;
@@ -71,20 +61,27 @@ import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
-import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -120,6 +117,8 @@ public class MessageActivity extends BaseActivity
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     private EmojiViewHelper emojiPicker;
+    private AudioViewHelper audioViewHelper;
+
     private List<PersistentMenu> persistentMenus;
 
     private WrapContentLinearLayoutManager linearLayoutManager;
@@ -131,7 +130,6 @@ public class MessageActivity extends BaseActivity
     private final int REQUEST_PLACE_PICKER_SEND = 2;
     private static final int REQUEST_GALLERY = 3;
     private String currentPhotoPath;
-    private Uri imageUri;
 
     public static int index = -1;
     public static int top = -1;
@@ -570,13 +568,14 @@ public class MessageActivity extends BaseActivity
             FrameLayout smileyLayout = (FrameLayout) regularKeyboardView.findViewById(R.id.smiley_layout);
             messageBox = messageEditText;
             emojiPicker = new EmojiViewHelper(this, smileyLayout, getWindow());
-            Activity activity = this;
+            audioViewHelper = new AudioViewHelper(this, smileyLayout, getWindow());
+
             messageEditText.setOnEditTextImeBackListener(() -> {
-                if(!emojiPicker.isEmojiState()) {
+                if(!emojiPicker.isEmojiState() || !audioViewHelper.isAudioState()) {
                     shouldHandleBack = false;
                     emojiPicker.reset();
-                    emojiButton.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_insert_emoticon));
-
+                    audioViewHelper.reset();
+//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
                     messageEditText.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
@@ -585,19 +584,24 @@ public class MessageActivity extends BaseActivity
                     shouldHandleBack = true;
                 }
                 emojiPicker.removeEmojiPickerView();
+                audioViewHelper.removeAudioPickerView();
             });
 
             messageEditText.setOnTouchListener((v, event) -> {
                 shouldHandleBack = false;
-                emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
+//                emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
                 if(!emojiPicker.isEmojiState()) {
                     emojiPicker.emojiButtonToggle();
+                }
+                if(!audioViewHelper.isAudioState()) {
+                    audioViewHelper.audioButtonToggle();
                 }
                 return false;
             });
 
             emojiButton.setOnClickListener(v -> {
                 shouldHandleBack = true;
+                audioViewHelper.reset();
                 emojiPicker.emojiButtonToggle();
                 if(!emojiPicker.isEmojiState()) {
 //                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
@@ -613,9 +617,20 @@ public class MessageActivity extends BaseActivity
                 firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_SMILEY, bundle);
             });
 
-            emojiPicker.setOnEmojiconBackspaceClickedListener(v -> {
-                messageEditText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+            audioButton.setOnClickListener(v -> {
+                shouldHandleBack = true;
+                emojiPicker.reset();
+                audioViewHelper.audioButtonToggle();
+                if(!audioViewHelper.isAudioState()) {
+//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
+                } else {
+//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
+                }
             });
+
+            emojiPicker.setOnEmojiconBackspaceClickedListener(v -> messageEditText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)));
 
             emojiPicker.setOnEmojiconClickedListener(v -> {
                 String text = messageEditText.getText() + v.getEmoji();
@@ -679,7 +694,7 @@ public class MessageActivity extends BaseActivity
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (s.length() == 1 && before == 0) {
+                    if (before == 0 && (s.length() == 1 || (Pattern.compile("(^[\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee ]+$)").matcher(s).find()))) {
                         sendView.hide();
                         new Handler().postDelayed(() -> {
                             sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
@@ -701,9 +716,7 @@ public class MessageActivity extends BaseActivity
                 public void afterTextChanged(Editable s) {}
             });
 
-            sendView.setOnClickListener(v -> {
-                onSendClicked();
-            });
+            sendView.setOnClickListener(v -> onSendClicked());
         }
     }
 
@@ -814,7 +827,7 @@ public class MessageActivity extends BaseActivity
             if(type == Presence.Type.available) {
 //                presenceView.setText(getResources().getString(R.string.chat_presence_online));
             } else if(type == Presence.Type.unavailable) {
-                DateTime timeNow = DateTime.now();
+//                DateTime timeNow = DateTime.now();
 //                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
             }
         }
@@ -885,8 +898,6 @@ public class MessageActivity extends BaseActivity
                     Intent loadIntent = new Intent(Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(loadIntent, REQUEST_GALLERY);
-                } else {
-                    //not granted
                 }
                 break;
             default:
@@ -896,7 +907,7 @@ public class MessageActivity extends BaseActivity
 
     // woraround for samsung devices, IndexOutOfBoundsException: Inconsistency detected. Invalid view holder adapter positionViewHolder
     private class WrapContentLinearLayoutManager extends LinearLayoutManager {
-        public WrapContentLinearLayoutManager(Context context) {
+        WrapContentLinearLayoutManager(Context context) {
             super(context);
         }
 

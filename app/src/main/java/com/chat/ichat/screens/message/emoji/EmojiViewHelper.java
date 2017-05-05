@@ -36,13 +36,10 @@ import java.util.List;
 /**
  * Source modified from https://github.com/rockerhieu/emojicon
  */
-public class EmojiViewHelper implements ViewPager.OnPageChangeListener, EmojiconRecents{
-    private View[] mEmojiTabs;
-    Context mContext;
+public class EmojiViewHelper implements ViewPager.OnPageChangeListener, EmojiconRecents {
+    private Context mContext;
     EmojiconGridView.OnEmojiconClickedListener onEmojiconClickedListener;
-    OnEmojiconBackspaceClickedListener onEmojiconBackspaceClickedListener;
-    private PagerAdapter mEmojisAdapter;
-    private EmojiconRecentsManager mRecentsManager;
+    private OnEmojiconBackspaceClickedListener onEmojiconBackspaceClickedListener;
     private ViewPager emojisPager;
     private int layoutHeightpx;
 
@@ -74,30 +71,27 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
     }
 
     private void updateKeyboardHeight() {
-        ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                smileyLayout.getWindowVisibleDisplayFrame(r);
+        ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = () -> {
+            Rect r = new Rect();
+            smileyLayout.getWindowVisibleDisplayFrame(r);
 
-                int screenHeight = getUsableScreenHeight();
-                int heightDifference = screenHeight - (r.bottom - r.top);
-                int resourceId = mContext.getResources()
-                        .getIdentifier("status_bar_height",
-                                "dimen", "android");
-                if (resourceId > 0) {
-                    heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
-                }
-                if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
-                    if(layoutHeightpx!=heightDifference) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
-                        editor.apply();
-                    }
-                    layoutHeightpx = heightDifference;
-                } else
-                    Log.d("DEF", "CLOSE");
+            int screenHeight = getUsableScreenHeight();
+            int heightDifference = screenHeight - (r.bottom - r.top);
+            int resourceId = mContext.getResources()
+                    .getIdentifier("status_bar_height",
+                            "dimen", "android");
+            if (resourceId > 0) {
+                heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
             }
+            if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
+                if(layoutHeightpx!=heightDifference) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
+                    editor.apply();
+                }
+                layoutHeightpx = heightDifference;
+            } else
+                Log.d("DEF", "CLOSE");
         };
         smileyLayout.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
     }
@@ -177,7 +171,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         emojisPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         emojisPager.setOnPageChangeListener(this);
         EmojiconRecents recents = this;
-        mEmojisAdapter = new EmojisPagerAdapter(
+        PagerAdapter mEmojisAdapter = new EmojisPagerAdapter(
                 Arrays.asList(
                         new EmojiconRecentsGridView(mContext, null, null, this),
                         new EmojiconGridView(mContext, People.DATA, recents, this),
@@ -188,7 +182,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
                 )
         );
         emojisPager.setAdapter(mEmojisAdapter);
-        mEmojiTabs = new View[6];
+        View[] mEmojiTabs = new View[6];
         mEmojiTabs[0] = view.findViewById(R.id.emojis_tab_0_recents);
         mEmojiTabs[1] = view.findViewById(R.id.emojis_tab_1_people);
         mEmojiTabs[2] = view.findViewById(R.id.emojis_tab_2_nature);
@@ -214,7 +208,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         }));
 
         // get last selected page
-        mRecentsManager = EmojiconRecentsManager.getInstance(view.getContext());
+        EmojiconRecentsManager mRecentsManager = EmojiconRecentsManager.getInstance(view.getContext());
         int page = mRecentsManager.getRecentPage();
         // last page was recents, check if there are recents to use
         // if none was found, go to page 1
@@ -240,7 +234,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
             }
             return null;
         }
-        public EmojisPagerAdapter(List<EmojiconGridView> views) {
+        EmojisPagerAdapter(List<EmojiconGridView> views) {
             super();
             this.views = views;
         }
@@ -254,13 +248,13 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View v = views.get(position).rootView;
-            ((ViewPager)container).addView(v, 0);
+            container.addView(v, 0);
             return v;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object view) {
-            ((ViewPager)container).removeView((View)view);
+            container.removeView((View)view);
         }
 
         @Override
@@ -298,7 +292,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
      * <p>Interval is scheduled before the onClick completes, so it has to run fast.
      * If it runs slow, it does not generate skipped onClicks.
      */
-    public static class RepeatListener implements View.OnTouchListener {
+    private static class RepeatListener implements View.OnTouchListener {
 
         private Handler handler = new Handler();
 
@@ -327,7 +321,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
          * @param clickListener   The OnClickListener, that will be called
          *                        periodically
          */
-        public RepeatListener(int initialInterval, int normalInterval, View.OnClickListener clickListener) {
+        RepeatListener(int initialInterval, int normalInterval, View.OnClickListener clickListener) {
             if (clickListener == null)
                 throw new IllegalArgumentException("null runnable");
             if (initialInterval < 0 || normalInterval < 0)
@@ -358,7 +352,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
     }
 
     /**
-     * Set the listener for the event when any of the emojicon is clicked
+     * Set the listener for the event when any of the emojicon is clicked.
      */
     public void setOnEmojiconClickedListener(EmojiconGridView.OnEmojiconClickedListener listener){
         this.onEmojiconClickedListener = listener;
