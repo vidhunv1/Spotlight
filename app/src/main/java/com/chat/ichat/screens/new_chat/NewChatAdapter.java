@@ -2,10 +2,7 @@ package com.chat.ichat.screens.new_chat;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -17,10 +14,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
+import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
 
 import org.jivesoftware.smack.packet.Presence;
@@ -44,13 +42,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
     private final int NO_CONTACTS = 5;
+    private final int SEARCH = 6;
 
     private Context context;
 
     private List<Integer> filteredList;
     private String filterQuery;
     private SharedPreferences sharedPreferences;
-    private String highlightColor;
+    private String highlightColor = "#0f9D58";
 
     public NewChatAdapter(Context context, ContactClickListener contactClickListener) {
         this.sharedPreferences = context.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
@@ -58,21 +57,21 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.contactClickListener = contactClickListener;
         this.itemList = new ArrayList<>();
         filteredList = new ArrayList<>();
-        this.highlightColor = "#0088C0";
         filterQuery = "";
     }
 
     public void setContactList(List<NewChatItemModel> contactItems) {
         for (NewChatItemModel contactItem : contactItems) {
             long millis = sharedPreferences.getLong(contactItem.getUserName(), 0);
+            String onlineHtml = "<font color=\"" + highlightColor + "\">Online</font>";
             if(millis == 0) {
                 if(contactItem.getUserName().startsWith("o_")) {
-                    contactItem.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
+                    contactItem.setPresence(onlineHtml);
                 } else {
                     contactItem.setPresence("Last seen recently");
                 }
             } else if((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
-                contactItem.setPresence("<font color=\"" + highlightColor + "\">Online</font>");
+                contactItem.setPresence(onlineHtml);
             } else {
                 String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
                 contactItem.setPresence(context.getResources().getString(R.string.chat_presence_away, lastSeen));
@@ -142,10 +141,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 return CONTACTS_NUMBER;
             }
         } else if(position == 0 && filterQuery.isEmpty()) {
-            Logger.d(this, "NewGroup");
             return HEADER;
         } else {
-            return CONTACT;
+            if(filterQuery.length() == 0)
+                return CONTACT;
+            else
+                return SEARCH;
         }
     }
 
@@ -158,6 +159,10 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case CONTACT:
                 View contactView = inflater.inflate(R.layout.item_contact, parent, false);
                 viewHolder = new ContactsViewHolder(contactView);
+                break;
+            case SEARCH:
+                View searchView = inflater.inflate(R.layout.item_chat, parent, false);
+                viewHolder = new SearchViewHolder(searchView);
                 break;
             case CONTACTS_NUMBER:
                 View categoryView = inflater.inflate(R.layout.item_contacts_number, parent, false);
@@ -189,11 +194,18 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         else
             position = vPos - 1;
 
-        Logger.d(this, "Position: "+position+" vpos: "+vPos+" itemSize: "+itemList.size()+" itemViewType: "+holder.getItemViewType());
         switch (holder.getItemViewType()) {
             case CONTACT:
                 ContactsViewHolder cVH = (ContactsViewHolder) holder;
-                cVH.renderItem(itemList.get(position), filterQuery);
+                boolean isStart;
+                boolean isEnd;
+                isStart = position == 0 || Character.toUpperCase(itemList.get(position).getContactName().charAt(0)) != Character.toUpperCase(itemList.get(position - 1).getContactName().charAt(0));
+                isEnd = position != (itemList.size() - 1) && Character.toUpperCase(itemList.get(position).getContactName().charAt(0)) != Character.toUpperCase(itemList.get(position + 1).getContactName().charAt(0));
+                cVH.renderItem(itemList.get(position), isStart, isEnd);
+                break;
+            case SEARCH:
+                SearchViewHolder sVH = (SearchViewHolder) holder;
+                sVH.renderItem(itemList.get(position), filterQuery);
                 break;
             case CONTACTS_NUMBER:
                 ContactsNumber iVH = (ContactsNumber) holder;
@@ -237,6 +249,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.view_contactItem_divider)
         View divider;
 
+        @Bind(R.id.start_letter)
+        TextView letter;
+
         ContactsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -248,7 +263,71 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         @SuppressWarnings("deprecation")
+        void renderItem(NewChatItemModel contactItem, boolean isStart, boolean isEnd) {
+            contactName.setText(contactItem.getContactName());
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                statusView.setText(Html.fromHtml(contactItem.getPresence(), Html.FROM_HTML_MODE_LEGACY));
+            else
+                statusView.setText(Html.fromHtml(contactItem.getPresence()));
+
+            if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
+                Glide.with(context)
+                        .load(contactItem.getProfileDP().replace("https://", "http://"))
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18))
+                        .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
+                        .into(profileImage);
+            } else {
+                profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
+            }
+            contactName.setTag(contactItem.getUserName());
+
+            if(isEnd) {
+                divider.setVisibility(View.VISIBLE);
+            } else {
+                divider.setVisibility(View.GONE);
+            }
+
+            if(isStart) {
+                letter.setVisibility(View.VISIBLE);
+                letter.setText(Character.toUpperCase(contactItem.getContactName().charAt(0))+"");
+            } else {
+                letter.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    class SearchViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.ll_item_chat)
+        LinearLayout contactListContent;
+
+        @Bind(R.id.iv_chatItem_profileImage)
+        ImageView profileImage;
+
+        @Bind(R.id.tv_chatItem_contactName)
+        TextView contactName;
+
+        @Bind(R.id.tv_chatItem_message)
+        TextView statusView;
+
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatus;
+
+        SearchViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            contactListContent.setOnClickListener(view -> {
+                if(contactClickListener != null)
+                    contactClickListener.onContactItemClicked(contactName.getTag().toString());
+            });
+        }
+
+        @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, String query) {
+            deliveryStatus.setVisibility(View.GONE);
+
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
             String contactNameLower = contactItem.getContactName().toLowerCase();
             int startPos = contactNameLower.indexOf(query.toLowerCase());
@@ -274,18 +353,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
                 Glide.with(context)
                         .load(contactItem.getProfileDP().replace("https://", "http://"))
-                        .asBitmap().centerCrop()
+                        .crossFade()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18))
-                        .into(new BitmapImageViewTarget(profileImage) {
-                            @Override
-                            protected void setResource(Bitmap resource) {
-                                RoundedBitmapDrawable circularBitmapDrawable =
-                                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                                circularBitmapDrawable.setCircular(true);
-                                profileImage.setImageDrawable(circularBitmapDrawable);
-                            }
-                        });
+                        .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
+                        .into(profileImage);
             } else {
                 profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             }
@@ -310,11 +382,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void renderItem(int number) {
-            if(number == 1) {
-                contactNumber.setText(number + " contact");
-            } else if(number >=1){
-                contactNumber.setText(number + " contacts");
-            }
+            contactNumber.setVisibility(View.GONE);
+//            if(number == 1) {l
+//                contactNumber.setText(number + " contact");
+//            } else if(number >=1){
+//                contactNumber.setText(number + " contacts");
+//            }
         }
     }
 

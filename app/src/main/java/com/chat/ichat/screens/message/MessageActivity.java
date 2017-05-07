@@ -44,6 +44,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
@@ -56,6 +57,7 @@ import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.NotificationController;
 import com.chat.ichat.core.lib.AndroidUtils;
+import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
@@ -390,21 +392,13 @@ public class MessageActivity extends BaseActivity
         showAddBlock(!contact.isAdded());
 
         if(contact.getProfileDP()!=null && !contact.getProfileDP().isEmpty()) {
-            Context context = this;
             Glide.with(this)
                     .load(contact.getProfileDP().replace("https://", "http://"))
-                    .asBitmap().centerCrop()
+                    .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18))
-                    .into(new BitmapImageViewTarget(profileImage) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImage.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    .bitmapTransform(new CenterCrop(this), new CircleTransformation(this))
+                    .into(profileImage);
         } else {
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
         }
@@ -697,7 +691,7 @@ public class MessageActivity extends BaseActivity
                     if (before == 0 && (s.length() == 1 || (Pattern.compile("(^[\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee ]+$)").matcher(s).find()))) {
                         sendView.hide();
                         new Handler().postDelayed(() -> {
-                            sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.sendMessageBubble)));
+                            sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                             sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
                             sendView.show();
                         }, 125);

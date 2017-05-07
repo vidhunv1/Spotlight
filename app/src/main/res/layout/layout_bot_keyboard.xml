@@ -42,7 +42,7 @@
             android:textSize="16sp"
             android:cursorVisible="true"
             android:textCursorDrawable="@drawable/bg_cursor_message"
-            android:textColorHint="#FFADADAD">
+            android:textColorHint="#FF607D8B">
         </EditText>
 
         <RelativeLayout

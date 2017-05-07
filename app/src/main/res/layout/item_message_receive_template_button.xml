@@ -63,7 +63,7 @@
                 android:paddingRight="12dp"
                 android:text="TextView"
                 android:textAllCaps="true"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textSize="14sp" />
 
@@ -76,7 +76,7 @@
                 android:paddingRight="12dp"
                 android:text="TextView"
                 android:textAllCaps="true"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textSize="14sp" />
 
@@ -89,7 +89,7 @@
                 android:paddingRight="12dp"
                 android:text="TextView"
                 android:textAllCaps="true"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textSize="14sp" />
         </LinearLayout>

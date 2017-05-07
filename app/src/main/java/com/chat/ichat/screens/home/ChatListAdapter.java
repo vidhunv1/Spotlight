@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.core.lib.CircleTransformation;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
 import com.chat.ichat.core.GsonProvider;
@@ -42,6 +44,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<ChatItem> temp;
     private ChatClickListener chatClickListener;
     private final int VIEW_CHAT = 0;
+    private final int VIEW_EMPTY = 1;
 
     public ChatListAdapter(Context context, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
@@ -149,12 +152,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        return VIEW_CHAT;
+        if(position<chatList.size())
+            return VIEW_CHAT;
+        else
+            return VIEW_EMPTY;
     }
 
     @Override
     public int getItemCount() {
-        return chatList.size();
+        return chatList.size()+1;
     }
 
     @Override
@@ -166,6 +172,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_CHAT:
                 View withoutNotificationView = inflater.inflate(R.layout.item_chat, parent, false);
                 viewHolder = new ChatItemViewHolder(withoutNotificationView);
+                break;
+            case VIEW_EMPTY:
+                View emptyView = inflater.inflate(R.layout.item_chat, parent, false);
+                viewHolder = new EmptyViewHolder(emptyView);
                 break;
             default:
                 return null;
@@ -278,19 +288,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Logger.d(this, "Setting profile dp: "+chatListItem.getProfileDP());
                 Glide.with(context)
                         .load(chatListItem.getProfileDP().replace("https://", "http://"))
-                        .asBitmap().centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .skipMemoryCache(true)
+                        .crossFade()
                         .placeholder(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18))
-                        .into(new BitmapImageViewTarget(profileImage) {
-                            @Override
-                            protected void setResource(Bitmap resource) {
-                                RoundedBitmapDrawable circularBitmapDrawable =
-                                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                                circularBitmapDrawable.setCircular(true);
-                                profileImage.setImageDrawable(circularBitmapDrawable);
-                            }
-                        });
+                        .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
+                        .into(profileImage);
             } else {
                 profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             }
@@ -311,6 +313,19 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             contactName.setTag(chatListItem.getChatId());
+        }
+    }
+
+    public class EmptyViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.ll_item_chat)
+        LinearLayout chatListContent;
+
+        public EmptyViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            chatListContent.setVisibility(View.INVISIBLE);
         }
     }
 

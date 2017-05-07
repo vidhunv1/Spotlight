@@ -14,60 +14,60 @@
         android:focusable="true"
         android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:text="A"
+            android:id="@+id/start_letter"
+            android:textColor="#808080"
+            android:textAppearance="@style/FontRobotoMedium"
+            android:textSize="22sp" />
+
         <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_marginLeft="17dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:id="@+id/iv_chatItem_profileImage"
             android:src="@drawable/default_profile_image"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="9dp"
-            android:paddingRight="11dp"/>
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ll_chatItem_content"
-            android:paddingTop="10.75dp">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/ll_chatItem_content">
+            <TextView
+                android:layout_marginTop="9.25dp"
+                android:layout_width="190dp"
+                tools:ignore="MissingPrefix"
                 android:layout_height="wrap_content"
-                android:paddingBottom="4.25dp">
+                android:text="Name"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:textColor="#212121"
+                android:textSize="17sp"
+                android:id="@+id/tv_chatItem_contactName"
+                android:maxWidth="190dp" />
 
-                <TextView
-                    android:layout_width="190dp"
-                    tools:ignore="MissingPrefix"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textAppearance="@style/FontRobotoMedium"
-                    android:textColor="#212121"
-                    android:textSize="17sp"
-                    android:id="@+id/tv_chatItem_contactName"
-                    android:maxWidth="190dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:maxLines="1"
-                    android:textColor="#8f8f8f"
-                    android:id="@+id/tv_chatItem_message"
-                    android:text="message"
-                    android:paddingRight="20dp" />
-
-            </LinearLayout>
+            <TextView
+                android:layout_marginTop="0.5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:textColor="#8f8f8f"
+                android:id="@+id/tv_chatItem_message"
+                android:text="message" />
         </LinearLayout>
     </LinearLayout>
     <View
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="fill_parent"
         android:layout_height="1px"
         android:id="@+id/view_contactItem_divider"

@@ -5,8 +5,8 @@
         android:viewportHeight="24.0">
     <path
         android:pathData="m9.991,17.07 l-5,-5 1.41,-1.41 3.59,3.58 7.59,-7.59 1.41,1.42z"
-        android:fillColor="@color/sendMessageBubble" />
+        android:fillColor="@color/appElement" />
     <path
         android:pathData="M12,-0.087C5.376,-0.087 -0,5.289 -0,11.913 -0,18.537 5.376,23.913 12,23.913 18.624,23.913 24,18.537 24,11.913 24,5.289 18.624,-0.087 12,-0.087ZM12,21.513C6.708,21.513 2.4,17.205 2.4,11.913 2.4,6.621 6.708,2.313 12,2.313c5.292,0 9.6,4.308 9.6,9.6 0,5.292 -4.308,9.6 -9.6,9.6z"
-        android:fillColor="@color/sendMessageBubble"/>
+        android:fillColor="@color/appElement"/>
 </vector>

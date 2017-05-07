@@ -188,18 +188,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			firebaseAnalytics.logEvent(AnalyticsContants.Event.START_NEW_CHAT_FAB, null);
 		});
 
-		chatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				if(dy > 0){
-					fab.hide();
-				} else{
-					fab.show();
-				}
-				super.onScrolled(recyclerView, dx, dy);
-			}
-		});
-
 		try {
 			presenter.init(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
 		} catch (PackageManager.NameNotFoundException e) {

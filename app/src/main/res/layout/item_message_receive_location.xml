@@ -11,7 +11,7 @@
         android:paddingTop="2dp"
         android:paddingRight="0.25dp"
         android:text="9:47 PM"
-        android:textColor="#999999"
+        android:textColor="@color/messageInfoText"
         android:textSize="12sp"
         android:id="@+id/tv_time"
         android:gravity="center" />

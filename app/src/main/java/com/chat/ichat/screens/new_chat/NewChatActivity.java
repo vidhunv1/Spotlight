@@ -63,18 +63,18 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     LinearLayout newChatLayout;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
-    private boolean showSoftInput;
+    private boolean isNewChat;
 
     NewChatPresenter newChatPresenter;
 
-    private static final String KEY_SHOW_SOFT_INPUT = "KEY_SHOW_SOFT_INPUT";
+    private static final String KEY_IS_NEW_CHAT = "KEY_IS_NEW_CHAT";
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "new_chat";
 
-    public static Intent callingIntent(Context context, boolean showSoftInput) {
+    public static Intent callingIntent(Context context, boolean isNewChat) {
         Intent intent = new Intent(context, NewChatActivity.class);
-        intent.putExtra(KEY_SHOW_SOFT_INPUT, showSoftInput);
+        intent.putExtra(KEY_IS_NEW_CHAT, isNewChat);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         return intent;
     }
@@ -99,19 +99,17 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
         Intent receivedIntent = getIntent();
-        if(!receivedIntent.hasExtra(KEY_SHOW_SOFT_INPUT))
+        if(!receivedIntent.hasExtra(KEY_IS_NEW_CHAT))
             return;
 
-        showSoftInput = receivedIntent.getBooleanExtra(KEY_SHOW_SOFT_INPUT, false);
+        isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, false);
+        toolbarSearch.setVisibility(View.GONE);
+        toolbarTitle.setVisibility(View.VISIBLE);
 
-        if(showSoftInput) {
-            toolbarSearch.setVisibility(View.VISIBLE);
-            toolbarTitle.setVisibility(View.GONE);
-//            AndroidUtils.showSoftInput(this, toolbarSearch);
+        if(isNewChat) {
+            toolbarTitle.setText("New Message");
         } else {
-            AndroidUtils.hideSoftInput(this);
-            toolbarSearch.setVisibility(View.GONE);
-            toolbarTitle.setVisibility(View.VISIBLE);
+            toolbarTitle.setText("Contacts");
         }
 
         newChatPresenter.attachView(this);
@@ -164,9 +162,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(showSoftInput)
-            getMenuInflater().inflate(R.menu.new_chat_toolbar, menu);
-        else
+//        if(isNewChat)
+//            getMenuInflater().inflate(R.menu.new_chat_toolbar, menu);
+//        else
             getMenuInflater().inflate(R.menu.contacts_toolbar, menu);
         return true;
     }

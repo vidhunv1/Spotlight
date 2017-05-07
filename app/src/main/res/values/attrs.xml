@@ -15,4 +15,8 @@
         <attr name="sctl_title_id" format="reference" />
         <attr name="sctl_subtitle_id" format="reference" />
     </declare-styleable>
+    <declare-styleable name="AudioRecord">
+        <attr name="mic_min_radius" format="dimension"/>
+        <attr name="mic_max_radius" format="dimension"/>
+    </declare-styleable>
 </resources>

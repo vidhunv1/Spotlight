@@ -68,15 +68,15 @@ public abstract class AndroidUtils {
     public static String lastActivityAt(DateTime time) {
         DateTime timeNow = DateTime.now();
         DateTimeFormatter timeFormat = DateTimeFormat.forPattern("h:mm a");
-
+        String t = "at "+time.toString(timeFormat).toUpperCase().replace(".", "");
         if(timeNow.getDayOfMonth() == time.getDayOfMonth()) {
-            return time.toString(timeFormat).toUpperCase().replace(".", "");
-        } else if(time.getDayOfMonth() > (timeNow.getDayOfMonth()-7)) {
-            return time.dayOfWeek().getAsShortText().toUpperCase();
+            return t;
+        } else if(time.getDayOfMonth() == (timeNow.getDayOfMonth()-1)) {
+            return "yesterday "+t;
         } else if(timeNow.getYear() == time.getYear()) {
-            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth();
+            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth() + " "+t;
         } else {
-            return time.monthOfYear().getAsShortText()+" "+time.getDayOfMonth()+" AT "+time.toString(timeFormat)+" "+time.getYear();
+            return "recently";
         }
     }
 }

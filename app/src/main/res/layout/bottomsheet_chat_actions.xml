@@ -20,6 +20,7 @@
             android:layout_marginLeft="32dp"
             android:textSize="16sp"
             android:text="Clear history"
+            android:textColor="@color/drawerText"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -38,6 +39,7 @@
             android:layout_marginLeft="32dp"
             android:textSize="16sp"
             android:text="Delete"
+            android:textColor="@color/drawerText"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

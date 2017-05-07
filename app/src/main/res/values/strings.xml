@@ -239,8 +239,8 @@
 
     <!-- Chat states -->
     <string name="chat_presence_online">Online</string>
-    <string name="chat_presence_away">Last seen at %1$s</string>
-    <string name="chat_state_typing">Typing…</string>
+    <string name="chat_presence_away">last seen %1$s</string>
+    <string name="chat_state_typing">typing…</string>
 
     <!-- Settings -->
     <string name="settings_app_version">%1$s for Android v%2$s</string>

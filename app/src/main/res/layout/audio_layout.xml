@@ -1,17 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/audio_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:orientation="horizontal">
-        <TextView
+        <com.chat.ichat.screens.message.audio.AudioRecord
+            xmlns:appNs="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
+            android:id="@+id/audio_record"
             android:layout_height="match_parent"
-            android:text="audio"
-            android:gravity="center"
-            android:textSize="40dp"/>
-    </LinearLayout>
+            android:layout_centerInParent="true"
+            appNs:mic_min_radius="50dp"
+            appNs:mic_max_radius="60dp"/>
+    </RelativeLayout>
 </RelativeLayout>

@@ -92,7 +92,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new MessageViewHolder(messageView);
                 break;
             case VIEW_TYPE_CONTACT:
-                View contactView = inflater.inflate(R.layout.item_contact, parent, false);
+                View contactView = inflater.inflate(R.layout.item_chat, parent, false);
                 viewHolder = new ContactViewHolder(contactView);
                 break;
             case VIEW_TYPE_CATEGORY_CONTACTS:
@@ -183,6 +183,9 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Bind(R.id.view_contactItem_divider)
         View divider;
 
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatus;
+
         ContactViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -190,6 +193,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @SuppressWarnings("deprecation")
         void renderContactItem(ContactsModel contactItem, String searchQuery) {
+            deliveryStatus.setVisibility(View.GONE);
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
 
             String contactLower = contactItem.getContactName().toLowerCase();

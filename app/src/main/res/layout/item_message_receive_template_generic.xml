@@ -83,7 +83,7 @@
                 android:gravity="center_vertical"
                 android:paddingRight="12dp"
                 android:textAllCaps="true"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textSize="14sp"
                 android:paddingLeft="12dp" />
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:id="@+id/tv_rcv_button2"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:gravity="center_vertical"
                 android:textAllCaps="true"
                 android:textAppearance="@style/FontRobotoMedium"
@@ -108,7 +108,7 @@
                 android:textAllCaps="true"
                 android:id="@+id/tv_rcv_button3"
                 android:gravity="center_vertical"
-                android:textColor="@color/sendMessageBubble"
+                android:textColor="@color/colorPrimary"
                 android:textAppearance="@style/FontRobotoMedium"
                 android:textSize="14sp"
                 android:paddingLeft="12dp"
@@ -120,5 +120,5 @@
         android:layout_width="4dp"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/ll_bubble"
-        android:background="#FFFAFAFA"/>
+        android:background="@color/messageBackground"/>
 </RelativeLayout>

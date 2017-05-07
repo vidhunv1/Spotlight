@@ -20,7 +20,7 @@
             android:layout_above="@id/rl_bubble"
             android:paddingTop="2dp"
             android:text="9:47 PM"
-            android:textColor="#999999"
+            android:textColor="@color/messageInfoText"
             android:paddingRight="0.25dp"
             android:textSize="12sp"
             android:id="@+id/tv_time"
@@ -43,7 +43,7 @@
                 android:layout_width="235dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/location_description"
-                android:background="@drawable/bg_lower_template_bottom"
+                android:background="@drawable/bg_send_location_bottom"
                 android:orientation="vertical"
                 android:layout_alignParentBottom="true">
                 <TextView
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/rl_bubble"
             android:text="Seen"
-            android:textColor="#999999"
+            android:textColor="@color/messageInfoText"
             android:textSize="12sp"
             android:id="@+id/tv_delivery_status"
             android:layout_marginRight="38dp"

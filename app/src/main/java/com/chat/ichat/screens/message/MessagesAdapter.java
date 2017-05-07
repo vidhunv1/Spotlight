@@ -28,11 +28,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.BitmapRequestBuilder;
+import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
 import com.chat.ichat.models.LocationMessage;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -68,7 +70,6 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
 /**
  * Created by vidhun on 07/08/16.
  */
@@ -97,7 +98,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private UrlClickListener urlClickListener;
     private QuickReplyActionListener quickReplyActionListener;
     private Drawable textProfileDrawable;
-    private BitmapRequestBuilder dp;
+    private DrawableRequestBuilder dp;
 
     private boolean isTyping;
     private int lastClickedPosition;
@@ -117,7 +118,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(dpUrl!=null && !dpUrl.isEmpty()) {
             dp = Glide.with(context)
                     .load(dpUrl.replace("https://", "http://"))
-                    .asBitmap().centerCrop()
+                    .crossFade()
+                    .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
                     .diskCacheStrategy(DiskCacheStrategy.ALL);
         }
 
@@ -446,10 +448,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private boolean hasProfileDP(int position) {
-        if(position == (messageList.size()-1) && isTyping) {
-            return false;
-        }
-        return !isSameConversation(position, position+1);
+        return !(position == (messageList.size() - 1) && isTyping) && !isSameConversation(position, position + 1);
     }
 
     private String getFormattedTime(DateTime time) {
@@ -629,15 +628,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(displayProfileDP) {
                 profileImage.setVisibility(View.VISIBLE);
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImage) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImage.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImage);
                 } else {
                     profileImage.setImageDrawable(textProfileDrawable);
                 }
@@ -789,15 +780,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImageView) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImageView.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImageView);
                 } else {
                     profileImageView.setImageDrawable(textProfileDrawable);
                 }
@@ -984,27 +967,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
                     .into(locationImage);
+            locationImage.setBackgroundResource(R.drawable.bg_msg_send_full);
 
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
-                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
-                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
-                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    locationImage.setBackgroundResource(R.drawable.bg_msg_receive_full);
-                    locationDescription.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
             }
             placeName.setText(locationMessage.getPlaceName());
@@ -1113,15 +1089,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(hasProfileDP(position)) {
                 profileImageView.setVisibility(View.VISIBLE);
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImageView) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImageView.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImageView);
                 } else {
                     profileImageView.setImageDrawable(textProfileDrawable);
                 }
@@ -1213,15 +1181,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(displayProfileDP) {
                 profileImageView.setVisibility(View.VISIBLE);
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImageView) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImageView.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImageView);
                 } else {
                     profileImageView.setImageDrawable(textProfileDrawable);
                 }
@@ -1335,15 +1295,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 profileImage.setVisibility(View.VISIBLE);
 
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImage) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImage.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImage);
                 } else {
                     profileImage.setImageDrawable(textProfileDrawable);
                 }
@@ -1378,15 +1330,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
             profileImageView.setVisibility(View.VISIBLE);
             if(dp!=null) {
-                dp.into(new BitmapImageViewTarget(profileImageView) {
-                    @Override
-                    protected void setResource(Bitmap resource) {
-                        RoundedBitmapDrawable circularBitmapDrawable =
-                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                        circularBitmapDrawable.setCircular(true);
-                        profileImageView.setImageDrawable(circularBitmapDrawable);
-                    }
-                });
+                dp.into(profileImageView);
             } else {
                 profileImageView.setImageDrawable(textProfileDrawable);
             }
@@ -1539,15 +1483,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(hasProfileDP(position)) {
                 profileImageView.setVisibility(View.VISIBLE);
                 if(dp!=null) {
-                    dp.into(new BitmapImageViewTarget(profileImageView) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable =
-                                    RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            profileImageView.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
+                    dp.into(profileImageView);
                 } else {
                     profileImageView.setImageDrawable(textProfileDrawable);
                 }

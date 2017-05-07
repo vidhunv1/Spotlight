@@ -39,7 +39,7 @@
             android:text="FLE : À"
             android:layout_width="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/sendMessageBubble"
+            android:textColor="@color/sendMessageText"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:maxWidth="234dp"/>

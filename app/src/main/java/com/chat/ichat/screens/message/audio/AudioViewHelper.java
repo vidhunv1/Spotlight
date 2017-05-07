@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
+import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,6 @@ import android.view.inputmethod.InputMethodManager;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
-
 /**
  * Created by vidhun on 03/05/17.
  */
@@ -89,6 +90,24 @@ public class AudioViewHelper{
             audioLayout.setLayoutParams(layoutParams);
             audioLayout.addView(audioPickerLayout);
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+
+            AudioRecord audioRecord = (AudioRecord) audioLayout.findViewById(R.id.audio_record);
+            audioRecord.setRecordListener(new AudioRecord.AudioRecordListener() {
+                @Override
+                public void onRecordStart() {
+                    Logger.d(this, "Recording start");
+                }
+
+                @Override
+                public void onRecordStop(String fileName) {
+                    Logger.d(this, "Recording stop");
+                }
+
+                @Override
+                public void onRecordCancel() {
+                    Logger.d(this, "Recording cancel");
+                }
+            });
         }
     }
 

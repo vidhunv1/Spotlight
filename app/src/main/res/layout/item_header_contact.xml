@@ -2,19 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:visibility="gone"
+    android:layout_height="32dp"
+    android:background="#F2F2F2"
     android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
         tools:ignore="MissingPrefix"
-        android:layout_height="wrap_content"
-        android:paddingTop="3dp"
-        android:text="CONTACTS"
-        android:paddingLeft="16dp"
+        android:layout_height="match_parent"
+        android:text="iChat contacts"
+        android:gravity="center_vertical"
+        android:paddingLeft="16.5dp"
         android:textAppearance="@style/FontRobotoMedium"
-        android:textColor="#797979"
-        android:textSize="14sp"
+        android:textColor="#546E7A"
+        android:textSize="15sp"
         android:id="@+id/tv_chatItem_contactName"
         android:maxWidth="190dp" />
 </LinearLayout>

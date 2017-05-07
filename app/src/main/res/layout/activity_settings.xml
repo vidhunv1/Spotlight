@@ -230,7 +230,7 @@
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
                             android:text="Default"
-                            android:textColor="#2f8cc9"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp" />
                     </TableRow>
 
@@ -263,7 +263,7 @@
                             android:paddingLeft="17dp"
                             android:paddingRight="17dp"
                             android:text="Default"
-                            android:textColor="#2f8cc9"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp" />
                     </TableRow>
 
