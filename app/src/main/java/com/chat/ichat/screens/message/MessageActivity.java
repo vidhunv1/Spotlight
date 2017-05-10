@@ -62,10 +62,12 @@ import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.screens.message.audio.AudioRecord;
 import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
@@ -635,6 +637,27 @@ public class MessageActivity extends BaseActivity
                 Bundle bundle = new Bundle();
                 bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
                 firebaseAnalytics.logEvent(AnalyticsContants.Event.SMILEY_SELECTED, bundle);
+            });
+
+            audioViewHelper.setAudioRecordListener(new AudioRecord.AudioRecordListener() {
+                @Override
+                public void onRecordStart() {
+
+                }
+
+                @Override
+                public void onRecordStop(String fileName) {
+                    Message m = new Message();
+                    AudioMessage audioMessage = new AudioMessage();
+                    audioMessage.setFileUri(fileName);
+                    m.setAudioMessage(audioMessage);
+                    messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
+                }
+
+                @Override
+                public void onRecordCancel() {
+
+                }
             });
 
             cameraButton.setOnClickListener(v -> {

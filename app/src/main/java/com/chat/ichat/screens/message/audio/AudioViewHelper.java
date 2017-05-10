@@ -39,6 +39,7 @@ public class AudioViewHelper{
 
     private static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
     private static String PREFS_NAME = "EmojiViewHelper";
+    private AudioRecord.AudioRecordListener audioRecordListener = null;
 
     public AudioViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
         this.mContext = mContext;
@@ -92,22 +93,10 @@ public class AudioViewHelper{
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
             AudioRecord audioRecord = (AudioRecord) audioLayout.findViewById(R.id.audio_record);
-            audioRecord.setRecordListener(new AudioRecord.AudioRecordListener() {
-                @Override
-                public void onRecordStart() {
-                    Logger.d(this, "Recording start");
-                }
 
-                @Override
-                public void onRecordStop(String fileName) {
-                    Logger.d(this, "Recording stop");
-                }
-
-                @Override
-                public void onRecordCancel() {
-                    Logger.d(this, "Recording cancel");
-                }
-            });
+            if(audioRecordListener!=null) {
+                audioRecord.setRecordListener(audioRecordListener);
+            }
         }
     }
 
@@ -173,5 +162,9 @@ public class AudioViewHelper{
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.audio_layout, null, false);
         return view;
+    }
+
+    public void setAudioRecordListener(AudioRecord.AudioRecordListener audioRecordListener) {
+        this.audioRecordListener = audioRecordListener;
     }
 }

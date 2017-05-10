@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/sendMessageBubble" />
+    <solid android:color="#ffffff" />
 
     <corners
         android:bottomLeftRadius="@dimen/bubble_full_corner_radius"

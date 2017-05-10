@@ -93,6 +93,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_TYPING = 8;
     private final int VIEW_TYPE_SEND_IMAGE = 10;
     private final int VIEW_TYPE_RECV_IMAGE = 11;
+    private final int VIEW_TYPE_SEND_AUDIO = 12;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -266,7 +267,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
 
-        if(messageList.get(position).isMe()) {
+        if(messageList.get(position).isMe()) { // SEND MESSAGE TYPES
             if(parsedMessage.getMessageType() == Message.MessageType.text) {
                 if(isAllEmoticon(parsedMessage.getText())) {
                     return VIEW_TYPE_SEND_EMOTICON;
@@ -287,7 +288,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     return VIEW_TYPE_SEND_TEXT;
                 }
             }
-        } else {
+        } else { // RECEIVE MESSAGE TYPES
             if(parsedMessage.getMessageType() == Message.MessageType.generic_template) {
                 return VIEW_TYPE_RECV_TEMPLATE_GENERIC;
             } else if(parsedMessage.getMessageType() == Message.MessageType.button_template) {
@@ -302,6 +303,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return VIEW_TYPE_RECV_LOCATION;
             } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
                 return VIEW_TYPE_RECV_IMAGE;
+            } else if(parsedMessage.getMessageType() == Message.MessageType.audio) {
+                return VIEW_TYPE_SEND_AUDIO;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -382,6 +385,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view12 = inflater.inflate(R.layout.item_message_receive_image, parent, false);
                 viewHolder = new ReceiveImageViewHolder(view12);
                 break;
+            case VIEW_TYPE_SEND_AUDIO:
+                View view13 = inflater.inflate(R.layout.item_message_send_audio, parent, false);
+                viewHolder = new SendAudioViewHolder(view13);
             default:
                 return null;
         }
@@ -435,6 +441,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ReceiveImageViewHolder receiveImageViewHolder = (ReceiveImageViewHolder) holder;
                 receiveImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getImageUrl(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
+            case VIEW_TYPE_SEND_AUDIO:
+                SendAudioViewHolder sendAudioViewHolder = (SendAudioViewHolder) holder;
+                sendAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
                 typingViewHolder.renderItem();
@@ -1500,6 +1509,100 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return true;
         }
     }
+
+    class SendAudioViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.iv_delivery_status)
+        ImageView deliveryStatusView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
+
+        private int position;
+
+        SendAudioViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String fileName, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.position = position;
+            int bubbleType = bubbleType(position);
+            boolean shouldShowTime = shouldShowTime(position);
+
+            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+            drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
+
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_full);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_top);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_middle);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_bottom);
+                    break;
+            }
+            if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
+            } else if(messageStatus == MessageResult.MessageStatus.SENT || messageStatus == MessageResult.MessageStatus.DELIVERED) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_sent);
+            } else if(messageStatus == MessageResult.MessageStatus.READ) {
+                deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
+            }
+
+            deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
+        }
+
+        @OnClick(R.id.rl_bubble)
+        public void onMessageClicked() {
+            boolean shouldShowTime = shouldShowTime(position);
+
+            if(isMessagePressed(position)) {
+                if(!shouldShowTime) {
+                    timeView.setVisibility(View.GONE);
+                }
+                deliveryStatusText.setVisibility(View.GONE);
+                toggleMessagePressed(position, false);
+                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
+            } else {
+                timeView.setVisibility(View.VISIBLE);
+                deliveryStatusText.setVisibility(View.VISIBLE);
+                toggleMessagePressed(position, true);
+                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubblePressed));
+            }
+        }
+
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            return true;
+        }
+    }
+
 
     interface PostbackClickListener {
         void sendPostbackMessage(String message, String payload);

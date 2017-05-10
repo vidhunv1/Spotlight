@@ -40,7 +40,7 @@ public class AudioRecord extends View {
     private MediaRecorder recorder = null;
     private String recordFileName;
 
-    private int micColor = 0xfe4034;
+    private int micColor = 0xFFFE4034;
 
     public AudioRecord(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -191,7 +191,7 @@ public class AudioRecord extends View {
         canvas.drawText(titleText, (canvas.getWidth()/2), (int) ((canvas.getHeight() / 10) - ((paint.descent() + paint.ascent()) / 2)), paint);
     }
 
-    interface AudioRecordListener {
+    public interface AudioRecordListener {
         void onRecordStart();
         void onRecordStop(String fileName);
         void onRecordCancel();

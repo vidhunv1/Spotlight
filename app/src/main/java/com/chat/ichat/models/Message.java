@@ -22,6 +22,8 @@ public class Message {
     private LocationMessage locationMessage;
     @SerializedName("image")
     private ImageMessage imageMessage;
+    @SerializedName("audio")
+    private AudioMessage audioMessage;
 
     public enum MessageType {
         text,
@@ -73,6 +75,14 @@ public class Message {
 
     public ImageMessage getImageMessage() {
         return imageMessage;
+    }
+
+    public AudioMessage getAudioMessage() {
+        return audioMessage;
+    }
+
+    public void setAudioMessage(AudioMessage audioMessage) {
+        this.audioMessage = audioMessage;
     }
 
     public void setImageMessage(ImageMessage imageMessage) {

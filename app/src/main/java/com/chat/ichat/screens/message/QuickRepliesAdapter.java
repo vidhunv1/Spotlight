@@ -98,8 +98,10 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
             quickReplyView.setOnTouchListener((v, event) -> {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     bubbleView.setBackgroundResource(R.drawable.bg_quick_reply_active);
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.sendMessageText));
                 } else if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
                     bubbleView.setBackgroundResource(R.drawable.bg_quick_reply_inactive);
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
                     if(event.getAction() == MotionEvent.ACTION_UP) {
                         if(qr.getContentType()!=null && qr.getContentType() == QuickReply.ContentType.location) {
                             quickReplyActionListener.navigateToGetLocation();

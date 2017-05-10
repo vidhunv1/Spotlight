@@ -317,15 +317,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class EmptyViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
+
+        @Bind(R.id.view_contactItem_divider)
+        View dividerLine;
 
         public EmptyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             chatListContent.setVisibility(View.INVISIBLE);
+            dividerLine.setVisibility(View.INVISIBLE);
         }
     }
 
