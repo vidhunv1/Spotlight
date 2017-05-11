@@ -48,6 +48,8 @@ public class Message {
             return MessageType.location;
         } else if(this.imageMessage != null) {
             return MessageType.image;
+        } else if(this.audioMessage != null) {
+            return MessageType.audio;
         }
         else
             return MessageType.unknown;

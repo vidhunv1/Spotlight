@@ -5,14 +5,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,13 +24,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.chat.ichat.components.AudioMessageView;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
 import com.chat.ichat.models.LocationMessage;
@@ -278,6 +274,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return VIEW_TYPE_SEND_LOCATION;
             } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
                 return VIEW_TYPE_SEND_IMAGE;
+            }  else if(parsedMessage.getMessageType() == Message.MessageType.audio) {
+                return VIEW_TYPE_SEND_AUDIO;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -303,8 +301,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return VIEW_TYPE_RECV_LOCATION;
             } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
                 return VIEW_TYPE_RECV_IMAGE;
-            } else if(parsedMessage.getMessageType() == Message.MessageType.audio) {
-                return VIEW_TYPE_SEND_AUDIO;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -388,6 +384,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_SEND_AUDIO:
                 View view13 = inflater.inflate(R.layout.item_message_send_audio, parent, false);
                 viewHolder = new SendAudioViewHolder(view13);
+                break;
             default:
                 return null;
         }
@@ -444,6 +441,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_SEND_AUDIO:
                 SendAudioViewHolder sendAudioViewHolder = (SendAudioViewHolder) holder;
                 sendAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
                 typingViewHolder.renderItem();
@@ -1521,6 +1519,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView timeView;
         @Bind(R.id.tv_delivery_status)
         TextView deliveryStatusText;
+        @Bind(R.id.audio_message)
+        AudioMessageView audioMessageView;
 
         private int position;
 
@@ -1537,6 +1537,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
             drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
 
+            audioMessageView.setAudioFile(fileName);
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
@@ -1550,19 +1551,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_full);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_top);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_middle);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    bubbleView.setBackgroundResource(R.drawable.bg_msg_send_bottom);
                     break;
             }
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {

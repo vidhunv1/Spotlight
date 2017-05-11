@@ -1,10 +1,7 @@
 package com.chat.ichat.screens.home;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -13,11 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -27,11 +22,9 @@ import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +51,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.notifyItemRangeChanged(0, chatItems.size());
     }
 
-    public List<ChatItem> newChatMessage(ChatItem chatItem){
+    List<ChatItem> newChatMessage(ChatItem chatItem){
         int i;
         for (i = 0; i < chatList.size(); i++) {
             if(chatItem.getChatId().equals(chatList.get(i).getChatId())){
@@ -85,7 +78,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return chatList;
     }
 
-    public List<ChatItem> updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
+    List<ChatItem> updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
         for (int i = 0; i < chatList.size(); i++) {
             if(chatList.get(i).isMe() && chatList.get(i).getReceiptId()!=null && (chatList.get(i).getReceiptId().equals(deliveryReceiptId) || chatList.get(i).getProfileDP().equals(deliveryReceiptId))) {
                 ChatItem tt = chatList.get(i);
@@ -98,7 +91,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return chatList;
     }
 
-    public void setChatState(String fromId, String chatState){
+    void setChatState(String fromId, String chatState){
         for (int i = 0; i < chatList.size(); i++) {
             if(fromId.equals(chatList.get(i).getChatId())){
                 if(chatState.equals(chatList.get(i).getLastMessage()))
@@ -123,7 +116,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public void resetChatState(String fromId){
+    void resetChatState(String fromId){
         ChatItem tempItem, item;
         for (int i = 0; i < chatList.size() ; i++) {
             item = chatList.get(i);
@@ -141,7 +134,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public void removeChat(String chatId) {
+    void removeChat(String chatId) {
         for (int i = 0; i < chatList.size() ; i++) {
             if(chatList.get(i).getChatId().equals(chatId)) {
                 chatList.remove(i);
@@ -213,7 +206,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class ChatItemViewHolder extends RecyclerView.ViewHolder {
+    class ChatItemViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
@@ -239,7 +232,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_delivery_status)
         ImageView deliveryStatus;
 
-        public ChatItemViewHolder(View itemView) {
+        ChatItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -255,7 +248,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        public void renderItem(ChatItem chatListItem, boolean isLineVisible) {
+        void renderItem(ChatItem chatListItem, boolean isLineVisible) {
             if(chatListItem.getNotificationCount()==0) {
                 notification.setVisibility(View.GONE);
                 lastMessage.setMaxWidth((int)AndroidUtils.px(256));
@@ -316,14 +309,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class EmptyViewHolder extends RecyclerView.ViewHolder {
+    class EmptyViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
 
         @Bind(R.id.view_contactItem_divider)
         View dividerLine;
 
-        public EmptyViewHolder(View itemView) {
+        EmptyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 

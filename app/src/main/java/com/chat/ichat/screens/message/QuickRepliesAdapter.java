@@ -20,11 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
 /**
  * Created by vidhun on 29/12/16.
  */
-
 public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapter.QuickReplyViewHolder> {
     private MessagesAdapter.PostbackClickListener quickReplyClickListener;
     private MessagesAdapter.QuickReplyActionListener quickReplyActionListener;
