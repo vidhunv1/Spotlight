@@ -641,9 +641,7 @@ public class MessageActivity extends BaseActivity
 
             audioViewHelper.setAudioRecordListener(new AudioRecord.AudioRecordListener() {
                 @Override
-                public void onRecordStart() {
-
-                }
+                public void onRecordStart() {}
 
                 @Override
                 public void onRecordStop(String fileName) {
@@ -651,13 +649,11 @@ public class MessageActivity extends BaseActivity
                     AudioMessage audioMessage = new AudioMessage();
                     audioMessage.setFileUri(fileName);
                     m.setAudioMessage(audioMessage);
-                    messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
+                    messagePresenter.sendAudioMessage(chatUserName, currentUser, fileName);
                 }
 
                 @Override
-                public void onRecordCancel() {
-
-                }
+                public void onRecordCancel() {}
             });
 
             cameraButton.setOnClickListener(v -> {

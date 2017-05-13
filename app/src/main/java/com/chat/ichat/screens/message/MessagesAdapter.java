@@ -90,6 +90,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_SEND_IMAGE = 10;
     private final int VIEW_TYPE_RECV_IMAGE = 11;
     private final int VIEW_TYPE_SEND_AUDIO = 12;
+    private final int VIEW_TYPE_RECV_AUDIO = 13;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -301,6 +302,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return VIEW_TYPE_RECV_LOCATION;
             } else if(parsedMessage.getMessageType() == Message.MessageType.image) {
                 return VIEW_TYPE_RECV_IMAGE;
+            }   else if(parsedMessage.getMessageType() == Message.MessageType.audio) {
+                return VIEW_TYPE_RECV_AUDIO;
             } else if(parsedMessage.getMessageType() == Message.MessageType.unknown) {
                 parsedMessage = new Message();
                 parsedMessage.setText(messageList.get(position).getMessage());
@@ -385,6 +388,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view13 = inflater.inflate(R.layout.item_message_send_audio, parent, false);
                 viewHolder = new SendAudioViewHolder(view13);
                 break;
+            case VIEW_TYPE_RECV_AUDIO:
+                View view14 = inflater.inflate(R.layout.item_message_receive_audio, parent, false);
+                viewHolder = new SendAudioViewHolder(view14);
+                break;
             default:
                 return null;
         }
@@ -441,6 +448,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_SEND_AUDIO:
                 SendAudioViewHolder sendAudioViewHolder = (SendAudioViewHolder) holder;
                 sendAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                break;
+            case VIEW_TYPE_RECV_AUDIO:
+                ReceiveAudioViewHolder receiveAudioViewHolder = (ReceiveAudioViewHolder) holder;
+                receiveAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
@@ -1522,15 +1533,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.audio_message)
         AudioMessageView audioMessageView;
 
-        private int position;
-
         SendAudioViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String fileName, String time, MessageResult.MessageStatus messageStatus, int position) {
-            this.position = position;
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
@@ -1538,6 +1546,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
 
             audioMessageView.setAudioFile(fileName);
+            audioMessageView.setMessageType(false);
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
@@ -1573,24 +1582,74 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
         }
 
-        @OnClick(R.id.rl_bubble)
-        public void onMessageClicked() {
+        @OnLongClick(R.id.rl_bubble)
+        public boolean onMessageLongClicked() {
+            return true;
+        }
+    }
+
+    class ReceiveAudioViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.iv_profileImage)
+        ImageView profileImageView;
+        @Bind(R.id.rl_bubble)
+        RelativeLayout bubbleView;
+        @Bind(R.id.message_send_text)
+        RelativeLayout layout;
+        @Bind(R.id.tv_time)
+        TextView timeView;
+        @Bind(R.id.tv_delivery_status)
+        TextView deliveryStatusText;
+        @Bind(R.id.audio_message)
+        AudioMessageView audioMessageView;
+
+        ReceiveAudioViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String fileName, String time, int position) {
+            int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
-            if(isMessagePressed(position)) {
-                if(!shouldShowTime) {
-                    timeView.setVisibility(View.GONE);
-                }
-                deliveryStatusText.setVisibility(View.GONE);
-                toggleMessagePressed(position, false);
-                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
-                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
-            } else {
+            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
+            drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
+
+            audioMessageView.setAudioFile(fileName);
+            audioMessageView.setMessageType(true);
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
-                deliveryStatusText.setVisibility(View.VISIBLE);
-                toggleMessagePressed(position, true);
-                GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
-                drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubblePressed));
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
+
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    break;
+            }
+
+            if(hasProfileDP(position)) {
+                profileImageView.setVisibility(View.VISIBLE);
+                if(dp!=null) {
+                    dp.into(profileImageView);
+                } else {
+                    profileImageView.setImageDrawable(textProfileDrawable);
+                }
+            } else {
+                profileImageView.setVisibility(View.INVISIBLE);
             }
         }
 

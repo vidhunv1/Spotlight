@@ -34,6 +34,7 @@ public interface MessageContract {
         void loadMessages(String chatUserName);
         void sendTextMessage(String toId, String fromId, String message);
         void sendImageMessage(String toId, String fromId, String imageFileUri);
+        void sendAudioMessage(String toId, String fromId, String audioFileUri);
         void sendChatState(String chatId, ChatState chatState);
         void updateMessageRead(MessageResult result);
         void getLastActivity(String chatId);

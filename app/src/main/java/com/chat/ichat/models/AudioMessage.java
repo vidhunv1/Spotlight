@@ -8,16 +8,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class AudioMessage {
     @SerializedName("audio_url")
-    private String imageUrl;
+    private String audioUrl;
     @SerializedName("file_uri")
     private String fileUri;
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getAudioUrl() {
+        return audioUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
     }
 
     public String getFileUri() {
@@ -31,7 +31,7 @@ public class AudioMessage {
     @Override
     public String toString() {
         return "ImageMessage{" +
-                "imageUrl='" + imageUrl + '\'' +
+                "audioUrl='" + audioUrl + '\'' +
                 ", fileUri='" + fileUri + '\'' +
                 '}';
     }

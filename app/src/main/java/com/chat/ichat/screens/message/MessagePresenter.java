@@ -1,7 +1,6 @@
 package com.chat.ichat.screens.message;
 
 import com.chat.ichat.MessageController;
-import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.PersistentMenu;
@@ -14,11 +13,11 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
-import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
@@ -336,6 +335,102 @@ public class MessagePresenter implements MessageContract.Presenter {
                                         imageMessage.setImageUrl(dataResponse.getDataUrl());
                                         imageMessage.setFileUri(fileUri);
                                         m.setImageMessage(imageMessage);
+                                        result.setMessage(GsonProvider.getGson().toJson(m));
+                                        messageStore.updateMessage(result)
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribeOn(Schedulers.io())
+                                                .subscribe(new Subscriber<MessageResult>() {
+                                                    @Override
+                                                    public void onCompleted() {}
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(MessageResult messageResult) {
+                                                        sendMessageUseCase.execute(result)
+                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribe(new Subscriber<MessageResult>() {
+                                                                    @Override
+                                                                    public void onCompleted() {}
+
+                                                                    @Override
+                                                                    public void onError(Throwable e) {}
+
+                                                                    @Override
+                                                                    public void onNext(MessageResult messageResult) {
+                                                                        Logger.d("SendMessage: "+messageResult.toString());
+                                                                        messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                    @Override
+                    public void onCompleted() {
+                    }
+                });
+        compositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void sendAudioMessage(String toId, String fromId, String audioFileUri) {
+        Message m = new Message();
+        AudioMessage audioMessage = new AudioMessage();
+        audioMessage.setFileUri(audioFileUri);
+        m.setAudioMessage(audioMessage);
+
+        MessageResult result = new MessageResult(toId, fromId, GsonProvider.getGson().toJson(m));
+        result.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
+        result.setTime(DateTime.now());
+
+        Subscription subscription = messageStore.storeMessage(result)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<MessageResult>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.d(this, "Store message error");
+                    }
+
+                    @Override
+                    public void onNext(MessageResult messageResult) {
+                        messageView.addMessageToList(messageResult);
+
+                        File image = new File(audioFileUri);
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String filename = timeStamp;
+                        int i = image.getName().lastIndexOf('.');
+                        if (i > 0) {
+                            filename = filename + image.getName().substring(i);
+                        } else {
+                            filename = filename + "." + image.getName();
+                        }
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), image);
+                        MultipartBody.Part audioFileBody = MultipartBody.Part.createFormData("audio", filename, requestBody);
+                        messageApi.uploadAudioData(audioFileBody)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<MessageDataResponse>() {
+                                    @Override
+                                    public void onCompleted() {}
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        Logger.d(this, e.getMessage());
+                                    }
+                                    @Override
+                                    public void onNext(MessageDataResponse dataResponse) {
+                                        Logger.d(this, "Image uploaded: "+dataResponse);
+                                        Message m = new Message();
+                                        AudioMessage audioMessage1 = new AudioMessage();
+                                        audioMessage1.setAudioUrl(dataResponse.getDataUrl());
+                                        audioMessage1.setFileUri(audioFileUri);
+                                        m.setAudioMessage(audioMessage1);
                                         result.setMessage(GsonProvider.getGson().toJson(m));
                                         messageStore.updateMessage(result)
                                                 .observeOn(AndroidSchedulers.mainThread())

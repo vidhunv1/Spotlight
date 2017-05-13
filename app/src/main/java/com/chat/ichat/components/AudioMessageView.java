@@ -26,21 +26,25 @@ public class AudioMessageView extends View {
     private RectF viewrectF;
     private Timer timer;
     private boolean isRunning;
+    private Context context;
 
     private int viewColor;
     private int playingColor;
     private int primaryColor;
 
     private float playPerc;
-    private long durationMilli = 10000;
+    private long durationMilli = 1000;
     private int delayMilli = 10;
     private int iterCount = 0;
 
     private String audioFile = null;
     private MediaPlayer mediaPlayer;
 
+    private Path roundRectPath = null;
+    private Path playPath = null;
     public AudioMessageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         paint = new Paint();
         paint.setAntiAlias(true);
 
@@ -85,6 +89,18 @@ public class AudioMessageView extends View {
         }
     }
 
+    public void setMessageType(boolean isMessageReceive) {
+        if(isMessageReceive) {
+            this.viewColor = ContextCompat.getColor(context, R.color.receiveMessageBubble);
+            this.playingColor = ContextCompat.getColor(context, R.color.receiveMessageBubblePressed);
+            this.primaryColor = ContextCompat.getColor(context, R.color.appElement);
+        } else {
+            this.viewColor = ContextCompat.getColor(context, R.color.sendMessageBubble);
+            this.playingColor = ContextCompat.getColor(context, R.color.sendMessageBubblePressed);
+            this.primaryColor = ContextCompat.getColor(context, R.color.colorPrimary);
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -98,11 +114,12 @@ public class AudioMessageView extends View {
 
         canvas.drawRoundRect(viewrectF, AndroidUtils.px(18), AndroidUtils.px(18), paint);
 
+        if(roundRectPath == null) {
+            roundRectPath = RoundedRect(0, getHeight(), getWidth(), 0, AndroidUtils.px(18), AndroidUtils.px(18), true, true, true, true);
+        }
         paint.setColor(playingColor);
-        Path path;
-        path = RoundedRect(0, getHeight(), getWidth(), 0, AndroidUtils.px(18), AndroidUtils.px(18), true, true, true, true);
 
-        canvas.clipPath(path);
+        canvas.clipPath(roundRectPath);
         canvas.drawRect(0, getHeight(), getWidth()*playPerc,0, paint);
 
         int pt = getPaddingTop();
@@ -129,19 +146,15 @@ public class AudioMessageView extends View {
         Logger.d(this, "Time: "+(durationMilli - delayMilli*((int)playPerc*durationMilli/delayMilli)));
         canvas.drawText(time, getWidth()-AndroidUtils.px(35), centerY + AndroidUtils.px(4), paint);
 
-        if(!isRunning) {
-            Path playPath = new Path();
-            playPath.setFillType(Path.FillType.EVEN_ODD);
-            playPath.moveTo(AndroidUtils.px(17), centerY+AndroidUtils.px(5));
-            playPath.lineTo(AndroidUtils.px(17), centerY+AndroidUtils.px(5));
-            playPath.lineTo(AndroidUtils.px(17+6f), centerY);
-            playPath.lineTo(AndroidUtils.px(17), centerY-AndroidUtils.px(5));
-            playPath.close();
+        if(!isRunning) { //play bitmap
+            if(playPath == null) {
+                playPath = getPlayPath(AndroidUtils.px(17), centerY);
+            }
             canvas.drawPath(playPath, paint);
-        } else {
-            paint.setStrokeWidth(AndroidUtils.px(2));
-            canvas.drawLine(AndroidUtils.px(17), centerY - AndroidUtils.px(4), AndroidUtils.px(17), centerY + AndroidUtils.px(4), paint);
-            canvas.drawLine(AndroidUtils.px(17+4), centerY - AndroidUtils.px(4), AndroidUtils.px(17+4), centerY + AndroidUtils.px(4), paint);
+        } else { // pause bitmap
+            paint.setStrokeWidth(AndroidUtils.px(1.5f));
+            canvas.drawLine(AndroidUtils.px(17), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(17), centerY + AndroidUtils.px(3.5f), paint);
+            canvas.drawLine(AndroidUtils.px(17+3.5f), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(17+3.5f), centerY + AndroidUtils.px(3.5f), paint);
         }
     }
 
@@ -167,7 +180,7 @@ public class AudioMessageView extends View {
         if(min>=1) {
             sec = sec - ((min-1) * 60);
         }
-        return String.format("%02d", min)+":"+String.format("%02d", sec+1);
+        return String.format("%01d", min)+":"+String.format("%02d", sec+1);
     }
 
     private Path RoundedRect(float left, float top, float right, float bottom, float rx, float ry,
@@ -216,5 +229,17 @@ public class AudioMessageView extends View {
         path.close();
 
         return path;
+    }
+
+    private Path getPlayPath(float x, float y) {
+        Path playPath = new Path();
+        playPath.setFillType(Path.FillType.EVEN_ODD);
+        playPath.moveTo(x, y+AndroidUtils.px(4));
+        playPath.lineTo(x, y+AndroidUtils.px(4));
+        playPath.lineTo(x + AndroidUtils.px(5f), y);
+        playPath.lineTo(x, y-AndroidUtils.px(4));
+        playPath.close();
+
+        return playPath;
     }
 }

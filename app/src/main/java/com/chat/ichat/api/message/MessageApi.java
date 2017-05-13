@@ -13,4 +13,8 @@ public interface MessageApi {
     @Multipart
     @PUT("message/image")
     Observable<MessageDataResponse> uploadImageData(@Part MultipartBody.Part image);
+
+    @Multipart
+    @PUT("message/audio")
+    Observable<MessageDataResponse> uploadAudioData(@Part MultipartBody.Part audio);
 }
