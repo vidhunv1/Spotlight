@@ -48,7 +48,7 @@
                 tools:ignore="MissingPrefix"
                 android:layout_height="wrap_content"
                 android:text="Name"
-                android:textAppearance="@style/FontRobotoMedium"
+                android:textStyle="normal"
                 android:textColor="#212121"
                 android:textSize="17sp"
                 android:id="@+id/tv_chatItem_contactName"

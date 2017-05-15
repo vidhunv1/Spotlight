@@ -75,7 +75,7 @@ public class MessagePresenter implements MessageContract.Presenter {
         ContactResult contactResult = new ContactResult();
         contactResult.setUserId(userId);
         contactResult.setAdded(true);
-        Subscription subscription = addContactUseCase.execute(userId)
+        Subscription subscription = addContactUseCase.execute(userId, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResult>() {

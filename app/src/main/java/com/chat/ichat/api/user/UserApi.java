@@ -53,4 +53,7 @@ public interface UserApi {
 
     @POST("users/login")
     Observable<UserResponse> loginUser(@Body UserRequest userRequest);
+
+    @GET("users/suggestions")
+    Observable<SuggestionsResponse> getUserSuggestions();
 }

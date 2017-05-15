@@ -405,8 +405,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			onBackPressed();
 			return true;
 		} else if(id == R.id.action_search) {
-			startActivity(SearchActivity.callingIntent(this, chats));
-			this.overridePendingTransition(0, 0);
+			startActivity(SearchActivity.callingIntent(this));
 
 			/*              Analytics           */
 			firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, null);

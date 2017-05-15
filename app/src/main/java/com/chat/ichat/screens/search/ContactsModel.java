@@ -54,6 +54,7 @@ public class ContactsModel {
                 "contactName='" + contactName + '\'' +
                 ", userId='" + userId + '\'' +
                 ", userName='" + userName + '\'' +
+                ", profileDp='" + profileDp + '\'' +
                 '}';
     }
 }

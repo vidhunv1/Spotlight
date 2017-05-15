@@ -383,11 +383,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void renderItem(int number) {
             contactNumber.setVisibility(View.GONE);
-//            if(number == 1) {l
-//                contactNumber.setText(number + " contact");
-//            } else if(number >=1){
-//                contactNumber.setText(number + " contacts");
-//            }
         }
     }
 

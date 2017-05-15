@@ -17,10 +17,10 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import java.util.Timer;
 import java.util.TimerTask;
+
 /**
  * Created by vidhun on 11/05/17.
  */
-
 public class AudioMessageView extends View {
     private Paint paint;
     private RectF viewrectF;
@@ -239,7 +239,6 @@ public class AudioMessageView extends View {
         playPath.lineTo(x + AndroidUtils.px(5f), y);
         playPath.lineTo(x, y-AndroidUtils.px(4));
         playPath.close();
-
         return playPath;
     }
 }

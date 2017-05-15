@@ -138,7 +138,7 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void addContact(String userId) {
         Logger.d(this);
-        Subscription subscription = addContactUseCase.execute(userId)
+        Subscription subscription = addContactUseCase.execute(userId, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResult>() {

@@ -10,8 +10,10 @@ import com.chat.ichat.core.BaseView;
 public interface SearchContract {
     interface View extends BaseView {
         void displaySearch(SearchModel searchModel);
+        void initSearch(SearchModel searchModel);
     }
     interface Presenter extends BasePresenter<SearchContract.View> {
-        void search(String query);
+        void init();
+        void searchContacts(String name);
     }
 }

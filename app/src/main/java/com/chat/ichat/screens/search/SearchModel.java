@@ -1,6 +1,8 @@
 package com.chat.ichat.screens.search;
 
 
+import com.chat.ichat.models.ContactResult;
+
 import java.util.List;
 
 /**
@@ -9,13 +11,18 @@ import java.util.List;
 
 public class SearchModel {
     private String searchTerm;
-    private List<ContactsModel> contactsModelList;
-    private List<MessagesModel> messagesModelList;
+    private List<ContactResult> contactsModelList;
+    private List<ContactResult> suggestedModelList;
+    private ContactResult searchUser;
 
-    public SearchModel(String searchTerm, List<ContactsModel> contactsModelList, List<MessagesModel> messagesModelList) {
+    public SearchModel(String searchTerm, List<ContactResult> contactsModelList, List<ContactResult> suggestedModelList) {
         this.searchTerm = searchTerm;
         this.contactsModelList = contactsModelList;
-        this.messagesModelList = messagesModelList;
+        this.suggestedModelList = suggestedModelList;
+    }
+
+    public SearchModel(String searchTerm) {
+        this.searchTerm = searchTerm;
     }
 
     public String getSearchTerm() {
@@ -26,32 +33,44 @@ public class SearchModel {
         this.searchTerm = searchTerm;
     }
 
-    public List<ContactsModel> getContactsModelList() {
+    public List<ContactResult> getContactsModelList() {
         return contactsModelList;
     }
 
-    public void setContactsModelList(List<ContactsModel> contactsModelList) {
+    public void setContactsModelList(List<ContactResult> contactsModelList) {
         this.contactsModelList = contactsModelList;
     }
 
-    public List<MessagesModel> getMessagesModelList() {
-        return messagesModelList;
+    public List<ContactResult> getSuggestedModelList() {
+        return suggestedModelList;
     }
 
-    public void setMessagesModelList(List<MessagesModel> messagesModelList) {
-        this.messagesModelList = messagesModelList;
+    public void setSuggestedModelList(List<ContactResult> suggestedModelList) {
+        this.suggestedModelList = suggestedModelList;
+    }
+
+    public ContactResult getSearchUser() {
+        return searchUser;
+    }
+
+    public void setSearchUser(ContactResult searchUser) {
+        this.searchUser = searchUser;
     }
 
     @Override
     public String toString() {
         String out = "Search: "+searchTerm+"\n";
-        out = out + "Messages: \n";
-        for (MessagesModel messages : messagesModelList)
-            out = out + messages.toString();
-        out = out + "\n Contacts: \n";
-        for(ContactsModel contact : contactsModelList)
-            out = out + contact.toString();
-
+        out = out + "SearchUser: "+searchUser+"\n";
+        out = out + "Contacts: \n";
+        if(contactsModelList!=null) {
+            for (ContactResult contactsModel : contactsModelList)
+                out = out + contactsModel.toString();
+        }
+        out = out + "\n Suggested: \n";
+        if(suggestedModelList!=null) {
+            for (ContactResult contact : suggestedModelList)
+                out = out + contact.toString();
+        }
         return out;
     }
 }

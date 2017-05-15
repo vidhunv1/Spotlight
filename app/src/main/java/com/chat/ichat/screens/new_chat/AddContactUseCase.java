@@ -41,9 +41,9 @@ public class AddContactUseCase {
         this.botDetailsStore = botDetailsStore;
     }
 
-    public Observable<ContactResult> execute(String userId) {
+    public Observable<ContactResult> execute(String userId, boolean shouldAdd) {
         return Observable.create(subscriber -> {
-            Subscription subscription = contactStore.getContactByUserId(userId)
+            contactStore.getContactByUserId(userId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(contact -> {
@@ -66,7 +66,7 @@ public class AddContactUseCase {
                                             contactResult.setDisplayName(userResponse.getUser().getName());
                                             contactResult.setUserType(userResponse.getUser().getUserType());
                                             contactResult.setProfileDP(userResponse.getUser().getProfileDP());
-                                            contactResult.setAdded(true);
+                                            contactResult.setAdded(shouldAdd);
                                             contactResult.setBlocked(false);
 
                                             return contactResult;

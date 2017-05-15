@@ -377,6 +377,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void setContactDetails(ContactResult contact) {
+        Logger.d(this, "ContactDetails: "+contact);
         this.contactDetails = contact;
 
         title.setText(AndroidUtils.displayNameStyle(contactDetails.getContactName()));

@@ -17,20 +17,20 @@
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="horizontal" android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <EditText
                     android:layout_width="242dp"
                     android:layout_height="48dp"
+                    android:maxLines="1"
                     android:background="@android:color/transparent"
                     android:id="@+id/et_search"
-                    android:hint="Search"
+                    android:hint="Name or Username"
                     android:textCursorDrawable="@drawable/bg_cursor_search"
                     android:textColorHint="@color/textHintColor"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:textSize="18sp"
-                    android:maxLines="1"
-                    android:textColor="@color/textHintColor"
-                    android:textColorLink="@android:color/black" />
+                    android:textColor="@color/textPrimaryLight" >
+                    <requestFocus/>
+                </EditText>
 
                 <ImageButton
                     android:layout_width="48dp"
@@ -54,12 +54,11 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/rv_contact_list"
-        android:name="com.stairway.spotlight.screens.home.chatlist.chatListFragment"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".screens.home.chats.ChatListFragment"
         tools:listitem="@layout/item_contact" />
 </LinearLayout>

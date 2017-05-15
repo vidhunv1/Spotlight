@@ -206,34 +206,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         alertDialog.setMessage(Html.fromHtml(message));
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-
-//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-//        View addedContactView = inflater.inflate(R.layout.popup_contact_added, null);
-//        PopupWindow addedPopupWindow = new PopupWindow(
-//                addedContactView,
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                true
-//        );
-//        if(Build.VERSION.SDK_INT>=21)
-//            addedPopupWindow.setElevation(5.0f);
-//
-//        addedPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
-//        addedPopupWindow.showAtLocation(newChatLayout, Gravity.CENTER,0,0);
-//
-//        RelativeLayout out = (RelativeLayout) addedContactView.findViewById(R.id.fl_added_contact);
-//        out.setOnClickListener(view -> addedPopupWindow.dismiss());
-//
-//        Button sendMessage = (Button) addedContactView.findViewById(R.id.btn_send_message);
-//        sendMessage.setOnClickListener(v1 -> {
-//            addedPopupWindow.dismiss();
-//            this.navigateToMessageActivity(username);
-//        });
-//
-//        TextView resultMessage = (TextView) addedContactView.findViewById(R.id.tv_add_result_message);
-//        resultMessage.setText(message);
-//        ImageView profileImage = (ImageView) addedContactView.findViewById(R.id.iv_profileImage);
-//        profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(name, username, 18));
         newChatPresenter.initContactList();
     }
 

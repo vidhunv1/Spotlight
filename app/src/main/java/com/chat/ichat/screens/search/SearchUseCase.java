@@ -43,11 +43,13 @@ public class SearchUseCase {
 
                         @Override
                         public void onNext(List<ContactResult> contactResults) {
-                            List<ContactsModel> contactsModelList = new ArrayList<>(contactResults.size());
+                            List<ContactResult> contactsModelList = new ArrayList<>(contactResults.size());
                             List<MessagesModel> messagesModelList = new ArrayList<>();
                             for (ContactResult contactResult : contactResults) {
-                                ContactsModel contactsModel = new ContactsModel(contactResult.getContactName(), contactResult.getUserId(), contactResult.getUsername());
-                                contactsModel.setProfileDp(contactResult.getProfileDP());
+                                ContactResult contactsModel = new ContactResult(contactResult.getCountryCode(), contactResult.getPhoneNumber(), contactResult.getContactName());
+                                contactsModel.setUsername(contactResult.getUsername());
+                                contactsModel.setUserId(contactResult.getUserId());
+                                contactsModel.setProfileDP(contactResult.getProfileDP());
                                 contactsModelList.add(contactsModel);
                             }
                             messageStore.searchMessages(searchTerm).subscribe(new Subscriber<List<MessageResult>>() {
@@ -88,7 +90,7 @@ public class SearchUseCase {
                                         }
                                     }
 
-                                    SearchModel searchModel = new SearchModel(searchTerm, contactsModelList, messagesModelList);
+                                    SearchModel searchModel = new SearchModel(searchTerm, contactsModelList, null);
                                     Logger.d(this, searchModel.toString());
                                     subscriber.onNext(searchModel);
                                     subscriber.onCompleted();

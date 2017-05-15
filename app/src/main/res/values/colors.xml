@@ -33,7 +33,7 @@
 
     <!--icons-->
     <color name="iconPrimary">#ffffff</color>
-    <color name="iconSecondary">#B9D6D9</color>
+    <color name="iconSecondary">#BBDDBB</color>
     <color name="divider">#D9D9D9</color>
 
     <color name="drawerText">#37474f</color>
