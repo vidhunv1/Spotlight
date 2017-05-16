@@ -146,13 +146,16 @@ public class SearchPresenter implements SearchContract.Presenter {
                                     @Override
                                     public void onNext(List<ContactResult> contactResults) {
                                         AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
+                                        List<ContactResult> getContacts = new ArrayList<>(contactsResultsm.size());
+                                        getContacts.addAll(contactsResultsm);
                                         List<Observable<ContactResult>> observables = new ArrayList<>();
                                         for (ContactResult contactResult : contactResults) {
                                             if(contactResult.isAdded())
                                                 contactsResultsm.remove(contactResult);
+                                            getContacts.remove(contactResult);
                                         }
 
-                                        for (ContactResult contactResult : contactsResultsm) {
+                                        for (ContactResult contactResult : getContacts) {
                                             observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
                                         }
 

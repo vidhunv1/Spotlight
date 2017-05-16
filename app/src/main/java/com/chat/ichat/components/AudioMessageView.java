@@ -97,7 +97,7 @@ public class AudioMessageView extends View {
         } else {
             this.viewColor = ContextCompat.getColor(context, R.color.sendMessageBubble);
             this.playingColor = ContextCompat.getColor(context, R.color.sendMessageBubblePressed);
-            this.primaryColor = ContextCompat.getColor(context, R.color.colorPrimary);
+            this.primaryColor = ContextCompat.getColor(context, R.color.appElement);
         }
     }
 

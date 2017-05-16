@@ -390,7 +390,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_RECV_AUDIO:
                 View view14 = inflater.inflate(R.layout.item_message_receive_audio, parent, false);
-                viewHolder = new SendAudioViewHolder(view14);
+                viewHolder = new ReceiveAudioViewHolder(view14);
                 break;
             default:
                 return null;
@@ -1494,9 +1494,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     break;
             }
 
-            Glide.with(context).load(imageUrl.replace("https://", "http://"))
-                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
-                    .into(messageImage);
+            if(imageUrl!=null && !imageUrl.isEmpty()) {
+                Glide.with(context).load(imageUrl.replace("https://", "http://"))
+                        .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int) context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
+                        .into(messageImage);
+            }
 
             if(hasProfileDP(position)) {
                 profileImageView.setVisibility(View.VISIBLE);
@@ -1593,12 +1595,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ImageView profileImageView;
         @Bind(R.id.rl_bubble)
         RelativeLayout bubbleView;
-        @Bind(R.id.message_send_text)
-        RelativeLayout layout;
         @Bind(R.id.tv_time)
         TextView timeView;
-        @Bind(R.id.tv_delivery_status)
-        TextView deliveryStatusText;
         @Bind(R.id.audio_message)
         AudioMessageView audioMessageView;
 
@@ -1611,13 +1609,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
-            GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
-            drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
-
             audioMessageView.setAudioFile(fileName);
             audioMessageView.setMessageType(true);
             timeView.setText(time);
-            deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);
                 timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
@@ -1628,16 +1622,16 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             switch (bubbleType) {
                 case 0:
-                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    bubbleView.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     break;
                 case 1:
-                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    bubbleView.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     break;
                 case 2:
-                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    bubbleView.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     break;
                 case 3:
-                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    bubbleView.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     break;
             }
 
