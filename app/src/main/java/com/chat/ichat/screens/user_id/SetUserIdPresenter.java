@@ -14,14 +14,18 @@ import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
 import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.UserSession;
+import com.chat.ichat.screens.new_chat.AddContactUseCase;
+import com.chat.ichat.screens.search.SearchModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -148,8 +152,12 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                         ContactResult contactResult = new ContactResult(contact.getCountryCode(), contact.getPhone(), contact.getName());
                                         contactResult.setUsername(contact.getUsername());
                                         contactResult.setUserId(contact.getUserId());
+                                        contactResult.setAdded(true);
+                                        contactResult.setBlocked(false);
+                                        contactResult.setProfileDP(contact.getProfileDP());
 
                                         // default behaviour, we auto add phone contacts
+                                        //TODO: [1]Sync phone contacts not working
                                         if(contact.isRegistered()) {
                                             contacts.add(contactResult);
                                             MessageController.getInstance().getLastActivity(contactResult.getUsername());
@@ -172,8 +180,16 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
 
                                     @Override
                                     public void onNext(List<ContactResult> contacts) {
-                                        appContactStore.storeContacts(contacts)
-                                                .subscribe(new Subscriber<Boolean>() {
+                                        AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
+                                        List<Observable<ContactResult>> observables = new ArrayList<>();
+                                        for (ContactResult contactResult : contacts) {
+                                            observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+                                        }
+
+                                        Observable.zip(observables, (i) -> "Done Sync")
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Subscriber<String>() {
                                                     @Override
                                                     public void onCompleted() {}
 
@@ -184,7 +200,7 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                                     }
 
                                                     @Override
-                                                    public void onNext(Boolean aBoolean) {
+                                                    public void onNext(String s) {
                                                         Logger.d(this, "onNext: ");
                                                         setUserIdView.navigateToHome();
                                                     }
