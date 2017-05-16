@@ -559,6 +559,8 @@ public class MessageActivity extends BaseActivity
             ImageButton audioButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_audio);
             ImageButton locationButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_location);
             ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
+            View smileySelector = (View) regularKeyboardView.findViewById(R.id.smiley_selector);
+            View audioSelector = (View) regularKeyboardView.findViewById(R.id.audio_selector);
 
 
             MessageEditText messageEditText = (MessageEditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
@@ -572,7 +574,6 @@ public class MessageActivity extends BaseActivity
                     shouldHandleBack = false;
                     emojiPicker.reset();
                     audioViewHelper.reset();
-//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
                     messageEditText.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
@@ -582,11 +583,18 @@ public class MessageActivity extends BaseActivity
                 }
                 emojiPicker.removeEmojiPickerView();
                 audioViewHelper.removeAudioPickerView();
+                smileySelector.setVisibility(View.GONE);
+                audioSelector.setVisibility(View.GONE);
+                audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
             });
 
             messageEditText.setOnTouchListener((v, event) -> {
                 shouldHandleBack = false;
-//                emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
+                smileySelector.setVisibility(View.GONE);
+                audioSelector.setVisibility(View.GONE);
+                audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
                 if(!emojiPicker.isEmojiState()) {
                     emojiPicker.emojiButtonToggle();
                 }
@@ -601,11 +609,11 @@ public class MessageActivity extends BaseActivity
                 audioViewHelper.reset();
                 emojiPicker.emojiButtonToggle();
                 if(!emojiPicker.isEmojiState()) {
-//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
-                } else {
-                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
-                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
+                    smileySelector.setVisibility(View.VISIBLE);
+                    audioSelector.setVisibility(View.GONE);
+
+                    audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                    emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon_selected));
                 }
 
                 /*              Analytics           */
@@ -619,11 +627,11 @@ public class MessageActivity extends BaseActivity
                 emojiPicker.reset();
                 audioViewHelper.audioButtonToggle();
                 if(!audioViewHelper.isAudioState()) {
-//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard));
-                } else {
-//                    emojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_insert_emoticon));
-                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    mgr.showSoftInput(messageEditText, InputMethodManager.RESULT_SHOWN);
+                    audioSelector.setVisibility(View.VISIBLE);
+                    smileySelector.setVisibility(View.GONE);
+
+                    audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_selected));
+                    emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
                 }
             });
 
@@ -753,7 +761,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
-        Logger.d(this, "MessageStatus: "+messageStatus.name());
         if(messagesAdapter!=null)
             messagesAdapter.updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus);
     }
@@ -791,7 +798,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void navigateToGetLocation() {
-        Logger.d(this, "NavigateToGetLocation");
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
             startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER_SEND);
@@ -839,21 +845,20 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onPresenceChanged(String username, Presence.Type type) {
         super.onPresenceChanged(username, type);
-        if(username.equals(chatUserName)) {
+//        if(username.equals(chatUserName)) {
 //            presenceView.setVisibility(View.VISIBLE);
-            if(type == Presence.Type.available) {
+//            if(type == Presence.Type.available) {
 //                presenceView.setText(getResources().getString(R.string.chat_presence_online));
-            } else if(type == Presence.Type.unavailable) {
+//            } else if(type == Presence.Type.unavailable) {
 //                DateTime timeNow = DateTime.now();
 //                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
-            }
-        }
+//            }
+//        }
     }
 
     @Override
     public void onMessageStatusReceived(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(messageId, chatId, deliveryReceiptId, messageStatus);
-        Logger.d(this, "MessageStatusReceived: "+messageStatus.name());
         if(this.chatUserName.equals(chatId)) {
             updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus);
         }

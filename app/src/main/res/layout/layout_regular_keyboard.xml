@@ -43,41 +43,58 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_insert_emoticon"
-            android:background="@android:color/transparent"
+            android:background="?android:selectableItemBackground"
             android:id="@+id/btn_message_smiley"/>
 
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/smiley_selector"
+            android:visibility="gone"
+            android:background="@color/colorPrimary"/>
+
+        <View
+            android:visibility="gone"
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginLeft="144dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/audio_selector"
+            android:background="@color/colorPrimary"/>
+
         <ImageButton
+            android:background="?android:selectableItemBackground"
             android:layout_alignParentBottom="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_toRightOf="@+id/btn_message_smiley"
             android:id="@+id/btn_sendMessage_gallery"
-            app:srcCompat="@drawable/ic_gallery"
-            android:background="@android:color/transparent"/>
+            app:srcCompat="@drawable/ic_gallery" />
         <ImageButton
             android:layout_alignParentBottom="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:id="@+id/btn_sendMessage_camera"
             android:layout_toRightOf="@+id/btn_sendMessage_gallery"
-            app:srcCompat="@drawable/ic_camera"
-            android:background="@android:color/transparent"/>
+            android:background="?android:selectableItemBackground"
+            app:srcCompat="@drawable/ic_camera" />
         <ImageButton
+            android:background="?android:selectableItemBackground"
             android:layout_alignParentBottom="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_toRightOf="@+id/btn_sendMessage_camera"
             android:id="@+id/btn_sendMessage_audio"
-            app:srcCompat="@drawable/ic_mic"
-            android:background="@android:color/transparent"/>
+            app:srcCompat="@drawable/ic_mic" />
         <ImageButton
+            android:background="?android:selectableItemBackground"
             android:layout_alignParentBottom="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_toRightOf="@+id/btn_sendMessage_audio"
             android:id="@+id/btn_sendMessage_location"
-            app:srcCompat="@drawable/ic_location"
-            android:background="@android:color/transparent"/>
+            app:srcCompat="@drawable/ic_location" />
     </RelativeLayout>
     <android.support.design.widget.FloatingActionButton
         android:layout_below="@+id/view_divider"
