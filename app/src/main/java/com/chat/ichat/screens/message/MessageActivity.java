@@ -722,6 +722,9 @@ public class MessageActivity extends BaseActivity
                             sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
                             sendView.show();
                         }, 125);
+                    } else if(s.length() > 0) {
+                        sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
                     }
                     onMessageChanged();
                 }
