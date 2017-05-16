@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="Name"
                 android:textStyle="normal"
-                android:textColor="#212121"
+                android:textColor="#262328"
                 android:textSize="17sp"
                 android:id="@+id/tv_chatItem_contactName"
                 android:maxWidth="190dp" />
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:maxLines="1"
-                android:textColor="#8f8f8f"
+                android:textColor="#546e7a"
                 android:id="@+id/tv_chatItem_message"
                 android:text="message" />
         </LinearLayout>

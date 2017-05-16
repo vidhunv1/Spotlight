@@ -1,5 +1,4 @@
 package com.chat.ichat.screens.search;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,18 +9,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import com.chat.ichat.R;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
-import com.chat.ichat.db.ContactStore;
-import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.screens.message.MessageActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.util.ArrayList;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -109,11 +105,12 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @OnTextChanged(R.id.et_search)
     public void onQueryChanged() {
         if(search.getText().length()>0) {
+            clearSearchView.setVisibility(View.VISIBLE);
             clearSearchView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_close_active));
             searchPresenter.searchContacts(search.getText().toString());
         }
         else {
-            clearSearchView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_close_inactive));
+            clearSearchView.setVisibility(View.GONE);
             searchPresenter.init();
         }
     }

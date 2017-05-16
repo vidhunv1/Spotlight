@@ -26,6 +26,7 @@
         android:textColor="#333333"
         android:textSize="16sp"
         android:cursorVisible="true"
+        android:inputType="textCapSentences"
         android:textCursorDrawable="@drawable/bg_cursor_message"
         android:textColorHint="@color/appElement">
         <requestFocus/>

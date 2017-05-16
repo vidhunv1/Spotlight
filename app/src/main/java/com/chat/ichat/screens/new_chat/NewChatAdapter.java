@@ -173,8 +173,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 viewHolder = new NoResultViewHolder(noResultView);
                 break;
             case HEADER:
-                View newGroup = inflater.inflate(R.layout.item_header_contact, parent, false);
-                viewHolder = new HeaderViewHolder(newGroup);
+                View newGroup = inflater.inflate(R.layout.item_search_category, parent, false);
+                viewHolder = new CategoryViewHolder(newGroup);
                 break;
             case NO_CONTACTS:
                 View noContacts = inflater.inflate(R.layout.item_no_contacts, parent, false);
@@ -216,7 +216,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 noResultViewHolder.renderItem(filterQuery);
                 break;
             case HEADER:
-//                NewGroupViewHolder newGroupViewHolder = (NewGroupViewHolder) holder;
+                CategoryViewHolder categoryNameViewHolder3 = (CategoryViewHolder) holder;
+                categoryNameViewHolder3.renderItem("Contacts");
             default:
                 break;
         }
@@ -365,10 +366,17 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    class HeaderViewHolder extends RecyclerView.ViewHolder {
-        HeaderViewHolder(View itemView) {
+    class CategoryViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_search_category)
+        TextView categoryTextView;
+
+        CategoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String categoryName) {
+            categoryTextView.setText(categoryName);
         }
     }
 

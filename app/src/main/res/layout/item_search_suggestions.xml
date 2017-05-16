@@ -9,4 +9,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"/>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:id="@+id/view_contactItem_divider"
+        android:background="@color/divider" />
+
 </LinearLayout>

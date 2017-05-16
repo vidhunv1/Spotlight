@@ -156,7 +156,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
 		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
 		profileNameView.setText(userSession.getName());
-		profileIdView.setText("ID: "+userSession.getUserId());
+		profileIdView.setText("@"+userSession.getUserId());
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();

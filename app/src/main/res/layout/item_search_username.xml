@@ -8,7 +8,7 @@
     <LinearLayout
         android:id="@+id/ll_item_chat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="72dp"
         android:background="?android:selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
@@ -64,7 +64,7 @@
                     android:maxWidth="256dp"
                     android:textSize="16sp"
                     android:maxLines="1"
-                    android:textColor="#8f8f8f"
+                    android:textColor="#546e7a"
                     android:id="@+id/tv_chatItem_message"
                     android:ellipsize="end"
                     android:text="messageasdasdasdasdadasdadssadsadsadsad" />
@@ -79,4 +79,9 @@
                 android:text="Searching..."/>
         </RelativeLayout>
     </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:id="@+id/view_contactItem_divider"
+        android:background="@color/divider" />
 </LinearLayout>

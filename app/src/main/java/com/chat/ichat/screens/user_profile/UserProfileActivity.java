@@ -122,7 +122,7 @@ public class UserProfileActivity extends BaseActivity {
         isBlocked = receivedIntent.getBooleanExtra(KEY_CONTACT_BLOCKED, false);
 
         contactNameView.setText(contactName);
-        userIdView.setText(userId);
+        userIdView.setText("@"+userId);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

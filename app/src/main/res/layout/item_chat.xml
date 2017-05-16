@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:text="Name"
                     android:textAppearance="@style/FontRobotoMedium"
-                    android:textColor="#212121"
+                    android:textColor="#262328"
                     android:paddingBottom="4.25dp"
                     android:textSize="17sp"
                     android:id="@+id/tv_chatItem_contactName"
@@ -63,7 +63,7 @@
                         android:paddingRight="15dp"
                         android:text="9:47 P.M."
                         android:textSize="13sp"
-                        android:textColor="#999999"
+                        android:textColor="#546e7a"
                         android:layout_gravity="right" />
                 </RelativeLayout>
             </LinearLayout>
@@ -78,7 +78,7 @@
                     android:maxWidth="256dp"
                     android:textSize="16sp"
                     android:maxLines="1"
-                    android:textColor="#8f8f8f"
+                    android:textColor="#546e7a"
                     android:id="@+id/tv_chatItem_message"
                     android:ellipsize="end"
                     android:text="messageasdasdasdasdadasdadssadsadsadsad" />

@@ -1,10 +1,8 @@
 package com.chat.ichat.screens.search;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.SharedPreferences;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -14,16 +12,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
 import com.chat.ichat.core.Logger;
@@ -35,6 +29,8 @@ import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +39,9 @@ import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
+
 /**
  * Created by vidhun on 17/12/16.
  */
@@ -63,6 +62,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_USERNAME_SEARCH = 7;
 
     private List<Integer> itemType;
+    private SharedPreferences sharedPreferences;
 
     public SearchAdapter(Context context, ContactClickListener contactClickListener) {
         this.context = context;
@@ -71,6 +71,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.suggestedUsersList = new ArrayList<>();
         this.searchQuery = "";
         this.itemType = new ArrayList<>();
+        this.sharedPreferences = context.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
     }
 
     public void displaySearch(String searchTerm, List<ContactResult> contactsModelList, List<ContactResult> suggestedModelList, ContactResult searchUser) {
@@ -257,7 +258,27 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 contactName.setText(contactItem.getContactName());
             }
 
-            status.setText("ID: "+contactItem.getUserId());
+            String presence = "";
+            String onlineColor = "#0f9D58";
+            long millis = sharedPreferences.getLong(contactItem.getUsername(), 0);
+            String onlineHtml = "<font color=\"" + onlineColor + "\">Online</font>";
+            if(millis == 0) {
+                if(contactItem.getUsername().startsWith("o_")) {
+                    presence = onlineHtml;
+                } else {
+                    presence = "Last seen recently";
+                }
+            } else if((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
+                presence = onlineHtml;
+            } else {
+                String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
+                presence = context.getResources().getString(R.string.chat_presence_away, lastSeen);
+            }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                status.setText(Html.fromHtml(presence, Html.FROM_HTML_MODE_LEGACY));
+            else
+                status.setText(Html.fromHtml(presence));
+
             contactName.setTag(contactItem.getUsername());
             divider.setVisibility(View.GONE);
 
@@ -375,10 +396,10 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                                 @Override
                                 public void onError(Throwable e) {
-                                    progressBar.setVisibility(View.INVISIBLE);
+                                    progressBar.setVisibility(View.GONE);
                                     textContent.setVisibility(View.GONE);
                                     searching.setVisibility(View.VISIBLE);
-                                    profileImage.setVisibility(View.INVISIBLE);
+                                    profileImage.setVisibility(View.GONE);
 
                                     searching.setText("Network error.");
                                 }
@@ -396,7 +417,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void renderItem(String query) {
             progressBar.setVisibility(View.VISIBLE);
             searching.setVisibility(View.VISIBLE);
-            profileImage.setVisibility(View.GONE);
+            profileImage.setVisibility(View.INVISIBLE);
             textContent.setVisibility(View.GONE);
             searching.setText("Searching...");
 
@@ -411,10 +432,12 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     @Override
                     public void onError(Throwable e) {
-                        progressBar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
                         textContent.setVisibility(View.GONE);
                         searching.setVisibility(View.VISIBLE);
-                        profileImage.setVisibility(View.INVISIBLE);
+                        profileImage.setVisibility(View.VISIBLE);
+                        profileImage.setPadding((int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20));
+                        profileImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error));
 
                         searching.setText("Network error.");
                         Logger.d(this, "OnError");
@@ -432,14 +455,14 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             searchUser.setAdded(false);
                             searchUser.setBlocked(false);
 
-                            Logger.d(this, "successUsername");
                             progressBar.setVisibility(View.INVISIBLE);
                             textContent.setVisibility(View.VISIBLE);
                             searching.setVisibility(View.GONE);
                             profileImage.setVisibility(View.VISIBLE);
+                            profileImage.setPadding((int)AndroidUtils.px(9),(int)AndroidUtils.px(10),(int)AndroidUtils.px(11),(int)AndroidUtils.px(10));
                             _User user = userResponse.getUser();
                             contactName.setText(AndroidUtils.displayNameStyle(user.getName()));
-                            lastMessage.setText(user.getUserId());
+                            lastMessage.setText("@"+user.getUserId());
 
                             if(user.getProfileDP()!=null && !user.getProfileDP().isEmpty()) {
                                 Glide.with(context)
@@ -454,13 +477,14 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             }
                             contactName.setTag(user.getUserId());
                         } else {
-                            Logger.d(this, "noUsername");
-                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.GONE);
                             textContent.setVisibility(View.GONE);
                             searching.setVisibility(View.VISIBLE);
-                            profileImage.setVisibility(View.INVISIBLE);
+                            profileImage.setVisibility(View.VISIBLE);
+                            profileImage.setPadding((int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20));
+                            profileImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error));
 
-                            searching.setText("No user found with '"+query+"'");
+                            searching.setText("Username '"+query+"' not found");
                         }
                     }
                 });

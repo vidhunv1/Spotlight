@@ -14,6 +14,7 @@ import com.chat.ichat.screens.new_chat.AddContactUseCase;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -144,22 +145,29 @@ public class SearchPresenter implements SearchContract.Presenter {
 
                                     @Override
                                     public void onNext(List<ContactResult> contactResults) {
+                                        AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
+                                        List<Observable<ContactResult>> observables = new ArrayList<>();
                                         for (ContactResult contactResult : contactResults) {
                                             if(contactResult.isAdded())
                                                 contactsResultsm.remove(contactResult);
                                         }
 
-                                        ContactStore.getInstance().storeContacts(contactsResultsm)
+                                        for (ContactResult contactResult : contactsResultsm) {
+                                            observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+                                        }
+
+                                        Observable.zip(observables, (i) -> "Done Sync")
                                                 .subscribeOn(Schedulers.io())
                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(new Subscriber<Boolean>() {
+                                                .subscribe(new Subscriber<String>() {
                                                     @Override
                                                     public void onCompleted() {}
+
                                                     @Override
                                                     public void onError(Throwable e) {}
 
                                                     @Override
-                                                    public void onNext(Boolean aBoolean) {
+                                                    public void onNext(String s) {
                                                         SearchModel searchModel = new SearchModel(null, null, contactsResultsm);
                                                         searchView.initSearch(searchModel);
                                                     }
