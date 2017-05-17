@@ -14,7 +14,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.chat.ichat.R;
@@ -43,6 +45,8 @@ public class GalleryViewHelper {
 
     private ComposerViewHelper composerViewHelper;
     private Listener listener;
+    private ArrayList<String> imageSelections;
+    ImageAdapter imageAdapter;
 
     public GalleryViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
         this.mContext = mContext;
@@ -50,6 +54,7 @@ public class GalleryViewHelper {
         this.window = window;
         this.galleryPickerLayout = createCustomView();
         this.composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
+        this.imageSelections = new ArrayList<>();
     }
 
     public void setListener(Listener listener) {
@@ -72,7 +77,8 @@ public class GalleryViewHelper {
             RecyclerView galleryRV = (RecyclerView) galleryLayout.findViewById(R.id.rv_gallery);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             galleryRV.setLayoutManager(linearLayoutManager);
-            galleryRV.setAdapter(new ImageAdapter(mContext, getAllShownImagesPath(mContext), composerViewHelper.getLayoutHeightpx()));
+            imageAdapter = new ImageAdapter(mContext, getAllShownImagesPath(mContext), composerViewHelper.getLayoutHeightpx());
+            galleryRV.setAdapter(imageAdapter);
 
             FloatingActionButton floatingActionButton = (FloatingActionButton) galleryLayout.findViewById(R.id.fab_gallery);
             floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +166,11 @@ public class GalleryViewHelper {
         return listOfAllImages;
     }
 
+    public void removeSelections() {
+        imageSelections.clear();
+        imageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * The Class ImageAdapter.
      */
@@ -186,7 +197,7 @@ public class GalleryViewHelper {
 
         @Override
         public void onBindViewHolder(GalleryViewHolder holder, int position) {
-            holder.render(images.get(position), composerViewHelper.getLayoutHeightpx());
+            holder.render(images.get(position), heightPx);
         }
 
         @Override
@@ -198,7 +209,11 @@ public class GalleryViewHelper {
             @Bind(R.id.gallery_pic)
             ImageView imageView;
 
+            @Bind(R.id.done)
+            ImageView done;
+
             private String uri;
+            private int layoutHeightPx;
             public GalleryViewHolder(View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
@@ -206,6 +221,7 @@ public class GalleryViewHelper {
 
             public void render(String uri, int layoutHeightPx) {
                 this.uri = uri;
+                this.layoutHeightPx = layoutHeightPx;
                 imageView.getLayoutParams().height = layoutHeightPx;
                 imageView.requestLayout();
 
@@ -216,9 +232,20 @@ public class GalleryViewHelper {
             }
 
             @OnClick(R.id.gallery_pic)
-            public void onPicClicked(){
+            public void onPicClicked() {
+                if(imageSelections.contains(uri)) {
+                    imageSelections.remove(uri);
+                    imageView.setPadding(0,0,0,0);
+                    done.setVisibility(View.GONE);
+//                    fg.setVisibility(View.GONE);
+                } else {
+                    imageSelections.add(uri);
+                    imageView.setPadding((int)AndroidUtils.px(10),(int)AndroidUtils.px(10),(int)AndroidUtils.px(10), (int)AndroidUtils.px(10));
+                    done.setVisibility(View.VISIBLE);
+//                    fg.setVisibility(View.VISIBLE);
+                }
                 if(listener!=null) {
-                    listener.onImageClicked(uri);
+                    listener.onImagesClicked(imageSelections);
                 }
             }
         }
@@ -226,7 +253,7 @@ public class GalleryViewHelper {
 
     public interface Listener{
         void onOpenGalleryClicked();
-        void onImageClicked(String uri);
+        void onImagesClicked(ArrayList<String> uris);
     }
 }
 

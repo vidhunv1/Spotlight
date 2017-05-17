@@ -105,18 +105,41 @@
             android:id="@+id/btn_sendMessage_location"
             app:srcCompat="@drawable/ic_location" />
     </RelativeLayout>
-    <android.support.design.widget.FloatingActionButton
+
+    <RelativeLayout
         android:layout_below="@+id/view_divider"
-        android:id="@+id/fab_sendMessage_send"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="40dp"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_send_inactive"
-        app:backgroundTint="#ECEFF1"/>
+        android:layout_gravity="bottom|end">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_sendMessage_send"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:elevation="0dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/ic_send_inactive"
+            app:backgroundTint="#ECEFF1"/>
+
+        <TextView
+            android:id="@+id/send_fab_badge"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/bg_send_fab_badge"
+            android:text="12"
+            android:textSize="8dp"
+            android:padding="3dp"
+            android:visibility="gone"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="3dp"
+            android:elevation="7dp"/>
+    </RelativeLayout>
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.25dp"

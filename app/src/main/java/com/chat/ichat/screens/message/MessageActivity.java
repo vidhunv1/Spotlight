@@ -125,6 +125,7 @@ public class MessageActivity extends BaseActivity
     private List<PersistentMenu> persistentMenus;
 
     private WrapContentLinearLayoutManager linearLayoutManager;
+    private ArrayList<String> selectedImages = new ArrayList<>();
 
     private ChatState currentChatState;
     private boolean shouldHandleBack = true;
@@ -142,6 +143,12 @@ public class MessageActivity extends BaseActivity
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
     private ContactResult contactDetails;
+
+    //send
+    private ImageButton galleryButton;
+    private View gallerySelector;
+    private FloatingActionButton sendView;
+    private TextView sendFABBadge;
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "message";
@@ -291,6 +298,24 @@ public class MessageActivity extends BaseActivity
             } else {
                 messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
             }
+        }
+
+        if(selectedImages.size()>0) {
+            galleryViewHelper.removeGalleryPickerView();
+            galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
+            gallerySelector.setVisibility(View.GONE);
+            sendFABBadge.setVisibility(View.GONE);
+            sendView.hide();
+            new Handler().postDelayed(() -> {
+                sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
+                sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
+                sendView.show();
+            }, 125);
+            for (String selectedImage : selectedImages) {
+                messagePresenter.sendImageMessage(chatUserName, currentUser, selectedImage);
+            }
+            selectedImages.clear();
+            galleryViewHelper.removeSelections();
         }
 
         /*              Analytics           */
@@ -552,15 +577,16 @@ public class MessageActivity extends BaseActivity
         } else {
             // regular keyboard
             View regularKeyboardView = View.inflate(this, R.layout.layout_regular_keyboard, rootLayout);
-            FloatingActionButton sendView = (FloatingActionButton) regularKeyboardView.findViewById(R.id.fab_sendMessage_send);
+            sendView = (FloatingActionButton) regularKeyboardView.findViewById(R.id.fab_sendMessage_send);
+            sendFABBadge = (TextView) regularKeyboardView.findViewById(R.id.send_fab_badge);
             ImageButton emojiButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_message_smiley);
-            ImageButton galleryButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_gallery);
+            galleryButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_gallery);
             ImageButton audioButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_audio);
             ImageButton locationButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_location);
             ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
-            View smileySelector = (View) regularKeyboardView.findViewById(R.id.smiley_selector);
-            View audioSelector = (View) regularKeyboardView.findViewById(R.id.audio_selector);
-            View gallerySelector = (View) regularKeyboardView.findViewById(R.id.gallery_selector);
+            View smileySelector = regularKeyboardView.findViewById(R.id.smiley_selector);
+            View audioSelector = regularKeyboardView.findViewById(R.id.audio_selector);
+            gallerySelector = regularKeyboardView.findViewById(R.id.gallery_selector);
             Context context = this;
             Activity activity = this;
             GalleryViewHelper.Listener openGalleryClickListener = new GalleryViewHelper.Listener() {
@@ -581,11 +607,32 @@ public class MessageActivity extends BaseActivity
                 }
 
                 @Override
-                public void onImageClicked(String uri) {
-                    messagePresenter.sendImageMessage(chatUserName, currentUser, uri);
-                    galleryViewHelper.removeGalleryPickerView();
-                    galleryButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_gallery));
-                    gallerySelector.setVisibility(View.GONE);
+                public void onImagesClicked(ArrayList<String> uris) {
+                    selectedImages.clear();
+                    selectedImages.addAll(uris);
+//                    messagePresenter.sendImageMessage(chatUserName, currentUser, uri);
+//                    galleryViewHelper.removeGalleryPickerView();
+//                    galleryButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_gallery));
+//                    gallerySelector.setVisibility(View.GONE);
+                    if(uris.size()>0) {
+                        sendView.hide();
+                        new Handler().postDelayed(() -> {
+                            sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                            sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
+                            sendView.show();
+                        }, 125);
+
+                        sendFABBadge.setVisibility(View.VISIBLE);
+                        sendFABBadge.setText(uris.size()+"");
+                    } else {
+                        sendFABBadge.setVisibility(View.GONE);
+                        sendView.hide();
+                        new Handler().postDelayed(() -> {
+                            sendView.setBackgroundTintList(ColorStateList.valueOf(0xffeeeeee));
+                            sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_inactive));
+                            sendView.show();
+                        }, 125);
+                    }
                 }
             };
 
