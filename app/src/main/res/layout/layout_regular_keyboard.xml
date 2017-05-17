@@ -55,12 +55,21 @@
             android:background="@color/colorPrimary"/>
 
         <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginLeft="48dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/gallery_selector"
             android:visibility="gone"
+            android:background="@color/colorPrimary"/>
+
+        <View
             android:layout_width="48dp"
             android:layout_height="4dp"
             android:layout_marginLeft="144dp"
             android:layout_alignParentBottom="true"
             android:id="@+id/audio_selector"
+            android:visibility="gone"
             android:background="@color/colorPrimary"/>
 
         <ImageButton

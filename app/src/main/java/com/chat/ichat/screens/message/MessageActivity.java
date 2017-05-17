@@ -1,13 +1,13 @@
 package com.chat.ichat.screens.message;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -20,8 +20,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,7 +43,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
@@ -70,6 +67,7 @@ import com.chat.ichat.models.MessageResult;
 import com.chat.ichat.screens.message.audio.AudioRecord;
 import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
+import com.chat.ichat.screens.message.gallery.GalleryViewHelper;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -122,6 +120,7 @@ public class MessageActivity extends BaseActivity
 
     private EmojiViewHelper emojiPicker;
     private AudioViewHelper audioViewHelper;
+    private GalleryViewHelper galleryViewHelper;
 
     private List<PersistentMenu> persistentMenus;
 
@@ -561,19 +560,49 @@ public class MessageActivity extends BaseActivity
             ImageButton cameraButton = (ImageButton) regularKeyboardView.findViewById(R.id.btn_sendMessage_camera);
             View smileySelector = (View) regularKeyboardView.findViewById(R.id.smiley_selector);
             View audioSelector = (View) regularKeyboardView.findViewById(R.id.audio_selector);
+            View gallerySelector = (View) regularKeyboardView.findViewById(R.id.gallery_selector);
+            Context context = this;
+            Activity activity = this;
+            GalleryViewHelper.Listener openGalleryClickListener = new GalleryViewHelper.Listener() {
+                @Override
+                public void onOpenGalleryClicked() {
+                    int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    int permission = PackageManager.PERMISSION_GRANTED;
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        if (!(perm1 == permission && perm2 == permission)) {
+                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                        } else {
+                            Intent loadIntent = new Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(loadIntent, REQUEST_GALLERY);
+                        }
+                    }
+                }
 
+                @Override
+                public void onImageClicked(String uri) {
+                    messagePresenter.sendImageMessage(chatUserName, currentUser, uri);
+                    galleryViewHelper.removeGalleryPickerView();
+                    galleryButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_gallery));
+                    gallerySelector.setVisibility(View.GONE);
+                }
+            };
 
             MessageEditText messageEditText = (MessageEditText) regularKeyboardView.findViewById(R.id.et_sendmessage_message);
             FrameLayout smileyLayout = (FrameLayout) regularKeyboardView.findViewById(R.id.smiley_layout);
             messageBox = messageEditText;
             emojiPicker = new EmojiViewHelper(this, smileyLayout, getWindow());
             audioViewHelper = new AudioViewHelper(this, smileyLayout, getWindow());
+            galleryViewHelper = new GalleryViewHelper(this, smileyLayout, getWindow());
 
             messageEditText.setOnEditTextImeBackListener(() -> {
-                if(!emojiPicker.isEmojiState() || !audioViewHelper.isAudioState()) {
+                if(!emojiPicker.isEmojiState() || !audioViewHelper.isAudioState() || !galleryViewHelper.isGalleryState()) {
                     shouldHandleBack = false;
                     emojiPicker.reset();
                     audioViewHelper.reset();
+                    galleryViewHelper.reset();
+
                     messageEditText.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
@@ -581,25 +610,37 @@ public class MessageActivity extends BaseActivity
                 } else {
                     shouldHandleBack = true;
                 }
+
                 emojiPicker.removeEmojiPickerView();
                 audioViewHelper.removeAudioPickerView();
+                galleryViewHelper.removeGalleryPickerView();
+
                 smileySelector.setVisibility(View.GONE);
                 audioSelector.setVisibility(View.GONE);
+                gallerySelector.setVisibility(View.GONE);
+
                 audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
                 emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
             });
 
             messageEditText.setOnTouchListener((v, event) -> {
                 shouldHandleBack = false;
                 smileySelector.setVisibility(View.GONE);
                 audioSelector.setVisibility(View.GONE);
+                gallerySelector.setVisibility(View.GONE);
                 audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
                 emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
+
                 if(!emojiPicker.isEmojiState()) {
                     emojiPicker.emojiButtonToggle();
                 }
                 if(!audioViewHelper.isAudioState()) {
                     audioViewHelper.audioButtonToggle();
+                }
+                if(!galleryViewHelper.isGalleryState()) {
+                    galleryViewHelper.galleryButtonToggle();
                 }
                 return false;
             });
@@ -607,13 +648,16 @@ public class MessageActivity extends BaseActivity
             emojiButton.setOnClickListener(v -> {
                 shouldHandleBack = true;
                 audioViewHelper.reset();
+                galleryViewHelper.reset();
                 emojiPicker.emojiButtonToggle();
                 if(!emojiPicker.isEmojiState()) {
                     smileySelector.setVisibility(View.VISIBLE);
                     audioSelector.setVisibility(View.GONE);
+                    gallerySelector.setVisibility(View.GONE);
 
                     audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
                     emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon_selected));
+                    galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
                 }
 
                 /*              Analytics           */
@@ -625,13 +669,37 @@ public class MessageActivity extends BaseActivity
             audioButton.setOnClickListener(v -> {
                 shouldHandleBack = true;
                 emojiPicker.reset();
+                galleryViewHelper.reset();
                 audioViewHelper.audioButtonToggle();
                 if(!audioViewHelper.isAudioState()) {
                     audioSelector.setVisibility(View.VISIBLE);
                     smileySelector.setVisibility(View.GONE);
+                    gallerySelector.setVisibility(View.GONE);
 
                     audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_selected));
                     emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                    galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
+
+                }
+            });
+
+            galleryButton.setOnClickListener(v -> {
+                shouldHandleBack = true;
+                audioViewHelper.reset();
+                emojiPicker.reset();
+                galleryViewHelper.galleryButtonToggle();
+                if(!galleryViewHelper.isGalleryState()) {
+                    audioSelector.setVisibility(View.GONE);
+                    smileySelector.setVisibility(View.GONE);
+                    gallerySelector.setVisibility(View.VISIBLE);
+
+                    audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                    emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                    galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery_selected));
+
+                    galleryViewHelper.setListener(openGalleryClickListener);
+                } else {
+                    galleryViewHelper.removeListener();
                 }
             });
 
@@ -666,6 +734,16 @@ public class MessageActivity extends BaseActivity
             });
 
             cameraButton.setOnClickListener(v -> {
+                audioViewHelper.reset();
+                emojiPicker.reset();
+                galleryViewHelper.reset();
+                audioSelector.setVisibility(View.GONE);
+                smileySelector.setVisibility(View.GONE);
+                gallerySelector.setVisibility(View.GONE);
+                audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
+
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 PackageManager pm = this.getPackageManager();
                 if (cameraIntent.resolveActivity(this.getPackageManager()) != null && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
@@ -690,24 +768,17 @@ public class MessageActivity extends BaseActivity
             });
 
             locationButton.setOnClickListener(v -> {
-                navigateToGetLocation();
-            });
+                audioViewHelper.reset();
+                emojiPicker.reset();
+                galleryViewHelper.reset();
+                audioSelector.setVisibility(View.GONE);
+                smileySelector.setVisibility(View.GONE);
+                gallerySelector.setVisibility(View.GONE);
+                audioButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic));
+                emojiButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_insert_emoticon));
+                galleryButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_gallery));
 
-            galleryButton.setOnClickListener(v -> {
-                // ** Load image from gallery **
-                // Permissions
-                int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                int permission = PackageManager.PERMISSION_GRANTED;
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    if (!(perm1 == permission && perm2 == permission)) {
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-                    } else {
-                        Intent loadIntent = new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(loadIntent, REQUEST_GALLERY);
-                    }
-                }
+                navigateToGetLocation();
             });
 
             messageBox.addTextChangedListener(new TextWatcher() {

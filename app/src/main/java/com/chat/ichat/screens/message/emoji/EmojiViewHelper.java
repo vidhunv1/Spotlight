@@ -23,6 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
+import com.chat.ichat.screens.message.audio.ComposerViewHelper;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Emojicon;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Nature;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Objects;
@@ -41,7 +42,6 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
     EmojiconGridView.OnEmojiconClickedListener onEmojiconClickedListener;
     private OnEmojiconBackspaceClickedListener onEmojiconBackspaceClickedListener;
     private ViewPager emojisPager;
-    private int layoutHeightpx;
 
     private ViewGroup smileyLayout;
     private View emojiPickerLayout;
@@ -49,59 +49,23 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
 
     private boolean isEmojiViewInflated = false;
     private boolean isEmojiState = true;
+    private ComposerViewHelper composerViewHelper;
 
-    private SharedPreferences sharedPreferences;
-
-    private static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
-    private static String PREFS_NAME = "EmojiViewHelper";
 
     public EmojiViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
         this.mContext = mContext;
         this.smileyLayout = viewGroup;
         this.window = window;
         this.emojiPickerLayout = createCustomView();
-        sharedPreferences = mContext.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
-        float cachedHeight = sharedPreferences.getFloat(KEY_KEYBOARD_HEIGHT, -1);
-        if(cachedHeight!=-1) {
-            layoutHeightpx = (int) AndroidUtils.px(cachedHeight);
-        } else {
-            layoutHeightpx = (int) AndroidUtils.px(230);
-        }
-        updateKeyboardHeight();
-    }
-
-    private void updateKeyboardHeight() {
-        ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = () -> {
-            Rect r = new Rect();
-            smileyLayout.getWindowVisibleDisplayFrame(r);
-
-            int screenHeight = getUsableScreenHeight();
-            int heightDifference = screenHeight - (r.bottom - r.top);
-            int resourceId = mContext.getResources()
-                    .getIdentifier("status_bar_height",
-                            "dimen", "android");
-            if (resourceId > 0) {
-                heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
-            }
-            if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
-                if(layoutHeightpx!=heightDifference) {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
-                    editor.apply();
-                }
-                layoutHeightpx = heightDifference;
-            } else
-                Log.d("DEF", "CLOSE");
-        };
-        smileyLayout.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+        composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
     }
 
     public void addEmojiPickerView() {
         if(!isEmojiViewInflated) {
             this.isEmojiViewInflated = true;
             ViewGroup.LayoutParams layoutParams = smileyLayout.getLayoutParams();
-            Logger.d(this, "adding smiley view, Setting height: "+layoutHeightpx);
-            layoutParams.height = layoutHeightpx;
+            Logger.d(this, "adding smiley view, Setting height: "+composerViewHelper.getLayoutHeightpx());
+            layoutParams.height = composerViewHelper.getLayoutHeightpx();
             smileyLayout.setLayoutParams(layoutParams);
             smileyLayout.addView(emojiPickerLayout);
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
@@ -117,20 +81,6 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
             smileyLayout.setLayoutParams(layoutParams);
             smileyLayout.removeAllViews();
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
-    }
-
-    private int getUsableScreenHeight() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            DisplayMetrics metrics = new DisplayMetrics();
-
-            WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-            windowManager.getDefaultDisplay().getMetrics(metrics);
-
-            return metrics.heightPixels;
-
-        } else {
-            return smileyLayout.getRootView().getHeight();
         }
     }
 

@@ -26,7 +26,6 @@ import com.chat.ichat.core.lib.AndroidUtils;
 
 public class AudioViewHelper{
     Context mContext;
-    private int layoutHeightpx;
 
     private ViewGroup audioLayout;
     private View audioPickerLayout;
@@ -35,59 +34,23 @@ public class AudioViewHelper{
     private boolean isAudioViewInflated = false;
     private boolean isAudioState = true;
 
-    private SharedPreferences sharedPreferences;
-
-    private static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
-    private static String PREFS_NAME = "EmojiViewHelper";
     private AudioRecord.AudioRecordListener audioRecordListener = null;
+    ComposerViewHelper composerViewHelper;
 
     public AudioViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
         this.mContext = mContext;
         this.audioLayout = viewGroup;
         this.window = window;
         this.audioPickerLayout = createCustomView();
-        sharedPreferences = mContext.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
-        float cachedHeight = sharedPreferences.getFloat(KEY_KEYBOARD_HEIGHT, -1);
-        if(cachedHeight!=-1) {
-            layoutHeightpx = (int) AndroidUtils.px(cachedHeight);
-        } else {
-            layoutHeightpx = (int) AndroidUtils.px(230);
-        }
-        updateKeyboardHeight();
-    }
-
-    private void updateKeyboardHeight() {
-        ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = () -> {
-            Rect r = new Rect();
-            audioLayout.getWindowVisibleDisplayFrame(r);
-
-            int screenHeight = getUsableScreenHeight();
-            int heightDifference = screenHeight - (r.bottom - r.top);
-            int resourceId = mContext.getResources()
-                    .getIdentifier("status_bar_height",
-                            "dimen", "android");
-            if (resourceId > 0) {
-                heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
-            }
-            if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
-                if(layoutHeightpx!=heightDifference) {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
-                    editor.apply();
-                }
-                layoutHeightpx = heightDifference;
-            } else
-                Log.d("DEF", "CLOSE");
-        };
-        audioLayout.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+        composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
     }
 
     public void addAudioView() {
         if(!isAudioViewInflated) {
             this.isAudioViewInflated = true;
             ViewGroup.LayoutParams layoutParams = audioLayout.getLayoutParams();
-            Logger.d(this, "adding smiley view, Setting height: "+layoutHeightpx);
-            layoutParams.height = layoutHeightpx;
+            Logger.d(this, "adding smiley view, Setting height: "+composerViewHelper.getLayoutHeightpx());
+            layoutParams.height = composerViewHelper.getLayoutHeightpx();
             audioLayout.setLayoutParams(layoutParams);
             audioLayout.addView(audioPickerLayout);
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
@@ -109,20 +72,6 @@ public class AudioViewHelper{
             audioLayout.setLayoutParams(layoutParams);
             audioLayout.removeAllViews();
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
-    }
-
-    private int getUsableScreenHeight() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            DisplayMetrics metrics = new DisplayMetrics();
-
-            WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-            windowManager.getDefaultDisplay().getMetrics(metrics);
-
-            return metrics.heightPixels;
-
-        } else {
-            return audioLayout.getRootView().getHeight();
         }
     }
 
