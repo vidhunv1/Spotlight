@@ -3,10 +3,6 @@ package com.chat.ichat.screens.message.emoji.emoji_objects;
 /**
  * Created by vidhun on 15/02/17.
  */
-
-/**
- * @author Hieu Rocker (rockerhieu@gmail.com)
- */
 public class Objects {
     public static final Emojicon[] DATA = new Emojicon[]{
             Emojicon.fromCodePoint(0x1f38d),
@@ -40,7 +36,6 @@ public class Objects {
             Emojicon.fromCodePoint(0x1f4be),
             Emojicon.fromCodePoint(0x1f4bb),
             Emojicon.fromCodePoint(0x1f4f1),
-            Emojicon.fromChar((char) 0x260e),
             Emojicon.fromCodePoint(0x1f4de),
             Emojicon.fromCodePoint(0x1f4df),
             Emojicon.fromCodePoint(0x1f4e0),
@@ -97,7 +92,6 @@ public class Objects {
             Emojicon.fromCodePoint(0x1f4e7),
             Emojicon.fromCodePoint(0x1f4e5),
             Emojicon.fromCodePoint(0x1f4e4),
-            Emojicon.fromChar((char) 0x2709),
             Emojicon.fromCodePoint(0x1f4e9),
             Emojicon.fromCodePoint(0x1f4e8),
             Emojicon.fromCodePoint(0x1f4ef),
@@ -121,11 +115,8 @@ public class Objects {
             Emojicon.fromCodePoint(0x1f4c7),
             Emojicon.fromCodePoint(0x1f4c1),
             Emojicon.fromCodePoint(0x1f4c2),
-            Emojicon.fromChar((char) 0x2702),
             Emojicon.fromCodePoint(0x1f4cc),
             Emojicon.fromCodePoint(0x1f4ce),
-            Emojicon.fromChar((char) 0x2712),
-            Emojicon.fromChar((char) 0x270f),
             Emojicon.fromCodePoint(0x1f4cf),
             Emojicon.fromCodePoint(0x1f4d0),
             Emojicon.fromCodePoint(0x1f4d5),
