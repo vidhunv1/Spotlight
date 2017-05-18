@@ -33,6 +33,7 @@ import com.chat.ichat.components.AudioMessageView;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
 import com.chat.ichat.models.LocationMessage;
+import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -1369,12 +1370,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.message_image)
         ImageView messageImage;
 
+        private String imageUri;
         SendImageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String localImageUri, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.imageUri = localImageUri;
             Logger.d(this, "SendImageViewHolder: "+localImageUri+", "+time+", "+position);
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
@@ -1430,6 +1433,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
+            if(imageUri!=null && !imageUri.isEmpty()) {
+                context.startActivity(ImageViewerActivity.callingIntent(context, imageUri));
+            }
         }
 
         @OnLongClick(R.id.rl_bubble)
@@ -1450,12 +1456,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.iv_profileImage)
         ImageView profileImageView;
 
+        private String imageUrl;
         ReceiveImageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String imageUrl, String time, int position) {
+            this.imageUrl = imageUrl;
             int bubbleType = bubbleType(position);
             Logger.d(this, "URL: "+imageUrl+" TYPE:+"+bubbleType);
             boolean shouldShowTime = shouldShowTime(position);
@@ -1513,7 +1521,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         @OnClick(R.id.rl_bubble)
-        public void onMessageClicked() {}
+        public void onMessageClicked() {
+            if(imageUrl!=null && !imageUrl.isEmpty()) {
+                context.startActivity(ImageViewerActivity.callingIntent(context, imageUrl));
+            }
+        }
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {

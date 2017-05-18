@@ -13,7 +13,7 @@
             android:id="@+id/audio_record"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            appNs:mic_min_radius="50dp"
-            appNs:mic_max_radius="60dp"/>
+            appNs:mic_min_radius="44.75dp"
+            appNs:mic_max_radius="56dp"/>
     </RelativeLayout>
 </RelativeLayout>

@@ -19,6 +19,6 @@
         android:layout_gravity="bottom|end"
         android:elevation="0dp"
         app:fabSize="normal"
-        app:srcCompat="@drawable/ic_gallery"
+        app:srcCompat="@drawable/ic_gallery_collections"
         app:backgroundTint="#ECEFF1"/>
 </RelativeLayout>

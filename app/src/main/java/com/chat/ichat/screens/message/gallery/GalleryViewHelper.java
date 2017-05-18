@@ -14,17 +14,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
 import com.bumptech.glide.Glide;
 import com.chat.ichat.R;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
-
 import java.util.ArrayList;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -81,12 +76,9 @@ public class GalleryViewHelper {
             galleryRV.setAdapter(imageAdapter);
 
             FloatingActionButton floatingActionButton = (FloatingActionButton) galleryLayout.findViewById(R.id.fab_gallery);
-            floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(listener!=null) {
-                        listener.onOpenGalleryClicked();
-                    }
+            floatingActionButton.setOnClickListener(v -> {
+                if(listener!=null) {
+                    listener.onOpenGalleryClicked();
                 }
             });
         }
@@ -229,23 +221,41 @@ public class GalleryViewHelper {
                         .centerCrop()
                         .crossFade()
                         .into(imageView);
+
+                imageSelections.remove(uri);
+                imageView.setBackgroundColor(0xffffffff);
+                imageView.setImageAlpha(255);
+                imageView.getLayoutParams().height = layoutHeightPx;
+                imageView.getLayoutParams().width = (int)AndroidUtils.px(230);
+                imageView.requestLayout();
+                done.setVisibility(View.GONE);
             }
 
             @OnClick(R.id.gallery_pic)
             public void onPicClicked() {
-                if(imageSelections.contains(uri)) {
-                    imageSelections.remove(uri);
-                    imageView.setPadding(0,0,0,0);
-                    done.setVisibility(View.GONE);
-//                    fg.setVisibility(View.GONE);
-                } else {
-                    imageSelections.add(uri);
-                    imageView.setPadding((int)AndroidUtils.px(10),(int)AndroidUtils.px(10),(int)AndroidUtils.px(10), (int)AndroidUtils.px(10));
-                    done.setVisibility(View.VISIBLE);
-//                    fg.setVisibility(View.VISIBLE);
-                }
+                displayImage();
                 if(listener!=null) {
                     listener.onImagesClicked(imageSelections);
+                }
+            }
+
+            public void displayImage() {
+                if(imageSelections.contains(uri)) {
+                    imageSelections.remove(uri);
+                    imageView.setBackgroundColor(0xffffffff);
+                    imageView.setImageAlpha(255);
+                    imageView.getLayoutParams().height = layoutHeightPx;
+                    imageView.getLayoutParams().width = (int)AndroidUtils.px(230);
+                    imageView.requestLayout();
+                    done.setVisibility(View.GONE);
+                } else {
+                    imageSelections.add(uri);
+                    imageView.setBackgroundColor(0xff000000);
+                    imageView.getLayoutParams().height = layoutHeightPx - (int)AndroidUtils.px(24);
+                    imageView.getLayoutParams().width = (int)AndroidUtils.px(230-24);
+                    imageView.requestLayout();
+                    imageView.setImageAlpha(120);
+                    done.setVisibility(View.VISIBLE);
                 }
             }
         }

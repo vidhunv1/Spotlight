@@ -31,7 +31,7 @@ public class AudioRecord extends View {
     private int touchState = 0;
 
     private long startTime = 0;
-    private boolean running = false;
+    private boolean running;
     private AudioRecordListener recordListener = null;
 
     private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
@@ -54,6 +54,7 @@ public class AudioRecord extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         this.timer = new Timer();
+        running = false;
     }
 
     public void setRadiusMin(int radiusMin) {
@@ -160,13 +161,13 @@ public class AudioRecord extends View {
         String circleText = "Record";
         paint.setColor(Color.WHITE);
         if(running) {
-            paint.setTextSize(AndroidUtils.px(18));
+            paint.setTextSize(AndroidUtils.px(16));
             if(touchState == 0) {
                 paint.setColor(micColor);
                 circleText = getElapsedTimeText();
             }
         } else {
-            paint.setTextSize(AndroidUtils.px(22));
+            paint.setTextSize(AndroidUtils.px(20));
         }
 
         paint.setTextAlign(Paint.Align.CENTER);
@@ -186,9 +187,10 @@ public class AudioRecord extends View {
             paint.setColor(Color.GRAY);
         }
 
+        paint.setTextSize(AndroidUtils.px(17));
         paint.setTextSize(AndroidUtils.px(20));
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(titleText, (canvas.getWidth()/2), (int) ((canvas.getHeight() / 10) - ((paint.descent() + paint.ascent()) / 2)), paint);
+        canvas.drawText(titleText, (canvas.getWidth()/2), (int) ((usableHeight - radiusMax*2)/4 - ((paint.descent() + paint.ascent()) / 2)), paint);
     }
 
     public interface AudioRecordListener {
@@ -225,9 +227,9 @@ public class AudioRecord extends View {
 
                 }
             }
-            return String.format("%02d", min)+":"+String.format("%02d", sec);
+            return String.format("%01d", min)+":"+String.format("%02d", sec);
         }
-        return "00:00";
+        return "0:00";
     }
 
     class ViewRefresher extends TimerTask {

@@ -19,6 +19,8 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
@@ -42,7 +44,9 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
     EmojiconGridView.OnEmojiconClickedListener onEmojiconClickedListener;
     private OnEmojiconBackspaceClickedListener onEmojiconBackspaceClickedListener;
     private ViewPager emojisPager;
+    private ImageButton[] mEmojiTabs;
 
+    private int prevPosition = -1;
     private ViewGroup smileyLayout;
     private View emojiPickerLayout;
     private Window window;
@@ -120,6 +124,12 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         View view = inflater.inflate(R.layout.emojicons, null, false);
         emojisPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         emojisPager.setOnPageChangeListener(this);
+
+        TextView keyboard = (TextView) view.findViewById(R.id.open_keyboard);
+        keyboard.setOnClickListener(v -> {
+
+        });
+
         EmojiconRecents recents = this;
         PagerAdapter mEmojisAdapter = new EmojisPagerAdapter(
                 Arrays.asList(
@@ -132,13 +142,13 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
                 )
         );
         emojisPager.setAdapter(mEmojisAdapter);
-        View[] mEmojiTabs = new View[6];
-        mEmojiTabs[0] = view.findViewById(R.id.emojis_tab_0_recents);
-        mEmojiTabs[1] = view.findViewById(R.id.emojis_tab_1_people);
-        mEmojiTabs[2] = view.findViewById(R.id.emojis_tab_2_nature);
-        mEmojiTabs[3] = view.findViewById(R.id.emojis_tab_3_objects);
-        mEmojiTabs[4] = view.findViewById(R.id.emojis_tab_4_cars);
-        mEmojiTabs[5] = view.findViewById(R.id.emojis_tab_5_punctuation);
+        mEmojiTabs = new ImageButton[6];
+        mEmojiTabs[0] = (ImageButton) view.findViewById(R.id.emojis_tab_0_recents);
+        mEmojiTabs[1] = (ImageButton) view.findViewById(R.id.emojis_tab_1_people);
+        mEmojiTabs[2] = (ImageButton) view.findViewById(R.id.emojis_tab_2_nature);
+        mEmojiTabs[3] = (ImageButton) view.findViewById(R.id.emojis_tab_3_objects);
+        mEmojiTabs[4] = (ImageButton) view.findViewById(R.id.emojis_tab_4_cars);
+        mEmojiTabs[5] = (ImageButton) view.findViewById(R.id.emojis_tab_5_punctuation);
         for (int i = 0; i < mEmojiTabs.length; i++) {
             final int position = i;
             mEmojiTabs[i].setOnClickListener(new View.OnClickListener() {
@@ -220,7 +230,37 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
 
     @Override
     public void onPageSelected(int position) {
+        if(position == 1) {
+            mEmojiTabs[1].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_emoticon_selected));
+        } else if(position == 0) {
+            mEmojiTabs[0].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_recents_selected));
+        } else if(position == 2) {
+            mEmojiTabs[2].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_flower_selected));
+        } else if(position == 3) {
+            mEmojiTabs[3].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_lightbulb_selected));
+        } else if(position == 4) {
+            mEmojiTabs[4].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_car_selected));
+        } else if(position == 5) {
+            mEmojiTabs[5].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_symbols_selected));
+        }
 
+        if(prevPosition>=0) {
+            if(prevPosition == 1) {
+                mEmojiTabs[1].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_emoticon));
+            } else if(prevPosition == 0) {
+                mEmojiTabs[0].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_recents));
+            } else if(prevPosition == 2) {
+                mEmojiTabs[2].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_flower));
+            } else if(prevPosition == 3) {
+                mEmojiTabs[3].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_lightbulb));
+            } else if(prevPosition == 4) {
+                mEmojiTabs[4].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_car));
+            } else if(prevPosition == 5) {
+                mEmojiTabs[5].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_symbols));
+            }
+        }
+
+        this.prevPosition = position;
     }
 
     @Override
