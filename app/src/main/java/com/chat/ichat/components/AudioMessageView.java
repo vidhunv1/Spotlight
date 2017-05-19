@@ -1,6 +1,8 @@
 package com.chat.ichat.components;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,15 +10,31 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
+import com.chat.ichat.db.GenericCache;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.chat.ichat.screens.message.audio.AudioRecord.AUDIO_RECORDER_FILE_EXT_MP4;
+import static com.chat.ichat.screens.message.audio.AudioRecord.AUDIO_RECORDER_FOLDER;
 
 /**
  * Created by vidhun on 11/05/17.
@@ -38,43 +56,66 @@ public class AudioMessageView extends View {
     private int iterCount = 0;
 
     private String audioFile = null;
+    private String audioUrl = null;
     private MediaPlayer mediaPlayer;
 
     private Path roundRectPath = null;
     private Path playPath = null;
+
+    private boolean isStream = false;
+    private String streamFileName = null;
+    private boolean isReady = false;
+
+    GenericCache genericCache;
     public AudioMessageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        setWillNotDraw(false);
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         paint = new Paint();
         paint.setAntiAlias(true);
+        this.genericCache = GenericCache.getInstance();
 
         viewrectF = new RectF(0, getHeight(), getWidth(), 0);
-        this.viewColor = ContextCompat.getColor(context, R.color.sendMessageBubble);
-        this.playingColor = ContextCompat.getColor(context, R.color.sendMessageBubblePressed);
-        this.primaryColor = ContextCompat.getColor(context, R.color.colorPrimary);
         this.playPerc = 0f;
         isRunning = false;
 
         this.setOnClickListener(v -> {
-            if(isRunning) {
-                timer.cancel();
-                isRunning = false;
-                mediaPlayer.pause();
-            } else {
-                isRunning = true;
-                timer = new Timer();
-                timer.scheduleAtFixedRate(new ViewRefresher(), 0 , delayMilli);
-                mediaPlayer.start();
+            if(isReady) {
+                if (isRunning) {
+                    timer.cancel();
+                    isRunning = false;
+                    mediaPlayer.pause();
+                } else {
+                    isRunning = true;
+                    timer = new Timer();
+                    timer.scheduleAtFixedRate(new ViewRefresher(), 0, delayMilli);
+                    mediaPlayer.start();
+                }
             }
         });
+
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.AudioMessageView, 0, 0);
+        try {
+            this.viewColor = ta.getColor(R.styleable.AudioMessageView_view_color, ContextCompat.getColor(context, R.color.sendMessageBubble));
+            this.playingColor = ta.getColor(R.styleable.AudioMessageView_playing_color, ContextCompat.getColor(context, R.color.sendMessageBubblePressed));
+            this.primaryColor = ta.getColor(R.styleable.AudioMessageView_primary_color, ContextCompat.getColor(context, R.color.appElement));
+        } finally {
+            ta.recycle();
+        }
     }
+
 
     public String getAudioFile() {
         return audioFile;
     }
 
     public void setAudioFile(String audioFile) {
+        this.isReady = true;
+        this.isStream = false;
+
         MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        Logger.d(this, "Setting audio file: "+audioFile);
         metaRetriever.setDataSource(audioFile);
         String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         long dur = Long.parseLong(duration);
@@ -89,23 +130,31 @@ public class AudioMessageView extends View {
         }
     }
 
-    public void setMessageType(boolean isMessageReceive) {
-        if(isMessageReceive) {
-            this.viewColor = ContextCompat.getColor(context, R.color.receiveMessageBubble);
-            this.playingColor = ContextCompat.getColor(context, R.color.receiveMessageBubblePressed);
-            this.primaryColor = ContextCompat.getColor(context, R.color.appElement);
+    public void setAudioUrl(String url) {
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+
+        if(!file.exists()){
+            file.mkdirs();
+        }
+
+        String filename = context.getFilesDir().getAbsolutePath()+ "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_MP4;
+        this.isStream = true;
+        this.streamFileName = filename;
+        this.audioUrl = url;
+
+        if(genericCache.get(url)!=null) {
+            this.isReady = true;
+            this.streamFileName = genericCache.get(url);
+            setAudioFile(this.streamFileName);
         } else {
-            this.viewColor = ContextCompat.getColor(context, R.color.sendMessageBubble);
-            this.playingColor = ContextCompat.getColor(context, R.color.sendMessageBubblePressed);
-            this.primaryColor = ContextCompat.getColor(context, R.color.appElement);
+            new DownloadFileAsync().execute(url, filename);
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(audioFile == null)
-            return;
         viewrectF.left = 0;
         viewrectF.top = getHeight();
         viewrectF.right = getWidth();
@@ -113,6 +162,9 @@ public class AudioMessageView extends View {
         paint.setColor(viewColor);
 
         canvas.drawRoundRect(viewrectF, AndroidUtils.px(18), AndroidUtils.px(18), paint);
+
+        if(!isReady || audioFile==null)
+            return;
 
         if(roundRectPath == null) {
             roundRectPath = RoundedRect(0, getHeight(), getWidth(), 0, AndroidUtils.px(18), AndroidUtils.px(18), true, true, true, true);
@@ -143,12 +195,12 @@ public class AudioMessageView extends View {
         paint.setTextSize(AndroidUtils.px(12));
         paint.setTextAlign(Paint.Align.CENTER);
         String time = getTimeString(durationMilli - delayMilli*iterCount);
-        Logger.d(this, "Time: "+(durationMilli - delayMilli*((int)playPerc*durationMilli/delayMilli)));
         canvas.drawText(time, getWidth()-AndroidUtils.px(35), centerY + AndroidUtils.px(4), paint);
 
         if(!isRunning) { //play bitmap
             if(playPath == null) {
-                playPath = getPlayPath(AndroidUtils.px(17), centerY);
+                if(isReady)
+                    playPath = getPlayPath(AndroidUtils.px(17), centerY);
             }
             canvas.drawPath(playPath, paint);
         } else { // pause bitmap
@@ -240,5 +292,70 @@ public class AudioMessageView extends View {
         playPath.lineTo(x, y-AndroidUtils.px(4));
         playPath.close();
         return playPath;
+    }
+
+    private void onDownloadStart() {
+        isReady = false;
+        invalidate();
+    }
+
+    private void onDownloadComplete() {
+        if(audioUrl!=null && streamFileName!=null) {
+            isReady = true;
+            genericCache.put(audioUrl, streamFileName);
+            setAudioFile(streamFileName);
+        }
+        invalidate();
+    }
+
+    private void onProgressUpdate(int progress) {
+
+    }
+
+    private class DownloadFileAsync extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            onDownloadStart();
+        }
+
+        @Override
+        protected String doInBackground(String... aurl) {
+            int count;
+            try {
+                URL url = new URL(aurl[0]);
+                String filename = aurl[1];
+                URLConnection conexion = url.openConnection();
+                conexion.connect();
+                int lenghtOfFile = conexion.getContentLength();
+                Log.d("ANDRO_ASYNC", "Length of file: " + lenghtOfFile);
+                InputStream input = new BufferedInputStream(url.openStream());
+
+                OutputStream output = new FileOutputStream(filename);
+                byte data[] = new byte[1024];
+                long total = 0;
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    publishProgress(""+(int)((total*100)/lenghtOfFile));
+                    output.write(data, 0, count);
+                }
+
+                output.flush();
+                output.close();
+                input.close();
+            } catch (Exception e) {}
+            return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            Log.d("ANDRO_ASYNC",progress[0]);
+            AudioMessageView.this.onProgressUpdate(Integer.parseInt(progress[0]));
+        }
+
+        @Override
+        protected void onPostExecute(String unused) {
+            onDownloadComplete();
+        }
     }
 }

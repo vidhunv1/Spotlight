@@ -19,4 +19,10 @@
         <attr name="mic_min_radius" format="dimension"/>
         <attr name="mic_max_radius" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="AudioMessageView">
+        <attr name="view_color" format="color"/>
+        <attr name="playing_color" format="color"/>
+        <attr name="primary_color" format="color"/>
+    </declare-styleable>
 </resources>

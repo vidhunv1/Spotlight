@@ -452,7 +452,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_RECV_AUDIO:
                 ReceiveAudioViewHolder receiveAudioViewHolder = (ReceiveAudioViewHolder) holder;
-                receiveAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), position);
+                receiveAudioViewHolder.renderItem(messageCache.get(position).getAudioMessage().getAudioUrl(), getFormattedTime(messageList.get(position).getTime()), position);
                 break;
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
@@ -1560,7 +1560,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
 
             audioMessageView.setAudioFile(fileName);
-            audioMessageView.setMessageType(false);
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);
             if(shouldShowTime) {
@@ -1617,12 +1616,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String fileName, String time, int position) {
+        void renderItem(String url, String time, int position) {
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
-            audioMessageView.setAudioFile(fileName);
-            audioMessageView.setMessageType(true);
+            audioMessageView.setAudioUrl(url);
             timeView.setText(time);
             if(shouldShowTime) {
                 timeView.setVisibility(View.VISIBLE);

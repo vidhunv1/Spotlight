@@ -34,8 +34,8 @@ public class AudioRecord extends View {
     private boolean running;
     private AudioRecordListener recordListener = null;
 
-    private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
-    private static final String AUDIO_RECORDER_FOLDER = "ichat_audio";
+    public static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
+    public static final String AUDIO_RECORDER_FOLDER = "ichat_audio";
 
     private MediaRecorder recorder = null;
     private String recordFileName;

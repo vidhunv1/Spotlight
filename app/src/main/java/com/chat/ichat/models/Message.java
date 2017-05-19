@@ -114,6 +114,8 @@ public class Message {
             return "Location: "+ locationMessage.getPlaceName();
         } else if(getMessageType() == MessageType.image) {
             return "Image";
+        } else if(getMessageType() == MessageType.audio) {
+            return "Voice clip";
         }
         else
             return "";
