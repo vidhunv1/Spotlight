@@ -110,7 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="#8A8A8A"
-                    android:text="username"
+                    android:text="Username"
                     android:textSize="13sp"
                     android:paddingLeft="55dp"/>
             </LinearLayout>
@@ -187,6 +187,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="0"
+                    android:id="@+id/tv_shared_media_count"
                     android:textColor="@color/activeIndicator"
                     android:textSize="16sp"
                     android:gravity="center_vertical|right" />

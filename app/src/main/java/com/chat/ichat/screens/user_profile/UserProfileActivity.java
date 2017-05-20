@@ -32,11 +32,15 @@ import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.models.Message;
+import com.chat.ichat.models.MessageResult;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.message.MessageActivity;
+import com.chat.ichat.screens.shared_media.MediaAdapter;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
@@ -49,6 +53,9 @@ import com.chat.ichat.screens.shared_media.SharedMediaActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -77,6 +84,9 @@ public class UserProfileActivity extends BaseActivity {
 
     @Bind(R.id.profile_presence)
     TextView presenceView;
+
+    @Bind(R.id.tv_shared_media_count)
+    TextView sharedMediaCount;
 
     private Menu menu;
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
@@ -167,6 +177,31 @@ public class UserProfileActivity extends BaseActivity {
                 presenceView.setText(time);
             }
         });
+
+        MessageStore.getInstance().getMessages(receivedIntent.getStringExtra(KEY_USER_NAME))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<MessageResult>>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<MessageResult> messageResults) {
+                        int count = 0;
+                        for (MessageResult messageResult : messageResults) {
+                            if(GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class).getMessageType() == Message.MessageType.image) {
+                                count++;
+                            }
+                        }
+                        sharedMediaCount.setText(count+"");
+                    }
+                });
+
 
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
@@ -394,7 +429,7 @@ public class UserProfileActivity extends BaseActivity {
 
     @OnClick(R.id.user_profile_shared_media)
     public void onSharedMediaClicked() {
-        startActivity(SharedMediaActivity.callingIntent(this, userId));
+        startActivity(SharedMediaActivity.callingIntent(this, username));
     }
 
     @OnClick(R.id.user_profile_notifications)

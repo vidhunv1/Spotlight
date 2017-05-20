@@ -92,6 +92,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_RECV_IMAGE = 11;
     private final int VIEW_TYPE_SEND_AUDIO = 12;
     private final int VIEW_TYPE_RECV_AUDIO = 13;
+    private final int VIEW_TYPE_NO_MESSAGES = 14;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -130,7 +131,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         quickReplies = new ArrayList<>();
         this.messageList.clear();
         this.messageList.addAll(messages);
-        this.notifyItemRangeChanged(0, messageList.size() - 1);
+        if(messageList.size()>0)
+            this.notifyItemRangeChanged(0, messageList.size() - 1);
+        else
+            this.notifyItemChanged(0);
         setQuickReplies();
     }
 
@@ -236,6 +240,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
+        if(messageList.size() == 0) {
+            return VIEW_TYPE_NO_MESSAGES;
+        }
         if(position == messageList.size()) {
             if(isTyping) {
                 return VIEW_TYPE_TYPING;
@@ -321,6 +328,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
+        if(messageList.size() == 0) {
+            return 1;
+        }
         if(quickReplies!=null && quickReplies.size()>=1 || isTyping)
             return messageList.size()+1;
         return messageList.size();
@@ -328,7 +338,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public long getItemId(int position) {
-        return  messageList.get(position).getTime().getMillis();
+        if(messageList.size()>0)
+            return  messageList.get(position).getTime().getMillis();
+        else
+            return 1;
     }
 
     @Override
@@ -392,6 +405,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_RECV_AUDIO:
                 View view14 = inflater.inflate(R.layout.item_message_receive_audio, parent, false);
                 viewHolder = new ReceiveAudioViewHolder(view14);
+                break;
+            case VIEW_TYPE_NO_MESSAGES:
+                View view15 = inflater.inflate(R.layout.item_message_no_messages, parent, false);
+                viewHolder = new NoMessagesViewHolder(view15);
                 break;
             default:
                 return null;
@@ -457,6 +474,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_TYPE_TYPING:
                 TypingViewHolder typingViewHolder = (TypingViewHolder) holder;
                 typingViewHolder.renderItem();
+                break;
+            case VIEW_TYPE_NO_MESSAGES:
+                NoMessagesViewHolder noMessagesViewHolder = (NoMessagesViewHolder) holder;
+                noMessagesViewHolder.renderItem("No messages here yet...");
                 break;
         }
     }
@@ -624,6 +645,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             quickRepliesListView.setLayoutManager(layoutManager);
             quickRepliesListView.setAdapter(new QuickRepliesAdapter(context, postbackClickListener, quickReplyActionListener, quickReplies));
             OverScrollDecoratorHelper.setUpOverScroll(quickRepliesListView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
+        }
+    }
+
+    class NoMessagesViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_info)
+        TextView info;
+
+        NoMessagesViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String text) {
+            info.setText(text);
         }
     }
 
@@ -1662,7 +1697,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return true;
         }
     }
-
 
     interface PostbackClickListener {
         void sendPostbackMessage(String message, String payload);

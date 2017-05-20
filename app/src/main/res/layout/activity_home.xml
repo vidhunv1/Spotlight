@@ -87,7 +87,29 @@
                 app:srcCompat="@drawable/ic_contacts"/>
 
             <TextView
-                android:layout_below="@+id/nav_item_contacts"
+                android:layout_toRightOf="@+id/iv_people_nearby"
+                android:layout_below="@+id/iv_contacts"
+                android:id="@+id/nav_item_people_nearby"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingLeft="24dp"
+                android:text="People Nearby"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:textColor="@color/drawerText"/>
+
+            <ImageView
+                android:id="@+id/iv_people_nearby"
+                android:layout_below="@+id/iv_contacts"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingLeft="5dp"
+                app:srcCompat="@drawable/ic_people_nearby"/>
+
+            <TextView
+                android:layout_below="@+id/nav_item_people_nearby"
                 android:layout_toRightOf="@+id/iv_settings"
                 android:id="@+id/nav_item_settings"
                 android:paddingLeft="24dp"
@@ -100,7 +122,7 @@
 
             <ImageView
                 android:id="@+id/iv_settings"
-                android:layout_below="@+id/nav_item_contacts"
+                android:layout_below="@+id/nav_item_people_nearby"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:paddingTop="12dp"

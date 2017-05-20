@@ -1009,21 +1009,31 @@ public class MessageActivity extends BaseActivity
         } else if (requestCode == REQUEST_PLACE_PICKER_SEND) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
-                Message m = new Message();
-                LocationMessage locationMessage = new LocationMessage(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString(), place.getAddress().toString());
-                m.setLocationMessage(locationMessage);
 
-                if(contactDetails.isBlocked()) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
-                    alertDialog.setMessage(Html.fromHtml("Unblock contact to send message."));
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Unblock", (dialog, which) -> {
-                        messagePresenter.blockContact(contactDetails.getUserId(), false);
-                        progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
-                        dialog.dismiss();
-                    });
-                    alertDialog.show();
-                } else {
-                    messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
+                if(place!=null) {
+                    Message m = new Message();
+                    String placeName="", address="";
+                    if(place.getName()!=null) {
+                        placeName = place.getName().toString();
+                    }
+                    if(place.getAddress()!=null) {
+                        address = place.getAddress().toString();
+                    }
+                    LocationMessage locationMessage = new LocationMessage(place.getLatLng().latitude, place.getLatLng().longitude, placeName, address);
+                    m.setLocationMessage(locationMessage);
+
+                    if (contactDetails.isBlocked()) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
+                        alertDialog.setMessage(Html.fromHtml("Unblock contact to send message."));
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Unblock", (dialog, which) -> {
+                            messagePresenter.blockContact(contactDetails.getUserId(), false);
+                            progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
+                            dialog.dismiss();
+                        });
+                        alertDialog.show();
+                    } else {
+                        messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
+                    }
                 }
             }
         }

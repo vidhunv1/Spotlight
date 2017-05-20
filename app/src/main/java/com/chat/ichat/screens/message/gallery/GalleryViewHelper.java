@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.chat.ichat.R;
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
 import java.util.ArrayList;
@@ -214,25 +215,18 @@ public class GalleryViewHelper {
             public void render(String uri, int layoutHeightPx) {
                 this.uri = uri;
                 this.layoutHeightPx = layoutHeightPx;
-                imageView.getLayoutParams().height = layoutHeightPx;
-                imageView.requestLayout();
+                Logger.d(this, "layout_height: "+layoutHeightPx);
 
-                Glide.with(context).load(uri)
-                        .centerCrop()
-                        .crossFade()
-                        .into(imageView);
-
-                imageSelections.remove(uri);
-                imageView.setBackgroundColor(0xffffffff);
-                imageView.setImageAlpha(255);
-                imageView.getLayoutParams().height = layoutHeightPx;
-                imageView.getLayoutParams().width = (int)AndroidUtils.px(230);
-                imageView.requestLayout();
-                done.setVisibility(View.GONE);
+                displayImage();
             }
 
             @OnClick(R.id.gallery_pic)
             public void onPicClicked() {
+                if(imageSelections.contains(uri)) {
+                    imageSelections.remove(uri);
+                } else {
+                    imageSelections.add(uri);
+                }
                 displayImage();
                 if(listener!=null) {
                     listener.onImagesClicked(imageSelections);
@@ -241,22 +235,25 @@ public class GalleryViewHelper {
 
             public void displayImage() {
                 if(imageSelections.contains(uri)) {
-                    imageSelections.remove(uri);
-                    imageView.setBackgroundColor(0xffffffff);
-                    imageView.setImageAlpha(255);
-                    imageView.getLayoutParams().height = layoutHeightPx;
-                    imageView.getLayoutParams().width = (int)AndroidUtils.px(230);
-                    imageView.requestLayout();
-                    done.setVisibility(View.GONE);
-                } else {
-                    imageSelections.add(uri);
                     imageView.setBackgroundColor(0xff000000);
                     imageView.getLayoutParams().height = layoutHeightPx - (int)AndroidUtils.px(24);
                     imageView.getLayoutParams().width = (int)AndroidUtils.px(230-24);
                     imageView.requestLayout();
                     imageView.setImageAlpha(120);
                     done.setVisibility(View.VISIBLE);
+                } else {
+                    imageView.setBackgroundColor(0xffffffff);
+                    imageView.setImageAlpha(255);
+                    imageView.getLayoutParams().height = layoutHeightPx;
+                    imageView.getLayoutParams().width = (int)AndroidUtils.px(230);
+                    imageView.requestLayout();
+                    done.setVisibility(View.GONE);
                 }
+
+                Glide.with(context).load(uri)
+                        .centerCrop()
+                        .crossFade()
+                        .into(imageView);
             }
         }
     }
