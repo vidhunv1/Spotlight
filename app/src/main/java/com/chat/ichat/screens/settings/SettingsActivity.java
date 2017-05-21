@@ -116,11 +116,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     String vibrateOptionsNames[] = {"Disabled", "Default", "Short", "Long", "Only if silent"};
 
     private SharedPreferences sharedPreferences;
-
     UserSession userSession;
-
     SettingsPresenter settingsPresenter;
-
     AlertDialog alertDialogPic = null;
 
     private FirebaseAnalytics firebaseAnalytics;

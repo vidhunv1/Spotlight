@@ -1,21 +1,22 @@
-package com.chat.ichat.api.user;
+package com.chat.ichat.api.location;
 
 import com.chat.ichat.api.ErrorResponse;
+import com.chat.ichat.api.user._User;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 /**
- * Created by vidhun on 24/04/17.
+ * Created by vidhun on 21/05/17.
  */
 
-public class ContactResponse {
+public class NearbyPeopleResponse {
     @SerializedName("error")
     ErrorResponse error;
     @SerializedName("contacts")
     @Expose
-    private List<_User> user;
+    private List<UserLocation> nearbyPeople;
     @SerializedName("status")
     @Expose
     private String status;
@@ -23,12 +24,16 @@ public class ContactResponse {
     @Expose
     private String message;
 
+    public boolean isSuccess() {
+        return error==null;
+    }
+
     public ErrorResponse getError() {
         return error;
     }
 
-    public List<_User> getUser() {
-        return user;
+    public List<UserLocation> getNearbyPeople() {
+        return nearbyPeople;
     }
 
     public String getStatus() {

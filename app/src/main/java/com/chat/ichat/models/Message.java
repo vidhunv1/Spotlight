@@ -111,7 +111,13 @@ public class Message {
                 return "Template";
             }
         } else if(getMessageType() == MessageType.location) {
-            return "Location: "+ locationMessage.getPlaceName();
+            if(locationMessage.getAddress()!=null && !locationMessage.getAddress().isEmpty()) {
+                return "Location: " + locationMessage.getAddress();
+            } else if(locationMessage.getPlaceName()!=null && !locationMessage.getPlaceName().isEmpty()) {
+                return "Location: " + locationMessage.getPlaceName();
+            } else {
+                return "Location";
+            }
         } else if(getMessageType() == MessageType.image) {
             return "Image";
         } else if(getMessageType() == MessageType.audio) {

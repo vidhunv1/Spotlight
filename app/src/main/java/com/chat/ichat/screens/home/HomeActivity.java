@@ -48,6 +48,7 @@ import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
@@ -156,7 +157,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
 		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
 		profileNameView.setText(userSession.getName());
-		profileIdView.setText("@"+userSession.getUserId());
+		profileIdView.setText("ID: "+userSession.getUserId());
 
 		chatList.setLayoutManager(new LinearLayoutManager(this));
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
@@ -379,7 +380,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@OnClick(R.id.nav_item_faq)
 	public void onNavigationFAQClicked() {
-		startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq"));
+		new Handler().postDelayed(() -> startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq")), 250);
 		drawer.closeDrawer(GravityCompat.START, true);
 	}
 
@@ -390,6 +391,12 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		drawer.closeDrawer(GravityCompat.START, true);
 		/*    Analytics    */
 		firebaseAnalytics.logEvent(AnalyticsContants.Event.HOME_ADD_CONTACT, null);
+	}
+
+	@OnClick(R.id.nav_item_people_nearby)
+	public void onPeopleNearbyClicked() {
+		new Handler().postDelayed(() -> startActivity(PeopleNearbyActivity.callingIntent(this)), 250);
+		drawer.closeDrawer(GravityCompat.START, true);
 	}
 
 	@Override
@@ -406,7 +413,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			return true;
 		} else if(id == R.id.action_search) {
 			startActivity(SearchActivity.callingIntent(this));
-
 			/*              Analytics           */
 			firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, null);
 			return true;

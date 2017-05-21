@@ -189,7 +189,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
             case VIEW_TYPE_CATEGORY_USERNAME_SEARCH:
                 CategoryViewHolder categoryNameViewHolder3 = (CategoryViewHolder) holder;
-                categoryNameViewHolder3.renderItem("Username Search");
+                categoryNameViewHolder3.renderItem("ID Search");
                 break;
             case VIEW_TYPE_USERNAME_SEARCH:
                 UsernameSearchViewHolder usernameSearchViewHolder = (UsernameSearchViewHolder) holder;
@@ -462,7 +462,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             profileImage.setPadding((int)AndroidUtils.px(9),(int)AndroidUtils.px(10),(int)AndroidUtils.px(11),(int)AndroidUtils.px(10));
                             _User user = userResponse.getUser();
                             contactName.setText(AndroidUtils.displayNameStyle(user.getName()));
-                            lastMessage.setText("@"+user.getUserId());
+                            lastMessage.setText("ID: "+user.getUserId());
 
                             if(user.getProfileDP()!=null && !user.getProfileDP().isEmpty()) {
                                 Glide.with(context)
@@ -484,7 +484,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             profileImage.setPadding((int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20),(int)AndroidUtils.px(20));
                             profileImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error));
 
-                            searching.setText("Username '"+query+"' not found");
+                            searching.setText("ID '"+query+"' not found");
                         }
                     }
                 });

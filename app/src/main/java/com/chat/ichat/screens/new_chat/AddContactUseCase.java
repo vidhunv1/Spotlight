@@ -4,6 +4,7 @@ package com.chat.ichat.screens.new_chat;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.XMPPManager;
 import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.BotResponse;
 import com.chat.ichat.api.user.UserApi;
@@ -27,7 +28,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 20/04/17.
  */
-
 public class AddContactUseCase {
     private UserApi userApi;
     private ContactStore contactStore;
@@ -50,7 +50,7 @@ public class AddContactUseCase {
                         if (contact != null && contact.isAdded()) {
                             subscriber.onNext(contact);
                         } else {
-                            userApi.addContact(userId)
+                            ApiManager.getContactApi().addContact(userId)
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribeOn(Schedulers.io())
                                     .map(userResponse -> {

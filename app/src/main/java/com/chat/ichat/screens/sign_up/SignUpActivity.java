@@ -143,7 +143,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             if(!(result1==permission && result2 == permission)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
             }
-
         }
 
         TelephonyManager manager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);

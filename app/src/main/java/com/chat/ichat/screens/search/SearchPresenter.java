@@ -1,9 +1,7 @@
 package com.chat.ichat.screens.search;
 
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.user.SuggestionsResponse;
-import com.chat.ichat.api.user.UserApi;
-import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.api.contact.ContactResponse;
 import com.chat.ichat.api.user._User;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.BotDetailsStore;
@@ -40,9 +38,7 @@ public class SearchPresenter implements SearchContract.Presenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<ContactResult>>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
@@ -84,10 +80,10 @@ public class SearchPresenter implements SearchContract.Presenter {
                     }
                 });
 
-        ApiManager.getUserApi().getUserSuggestions()
+        ApiManager.getContactApi().getUserSuggestions()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<SuggestionsResponse>() {
+                .subscribe(new Subscriber<ContactResponse>() {
                     @Override
                     public void onCompleted() {
 
@@ -121,9 +117,9 @@ public class SearchPresenter implements SearchContract.Presenter {
                     }
 
                     @Override
-                    public void onNext(SuggestionsResponse suggestionsResponse) {
-                        List<ContactResult> contactsResultsm = new ArrayList<>(suggestionsResponse.getUsers().size());
-                        for (_User user : suggestionsResponse.getUsers()) {
+                    public void onNext(ContactResponse contactResponse) {
+                        List<ContactResult> contactsResultsm = new ArrayList<>(contactResponse.getContacts().size());
+                        for (_User user : contactResponse.getContacts()) {
                             ContactResult contactResult = new ContactResult(user.getCountryCode(), user.getPhone(), user.getName());
                             contactResult.setProfileDP(user.getProfileDP());
                             contactResult.setAdded(false);

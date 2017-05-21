@@ -36,24 +36,9 @@ public interface UserApi {
     @GET("users/id/{user_id}")
     Observable<UserResponse> findUserByUserId(@Path("user_id") String userId);
 
-    @GET("contacts/add/{user_id}")
-    Observable<UserResponse> addContact(@Path("user_id") String userId);
-
-    @GET("contacts/block/{user_id}")
-    Observable<UserResponse> blockContact(@Path("user_id") String userId);
-
-    @GET("contacts/unblock/{user_id}")
-    Observable<UserResponse> unblockContact(@Path("user_id") String userId);
-
-    @GET("contacts/get")
-    Observable<ContactResponse> getContacts();
-
     @GET("users/logout")
     Observable<StatusResponse> logout();
 
     @POST("users/login")
     Observable<UserResponse> loginUser(@Body UserRequest userRequest);
-
-    @GET("users/suggestions")
-    Observable<SuggestionsResponse> getUserSuggestions();
 }

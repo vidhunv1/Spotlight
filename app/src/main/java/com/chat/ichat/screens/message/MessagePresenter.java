@@ -2,6 +2,7 @@ package com.chat.ichat.screens.message;
 
 import com.chat.ichat.MessageController;
 import com.chat.ichat.api.ApiError;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.PersistentMenu;
 import com.chat.ichat.api.message.MessageApi;
@@ -110,9 +111,9 @@ public class MessagePresenter implements MessageContract.Presenter {
         contactResult.setBlocked(shouldBlock);
         Observable<UserResponse> a;
         if(shouldBlock) {
-            a = userApi.blockContact(userId);
+            a = ApiManager.getContactApi().blockContact(userId);
         } else {
-            a = userApi.unblockContact(userId);
+            a = ApiManager.getContactApi().unblockContact(userId);
         }
         Subscription subscription = a
                 .subscribeOn(Schedulers.io())

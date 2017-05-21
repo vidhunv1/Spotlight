@@ -49,7 +49,7 @@ public class ImageViewerActivity extends AppCompatActivity {
         if(!receivedIntent.hasExtra(KEY_IMAGE))
             return;
 
-        image = receivedIntent.getStringExtra(KEY_IMAGE);
+        image = receivedIntent.getStringExtra(KEY_IMAGE).replace("https://", "http://");
         Glide.with(this).load(image)
                 .crossFade()
                 .into(imageView);

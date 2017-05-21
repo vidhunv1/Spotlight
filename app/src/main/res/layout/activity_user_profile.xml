@@ -110,7 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="#8A8A8A"
-                    android:text="Username"
+                    android:text="iChat ID"
                     android:textSize="13sp"
                     android:paddingLeft="55dp"/>
             </LinearLayout>

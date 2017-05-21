@@ -24,13 +24,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.db.ContactStore;
@@ -39,8 +37,7 @@ import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
 import com.chat.ichat.screens.home.HomeActivity;
-import com.chat.ichat.screens.message.MessageActivity;
-import com.chat.ichat.screens.shared_media.MediaAdapter;
+import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
@@ -50,19 +47,14 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.screens.shared_media.SharedMediaActivity;
-
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -132,7 +124,7 @@ public class UserProfileActivity extends BaseActivity {
         isBlocked = receivedIntent.getBooleanExtra(KEY_CONTACT_BLOCKED, false);
 
         contactNameView.setText(contactName);
-        userIdView.setText("@"+userId);
+        userIdView.setText(userId);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -155,6 +147,8 @@ public class UserProfileActivity extends BaseActivity {
                             profileDP.setImageDrawable(circularBitmapDrawable);
                         }
                     });
+
+            profileDP.setOnClickListener(v -> startActivity(ImageViewerActivity.callingIntent(this, contactProfileDP)));
         } else {
             profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
         }
@@ -186,9 +180,7 @@ public class UserProfileActivity extends BaseActivity {
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {
-
-                    }
+                    public void onError(Throwable e) {}
 
                     @Override
                     public void onNext(List<MessageResult> messageResults) {
@@ -232,7 +224,7 @@ public class UserProfileActivity extends BaseActivity {
         contactResult.setUserId(userId);
         contactResult.setBlocked(shouldBlock);
         Activity activity = UserProfileActivity.this;
-        ApiManager.getUserApi().blockContact(userId)
+        ApiManager.getContactApi().blockContact(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<UserResponse>() {
@@ -246,17 +238,15 @@ public class UserProfileActivity extends BaseActivity {
                     public void onNext(UserResponse userResponse) {
                         Observable<UserResponse> a;
                         if(shouldBlock) {
-                            a = ApiManager.getUserApi().blockContact(userId);
+                            a = ApiManager.getContactApi().blockContact(userId);
                         } else {
-                            a = ApiManager.getUserApi().unblockContact(userId);
+                            a = ApiManager.getContactApi().unblockContact(userId);
                         }
                         a.subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new Subscriber<UserResponse>() {
                                     @Override
-                                    public void onCompleted() {
-
-                                    }
+                                    public void onCompleted() {}
 
                                     @Override
                                     public void onError(Throwable e) {
@@ -374,7 +364,7 @@ public class UserProfileActivity extends BaseActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-                    /*              Analytics           */
+            /*              Analytics           */
             Bundle bundle = new Bundle();
             bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
             firebaseAnalytics.logEvent(AnalyticsContants.Event.DELETE_USER, bundle);
@@ -498,13 +488,10 @@ public class UserProfileActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Boolean>() {
                     @Override
-                    public void onCompleted() {
-                    }
+                    public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {
-
-                    }
+                    public void onError(Throwable e) {}
 
                     @Override
                     public void onNext(Boolean aBoolean) {

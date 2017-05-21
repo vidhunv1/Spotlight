@@ -6,7 +6,7 @@ import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.XMPPManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.user.ContactResponse;
+import com.chat.ichat.api.contact.ContactResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserRequest;
 import com.chat.ichat.api.user.UserResponse;
@@ -109,7 +109,7 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void fetchContacts() {
-        Subscription subscription = ApiManager.getUserApi().getContacts()
+        Subscription subscription = ApiManager.getContactApi().getContacts()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResponse>() {
@@ -125,7 +125,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                     public void onNext(ContactResponse contactResponse) {
                         Logger.d(this, "CONTATCTS");
                         List<ContactResult> contactResults = new ArrayList<>();
-                        for (_User user : contactResponse.getUser()) {
+                        for (_User user : contactResponse.getContacts()) {
                             Logger.d(this, user.toString());
                             ContactResult c = new ContactResult();
                             c.setUsername(user.getUsername());

@@ -2,11 +2,14 @@ package com.chat.ichat.api;
 
 import com.chat.ichat.api.app.AppApi;
 import com.chat.ichat.api.bot.BotApi;
+import com.chat.ichat.api.contact.ContactApi;
+import com.chat.ichat.api.location.LocationApi;
 import com.chat.ichat.api.message.MessageApi;
 import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.config.AppConfig;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.screens.people_nearby.Location;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -36,6 +39,8 @@ public class ApiManager {
     private BotApi botApi;
     private AppApi appApi;
     private MessageApi messageApi;
+    private ContactApi contactApi;
+    private LocationApi locationApi;
 
     public ApiManager() {
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -74,6 +79,8 @@ public class ApiManager {
         getInstance().botApi = null;
         getInstance().appApi = null;
         getInstance().messageApi = null;
+        getInstance().contactApi = null;
+        getInstance().locationApi = null;
     }
 
     public static PhoneContactsApi getPhoneContactsApi() {
@@ -108,6 +115,20 @@ public class ApiManager {
             getInstance().messageApi = getInstance().retrofitClient.create(MessageApi.class);
         }
         return getInstance().messageApi;
+    }
+
+    public static ContactApi getContactApi() {
+        if(getInstance().contactApi == null) {
+            getInstance().contactApi = getInstance().retrofitClient.create(ContactApi.class);
+        }
+        return getInstance().contactApi;
+    }
+
+    public static LocationApi getLocationApi() {
+        if(getInstance().locationApi == null) {
+            getInstance().locationApi = getInstance().retrofitClient.create(LocationApi.class);
+        }
+        return getInstance().locationApi;
     }
 
     public static void reset() {

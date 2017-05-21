@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
@@ -58,6 +59,7 @@ import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.GenericCache;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
@@ -95,55 +97,40 @@ public class MessageActivity extends BaseActivity
 
     @Bind(R.id.rv_messageitem)
     RecyclerView messageList;
-
     EditText messageBox;
-
     @Bind(R.id.tb_message)
     Toolbar toolbar;
-
     @Bind(R.id.tb_message_title)
     TextView title;
-
 //    @Bind(R.id.tb_message_presence)
 //    TextView presenceView;
-
     @Bind(R.id.container)
     RelativeLayout rootLayout;
-
     @Bind(R.id.message_add_block)
     LinearLayout addBlockView;
-
     @Bind(R.id.iv_profile_image)
     ImageView profileImage;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
-
     private EmojiViewHelper emojiPicker;
     private AudioViewHelper audioViewHelper;
     private GalleryViewHelper galleryViewHelper;
-
     private List<PersistentMenu> persistentMenus;
-
     private WrapContentLinearLayoutManager linearLayoutManager;
     private ArrayList<String> selectedImages = new ArrayList<>();
-
     private ChatState currentChatState;
     private boolean shouldHandleBack = true;
-
     private final int REQUEST_CAMERA = 1;
     private final int REQUEST_PLACE_PICKER_SEND = 2;
     private static final int REQUEST_GALLERY = 3;
     private String currentPhotoPath;
-
     public static int index = -1;
     public static int top = -1;
-
     private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
     private String chatUserName; // contact user
     private String currentUser; // this user
     private MessagesAdapter messagesAdapter;
     private ContactResult contactDetails;
-
     //send
     private ImageButton galleryButton;
     private View gallerySelector;
@@ -153,13 +140,13 @@ public class MessageActivity extends BaseActivity
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "message";
     // userName: id for ejabberd xmpp. userId: id set by user
+
     public static Intent callingIntent(Context context, String chatUserName) {
         Logger.d("[MessageActivity] "+chatUserName);
         Intent intent = new Intent(context, MessageActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
-
         return intent;
     }
 
@@ -169,7 +156,6 @@ public class MessageActivity extends BaseActivity
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
         messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), ApiManager.getBotApi(), ApiManager.getMessageApi());
-
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_CHAT_USER_NAME))
@@ -199,6 +185,8 @@ public class MessageActivity extends BaseActivity
             View v = messageList.getChildAt(0);
             top = (v == null) ? 0 : (v.getTop() - messageList.getPaddingTop());
         }
+
+        GenericCache.getInstance().put("draft_"+chatUserName, messageBox.getText().toString());
     }
 
     @Override
@@ -860,6 +848,13 @@ public class MessageActivity extends BaseActivity
             });
 
             sendView.setOnClickListener(v -> onSendClicked());
+            String draft = GenericCache.getInstance().get("draft_"+chatUserName);
+            if(draft!=null) {
+                messageBox.setText("");
+                messageBox.append(draft);
+                sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
+            }
         }
     }
 
