@@ -350,14 +350,10 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResult>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {
-
-                    }
+                    public void onError(Throwable e) {}
 
                     @Override
                     public void onNext(ContactResult contactResult) {

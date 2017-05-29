@@ -35,7 +35,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 29/01/17.
  */
-
 public class MessageController {
     public static final String LAST_SEEN_PREFS_FILE = "last_seen";
     private static MessageController instance;
@@ -111,7 +110,7 @@ public class MessageController {
         });
     }
 
-    public Observable<MessageResult> sendMessage(MessageResult message){
+    public Observable<MessageResult> sendMessage(MessageResult message) {
         Logger.d(this, "Sending message"+message.getMessage()+" to "+message.getChatId());
 
         return Observable.create(subscriber -> {
@@ -193,7 +192,7 @@ public class MessageController {
     }
 
     //Typing/stopped typing indicators
-    public Observable<Boolean> sendChatState(String chatId, ChatState chatState){
+    public Observable<Boolean> sendChatState(String chatId, ChatState chatState) {
         return Observable.create(subscriber -> {
             ChatManager chatManager = ChatManager.getInstanceFor(this.conn);
             Chat newChat = chatManager.createChat(XMPPManager.getJidFromUserName(chatId));
@@ -211,7 +210,7 @@ public class MessageController {
         });
     }
 
-    public Observable<Boolean> sendReadReceipt(MessageResult messageResult){
+    public Observable<Boolean> sendReadReceipt(MessageResult messageResult) {
         return Observable.create(subscriber -> {
             Message message = new Message(XMPPManager.getJidFromUserName(messageResult.getChatId()));
             ReadReceiptExtension read = new ReadReceiptExtension(messageResult.getReceiptId());

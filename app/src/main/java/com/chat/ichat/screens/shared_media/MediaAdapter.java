@@ -1,19 +1,15 @@
 package com.chat.ichat.screens.shared_media;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.chat.ichat.R;
 import com.chat.ichat.core.lib.AndroidUtils;
-import com.chat.ichat.core.lib.RoundedCornerTransformation;
 
 import java.util.List;
 
@@ -24,7 +20,6 @@ import java.util.List;
 public class MediaAdapter extends BaseAdapter {
     private Context context;
     private List<String> imageUrls;
-
     public MediaAdapter(Context context, List<String> imageUrls) {
         this.context = context;
         this.imageUrls = imageUrls;

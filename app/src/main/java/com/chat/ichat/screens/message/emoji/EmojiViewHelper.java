@@ -2,20 +2,15 @@ package com.chat.ichat.screens.message.emoji;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -24,7 +19,6 @@ import android.widget.TextView;
 
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
-import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Emojicon;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Nature;
@@ -121,7 +115,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
     }
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.emojicons, null, false);
+        View view = inflater.inflate(R.layout.emojicons_layout, null, false);
         emojisPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         emojisPager.setOnPageChangeListener(this);
 

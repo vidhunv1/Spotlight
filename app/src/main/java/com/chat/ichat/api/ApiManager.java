@@ -131,6 +131,10 @@ public class ApiManager {
         return getInstance().locationApi;
     }
 
+    public static Retrofit getRetrofitClient() {
+        return getInstance().retrofitClient;
+    }
+
     public static void reset() {
         instance = null;
     }

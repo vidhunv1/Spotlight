@@ -66,9 +66,18 @@
         <View
             android:layout_width="48dp"
             android:layout_height="4dp"
-            android:layout_marginLeft="144dp"
+            android:layout_marginLeft="192dp"
             android:layout_alignParentBottom="true"
             android:id="@+id/audio_selector"
+            android:visibility="gone"
+            android:background="@color/colorPrimary"/>
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginLeft="144dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/gif_selector"
             android:visibility="gone"
             android:background="@color/colorPrimary"/>
 
@@ -94,6 +103,14 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_toRightOf="@+id/btn_sendMessage_camera"
+            android:id="@+id/btn_sendMessage_gif"
+            app:srcCompat="@drawable/ic_gif" />
+        <ImageButton
+            android:background="?android:selectableItemBackground"
+            android:layout_alignParentBottom="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_toRightOf="@+id/btn_sendMessage_gif"
             android:id="@+id/btn_sendMessage_audio"
             app:srcCompat="@drawable/ic_mic" />
         <ImageButton

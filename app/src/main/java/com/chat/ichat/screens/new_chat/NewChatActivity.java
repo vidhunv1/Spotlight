@@ -45,25 +45,15 @@ import butterknife.OnTextChanged;
  * Created by vidhun on 08/01/17.
  */
 public class NewChatActivity extends BaseActivity implements NewChatContract.View, NewChatAdapter.ContactClickListener{
-    @Bind(R.id.rv_contact_list)
-    RecyclerView contactList;
-
-    @Bind(R.id.tb_new_chat)
-    Toolbar toolbar;
-
-    @Bind(R.id.et_new_chat_search1)
-    EditText toolbarSearch;
-
-    @Bind(R.id.tv_new_chat_title)
-    TextView toolbarTitle;
+    @Bind(R.id.rv_contact_list) RecyclerView contactList;
+    @Bind(R.id.tb_new_chat) Toolbar toolbar;
+    @Bind(R.id.et_new_chat_search1) EditText toolbarSearch;
+    @Bind(R.id.tv_new_chat_title) TextView toolbarTitle;
+    @Bind(R.id.ll_new_chat) LinearLayout newChatLayout;
 
     NewChatAdapter newChatAdapter;
 
-    @Bind(R.id.ll_new_chat)
-    LinearLayout newChatLayout;
-
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
-    private boolean isNewChat;
 
     NewChatPresenter newChatPresenter;
 
@@ -102,7 +92,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if(!receivedIntent.hasExtra(KEY_IS_NEW_CHAT))
             return;
 
-        isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, false);
+        boolean isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, false);
         toolbarSearch.setVisibility(View.GONE);
         toolbarTitle.setVisibility(View.VISIBLE);
 

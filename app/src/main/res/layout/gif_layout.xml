@@ -1,0 +1,114 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:id="@+id/gifs_tab"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+        <ImageButton
+            android:background="?android:selectableItemBackground"
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:id="@+id/trending"
+            app:srcCompat="@drawable/ic_trending_up"/>
+        <ImageButton
+            android:background="?android:selectableItemBackground"
+            android:layout_weight="1"
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:id="@+id/category"
+            app:srcCompat="@drawable/ic_view_compact"/>
+    </LinearLayout>
+
+    <ProgressBar
+        android:paddingBottom="42dp"
+        android:id="@+id/progress"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:paddingBottom="42dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="@color/appElement"
+        android:visibility="gone"
+        android:id="@+id/error"
+        android:textSize="14sp"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:text="Check your phone's Internet connection and try again."/>
+
+    <com.chat.ichat.screens.message.MessageEditText
+        android:layout_alignParentTop="true"
+        android:id="@+id/gif_search"
+        android:hint=" Search for GIFs"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="match_parent"
+        android:textSize="15sp"
+        android:drawableLeft="@drawable/ic_search_dark"
+        android:background="@null"
+        android:inputType="textFilter"
+        android:layout_height="40dp" />
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:id="@+id/grid_gifs"
+        android:layout_below="@+id/gif_search"
+        android:layout_above="@+id/gifs_tab"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.25dp"
+        android:id="@+id/view_divider"
+        android:layout_below="@+id/grid_gifs"
+        android:background="#E6E6E6" />
+
+    <RelativeLayout
+        android:background="#ff000000"
+        android:id="@+id/full_gif_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="6dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="12dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/back"
+            app:srcCompat="@drawable/ic_back"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_sendMessage_send"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:elevation="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_send_white"
+            app:backgroundTint="@color/colorPrimary"/>
+
+        <ImageView
+            android:layout_above="@+id/back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/iv_full_gif"
+            android:background="#000000"/>
+    </RelativeLayout>
+</RelativeLayout>
