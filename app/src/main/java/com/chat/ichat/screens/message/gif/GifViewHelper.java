@@ -3,6 +3,7 @@ package com.chat.ichat.screens.message.gif;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
@@ -27,17 +27,15 @@ import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
-import com.chat.ichat.screens.message.MessageContract;
 import com.chat.ichat.screens.message.MessageEditText;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
-
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 22/05/17.
  */
-public class GifViewHelper{
+public class GifViewHelper {
     Context mContext;
 
     private ViewGroup gifLayout;
@@ -59,10 +57,14 @@ public class GifViewHelper{
     private View gifsTab;
     private GifApi gifApi;
     private boolean isSearchFocused = false;
+    private FloatingActionButton sendFab;
+    private View.OnClickListener sendClickListener;
+
+    private SendGifListener sendGifListener;
 
     private GridView gifsGrid;
     private TextView error;
-    public GifViewHelper(Context mContext, final ViewGroup viewGroup, Window window) {
+    public GifViewHelper(Context mContext, final ViewGroup viewGroup, Window window, SendGifListener sendGifListener) {
         this.mContext = mContext;
         this.gifLayout = viewGroup;
         this.window = window;
@@ -70,6 +72,7 @@ public class GifViewHelper{
         composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
         this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("gif_preferences", Context.MODE_PRIVATE);
         this.gifApi = ApiManager.getRetrofitClient().create(GifApi.class);
+        this.sendGifListener = sendGifListener;
     }
 
     private void addGifView() {
@@ -89,6 +92,7 @@ public class GifViewHelper{
             search = (MessageEditText) gifLayout.findViewById(R.id.gif_search);
             gifsTab = gifLayout.findViewById(R.id.gifs_tab);
             progressBar = (ProgressBar) gifLayout.findViewById(R.id.progress);
+            sendFab = (FloatingActionButton) gifLayout.findViewById(R.id.fab_sendMessage_send);
             progressBar.setVisibility(View.VISIBLE);
 
             back.setOnClickListener(v -> {
@@ -212,7 +216,6 @@ public class GifViewHelper{
                         gifsGrid.setAdapter(g);
                     }
                 });
-
     }
 
     public void setTrendingGifs() {
@@ -240,12 +243,19 @@ public class GifViewHelper{
                             for (GiphyGifResponse.Data data : giphyGifResponse.getData()) {
                                 if(data.getId().equals(id)) {
                                     fullGifLayout.setVisibility(View.VISIBLE);
-                                    Glide.with(mContext).load(data.getHighGifUrl().replace("https://", "http://"))
+                                    Glide.with(mContext).load(data.getLowGifUrl().replace("https://", "http://"))
                                             .bitmapTransform(new FitCenter(mContext))
                                             .placeholder(0xFF000000)
                                             .crossFade()
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
+                                    sendFab.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            sendGifListener.onSendGif(data.getLowGifUrl());
+                                        }
+                                    });
+                                    break;
                                 }
                             }
                         });
@@ -279,13 +289,25 @@ public class GifViewHelper{
                             progressBar.setVisibility(View.GONE);
                             gifsTab.setVisibility(View.VISIBLE);
                             TenorGifAdapter tenorGifAdapter = new TenorGifAdapter(mContext, tenorGifResponse, position -> {
+                                InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                Activity currentActivity = (Activity) mContext;
+
+                                View view = currentActivity.getCurrentFocus();
+                                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                                 fullGifLayout.setVisibility(View.VISIBLE);
+
                                 Glide.with(mContext).load(tenorGifResponse.getResults().get(position).getGif().getUrl().replace("https://", "http://"))
                                         .bitmapTransform(new FitCenter(mContext))
                                         .placeholder(0xFF000000)
                                         .crossFade()
                                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                         .into(fullGifImage);
+                                sendFab.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl());
+                                    }
+                                });
                             });
                             gifsGrid.setAdapter(tenorGifAdapter);
                         }
@@ -345,5 +367,9 @@ public class GifViewHelper{
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         return inflater.inflate(R.layout.gif_layout, null, false);
+    }
+
+    public interface SendGifListener {
+        public void onSendGif(String url);
     }
 }

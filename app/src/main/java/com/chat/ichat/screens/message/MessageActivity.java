@@ -29,6 +29,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -62,6 +63,7 @@ import com.chat.ichat.db.GenericCache;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
@@ -80,6 +82,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
@@ -250,6 +253,12 @@ public class MessageActivity extends BaseActivity
             this.finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.messages_toolbar, menu);
+        return true;
     }
 
     @OnClick(R.id.message_head)
@@ -632,7 +641,14 @@ public class MessageActivity extends BaseActivity
             emojiViewHelper = new EmojiViewHelper(this, smileyLayout, getWindow());
             audioViewHelper = new AudioViewHelper(this, smileyLayout, getWindow());
             galleryViewHelper = new GalleryViewHelper(this, smileyLayout, getWindow());
-            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow());
+            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), url -> {
+                Message m = new Message();
+                ImageMessage imageMessage = new ImageMessage();
+                imageMessage.setImageUrl(url);
+                m.setImageMessage(imageMessage);
+
+                messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
+            });
 
             messageEditText.setOnEditTextImeBackListener(() -> {
                 if(!emojiViewHelper.isEmojiState() || !audioViewHelper.isAudioState() || !galleryViewHelper.isGalleryState() || !gifViewHelper.isGifState()) {

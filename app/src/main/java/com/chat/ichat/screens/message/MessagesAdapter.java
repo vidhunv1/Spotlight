@@ -457,7 +457,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_SEND_IMAGE:
                 SendImageViewHolder sendImageViewHolder = (SendImageViewHolder) holder;
-                sendImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getFileUri(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                if(messageCache.get(position).getImageMessage().getFileUri()!=null) {
+                    sendImageViewHolder.renderItem(new File(messageCache.get(position).getImageMessage().getFileUri()), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                } else {
+                    sendImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getImageUrl(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                }
                 break;
             case VIEW_TYPE_RECV_IMAGE:
                 ReceiveImageViewHolder receiveImageViewHolder = (ReceiveImageViewHolder) holder;
@@ -1405,28 +1409,16 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.message_image)
         ImageView messageImage;
 
-        private String imageUri;
+        private File imageUri;
+        private String imageUrl;
         SendImageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String localImageUri, String time, MessageResult.MessageStatus messageStatus, int position) {
-            this.imageUri = localImageUri;
-            Logger.d(this, "SendImageViewHolder: "+localImageUri+", "+time+", "+position);
+        void renderItem(File localFile, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.imageUri = localFile;
             int bubbleType = bubbleType(position);
-            boolean shouldShowTime = shouldShowTime(position);
-
-            timeView.setText(time);
-            deliveryStatusText.setVisibility(View.GONE);
-            if(shouldShowTime) {
-                timeView.setVisibility(View.VISIBLE);
-                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
-            } else {
-                timeView.setVisibility(View.GONE);
-                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
-            }
-
             RoundedCornerTransformation roundedCornerTransformationT = null;
             RoundedCornerTransformation roundedCornerTransformationB = null;
             switch (bubbleType) {
@@ -1452,9 +1444,60 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     break;
             }
 
-            Glide.with(context).load(new File(localImageUri))
+            Glide.with(context).load(localFile)
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
                     .into(messageImage);
+
+            render(time, messageStatus, position);
+        }
+
+        void renderItem(String imageUrl, String time, MessageResult.MessageStatus messageStatus, int position) {
+            this.imageUrl = imageUrl;
+            int bubbleType = bubbleType(position);
+            RoundedCornerTransformation roundedCornerTransformationT = null;
+            RoundedCornerTransformation roundedCornerTransformationB = null;
+            switch (bubbleType) {
+                case 0:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 1:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 2:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+                case 3:
+                    layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    break;
+            }
+
+            Glide.with(context).load(imageUrl)
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .into(messageImage);
+
+            render(time, messageStatus, position);
+        }
+
+        void render(String time, MessageResult.MessageStatus messageStatus, int position) {
+            boolean shouldShowTime = shouldShowTime(position);
+
+            timeView.setText(time);
+            deliveryStatusText.setVisibility(View.GONE);
+            if(shouldShowTime) {
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setPadding(0, (int)AndroidUtils.px(15.75f),0,(int)AndroidUtils.px(9f));
+            } else {
+                timeView.setVisibility(View.GONE);
+                timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
+            }
 
             if(messageStatus == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_pending);
@@ -1464,12 +1507,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
             }
             deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
+
         }
 
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
-            if(imageUri!=null && !imageUri.isEmpty()) {
-                context.startActivity(ImageViewerActivity.callingIntent(context, imageUri));
+            if(imageUrl!=null && !imageUrl.isEmpty()) {
+                context.startActivity(ImageViewerActivity.callingIntent(context, imageUrl));
             }
         }
 

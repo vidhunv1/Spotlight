@@ -2,75 +2,71 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="right"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
     android:animateLayoutChanges="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/message_send_text">
-
-    <LinearLayout
+    android:id="@+id/message_send_text"
+    android:layout_alignParentBottom="true">
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:layout_alignParentTop="true"
+        android:paddingTop="2dp"
+        android:text="9:47 PM"
+        android:textColor="@color/messageInfoText"
+        android:paddingRight="0.25dp"
+        android:textSize="12sp"
+        android:id="@+id/tv_time"
+        android:gravity="center" />
+
+    <RelativeLayout
+        android:layout_below="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_msg_send_full"
+        android:id="@+id/rl_bubble"
+        android:paddingTop="6.25dp"
+        android:paddingBottom="8.25dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:maxWidth="258dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:layout_marginRight="12dp">
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/rl_bubble"
-            android:paddingTop="2dp"
-            android:text="9:47 PM"
-            android:textColor="@color/messageInfoText"
-            android:paddingRight="0.25dp"
-            android:textSize="12sp"
-            android:id="@+id/tv_time"
-            android:gravity="center" />
-
-        <RelativeLayout
+            android:text="Hello"
             android:layout_width="wrap_content"
+            android:id="@+id/tv_messageitem_message"
+            android:textSize="16sp"
+            android:textColor="@color/sendMessageText"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_msg_send_full"
-            android:id="@+id/rl_bubble"
-            android:paddingTop="6.25dp"
-            android:paddingBottom="8.25dp"
-            android:maxWidth="258dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:layout_marginRight="26dp">
-            <TextView
-                android:text="Hello"
-                android:layout_width="wrap_content"
-                android:id="@+id/tv_messageitem_message"
-                android:textSize="16sp"
-                android:textColor="@color/sendMessageText"
-                android:layout_height="wrap_content"
-                android:maxWidth="234dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/rl_bubble"
-            android:text="Seen"
-            android:textColor="@color/messageInfoText"
-            android:textSize="12sp"
-            android:id="@+id/tv_delivery_status"
-            android:layout_marginRight="38dp"
-            android:gravity="right" />
-    </LinearLayout>
+            android:maxWidth="234dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
 
     <ImageView
         android:layout_width="12dp"
         android:layout_height="12dp"
         app:srcCompat="@drawable/ic_delivery_pending"
         android:id="@+id/iv_delivery_status"
-        android:layout_marginRight="6dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_marginRight="4.25dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="1dp"
-        android:baselineAlignBottom="false"
-        android:layout_alignParentTop="false" />
+        android:layout_toLeftOf="@+id/rl_bubble"
+        android:layout_below="@+id/tv_time"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_bubble"
+        android:text="Seen"
+        android:textColor="@color/messageInfoText"
+        android:textSize="12sp"
+        android:id="@+id/tv_delivery_status"
+        android:layout_marginRight="24dp"
+        android:gravity="right" />
 </RelativeLayout>
+

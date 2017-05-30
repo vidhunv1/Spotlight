@@ -16,7 +16,7 @@ import com.chat.ichat.core.lib.AndroidUtils;
 /**
  * Created by vidhun on 22/05/17.
  */
-public class GiphyGifAdapter extends BaseAdapter {
+class GiphyGifAdapter extends BaseAdapter {
     private Context context;
     private GiphyGifResponse gifs;
     private ClickListener clickListener;

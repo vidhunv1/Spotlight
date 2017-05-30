@@ -25,34 +25,35 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:id="@+id/message_head"
+                    android:layout_toRightOf="@+id/iv_profile_image"
                     android:layout_centerVertical="true">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="20sp"
+                        android:text="hhh"
+                        android:textSize="18sp"
                         android:textAppearance="@style/FontRobotoMedium"
                         android:textColor="@color/textPrimaryLight"
                         android:id="@+id/tb_message_title" />
 
-                    <!--<TextView-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="Online"-->
-                        <!--android:id="@+id/tb_message_presence"-->
-                        <!--android:visibility="gone"-->
-                        <!--android:textSize="14sp"-->
-                        <!--android:textColor="@color/textPrimaryLight" />-->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Online"
+                        android:layout_marginTop="1.25dp"
+                        android:id="@+id/tb_message_presence"
+                        android:textSize="14sp"
+                        android:textColor="@color/textPrimaryLight" />
                 </LinearLayout>
 
                 <ImageView
                     android:id="@+id/iv_profile_image"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_alignParentRight="true"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"/>
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
