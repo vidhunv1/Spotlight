@@ -48,6 +48,7 @@ import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -396,6 +397,12 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@OnClick(R.id.nav_item_people_nearby)
 	public void onPeopleNearbyClicked() {
 		new Handler().postDelayed(() -> startActivity(PeopleNearbyActivity.callingIntent(this)), 250);
+		drawer.closeDrawer(GravityCompat.START, true);
+	}
+
+	@OnClick(R.id.nav_item_discover_bots)
+	public void onDiscoverBotsClicked() {
+		new Handler().postDelayed(() -> startActivity(DiscoverBotsActivity.callingIntent(this)), 250);
 		drawer.closeDrawer(GravityCompat.START, true);
 	}
 
