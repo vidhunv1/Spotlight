@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        app:elevation="0dp"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tb_invite_friends"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorPrimary">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:id="@+id/rl_invite_friends"
+                android:layout_height="48dp">
+                <TextView
+                    android:gravity="center_vertical"
+                    android:text="Invite by SMS"
+                    android:textSize="19.5dp"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textColor="@color/textPrimaryLight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/tv_new_chat_title" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:padding="10dp"
+                    android:layout_toLeftOf="@+id/invite"
+                    app:srcCompat="@drawable/ic_done_active"
+                    android:layout_height="match_parent" />
+                <TextView
+                    android:id="@+id/invite"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical"
+                    android:text="INVITE"
+                    android:paddingRight="16dp"
+                    android:textSize="16dp"
+                    android:textAppearance="@style/FontRobotoMedium"
+                    android:textColor="@color/textPrimaryLight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:textSize="18sp"
+            android:text="Select All"/>
+
+        <CheckBox
+            android:layout_width="48dp"
+            android:id="@+id/checkbox"
+            android:theme="@style/CheckBoxStyle"
+            android:checked="false"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rv_invite_friends"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_invite_contact" />
+</LinearLayout>

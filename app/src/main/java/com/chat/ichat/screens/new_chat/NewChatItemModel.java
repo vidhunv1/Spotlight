@@ -10,6 +10,7 @@ public class NewChatItemModel {
     private String status;
     private String profileDP;
     private String presence;
+    private boolean isRegistered;
 
     public NewChatItemModel() {}
 
@@ -21,6 +22,14 @@ public class NewChatItemModel {
         }
         this.userId = userId;
         this.userName = username;
+    }
+
+    public boolean isRegistered() {
+        return isRegistered;
+    }
+
+    public void setRegistered(boolean registered) {
+        isRegistered = registered;
     }
 
     public String getPresence() {

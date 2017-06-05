@@ -20,6 +20,7 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
+import com.chat.ichat.screens.invite_friends.InviteFriendsActivity;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
@@ -28,21 +29,26 @@ import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 /**
  * Created by vidhun on 01/09/16.
  */
-public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
     private final int CONTACTS_NUMBER = 2;
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
+    private final int INVITE_FRIENDS = 8;
     private final int NO_CONTACTS = 5;
     private final int SEARCH = 6;
+    private final int INVITE_CONTACT = 7;
+
+    private int invitePosition = -1;
 
     private Context context;
 
@@ -61,22 +67,28 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void setContactList(List<NewChatItemModel> contactItems) {
-        for (NewChatItemModel contactItem : contactItems) {
-            long millis = sharedPreferences.getLong(contactItem.getUserName(), 0);
-            String onlineHtml = "<font color=\"" + highlightColor + "\">Online</font>";
-            if(millis == 0) {
-                if(contactItem.getUserName().startsWith("o_")) {
+        for (int i = 0; i < contactItems.size(); i++) {
+            NewChatItemModel contactItem = contactItems.get(i);
+            if(contactItem.isRegistered()) {
+                long millis = sharedPreferences.getLong(contactItem.getUserName(), 0);
+                String onlineHtml = "<font color=\"" + highlightColor + "\">Online</font>";
+                if (millis == 0) {
+                    if (contactItem.getUserName().startsWith("o_")) {
+                        contactItem.setPresence(onlineHtml);
+                    } else {
+                        contactItem.setPresence("Last seen recently");
+                    }
+                } else if ((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
                     contactItem.setPresence(onlineHtml);
                 } else {
-                    contactItem.setPresence("Last seen recently");
+                    String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
+                    contactItem.setPresence(context.getResources().getString(R.string.chat_presence_away, lastSeen));
                 }
-            } else if((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
-                contactItem.setPresence(onlineHtml);
-            } else {
-                String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
-                contactItem.setPresence(context.getResources().getString(R.string.chat_presence_away, lastSeen));
+            } else if(invitePosition==-1) {
+                invitePosition = i;
             }
         }
+        Logger.d(this, "invite position: "+invitePosition);
         this.itemList = contactItems;
         this.notifyItemRangeChanged(0, contactItems.size());
     }
@@ -140,11 +152,18 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else {
                 return CONTACTS_NUMBER;
             }
-        } else if(position == 0 && filterQuery.isEmpty()) {
+        } else if(position == 1 && filterQuery.isEmpty()) {
             return HEADER;
+        } else if(position == 0 && filterQuery.isEmpty()) {
+            return INVITE_FRIENDS;
         } else {
-            if(filterQuery.length() == 0)
-                return CONTACT;
+            if(filterQuery.length() == 0) {
+                if(position < invitePosition || invitePosition == -1) {
+                    return CONTACT;
+                } else {
+                    return INVITE_CONTACT;
+                }
+            }
             else
                 return SEARCH;
         }
@@ -180,6 +199,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View noContacts = inflater.inflate(R.layout.item_no_contacts, parent, false);
                 viewHolder = new NoContactsViewHolder(noContacts);
                 break;
+            case INVITE_CONTACT:
+                View inviteContacts = inflater.inflate(R.layout.item_invite_contact, parent, false);
+                viewHolder = new InviteContactsViewHolder(inviteContacts);
+                break;
+            case INVITE_FRIENDS:
+                View inviteFriends = inflater.inflate(R.layout.item_invite_friends, parent, false);
+                viewHolder = new InviteFriendsViewHolder(inviteFriends);
+                break;
             default:
                 return null;
         }
@@ -192,7 +219,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(!filterQuery.isEmpty() && filteredList.size() > 0 && vPos < filteredList.size())
             position = filteredList.get(vPos);
         else
-            position = vPos - 1;
+            position = vPos - 2;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
@@ -202,6 +229,12 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 isStart = position == 0 || Character.toUpperCase(itemList.get(position).getContactName().charAt(0)) != Character.toUpperCase(itemList.get(position - 1).getContactName().charAt(0));
                 isEnd = position != (itemList.size() - 1) && Character.toUpperCase(itemList.get(position).getContactName().charAt(0)) != Character.toUpperCase(itemList.get(position + 1).getContactName().charAt(0));
                 cVH.renderItem(itemList.get(position), isStart, isEnd);
+                break;
+            case INVITE_CONTACT:
+                InviteContactsViewHolder ivh = (InviteContactsViewHolder) holder;
+                ivh.renderItem(itemList.get(position).getContactName());
+                break;
+            case INVITE_FRIENDS:
                 break;
             case SEARCH:
                 SearchViewHolder sVH = (SearchViewHolder) holder;
@@ -380,6 +413,32 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    class InviteContactsViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_chatItem_contactName)
+        TextView name;
+
+        InviteContactsViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(String contactName) {
+            name.setText(contactName);
+        }
+    }
+
+    class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
+        InviteFriendsViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @OnClick(R.id.layout)
+        void onClick() {
+            context.startActivity(InviteFriendsActivity.callingIntent(context));
+        }
+    }
+
     class ContactsNumber extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_chatItem_contact)
         TextView contactNumber;
@@ -397,7 +456,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class NoResultViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.no_result)
         TextView noResult;
-
         public NoResultViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

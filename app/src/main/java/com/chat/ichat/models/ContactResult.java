@@ -16,6 +16,7 @@ public class ContactResult implements Serializable {
     private boolean isBlocked;
     private String userId;
     private String profileDP;
+    private boolean isRegistered;
     private _User.UserType userType;
 
     public ContactResult(String countryCode, String phoneNumber, String displayName) {
@@ -103,12 +104,26 @@ public class ContactResult implements Serializable {
         this.contactName = displayName;
     }
 
+    public boolean isRegistered() {
+        return isRegistered;
+    }
+
+    public void setRegistered(boolean registered) {
+        isRegistered = registered;
+    }
+
     @Override
     public boolean equals(Object o) {
         if(o instanceof ContactResult) {
             ContactResult temp = (ContactResult) o;
-            if(temp.getUsername().equals(this.getUsername())) {
-                return true;
+            if(temp.getUsername()!=null) {
+                if (temp.getUsername().equals(this.getUsername())) {
+                    return true;
+                }
+            } else {
+                if (temp.getPhoneNumber().equals(this.getPhoneNumber()) && temp.getCountryCode().equals(this.getPhoneNumber())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -134,10 +149,10 @@ public class ContactResult implements Serializable {
         int result = phoneNumber != null ? phoneNumber.hashCode() : 0;
         result = 31 * result + (countryCode != null ? countryCode.hashCode() : 0);
         result = 31 * result + (contactName != null ? contactName.hashCode() : 0);
-        result = 31 * result + username.hashCode();
+        result = 31 * result + (username != null ? username.hashCode() : 0);
         result = 31 * result + (isAdded ? 1 : 0);
         result = 31 * result + (isBlocked ? 1 : 0);
-        result = 31 * result + userId.hashCode();
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
         result = 31 * result + (profileDP != null ? profileDP.hashCode() : 0);
         result = 31 * result + (userType != null ? userType.hashCode() : 0);
         return result;

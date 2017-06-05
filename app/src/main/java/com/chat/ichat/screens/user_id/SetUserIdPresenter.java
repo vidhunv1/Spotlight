@@ -155,15 +155,8 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                         contactResult.setAdded(true);
                                         contactResult.setBlocked(false);
                                         contactResult.setProfileDP(contact.getProfileDP());
-
-                                        // default behaviour, we auto add phone contacts
-                                        //TODO: [1]Sync phone contacts not working
-                                        if(contact.isRegistered()) {
-                                            contacts.add(contactResult);
-                                            MessageController.getInstance().getLastActivity(contactResult.getUsername());
-
-                                            Logger.d(this, "Registered_ContactResult: "+contactResult.toString());
-                                        }
+                                        contactResult.setRegistered(contact.isRegistered());
+                                        contacts.add(contactResult);
                                     }
                                     return contacts; })
                                 .subscribeOn(Schedulers.io())
@@ -183,7 +176,12 @@ public class SetUserIdPresenter implements SetUserIdContract.Presenter {
                                         AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
                                         List<Observable<ContactResult>> observables = new ArrayList<>();
                                         for (ContactResult contactResult : contacts) {
-                                            observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+                                            // default behaviour, we auto add phone contacts
+                                            //TODO: [1]Sync phone contacts not working
+                                            if(contactResult.isRegistered()) {
+                                                MessageController.getInstance().getLastActivity(contactResult.getUsername());
+                                                observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+                                            }
                                         }
 
                                         Observable.zip(observables, (i) -> "Done Sync")

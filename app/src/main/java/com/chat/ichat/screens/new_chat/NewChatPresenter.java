@@ -12,6 +12,7 @@ import com.chat.ichat.api.user._User;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
 
 import org.jivesoftware.smack.SmackException;
@@ -34,10 +35,12 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     private NewChatContract.View contactsView;
     private CompositeSubscription compositeSubscription;
     private ContactStore contactStore;
+    private ContactsContent contactsContent;
     private AddContactUseCase addContactUseCase;
 
-    public NewChatPresenter(ContactStore contactStore, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
+    NewChatPresenter(ContactStore contactStore, ContactsContent contactsContent, UserApi userApi, BotDetailsStore botDetailsStore, BotApi botApi) {
         this.contactStore = contactStore;
+        this.contactsContent = contactsContent;
         this.compositeSubscription = new CompositeSubscription();
         this.addContactUseCase = new AddContactUseCase(userApi, contactStore, botApi, botDetailsStore);
     }
@@ -72,6 +75,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         contactsResult.getUsername(),
                                         contactsResult.getUserId());
                                 newChatItemModel.setProfileDP(contactsResult.getProfileDP());
+                                newChatItemModel.setRegistered(true);
                                 newChatItemModels.add(newChatItemModel);
 
                                 MessageController messageController = MessageController.getInstance();
@@ -82,19 +86,42 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                             @Override
                                             public void onCompleted() {}
                                             @Override
-                                            public void onError(Throwable e) {
-                                            }
-
+                                            public void onError(Throwable e) {}
                                             @Override
                                             public void onNext(String time) {}
                                         });
                             }
                         }
-
                         contactsView.displayContacts(newChatItemModels);
+                        contactsContent.getContacts()
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<List<ContactResult>>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        contactsView.displayContacts(newChatItemModels);
+                                        e.printStackTrace();
+                                    }
+
+                                    @Override
+                                    public void onNext(List<ContactResult> cr) {
+                                        for(ContactResult contactsResult: cr) {
+                                            NewChatItemModel newChatItemModel = new NewChatItemModel(
+                                                    contactsResult.getContactName(),
+                                                    contactsResult.getUsername(),
+                                                    contactsResult.getUserId());
+                                            newChatItemModel.setRegistered(false);
+                                            newChatItemModels.add(newChatItemModel);
+                                        }
+                                        Logger.d(this, "Phone Contacts: "+cr.size());
+                                        contactsView.displayContacts(newChatItemModels);
+                                    }
+                                });
                     }
                 });
-
         compositeSubscription.add(subscription);
     }
 
@@ -107,10 +134,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ContactResult>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
+                    public void onCompleted() {}
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();

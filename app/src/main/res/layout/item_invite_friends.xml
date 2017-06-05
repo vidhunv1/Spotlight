@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?android:selectableItemBackground"
+    android:id="@+id/layout"
+    android:orientation="horizontal">
+    <ImageView
+        android:layout_width="48dp"
+        android:padding="10dp"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/ic_share"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:gravity="center_vertical"
+        android:text="Invite Friends"
+        android:layout_marginLeft="18dp"
+        android:textStyle="normal"
+        android:textColor="#262328"
+        android:textSize="15sp"
+        android:id="@+id/tv_invite_friends"
+        android:maxWidth="190dp" />
+</LinearLayout>

@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.chat.ichat.db.ContactsContent;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.config.AnalyticsContants;
@@ -86,7 +87,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         newChatAdapter = new NewChatAdapter(this, this);
         contactList.setAdapter(newChatAdapter);
 
-        newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
+        ContactsContent contactsContent = new ContactsContent(this);
+        newChatPresenter = new NewChatPresenter(ContactStore.getInstance(), contactsContent, ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra(KEY_IS_NEW_CHAT))
@@ -292,7 +294,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     public void onSearchChanged() {
         newChatAdapter.filterList(toolbarSearch.getText().toString());
 
-                /*              Analytics           */
+        /*              Analytics           */
         Bundle bundle = new Bundle();
         firebaseAnalytics.logEvent(AnalyticsContants.Event.SEARCH, bundle);
     }

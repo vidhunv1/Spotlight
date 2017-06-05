@@ -56,6 +56,7 @@ public class ContactStore {
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
                 values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
                 values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
+
                 String profileDp = "";
                 if(contactResult.getProfileDP()!=null)
                     profileDp = contactResult.getProfileDP().replace("https://", "http://");
@@ -207,7 +208,7 @@ public class ContactStore {
 
     private Observable<ContactResult> getContact(String id, boolean isId) {
         return Observable.create(subscriber -> {
-            if(id.length()==0) {
+            if(id == null || id.length()==0) {
                 subscriber.onNext(new ContactResult());
                 subscriber.onCompleted();
             }

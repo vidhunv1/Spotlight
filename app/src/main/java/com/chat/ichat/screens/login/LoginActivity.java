@@ -23,6 +23,7 @@ import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
@@ -94,7 +95,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this), ContactStore.getInstance());
+        loginPresenter = new LoginPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this), ContactStore.getInstance(), new ContactsContent(this));
         if(UserSessionManager.getInstance().getCacheID()!=null) {
             accountET.setText(UserSessionManager.getInstance().getCacheID());
             accountDivider.setBackgroundColor(Color.parseColor(dividerColor));

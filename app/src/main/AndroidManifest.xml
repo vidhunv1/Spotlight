@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -106,6 +107,7 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity android:name=".screens.web_view.WebViewActivity" />
         <activity android:name=".screens.discover_bots.DiscoverBotsActivity" />
+        <activity android:name=".screens.invite_friends.InviteFriendsActivity" />
         <activity android:name=".screens.settings.SettingsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
         <activity

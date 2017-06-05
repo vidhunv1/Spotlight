@@ -412,7 +412,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             if(progressDialog[0].isShowing()) {
                 progressDialog[0].dismiss();
             }
-            progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Verifying OTP...", true);
+            if(isInFront)
+                progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Verifying OTP...", true);
             signUpPresenter.verifyOTP(countryCode, mobile, val, verificationUUID);
         }
     }

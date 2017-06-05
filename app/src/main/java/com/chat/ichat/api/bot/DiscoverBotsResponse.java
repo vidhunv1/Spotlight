@@ -1,6 +1,5 @@
 package com.chat.ichat.api.bot;
 
-import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,7 +8,6 @@ import java.util.List;
 /**
  * Created by vidhun on 31/05/17.
  */
-
 public class DiscoverBotsResponse {
     @SerializedName("status")
     private String status;

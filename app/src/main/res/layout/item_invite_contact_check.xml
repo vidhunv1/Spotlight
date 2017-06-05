@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/layout"
+    android:background="?android:selectableItemBackground"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:gravity="bottom"
+            android:text="Name"
+            android:layout_marginLeft="66dp"
+            android:textStyle="normal"
+            android:textColor="#262328"
+            android:textSize="17sp"
+            android:id="@+id/tv_chatItem_contactName"
+            android:maxWidth="190dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:gravity="top"
+            android:text="Name"
+            android:layout_marginLeft="66dp"
+            android:textStyle="normal"
+            android:textColor="#262328"
+            android:textSize="17sp"
+            android:id="@+id/tv_chatItem_number"
+            android:maxWidth="190dp" />
+    </LinearLayout>
+
+    <CheckBox
+        android:layout_width="48dp"
+        android:checked="false"
+        android:id="@+id/checkbox"
+        android:gravity="center_vertical"
+        android:theme="@style/CheckBoxStyle"
+        android:layout_height="match_parent" />
+</LinearLayout>

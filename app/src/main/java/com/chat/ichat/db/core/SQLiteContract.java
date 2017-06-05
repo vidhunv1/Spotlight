@@ -89,4 +89,24 @@ public abstract class SQLiteContract {
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
+
+    public static final class PhoneContactsCache {
+        public static final String TABLE_NAME = "phone_contacts";
+
+        public static final String COLUMN_PHONE_NUMBER = "phone_number";
+        public static final String COLUMN_COUNTRY_CODE = "country_code";
+        public static final String COLUMN_CONTACT_NAME = "contact_name";
+        public static final String COLUMN_CREATED_AT = "created_at";
+        public static final String COLUMN_IS_REGISTERED = "is_registered";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_PHONE_NUMBER + " TEXT, " +
+                COLUMN_COUNTRY_CODE + " TEXT, " +
+                COLUMN_CONTACT_NAME + " TEXT, " +
+                COLUMN_IS_REGISTERED + " INTEGER DEFAULT 0, " +
+                COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                "UNIQUE("+COLUMN_PHONE_NUMBER+") ON CONFLICT REPLACE); ";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
 }
