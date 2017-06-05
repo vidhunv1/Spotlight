@@ -80,13 +80,27 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
         ContactsContent contactsContent = new ContactsContent(this);
         inviteFriendsPresenter = new InviteFriendsPresenter(contactsContent, ContactStore.getInstance());
         inviteFriendsPresenter.attachView(this);
-        inviteFriendsPresenter.getInviteList();
 
         selectAll.setOnCheckedChangeListener((buttonView , isChecked) -> {
             if(inviteFriendsAdapter!=null) {
                 inviteFriendsAdapter.setAllSelected(isChecked);
             }
         });
+
+        // Permissions
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            int permission = PackageManager.PERMISSION_GRANTED;
+            int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+
+            if(!(result2 == permission)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 102);
+            } else {
+                inviteFriendsPresenter.getInviteList();
+            }
+        } else {
+            inviteFriendsPresenter.getInviteList();
+        }
+
     }
 
     @Override
@@ -184,8 +198,16 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
                     //not granted
                 }
                 break;
+            case 102:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    inviteFriends();
+                } else {
+                    //not granted
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
 }

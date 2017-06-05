@@ -84,22 +84,24 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        if (hasLocationPermission()) { //has permission
-            permissionLayout.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        } else {
-            permissionLayout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        }
-
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        googleApiClient.connect();
-        peopleNearbyPresenter = new PeopleNearbyPresenter();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (hasLocationPermission()) { //has permission
+            permissionLayout.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+
+            googleApiClient.connect();
+        } else {
+            permissionLayout.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }
+
+        peopleNearbyPresenter = new PeopleNearbyPresenter();
     }
 
     @Override
@@ -154,6 +156,8 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
                     //granted
                     permissionLayout.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
+
+                    googleApiClient.connect();
                 } else {
                     //not granted
                     permissionLayout.setVisibility(View.VISIBLE);

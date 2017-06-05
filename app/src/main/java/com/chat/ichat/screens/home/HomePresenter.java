@@ -92,13 +92,11 @@ public class HomePresenter implements HomeContract.Presenter {
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<VersionResponse>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
-
+                        e.printStackTrace();
                     }
 
                     @Override
