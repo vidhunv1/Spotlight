@@ -13,7 +13,7 @@ import com.chat.ichat.core.Logger;
 public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLiteHelper";
 
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 20;
     public static final String DATABASE_NAME = "spotlight.db";
 
     public SQLiteHelper(Context context)
@@ -25,15 +25,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db)
     {
         try {
-            if(DATABASE_VERSION<=16) {
-                db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
-                db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
-                db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
-                db.execSQL(SQLiteContract.BotDetailsContract.SQL_CREATE_TABLE);
-                db.execSQL(SQLiteContract.PhoneContactsCache.SQL_CREATE_TABLE);
-            } else if(DATABASE_VERSION == 18) {
-                db.execSQL(SQLiteContract.PhoneContactsCache.SQL_CREATE_TABLE);
-            }
+            db.execSQL(SQLiteContract.GenericCacheContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.MessagesContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.ContactsContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.BotDetailsContract.SQL_CREATE_TABLE);
+            db.execSQL(SQLiteContract.PhoneContactsCache.SQL_CREATE_TABLE);
         } catch (SQLException sql) {
             sql.printStackTrace();
             Logger.e(this, "Error creating database. Cannot recover");
@@ -43,13 +39,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        if(DATABASE_VERSION<=16) {
-            db.execSQL(SQLiteContract.GenericCacheContract.SQL_DELETE_TABLE);
-            db.execSQL(SQLiteContract.MessagesContract.SQL_DELETE_TABLE);
-            db.execSQL(SQLiteContract.ContactsContract.SQL_DELETE_TABLE);
-            db.execSQL(SQLiteContract.BotDetailsContract.SQL_DELETE_TABLE);
-        }
-        onCreate(db);
+        db.execSQL(SQLiteContract.PhoneContactsCache.SQL_CREATE_TABLE);
         Logger.d(this, "Sqlite Cache database upgraded");
     }
 
