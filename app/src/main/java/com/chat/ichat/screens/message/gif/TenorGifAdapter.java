@@ -54,8 +54,8 @@ public class TenorGifAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        if(gifs.getResults().get(position).getNanoGif()!=null && !gifs.getResults().get(position).getNanoGif().getPreview().isEmpty()) {
-            Glide.with(context).load(gifs.getResults().get(position).getNanoGif().getPreview().replace("https://", "http://"))
+        if(gifs.getResults().get(position).getNanoGif()!=null) {
+            Glide.with(context).load(gifs.getResults().get(position).getNanoGif().getUrl())
                     .bitmapTransform(new CenterCrop(context))
                     .placeholder(R.color.messageBackground)
                     .crossFade()

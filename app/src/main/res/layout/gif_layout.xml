@@ -5,7 +5,7 @@
     <LinearLayout
         android:id="@+id/gifs_tab"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="40dp"
         android:background="#ffffff"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
@@ -47,25 +47,48 @@
         android:textAlignment="center"
         android:text="Check your phone's Internet connection and try again."/>
 
-    <com.chat.ichat.screens.message.MessageEditText
-        android:layout_alignParentTop="true"
-        android:id="@+id/gif_search"
-        android:hint=" Search for GIFs"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_width="match_parent"
-        android:textSize="15sp"
-        android:drawableLeft="@drawable/ic_search_dark"
-        android:background="@null"
-        android:inputType="textFilter"
-        android:layout_height="40dp" />
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fl_search"
+        android:layout_alignParentTop="true">
+
+        <com.chat.ichat.screens.message.MessageEditText
+            android:id="@+id/gif_search"
+            android:hint="Search for GIFs"
+            android:textColorHint="@color/appElement"
+            android:textColor="@color/textColor"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginTop="10dp"
+            android:paddingTop="2dp"
+            android:paddingLeft="1.25dp"
+            android:layout_width="match_parent"
+            android:textSize="18sp"
+            android:theme="@style/GifSearchEditTextStyle"
+            android:drawableLeft="@drawable/ic_search_dark"
+            android:inputType="textFilter"
+            android:drawablePadding="4dp"
+            android:layout_height="40dp" />
+
+        <ImageView
+            android:id="@+id/clear_search"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:visibility="gone"
+            android:layout_marginRight="6dp"
+            android:layout_gravity="right|center_vertical"
+            app:srcCompat="@drawable/ic_close_dark" />
+
+    </FrameLayout>
 
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="2"
         android:id="@+id/grid_gifs"
-        android:layout_below="@+id/gif_search"
+        android:layout_below="@+id/fl_search"
         android:layout_above="@+id/gifs_tab"/>
 
     <View

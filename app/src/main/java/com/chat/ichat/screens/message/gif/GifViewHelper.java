@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,7 +55,8 @@ public class GifViewHelper {
     private MessageEditText search;
     private ImageButton trendingButton;
     private ImageButton categoryButton;
-    private View gifsTab;
+    private ImageView clearSearch;
+    private LinearLayout gifsTab;
     private GifApi gifApi;
     private boolean isSearchFocused = false;
     private FloatingActionButton sendFab;
@@ -89,14 +91,20 @@ public class GifViewHelper {
             fullGifLayout = (RelativeLayout) gifLayout.findViewById(R.id.full_gif_view);
             fullGifImage = (ImageView) gifLayout.findViewById(R.id.iv_full_gif);
             back = (ImageView) gifLayout.findViewById(R.id.back);
+            clearSearch = (ImageView) gifLayout.findViewById(R.id.clear_search);
             search = (MessageEditText) gifLayout.findViewById(R.id.gif_search);
-            gifsTab = gifLayout.findViewById(R.id.gifs_tab);
+            gifsTab = (LinearLayout) gifLayout.findViewById(R.id.gifs_tab);
             progressBar = (ProgressBar) gifLayout.findViewById(R.id.progress);
             sendFab = (FloatingActionButton) gifLayout.findViewById(R.id.fab_sendMessage_send);
             progressBar.setVisibility(View.VISIBLE);
 
             back.setOnClickListener(v -> {
                 fullGifLayout.setVisibility(View.GONE);
+            });
+
+            clearSearch.setOnClickListener(v -> {
+                search.setText("");
+                search("");
             });
 
             fullGifLayout.setVisibility(View.GONE);
@@ -266,6 +274,7 @@ public class GifViewHelper {
 
     public void search(CharSequence s) {
         if(s.length()>0) {
+            clearSearch.setVisibility(View.VISIBLE);
             gifsTab.setVisibility(View.GONE);
             gifsGrid.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
@@ -313,6 +322,7 @@ public class GifViewHelper {
                         }
                     });
         } else {
+            clearSearch.setVisibility(View.GONE);
             gifsTab.setVisibility(View.VISIBLE);
             int lastSelected = sharedPreferences.getInt("last_selected", 0);
             if(lastSelected == 1) {

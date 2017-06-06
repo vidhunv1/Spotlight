@@ -32,7 +32,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
-
 /**
  * Created by vidhun on 01/09/16.
  */

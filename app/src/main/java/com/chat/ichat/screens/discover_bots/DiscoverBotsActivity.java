@@ -41,6 +41,9 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
         ButterKnife.bind(this);
 
         discoverBotsPresenter = new DiscoverBotsPresenter();
+        discoverBotsPresenter.attachView(this);
+        progressDialog[0] = ProgressDialog.show(this, "", "loading please wait...", true);
+        discoverBotsPresenter.discoverBots();
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -51,8 +54,6 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     @Override
     protected void onResume() {
         discoverBotsPresenter.attachView(this);
-        progressDialog[0] = ProgressDialog.show(this, "", "loading please wait...", true);
-        discoverBotsPresenter.discoverBots();
         super.onResume();
     }
 

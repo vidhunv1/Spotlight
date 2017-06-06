@@ -107,8 +107,8 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.container) RelativeLayout rootLayout;
     @Bind(R.id.message_add_block) LinearLayout addBlockView;
     @Bind(R.id.iv_profile_image) ImageView profileImage;
-    //    @Bind(R.id.tb_message_presence)
-    //    TextView presenceView;
+    @Bind(R.id.tb_message_presence)
+    TextView presenceView;
 
     EditText messageBox;
 
@@ -173,8 +173,8 @@ public class MessageActivity extends BaseActivity
         currentUser = UserSessionManager.getInstance().load().getUserName();
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         index = -1;
@@ -261,7 +261,7 @@ public class MessageActivity extends BaseActivity
         return true;
     }
 
-    @OnClick(R.id.message_head)
+    @OnClick(R.id.tb_message_title)
     public void onTBClicked() {
         AndroidUtils.hideSoftInput(this);
         startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
@@ -430,6 +430,7 @@ public class MessageActivity extends BaseActivity
         } else {
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
         }
+        linearLayoutManager.scrollToPositionWithOffset(-1,-1);
     }
 
     @Override
@@ -926,12 +927,12 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void updateLastActivity(String time) {
-//        if(time != null && !time.isEmpty()) {
-//            presenceView.setVisibility(View.VISIBLE);
-//            presenceView.setText(time);
-//        } else {
-//            presenceView.setVisibility(View.GONE);
-//        }
+        if(time != null && !time.isEmpty()) {
+            presenceView.setVisibility(View.VISIBLE);
+            presenceView.setText(time);
+        } else {
+            presenceView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -990,13 +991,13 @@ public class MessageActivity extends BaseActivity
         super.onChatStateReceived(from, chatState);
         if(from.equals(chatUserName)) {
             if(chatState == ChatState.composing) {
-//                presenceView.setText(getResources().getString(R.string.chat_state_typing));
+                presenceView.setText(getResources().getString(R.string.chat_state_typing));
                 messagesAdapter.setTyping(true);
                 messageList.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 final Handler handler = new Handler();
                 handler.postDelayed(() -> messagesAdapter.setTyping(false), 10000);
             } else {
-//                messagePresenter.getLastActivity(this.chatUserName);
+                messagePresenter.getLastActivity(this.chatUserName);
             }
         }
     }
@@ -1004,15 +1005,15 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onPresenceChanged(String username, Presence.Type type) {
         super.onPresenceChanged(username, type);
-//        if(username.equals(chatUserName)) {
-//            presenceView.setVisibility(View.VISIBLE);
-//            if(type == Presence.Type.available) {
-//                presenceView.setText(getResources().getString(R.string.chat_presence_online));
-//            } else if(type == Presence.Type.unavailable) {
-//                DateTime timeNow = DateTime.now();
-//                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
-//            }
-//        }
+        if(username.equals(chatUserName)) {
+            presenceView.setVisibility(View.VISIBLE);
+            if(type == Presence.Type.available) {
+                presenceView.setText(getResources().getString(R.string.chat_presence_online));
+            } else if(type == Presence.Type.unavailable) {
+                DateTime timeNow = DateTime.now();
+                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
+            }
+        }
     }
 
     @Override
@@ -1111,5 +1112,10 @@ public class MessageActivity extends BaseActivity
                 Logger.e(this, "meet a IOOBE in RecyclerView");
             }
         }
+    }
+
+    @OnClick(R.id.iv_back)
+    public void onBackClick() {
+        super.onBackPressed();
     }
 }

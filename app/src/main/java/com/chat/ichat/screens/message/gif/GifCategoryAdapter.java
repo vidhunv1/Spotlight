@@ -60,8 +60,27 @@ class GifCategoryAdapter extends BaseAdapter {
         }
 
         ImageView imageView = (ImageView) v.findViewById(R.id.category_image);
+        View bg = v.findViewById(R.id.bg_view);
         TextView textView = (TextView) v.findViewById(R.id.category_tag);
         textView.setText(tags.getTags().get(position).getName());
+
+        if(position%2 == 0) {
+            ViewGroup.MarginLayoutParams i = (ViewGroup.MarginLayoutParams) imageView.getLayoutParams();
+            i.setMargins((int)AndroidUtils.px(2),0,0,(int)AndroidUtils.px(2));
+            imageView.requestLayout();
+
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) bg.getLayoutParams();
+            p.setMargins((int)AndroidUtils.px(2),0,0,(int)AndroidUtils.px(2));
+            bg.requestLayout();
+        } else {
+            ViewGroup.MarginLayoutParams i = (ViewGroup.MarginLayoutParams) imageView.getLayoutParams();
+            i.setMargins((int)AndroidUtils.px(2),0,(int)AndroidUtils.px(2),(int)AndroidUtils.px(2));
+            imageView.requestLayout();
+
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) bg.getLayoutParams();
+            p.setMargins((int)AndroidUtils.px(2),0,(int)AndroidUtils.px(2),(int)AndroidUtils.px(2));
+            bg.requestLayout();
+        }
 
         if(tags.getTags().get(position).getImage()!=null && !tags.getTags().get(position).getImage().isEmpty()) {
             Glide.with(context).load(tags.getTags().get(position).getImage().replace("https://", "http://"))

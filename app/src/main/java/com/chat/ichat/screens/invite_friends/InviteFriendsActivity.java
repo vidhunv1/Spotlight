@@ -15,10 +15,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -201,7 +199,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             case 102:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
-                    inviteFriends();
+                    inviteFriendsPresenter.getInviteList();
                 } else {
                     //not granted
                 }

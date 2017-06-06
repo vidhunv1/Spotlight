@@ -49,9 +49,14 @@ class GiphyGifAdapter extends BaseAdapter {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)AndroidUtils.px(100)));
             imageView.setPadding((int)AndroidUtils.px(2), (int)AndroidUtils.px(4), (int)AndroidUtils.px(2), (int)AndroidUtils.px(0));
-        }
-        else {
+        } else {
             imageView = (ImageView) convertView;
+        }
+
+        if(position%2 == 0) {
+            imageView.setPadding((int)AndroidUtils.px(2),0,0,0);
+        } else {
+            imageView.setPadding((int)AndroidUtils.px(2),0,(int)AndroidUtils.px(2),0);
         }
 
         if(gifs.getData().get(position).getLowGifUrl()!=null && !gifs.getData().get(position).getLowGifUrl().isEmpty()) {

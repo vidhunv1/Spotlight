@@ -5,11 +5,12 @@
     android:background="?android:selectableItemBackground"
     android:orientation="vertical">
     <TextView
+        android:background="?android:selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:gravity="center_vertical"
         android:text="Name"
-        android:layout_marginLeft="66dp"
+        android:paddingLeft="66dp"
         android:textStyle="normal"
         android:textColor="#262328"
         android:textSize="17sp"
