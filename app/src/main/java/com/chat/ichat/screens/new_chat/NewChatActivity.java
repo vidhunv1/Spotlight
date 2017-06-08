@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.chat.ichat.db.ContactsContent;
@@ -41,6 +42,9 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
+import xyz.danoz.recyclerviewfastscroller.sectionindicator.SectionIndicator;
+import xyz.danoz.recyclerviewfastscroller.sectionindicator.title.SectionTitleIndicator;
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 /**
  * Created by vidhun on 08/01/17.
@@ -50,7 +54,9 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Bind(R.id.tb_new_chat) Toolbar toolbar;
     @Bind(R.id.et_new_chat_search1) EditText toolbarSearch;
     @Bind(R.id.tv_new_chat_title) TextView toolbarTitle;
-    @Bind(R.id.ll_new_chat) LinearLayout newChatLayout;
+    @Bind(R.id.ll_new_chat) RelativeLayout newChatLayout;
+    @Bind(R.id.fast_scroller) VerticalRecyclerViewFastScroller fastScroller;
+//    @Bind(R.id.fast_scroller_section_title_indicator) SectionTitleIndicator sectionTitleIndicator;
 
     NewChatAdapter newChatAdapter;
 
@@ -80,8 +86,14 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        fastScroller.setRecyclerView(contactList);
+        contactList.setOnScrollListener(fastScroller.getOnScrollListener());
+//        fastScroller.setSectionIndicator(sectionTitleIndicator);
         contactList.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+
+        contactList.setLayoutManager(linearLayoutManager);
+
         RecyclerView.ItemAnimator animator = contactList.getItemAnimator();
         if (animator instanceof SimpleItemAnimator)
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);

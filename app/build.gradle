@@ -51,7 +51,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
-
+    compile 'xyz.danoz:recyclerviewfastscroller:0.1.3'
     compile 'com.google.android.gms:play-services-places:10.0.1'
     compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.jakewharton.timber:timber:3.1.0'
