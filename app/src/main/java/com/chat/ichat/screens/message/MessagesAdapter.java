@@ -1638,6 +1638,16 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             GradientDrawable drawable = (GradientDrawable) bubbleView.getBackground();
             drawable.setColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
 
+            audioMessageView.setAudioReadyListener(dur -> {
+                long ds = dur/1000;
+                if(ds <=10) {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(157);
+                    audioMessageView.requestLayout();
+                } else {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(1);
+                    audioMessageView.requestLayout();
+                }
+            });
             audioMessageView.setAudioFile(fileName);
             timeView.setText(time);
             deliveryStatusText.setVisibility(View.GONE);

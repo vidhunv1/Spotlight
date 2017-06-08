@@ -61,7 +61,7 @@
             android:layout_marginLeft="14dp"
             android:layout_marginRight="14dp"
             android:layout_marginTop="10dp"
-            android:paddingTop="2dp"
+            android:paddingTop="1.5dp"
             android:paddingLeft="1.25dp"
             android:layout_width="match_parent"
             android:textSize="18sp"
@@ -80,13 +80,13 @@
             android:layout_marginRight="6dp"
             android:layout_gravity="right|center_vertical"
             app:srcCompat="@drawable/ic_close_dark" />
-
     </FrameLayout>
 
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="2"
+        android:layout_marginTop="1dp"
         android:id="@+id/grid_gifs"
         android:layout_below="@+id/fl_search"
         android:layout_above="@+id/gifs_tab"/>
@@ -105,10 +105,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="6dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:padding="12dp"
             android:layout_alignParentBottom="true"
             android:id="@+id/back"
@@ -118,8 +118,8 @@
             android:id="@+id/fab_sendMessage_send"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             app:fabSize="mini"
             android:elevation="0dp"
             android:layout_alignParentBottom="true"

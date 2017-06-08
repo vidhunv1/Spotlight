@@ -16,7 +16,7 @@ public class NewChatContract {
     }
 
     interface Presenter extends BasePresenter<NewChatContract.View> {
-        void initContactList();
+        void initContactList(boolean shouldDisplayPhoneBook);
         void addContact(String userId);
     }
 }

@@ -70,10 +70,15 @@
         <item name="android:textColorSecondary">@color/appElement</item>
     </style>
 
+    <style name="CheckBoxStyleInvite" parent="Theme.AppCompat">
+        <item name="colorAccent">#ffffff</item>
+        <item name="android:textColorSecondary">#ffffff</item>
+    </style>
+
     <style name="GifSearchEditTextStyle" parent="Theme.AppCompat">
         <item name="colorControlNormal">@color/appElement</item>
-        <item name="colorControlActivated">@color/colorPrimary</item>
-        <item name="colorControlHighlight">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/appElement</item>
+        <item name="colorControlHighlight">@color/appElement</item>
     </style>
 
 </resources>

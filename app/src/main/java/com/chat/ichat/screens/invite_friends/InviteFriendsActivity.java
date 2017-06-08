@@ -11,12 +11,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +54,12 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
     RelativeLayout inviteFriends;
     @Bind(R.id.invite)
     TextView invite;
+    @Bind(R.id.count)
+    TextView inviteCount;
+    @Bind(R.id.list_identifier)
+    TextView listIdentifier;
+    @Bind(R.id.invite_tick)
+    ImageView inviteTick;
 
     InviteFriendsPresenter inviteFriendsPresenter;
     InviteFriendsAdapter inviteFriendsAdapter;
@@ -79,9 +90,13 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
         inviteFriendsPresenter = new InviteFriendsPresenter(contactsContent, ContactStore.getInstance());
         inviteFriendsPresenter.attachView(this);
 
+        setInviteCount(0);
+
         selectAll.setOnCheckedChangeListener((buttonView , isChecked) -> {
             if(inviteFriendsAdapter!=null) {
                 inviteFriendsAdapter.setAllSelected(isChecked);
+                int size = inviteFriendsAdapter.getSelected().size();
+                setInviteCount(size);
             }
         });
 
@@ -99,6 +114,11 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             inviteFriendsPresenter.getInviteList();
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(0xff212121);
+        }
     }
 
     @Override
@@ -154,7 +174,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             PendingIntent sentPI;
             sentPI = PendingIntent.getBroadcast(this, 0,new Intent("SMS_SENT"), 0);
             inviteFriendsAdapter.setAllSelected(false);
-            invite.setText("INVITE");
+            inviteCount.setVisibility(View.INVISIBLE);
             for (ContactResult contactResult : cr) {
                 String phone = contactResult.getCountryCode()+contactResult.getPhoneNumber();
                 try {
@@ -176,13 +196,69 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
         inviteFriendsAdapter = new InviteFriendsAdapter(this, contactResultList, (phone, countryCode) -> {
             int size = inviteFriendsAdapter.getSelected().size();
             Logger.d(this, "onChecked total: "+size);
-            if(size == 0) {
-                invite.setText("INVITE");
-            } else {
-                invite.setText("INVITE ("+size+")");
-            }
+            setInviteCount(size);
         });
         contactList.setAdapter(inviteFriendsAdapter);
+        RecyclerView.LayoutManager layoutManager = contactList.getLayoutManager();
+        contactList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                final View child = findOneVisibleChild(0, layoutManager.getChildCount(), true, false);
+                int pos = child == null ? RecyclerView.NO_POSITION : contactList.getChildAdapterPosition(child);
+                if(pos <= 0) {
+                    listIdentifier.setText("Favorites");
+                } else {
+                    listIdentifier.setText(inviteFriendsAdapter.getFirstChar(pos));
+                }
+            }
+        });
+    }
+
+    View findOneVisibleChild(int fromIndex, int toIndex, boolean completelyVisible,
+                             boolean acceptPartiallyVisible) {
+        OrientationHelper helper;
+
+        if (contactList.getLayoutManager().canScrollVertically()) {
+            helper = OrientationHelper.createVerticalHelper(contactList.getLayoutManager());
+        } else {
+            helper = OrientationHelper.createHorizontalHelper(contactList.getLayoutManager());
+        }
+
+        final int start = helper.getStartAfterPadding();
+        final int end = helper.getEndAfterPadding();
+        final int next = toIndex > fromIndex ? 1 : -1;
+        View partiallyVisible = null;
+        for (int i = fromIndex; i != toIndex; i += next) {
+            final View child = contactList.getLayoutManager().getChildAt(i);
+            final int childStart = helper.getDecoratedStart(child);
+            final int childEnd = helper.getDecoratedEnd(child);
+            if (childStart < end && childEnd > start) {
+                if (completelyVisible) {
+                    if (childStart >= start && childEnd <= end) {
+                        return child;
+                    } else if (acceptPartiallyVisible && partiallyVisible == null) {
+                        partiallyVisible = child;
+                    }
+                } else {
+                    return child;
+                }
+            }
+        }
+        return partiallyVisible;
+    }
+
+    public void setInviteCount(int count) {
+        if(count==0) {
+            inviteCount.setVisibility(View.INVISIBLE);
+            inviteTick.setImageAlpha(127);
+            invite.setAlpha(0.5f);
+        } else {
+            inviteTick.setImageAlpha(255);
+            invite.setAlpha(1f);
+            inviteCount.setVisibility(View.VISIBLE);
+            inviteCount.setText(count + "");
+        }
     }
 
     @Override

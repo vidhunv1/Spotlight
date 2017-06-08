@@ -269,7 +269,14 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     public void onConnected(@Nullable Bundle bundle) {
         Context context = this;
         Logger.d(this, "Connected location");
-        progressDialog[0] = ProgressDialog.show(context, "", "loading location data", true);
+        progressDialog[0] = new ProgressDialog(PeopleNearbyActivity.this) {
+            @Override
+            public void onBackPressed() {
+                finish();
+            }};
+        progressDialog[0].setMessage("Loading location data");
+        progressDialog[0].show();
+
         fetchCurrentLocation()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

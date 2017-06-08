@@ -57,7 +57,7 @@ public class NewChatPresenter implements NewChatContract.Presenter {
     }
 
     @Override
-    public void initContactList() {
+    public void initContactList(boolean shouldShowPhoneBook) {
         Subscription subscription = contactStore.getContacts()
                 .subscribe(new Subscriber<List<ContactResult>>() {
                     @Override
@@ -92,34 +92,39 @@ public class NewChatPresenter implements NewChatContract.Presenter {
                                         });
                             }
                         }
-                        contactsView.displayContacts(newChatItemModels);
-                        contactsContent.getContacts()
-                                .subscribeOn(Schedulers.newThread())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Subscriber<List<ContactResult>>() {
-                                    @Override
-                                    public void onCompleted() {}
 
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        contactsView.displayContacts(newChatItemModels);
-                                        e.printStackTrace();
-                                    }
-
-                                    @Override
-                                    public void onNext(List<ContactResult> cr) {
-                                        for(ContactResult contactsResult: cr) {
-                                            NewChatItemModel newChatItemModel = new NewChatItemModel(
-                                                    contactsResult.getContactName(),
-                                                    contactsResult.getUsername(),
-                                                    contactsResult.getUserId());
-                                            newChatItemModel.setRegistered(false);
-                                            newChatItemModels.add(newChatItemModel);
+                        if(shouldShowPhoneBook) {
+                            contactsContent.getContacts()
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Subscriber<List<ContactResult>>() {
+                                        @Override
+                                        public void onCompleted() {
                                         }
-                                        Logger.d(this, "Phone Contacts: "+cr.size());
-                                        contactsView.displayContacts(newChatItemModels);
-                                    }
-                                });
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            contactsView.displayContacts(newChatItemModels);
+                                            e.printStackTrace();
+                                        }
+
+                                        @Override
+                                        public void onNext(List<ContactResult> cr) {
+                                            for (ContactResult contactsResult : cr) {
+                                                NewChatItemModel newChatItemModel = new NewChatItemModel(
+                                                        contactsResult.getContactName(),
+                                                        contactsResult.getUsername(),
+                                                        contactsResult.getUserId());
+                                                newChatItemModel.setRegistered(false);
+                                                newChatItemModels.add(newChatItemModel);
+                                            }
+                                            Logger.d(this, "Phone Contacts: " + cr.size());
+                                            contactsView.displayContacts(newChatItemModels);
+                                        }
+                                    });
+                        } else {
+                            contactsView.displayContacts(newChatItemModels);
+                        }
                     }
                 });
         compositeSubscription.add(subscription);

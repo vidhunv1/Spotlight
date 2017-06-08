@@ -35,6 +35,10 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
+    public String getFirstChar(int position) {
+        return contacts.get(position).getContactName().charAt(0)+"";
+    }
+
     public void setAllSelected(boolean isSelected) {
         for (int i = 0; i < checked.size(); i++) {
             checked.set(i, isSelected);
@@ -77,8 +81,6 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
         TextView number;
         @Bind(R.id.checkbox)
         CheckBox checkbox;
-        @Bind(R.id.layout)
-        LinearLayout layout;
 
         InviteContactsViewHolder(View itemView) {
             super(itemView);

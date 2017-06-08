@@ -14,6 +14,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.api.bot.DiscoverBotsResponse;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.screens.message.MessageActivity;
+import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,7 +43,13 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
 
         discoverBotsPresenter = new DiscoverBotsPresenter();
         discoverBotsPresenter.attachView(this);
-        progressDialog[0] = ProgressDialog.show(this, "", "loading please wait...", true);
+        progressDialog[0] = new ProgressDialog(DiscoverBotsActivity.this) {
+            @Override
+            public void onBackPressed() {
+                finish();
+            }};
+        progressDialog[0].setMessage("loading please wait...");
+        progressDialog[0].show();
         discoverBotsPresenter.discoverBots();
 
         setSupportActionBar(toolbar);

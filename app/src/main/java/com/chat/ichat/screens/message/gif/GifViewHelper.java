@@ -161,8 +161,7 @@ public class GifViewHelper {
 
             search.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -170,9 +169,7 @@ public class GifViewHelper {
                 }
 
                 @Override
-                public void afterTextChanged(Editable s) {
-
-                }
+                public void afterTextChanged(Editable s) {}
             });
         }
     }
@@ -257,12 +254,7 @@ public class GifViewHelper {
                                             .crossFade()
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
-                                    sendFab.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            sendGifListener.onSendGif(data.getLowGifUrl());
-                                        }
-                                    });
+                                    sendFab.setOnClickListener(v -> sendGifListener.onSendGif(data.getLowGifUrl()));
                                     break;
                                 }
                             }

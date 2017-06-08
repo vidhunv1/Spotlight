@@ -65,6 +65,15 @@
                         android:textSize="13sp"
                         android:textColor="#546e7a"
                         android:layout_gravity="right" />
+
+                    <ImageView
+                        android:layout_marginRight="6dp"
+                        android:layout_width="16dp"
+                        android:layout_height="24dp"
+                        app:srcCompat="@drawable/ic_delivery_read"
+                        android:layout_toLeftOf="@id/tv_chatItem_time"
+                        android:layout_gravity="top"
+                        android:id="@+id/iv_delivery_status" />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -102,15 +111,6 @@
                         android:textColor="#ffffff"
                         android:maxLines="1"
                         android:background="@drawable/bg_chat_notification" />
-
-                    <ImageView
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="13.5dp"
-                        android:layout_width="12dp"
-                        android:layout_height="21.5dp"
-                        app:srcCompat="@drawable/ic_delivery_pending"
-                        android:layout_gravity="top"
-                        android:id="@+id/iv_delivery_status" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

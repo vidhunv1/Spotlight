@@ -1,7 +1,6 @@
 package com.chat.ichat.components;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,13 +28,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.chat.ichat.screens.message.audio.AudioRecord.AUDIO_RECORDER_FILE_EXT_MP4;
 import static com.chat.ichat.screens.message.audio.AudioRecord.AUDIO_RECORDER_FOLDER;
-
 /**
  * Created by vidhun on 11/05/17.
  */
@@ -67,6 +64,8 @@ public class AudioMessageView extends View {
     private boolean isReady = false;
 
     GenericCache genericCache;
+
+    private AudioReadyListener audioReadyListener;
     public AudioMessageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
@@ -105,6 +104,9 @@ public class AudioMessageView extends View {
         }
     }
 
+    public void setAudioReadyListener(AudioReadyListener audioReadyListener) {
+        this.audioReadyListener = audioReadyListener;
+    }
 
     public String getAudioFile() {
         return audioFile;
@@ -120,6 +122,9 @@ public class AudioMessageView extends View {
         String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         long dur = Long.parseLong(duration);
         durationMilli = dur % 60000;
+        if(audioReadyListener!=null) {
+            audioReadyListener.onAudioReady(durationMilli);
+        }
         this.audioFile = audioFile;
         mediaPlayer = new MediaPlayer();
         try {
@@ -132,7 +137,7 @@ public class AudioMessageView extends View {
 
     public void setAudioUrl(String url) {
         String filepath = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+        File file = new File(filepath, AUDIO_RECORDER_FOLDER);
 
         if(!file.exists()){
             file.mkdirs();
@@ -181,7 +186,7 @@ public class AudioMessageView extends View {
         int centerY = pt + (usableHeight / 2);
 
         paint.setColor(primaryColor);
-        canvas.drawCircle(AndroidUtils.px(15+4), centerY, AndroidUtils.px(8), paint);
+        canvas.drawCircle(AndroidUtils.px(15+4), centerY, AndroidUtils.px(7), paint);
         paint.setStrokeWidth(AndroidUtils.px(1));
         canvas.drawLine(AndroidUtils.px(15+4), centerY, getWidth()-AndroidUtils.px(15+4), centerY, paint);
 
@@ -308,9 +313,7 @@ public class AudioMessageView extends View {
         invalidate();
     }
 
-    private void onProgressUpdate(int progress) {
-
-    }
+    private void onProgressUpdate(int progress) {}
 
     private class DownloadFileAsync extends AsyncTask<String, String, String> {
 
@@ -357,5 +360,9 @@ public class AudioMessageView extends View {
         protected void onPostExecute(String unused) {
             onDownloadComplete();
         }
+    }
+
+    public interface AudioReadyListener {
+        void onAudioReady(long duration);
     }
 }

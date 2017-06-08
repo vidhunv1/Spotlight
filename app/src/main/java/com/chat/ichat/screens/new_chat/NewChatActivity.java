@@ -62,6 +62,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "new_chat";
+    private boolean isNewChat;
 
     public static Intent callingIntent(Context context, boolean isNewChat) {
         Intent intent = new Intent(context, NewChatActivity.class);
@@ -94,7 +95,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if(!receivedIntent.hasExtra(KEY_IS_NEW_CHAT))
             return;
 
-        boolean isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, false);
+        isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, true);
         toolbarSearch.setVisibility(View.GONE);
         toolbarTitle.setVisibility(View.VISIBLE);
 
@@ -105,7 +106,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         }
 
         newChatPresenter.attachView(this);
-        newChatPresenter.initContactList();
+        newChatPresenter.initContactList(!isNewChat);
 
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
@@ -198,7 +199,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         alertDialog.setMessage(Html.fromHtml(message));
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-        newChatPresenter.initContactList();
+        newChatPresenter.initContactList(!isNewChat);
     }
 
     @Override

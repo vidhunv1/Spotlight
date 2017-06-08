@@ -48,8 +48,8 @@
     </RelativeLayout>
 
     <ImageView
-        android:layout_width="12dp"
-        android:layout_height="12dp"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
         app:srcCompat="@drawable/ic_delivery_pending"
         android:id="@+id/iv_delivery_status"
         android:layout_marginRight="4.25dp"
