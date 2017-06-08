@@ -180,6 +180,7 @@ public class MessageActivity extends BaseActivity
         index = -1;
         top = -1;
 
+
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
@@ -200,7 +201,8 @@ public class MessageActivity extends BaseActivity
     protected void onResume() {
         Logger.d(this, "onResume");
         super.onResume();
-        if(index != -1) {
+        Logger.d(this, "index: "+index+" top: "+top);
+        if(index != -1 && top!=-1) {
             linearLayoutManager.scrollToPositionWithOffset( index, top);
         }
         messagePresenter.loadMessages(chatUserName);
@@ -533,6 +535,7 @@ public class MessageActivity extends BaseActivity
     public void displayMessages(List<MessageResult> messages) {
         if(messagesAdapter == null) {
             messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this, this, this);
+            linearLayoutManager.scrollToPosition(messagesAdapter.getItemCount());
         }
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
