@@ -170,7 +170,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
 //        if(isNewChat)
 //            getMenuInflater().inflate(R.menu.new_chat_toolbar, menu);
 //        else
-            getMenuInflater().inflate(R.menu.contacts_toolbar, menu);
+        getMenuInflater().inflate(R.menu.contacts_toolbar, menu);
         return true;
     }
 

@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +37,7 @@ import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -78,6 +82,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<QuickReply> quickReplies;
     private String chatUserName;
 
+    private int lastPosition = -1;
+    private boolean shouldAnimate = false;
+
+
     private final int VIEW_TYPE_SEND_TEXT = 0;
     private final int VIEW_TYPE_RECV_TEXT = 1;
     private final int VIEW_TYPE_RECV_TEMPLATE_GENERIC = 2;
@@ -102,11 +110,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private boolean isTyping;
     private int lastClickedPosition;
+    Animation insertAnimation;
 
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.quickReplyActionListener = qrActionListener;
+        insertAnimation = AnimationUtils.loadAnimation(context, R.anim.message_push_bottom_up);
 
         this.context = context;
         this.messageList = new ArrayList<>();
@@ -127,6 +137,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void setMessages(List<MessageResult> messages) {
+        lastPosition = messages.size() - 1;
         Logger.d(this, "setting messages "+messages.size());
         quickReplies = new ArrayList<>();
         this.messageList.clear();
@@ -418,6 +429,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            holder.itemView.startAnimation(insertAnimation);
+            lastPosition = position;
+        }
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SEND_TEXT:
                 SendTextViewHolder sendViewHolder = (SendTextViewHolder) holder;
