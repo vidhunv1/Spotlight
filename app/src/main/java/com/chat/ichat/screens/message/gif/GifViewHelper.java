@@ -95,7 +95,7 @@ public class GifViewHelper {
             search = (MessageEditText) gifLayout.findViewById(R.id.gif_search);
             gifsTab = (LinearLayout) gifLayout.findViewById(R.id.gifs_tab);
             progressBar = (ProgressBar) gifLayout.findViewById(R.id.progress);
-            sendFab = (FloatingActionButton) gifLayout.findViewById(R.id.fab_sendMessage_send);
+            sendFab = (FloatingActionButton) gifLayout.findViewById(R.id.sendMessage_send);
             progressBar.setVisibility(View.VISIBLE);
 
             back.setOnClickListener(v -> {

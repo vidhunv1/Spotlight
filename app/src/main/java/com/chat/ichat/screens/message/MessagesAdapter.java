@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +36,6 @@ import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
@@ -116,7 +114,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.quickReplyActionListener = qrActionListener;
-        insertAnimation = AnimationUtils.loadAnimation(context, R.anim.message_push_bottom_up);
+        insertAnimation = AnimationUtils.loadAnimation(context, R.anim.push_bottom_up);
 
         this.context = context;
         this.messageList = new ArrayList<>();

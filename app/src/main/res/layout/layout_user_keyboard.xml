@@ -6,158 +6,92 @@
     android:background="#ffffff">
     <View
         android:layout_width="fill_parent"
-        android:layout_height="0.25dp"
+        android:layout_height="1px"
         android:id="@+id/view_divider"
         android:background="#E6E6E6" />
-    <com.chat.ichat.screens.message.MessageEditText
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:minHeight="47dp"
-        android:maxLines="5"
-        android:layout_height="wrap_content"
-        android:id="@+id/et_sendmessage_message"
-        android:focusableInTouchMode="true"
-        android:focusable="true"
-        android:layout_gravity="center_horizontal"
-        android:background="@android:color/transparent"
-        android:hint="@string/keyboard_hint"
-        android:textColor="#333333"
-        android:textSize="16sp"
-        android:cursorVisible="true"
-        android:inputType="textCapSentences"
-        android:textCursorDrawable="@drawable/bg_cursor_message"
-        android:textColorHint="@color/appElement">
-        <requestFocus/>
-    </com.chat.ichat.screens.message.MessageEditText>
-    <RelativeLayout android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="#ffffff"
-        android:layout_below="@+id/et_sendmessage_message"
-        android:orientation="horizontal"
-        android:id="@+id/ll_keyboard">
-
-        <ImageButton
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:srcCompat="@drawable/ic_insert_emoticon"
-            android:background="?android:selectableItemBackground"
-            android:id="@+id/btn_message_smiley"/>
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/smiley_selector"
-            android:visibility="gone"
-            android:background="@color/colorPrimary"/>
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="4dp"
-            android:layout_marginLeft="48dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/gallery_selector"
-            android:visibility="gone"
-            android:background="@color/colorPrimary"/>
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="4dp"
-            android:layout_marginLeft="192dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/audio_selector"
-            android:visibility="gone"
-            android:background="@color/colorPrimary"/>
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="4dp"
-            android:layout_marginLeft="144dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/gif_selector"
-            android:visibility="gone"
-            android:background="@color/colorPrimary"/>
-
-        <ImageButton
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_toRightOf="@+id/btn_message_smiley"
-            android:id="@+id/btn_sendMessage_gallery"
-            app:srcCompat="@drawable/ic_gallery" />
-        <ImageButton
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:id="@+id/btn_sendMessage_camera"
-            android:layout_toRightOf="@+id/btn_sendMessage_gallery"
-            android:background="?android:selectableItemBackground"
-            app:srcCompat="@drawable/ic_camera" />
-        <ImageButton
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_toRightOf="@+id/btn_sendMessage_camera"
-            android:id="@+id/btn_sendMessage_gif"
-            app:srcCompat="@drawable/ic_gif" />
-        <ImageButton
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_toRightOf="@+id/btn_sendMessage_gif"
-            android:id="@+id/btn_sendMessage_audio"
-            app:srcCompat="@drawable/ic_mic" />
-        <ImageButton
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentBottom="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_toRightOf="@+id/btn_sendMessage_audio"
-            android:id="@+id/btn_sendMessage_location"
-            app:srcCompat="@drawable/ic_location" />
-    </RelativeLayout>
-
     <RelativeLayout
-        android:layout_below="@+id/view_divider"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|end">
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_sendMessage_send"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            app:fabSize="mini"
-            android:elevation="0dp"
-            android:layout_centerInParent="true"
-            app:srcCompat="@drawable/ic_send_inactive"
-            app:backgroundTint="#ECEFF1"/>
+        android:layout_width="wrap_content"
+        android:id="@+id/rv_message_box"
+        android:elevation="10dp"
+        android:layout_toLeftOf="@+id/sendMessage_send"
+        android:layout_height="52dp">
+        <com.chat.ichat.screens.message.MessageEditText
+            android:layout_margin="8sp"
+            android:paddingLeft="12dp"
+            android:paddingRight="16dp"
+            android:layout_width="132dp"
+            android:layout_weight="1"
+            android:paddingEnd="44dp"
+            android:minHeight="40dp"
+            android:maxLines="5"
+            android:layout_height="match_parent"
+            android:id="@+id/et_sendmessage_message"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_message_edit_text"
+            android:hint="@string/keyboard_hint"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            android:cursorVisible="true"
+            android:inputType="textCapSentences"
+            android:textCursorDrawable="@drawable/bg_cursor_message"
+            android:textColorHint="@color/appElement">
+        </com.chat.ichat.screens.message.MessageEditText>
 
-        <TextView
-            android:id="@+id/send_fab_badge"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:gravity="center"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/bg_send_fab_badge"
-            android:text="12"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            android:padding="3dp"
-            android:visibility="gone"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="3dp"
-            android:elevation="7dp"/>
+        <ImageButton
+            android:background="?android:selectableItemBackground"
+            android:layout_width="36dp"
+            android:layout_height="40dp"
+            android:layout_alignRight="@+id/et_sendmessage_message"
+            android:id="@+id/btn_message_smiley"
+            app:srcCompat="@drawable/ic_emoticon_inactive"
+            android:layout_alignBottom="@+id/et_sendmessage_message"
+            android:layout_alignTop="@+id/et_sendmessage_message" />
     </RelativeLayout>
+
+    <ImageButton
+        android:background="?android:selectableItemBackground"
+        android:id="@+id/sendMessage_send"
+        android:layout_width="48dp"
+        android:paddingRight="2dp"
+        android:layout_height="52dp"
+        android:layout_alignParentRight="true"
+        app:srcCompat="@drawable/ic_mic_selected" />
+
+    <ImageButton
+        android:background="?android:selectableItemBackground"
+        android:layout_width="40dp"
+        android:layout_height="52dp"
+        android:layout_toRightOf="@+id/btn_sendMessage_gallery"
+        android:id="@+id/btn_sendMessage_gif"
+        app:srcCompat="@drawable/ic_gif" />
+
+    <ImageButton
+        android:background="?android:selectableItemBackground"
+        android:layout_width="40dp"
+        android:layout_height="52dp"
+        android:layout_toRightOf="@+id/btn_sendMessage_camera"
+        android:id="@+id/btn_sendMessage_gallery"
+        app:srcCompat="@drawable/ic_gallery" />
+
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="52dp"
+        android:id="@+id/btn_sendMessage_camera"
+        android:layout_toRightOf="@+id/btn_add_circle"
+        android:background="?android:selectableItemBackground"
+        app:srcCompat="@drawable/ic_camera" />
+
+    <ImageButton
+        android:layout_width="46dp"
+        android:layout_height="52dp"
+        android:paddingLeft="6dp"
+        android:id="@+id/btn_add_circle"
+        android:layout_alignParentLeft="true"
+        android:background="?android:selectableItemBackground"
+        app:srcCompat="@drawable/ic_add_circle" />
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
@@ -166,7 +100,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/ll_keyboard"
+        android:layout_below="@id/rv_message_box"
         android:id="@+id/smiley_layout">
     </FrameLayout>
 </RelativeLayout>

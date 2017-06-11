@@ -119,11 +119,6 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         emojisPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         emojisPager.setOnPageChangeListener(this);
 
-        TextView keyboard = (TextView) view.findViewById(R.id.open_keyboard);
-        keyboard.setOnClickListener(v -> {
-
-        });
-
         EmojiconRecents recents = this;
         PagerAdapter mEmojisAdapter = new EmojisPagerAdapter(
                 Arrays.asList(
