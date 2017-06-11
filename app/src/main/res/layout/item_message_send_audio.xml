@@ -41,7 +41,7 @@
         android:layout_height="13dp"
         app:srcCompat="@drawable/ic_delivery_pending"
         android:id="@+id/iv_delivery_status"
-        android:layout_marginRight="4.25dp"
+        android:layout_marginRight="2.75dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="1dp"
         android:layout_toLeftOf="@+id/rl_bubble"

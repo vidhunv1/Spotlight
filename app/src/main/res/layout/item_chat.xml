@@ -67,8 +67,9 @@
                         android:layout_gravity="right" />
 
                     <ImageView
-                        android:layout_marginRight="6dp"
-                        android:layout_width="16dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_width="13dp"
+                        android:paddingTop="1.25dp"
                         android:layout_height="24dp"
                         app:srcCompat="@drawable/ic_delivery_read"
                         android:layout_toLeftOf="@id/tv_chatItem_time"

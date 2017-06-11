@@ -62,6 +62,7 @@
         android:layout_marginLeft="10dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        app:rfs_barColor="#00000000" />
-
+        app:rfs_barColor="#00000000"
+        app:rfs_handleColor="@color/appElement"
+        app:rfs_handleBackground="@drawable/bg_scrollbar_handle"/>
 </RelativeLayout>

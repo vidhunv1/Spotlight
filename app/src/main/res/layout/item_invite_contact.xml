@@ -7,10 +7,10 @@
     <TextView
         android:background="?android:selectableItemBackground"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="48dp"
         android:gravity="center_vertical"
         android:text="Name"
-        android:paddingLeft="66dp"
+        android:paddingLeft="71dp"
         android:textStyle="normal"
         android:textColor="#262328"
         android:textSize="17sp"
