@@ -88,8 +88,8 @@ public class PeopleNearbyAdapter extends RecyclerView.Adapter<PeopleNearbyAdapte
         }
 
         void renderContactItem(UserLocation userLocation) {
-            deliveryStatus.setVisibility(View.GONE);
-            time.setVisibility(View.GONE);
+            deliveryStatus.setVisibility(View.INVISIBLE);
+            time.setVisibility(View.INVISIBLE);
 
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(userLocation.getUser().getName(), userLocation.getUser().getUserId(), 18));
             int dst = (int) userLocation.getDistance();

@@ -27,7 +27,7 @@
             android:text="Name"
             android:layout_marginLeft="20dp"
             android:textStyle="normal"
-            android:textColor="#262328"
+            android:textColor="@color/appElement"
             android:textSize="12sp"
             android:id="@+id/tv_chatItem_number" />
     </LinearLayout>
@@ -36,7 +36,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
         android:layout_width="48dp"
-        android:layout_marginRight="50.5dp"
+        android:layout_marginRight="21.75dp"
         android:checked="false"
         android:id="@+id/checkbox"
         android:gravity="center_vertical|right"

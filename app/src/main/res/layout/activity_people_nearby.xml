@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.chat.ichat.screens.people_nearby.PeopleNearbyActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         app:elevation="0dp"
-        android:id="@+id/appbar"
         android:layout_height="wrap_content">
         <android.support.v7.widget.Toolbar
             android:id="@+id/tb"
@@ -20,11 +19,13 @@
             android:background="@color/colorPrimary">
             <TextView
                 android:text="People Nearby"
-                android:textSize="20sp"
+                android:textSize="19.5dp"
                 android:textAppearance="@style/FontRobotoMedium"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/textPrimaryLight"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_people_nearby_title" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

@@ -5,6 +5,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -29,8 +31,14 @@ import android.widget.TextView;
 import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.Resource;
+import com.bumptech.glide.load.resource.SimpleResource;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
+import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.chat.ichat.components.AudioMessageView;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.RoundedCornerTransformation;
@@ -59,6 +67,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -108,7 +117,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private boolean isTyping;
     private int lastClickedPosition;
-    Animation insertAnimation;
+    private Animation insertAnimation;
 
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener) {
         this.postbackClickListener = postbackClickListener;
@@ -474,7 +483,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if(messageCache.get(position).getImageMessage().getFileUri()!=null) {
                     sendImageViewHolder.renderItem(new File(messageCache.get(position).getImageMessage().getFileUri()), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
                 } else {
-                    sendImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getImageUrl(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
+                    sendImageViewHolder.renderItem(messageCache.get(position).getImageMessage().getImageUrl(), messageCache.get(position).getImageMessage().getWidth(), messageCache.get(position).getImageMessage().getHeight(), getFormattedTime(messageList.get(position).getTime()), messageList.get(position).getMessageStatus(), position);
                 }
                 break;
             case VIEW_TYPE_RECV_IMAGE:
@@ -1036,7 +1045,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
-            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
+            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=size:big|color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
                     .into(locationImage);
             locationImage.setBackgroundResource(R.drawable.bg_msg_send_full);
@@ -1129,7 +1138,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
-            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
+            Glide.with(context).load("https://maps.googleapis.com/maps/api/staticmap?markers=size:big|color:red|"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude()+"&zoom=16&size=512x512&key=AIzaSyCPMaS_Gq7h09iFzLKla-UZ9-JCpp8Rgi8")
                     .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.ALL))
                     .into(locationImage);
 
@@ -1458,43 +1467,129 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     break;
             }
 
+            //TODO: hacky solution:
+            Glide
+                    .with(context)
+                    .load(localFile)
+                    .asBitmap()
+                    .transcode(new BitmapSizeTranscoder(), Size.class)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(new SimpleTarget<Size>() {
+                        @Override public void onResourceReady(Size resource, GlideAnimation glideAnimation) {
+                            Logger.d(this, "SIZE: "+String.format(Locale.ROOT, "%dx%d", resource.width, resource.height));
+                            int w,h;
+                            if(resource.width >= resource.height) {
+                                w= (int)AndroidUtils.px(240);
+                                h= (int)((AndroidUtils.px(240)/resource.width)*resource.height);
+                            } else {
+                                h= (int)AndroidUtils.px(240);
+                                w= (int)((AndroidUtils.px(240)/resource.height)*resource.width);
+                            }
+                            messageImage.getLayoutParams().height = h;
+                            messageImage.getLayoutParams().width = w;
+                            messageImage.requestLayout();
+
+                            bubbleView.getLayoutParams().height = h;
+                            messageImage.getLayoutParams().width = w;
+                            messageImage.requestLayout();
+                            Logger.d(this, "Width: "+w+", height:"+h);
+                        }
+                    });
+
             Glide.with(context).load(localFile)
-                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .bitmapTransform(new FitCenter(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(messageImage);
 
             render(time, messageStatus, position);
         }
 
-        void renderItem(String imageUrl, String time, MessageResult.MessageStatus messageStatus, int position) {
+        void renderItem(String imageUrl, int iWidth, int iHeight, String time, MessageResult.MessageStatus messageStatus, int position) {
             this.imageUrl = imageUrl;
             int bubbleType = bubbleType(position);
             RoundedCornerTransformation roundedCornerTransformationT = null;
             RoundedCornerTransformation roundedCornerTransformationB = null;
+            RoundedCornerTransformation roundedCornerTransformationTL = null;
+            RoundedCornerTransformation roundedCornerTransformationBL = null;
+
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, 14, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, 14, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_mid_corner_radius), 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
+                    roundedCornerTransformationT = new RoundedCornerTransformation(context, 14, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
+                    roundedCornerTransformationB = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
+            }
+            roundedCornerTransformationTL = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.TOP_LEFT);
+            roundedCornerTransformationBL = new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.BOTTOM_LEFT);
+
+            if(iWidth<=0 || iHeight<=0) {
+                Glide
+                        .with(context)
+                        .load(imageUrl)
+                        .asBitmap()
+                        .transcode(new BitmapSizeTranscoder(), Size.class)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(new SimpleTarget<Size>() {
+                            @Override
+                            public void onResourceReady(Size resource, GlideAnimation glideAnimation) {
+                                Logger.d(this, "SIZE: " + String.format(Locale.ROOT, "%dx%d", resource.width, resource.height));
+                                int w, h;
+                                if (resource.width >= resource.height) {
+                                    w = (int) AndroidUtils.px(240);
+                                    h = (int) ((AndroidUtils.px(240) / resource.width) * resource.height);
+                                } else {
+                                    h = (int) AndroidUtils.px(240);
+                                    w = (int) ((AndroidUtils.px(240) / resource.height) * resource.width);
+                                }
+                                messageImage.getLayoutParams().height = h;
+                                messageImage.getLayoutParams().width = w;
+                                messageImage.requestLayout();
+
+                                bubbleView.getLayoutParams().height = h;
+                                messageImage.getLayoutParams().width = w;
+                                messageImage.requestLayout();
+                                Logger.d(this, "Width: " + w + ", height:" + h);
+                            }
+                        });
+            } else {
+                int wi = (int) AndroidUtils.px(iWidth);
+                int he = (int) AndroidUtils.px(iHeight);
+                int w, h;
+                if (wi >= he) {
+                    w = (int) AndroidUtils.px(240);
+                    h = (int) ((AndroidUtils.px(240) / wi) * he);
+                } else {
+                    h = (int) AndroidUtils.px(240);
+                    w = (int) ((AndroidUtils.px(240) / he) * wi);
+                }
+
+                messageImage.getLayoutParams().height = h;
+                messageImage.getLayoutParams().width = w;
+                messageImage.requestLayout();
+
+                bubbleView.getLayoutParams().height = h;
+                messageImage.getLayoutParams().width = w;
+                messageImage.requestLayout();
             }
 
             Glide.with(context).load(imageUrl)
-                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.LEFT), roundedCornerTransformationB, roundedCornerTransformationT)
+                    .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, 18, 0, RoundedCornerTransformation.CornerType.ALL))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(messageImage);
 
             render(time, messageStatus, position);
@@ -1596,6 +1691,34 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             if(imageUrl!=null && !imageUrl.isEmpty()) {
+                Glide
+                        .with(context)
+                        .load(imageUrl)
+                        .asBitmap()
+                        .transcode(new BitmapSizeTranscoder(), Size.class)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(new SimpleTarget<Size>() {
+                            @Override public void onResourceReady(Size resource, GlideAnimation glideAnimation) {
+                                Logger.d(this, "SIZE: "+String.format(Locale.ROOT, "%dx%d", resource.width, resource.height));
+                                int w,h;
+                                if(resource.width >= resource.height) {
+                                    w= (int)AndroidUtils.px(240);
+                                    h= (int)((AndroidUtils.px(240)/resource.width)*resource.height);
+                                } else {
+                                    h= (int)AndroidUtils.px(240);
+                                    w= (int)((AndroidUtils.px(240)/resource.height)*resource.width);
+                                }
+                                messageImage.getLayoutParams().height = h;
+                                messageImage.getLayoutParams().width = w;
+                                messageImage.requestLayout();
+
+                                bubbleView.getLayoutParams().height = h;
+                                messageImage.getLayoutParams().width = w;
+                                messageImage.requestLayout();
+                                Logger.d(this, "Width: "+w+", height:"+h);
+                            }
+                        });
+
                 Glide.with(context).load(imageUrl.replace("https://", "http://"))
                         .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int) context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
                         .into(messageImage);
@@ -1654,11 +1777,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             audioMessageView.setAudioReadyListener(dur -> {
                 long ds = dur/1000;
-                if(ds <=10) {
+                if(ds <=5) {
                     audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(157);
                     audioMessageView.requestLayout();
+                } else if(ds*24 <= (int)AndroidUtils.px(262)) {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(ds*24);
+                    audioMessageView.requestLayout();
                 } else {
-                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(1);
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(262);
                     audioMessageView.requestLayout();
                 }
             });
@@ -1723,6 +1849,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int bubbleType = bubbleType(position);
             boolean shouldShowTime = shouldShowTime(position);
 
+            audioMessageView.setAudioReadyListener(dur -> {
+                long ds = dur/1000;
+                if(ds <=5) {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(157);
+                    audioMessageView.requestLayout();
+                } else if(ds*24 <= (int)AndroidUtils.px(262)) {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(ds*24);
+                    audioMessageView.requestLayout();
+                } else {
+                    audioMessageView.getLayoutParams().width = (int)AndroidUtils.px(262);
+                    audioMessageView.requestLayout();
+                }
+            });
             audioMessageView.setAudioUrl(url);
             timeView.setText(time);
             if(shouldShowTime) {
@@ -1776,5 +1915,18 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     interface QuickReplyActionListener {
         void navigateToGetLocation();
+    }
+
+    class BitmapSizeTranscoder implements ResourceTranscoder<Bitmap, Size> {
+        @Override public Resource<Size> transcode(Resource<Bitmap> toTranscode) {
+            Bitmap bitmap = toTranscode.get();
+            Size size = new Size();
+            size.width = bitmap.getWidth();
+            size.height = bitmap.getHeight();
+            return new SimpleResource<>(size);
+        }
+        @Override public String getId() {
+            return getClass().getName();
+        }
     }
 }

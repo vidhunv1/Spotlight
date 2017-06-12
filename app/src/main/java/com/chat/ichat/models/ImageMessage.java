@@ -11,6 +11,10 @@ public class ImageMessage {
     private String imageUrl;
     @SerializedName("file_uri")
     private String fileUri;
+    @SerializedName("width")
+    private String width;
+    @SerializedName("height")
+    private String height;
 
     public String getImageUrl() {
         return imageUrl;
@@ -26,6 +30,28 @@ public class ImageMessage {
 
     public void setFileUri(String fileUri) {
         this.fileUri = fileUri;
+    }
+
+    public int getWidth() {
+        if(width == null || width.equals("")){
+            return 0;
+        }
+        return Integer.valueOf(width);
+    }
+
+    public int getHeight() {
+        if(height == null || height.equals("")){
+            return 0;
+        }
+        return Integer.valueOf(height);
+    }
+
+    public void setWidth(int width) {
+        this.width = width+"";
+    }
+
+    public void setHeight(int height) {
+        this.height = height+"";
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.chat.ichat.screens.message;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import com.chat.ichat.MessageController;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
@@ -25,6 +28,8 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -194,7 +199,6 @@ public class MessagePresenter implements MessageContract.Presenter {
                         messageView.displayMessages(messageResults);
                     }
                 });
-
         compositeSubscription.add(subscription);
     }
 
@@ -305,7 +309,7 @@ public class MessagePresenter implements MessageContract.Presenter {
                     public void onNext(MessageResult messageResult) {
                         messageView.addMessageToList(messageResult);
 
-                        File image = new File(fileUri);
+                        File image = saveBitmapToFile(new File(fileUri));
                         Logger.d(this, "File size(MB): "+image.length()/(1024*1024));
                         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                         String filename = timeStamp;
@@ -515,6 +519,50 @@ public class MessagePresenter implements MessageContract.Presenter {
 
         compositeSubscription.add(subscription);
     }
+
+    public File saveBitmapToFile(File file){
+        try {
+
+            // BitmapFactory options to downsize the image
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            o.inSampleSize = 6;
+            // factor of downsizing the image
+
+            FileInputStream inputStream = new FileInputStream(file);
+            //Bitmap selectedBitmap = null;
+            BitmapFactory.decodeStream(inputStream, null, o);
+            inputStream.close();
+
+            // The new size we want to scale to
+            final int REQUIRED_SIZE=75;
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            inputStream = new FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
+            inputStream.close();
+
+            // here i override the original image file
+            file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , outputStream);
+
+            return file;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     @Override
     public void sendReadReceipt(String chatId) {

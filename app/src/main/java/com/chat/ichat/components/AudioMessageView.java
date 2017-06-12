@@ -185,33 +185,37 @@ public class AudioMessageView extends View {
         int usableHeight = getHeight() - (pt + pb);
         int centerY = pt + (usableHeight / 2);
 
-        paint.setColor(primaryColor);
-        canvas.drawCircle(AndroidUtils.px(15+4), centerY, AndroidUtils.px(7), paint);
-        paint.setStrokeWidth(AndroidUtils.px(1));
-        canvas.drawLine(AndroidUtils.px(15+4), centerY, getWidth()-AndroidUtils.px(15+4), centerY, paint);
+        int circleCenterX = 19;
 
-        viewrectF.left = getWidth()-AndroidUtils.px(15+40);
-        viewrectF.top = getHeight() - AndroidUtils.px(8);
-        viewrectF.right = getWidth() - AndroidUtils.px(15);
-        viewrectF.bottom = AndroidUtils.px(8);
+        paint.setColor(primaryColor);
+        canvas.drawCircle(AndroidUtils.px(circleCenterX+3), centerY, AndroidUtils.px(8), paint);
+        paint.setStrokeWidth(AndroidUtils.px(1));
+        canvas.drawLine(AndroidUtils.px(circleCenterX+4), centerY, getWidth()-AndroidUtils.px(circleCenterX+4), centerY, paint);
+
+        viewrectF.left = getWidth()-AndroidUtils.px(52);
+        viewrectF.top = getHeight() - AndroidUtils.px(10.5f);
+        viewrectF.right = getWidth() - AndroidUtils.px(circleCenterX-5);
+        viewrectF.bottom = AndroidUtils.px(10.5f);
         canvas.drawRoundRect(viewrectF, AndroidUtils.px(18), AndroidUtils.px(18), paint);
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(AndroidUtils.px(12));
         paint.setTextAlign(Paint.Align.CENTER);
         String time = getTimeString(durationMilli - delayMilli*iterCount);
-        canvas.drawText(time, getWidth()-AndroidUtils.px(35), centerY + AndroidUtils.px(4), paint);
+        canvas.drawText(time, getWidth()-AndroidUtils.px(33), centerY + AndroidUtils.px(4), paint);
 
+        float playX = 19.5f;
         if(!isRunning) { //play bitmap
             if(playPath == null) {
                 if(isReady)
-                    playPath = getPlayPath(AndroidUtils.px(17), centerY);
+                    playPath = getPlayPath(AndroidUtils.px(playX), centerY);
             }
             canvas.drawPath(playPath, paint);
         } else { // pause bitmap
+            float pauseX = 20.5f;
             paint.setStrokeWidth(AndroidUtils.px(1.5f));
-            canvas.drawLine(AndroidUtils.px(17), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(17), centerY + AndroidUtils.px(3.5f), paint);
-            canvas.drawLine(AndroidUtils.px(17+3.5f), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(17+3.5f), centerY + AndroidUtils.px(3.5f), paint);
+            canvas.drawLine(AndroidUtils.px(pauseX), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(pauseX), centerY + AndroidUtils.px(3.5f), paint);
+            canvas.drawLine(AndroidUtils.px(pauseX+3.5f), centerY - AndroidUtils.px(3.5f), AndroidUtils.px(pauseX+3.5f), centerY + AndroidUtils.px(3.5f), paint);
         }
     }
 
@@ -291,10 +295,10 @@ public class AudioMessageView extends View {
     private Path getPlayPath(float x, float y) {
         Path playPath = new Path();
         playPath.setFillType(Path.FillType.EVEN_ODD);
-        playPath.moveTo(x, y+AndroidUtils.px(4));
-        playPath.lineTo(x, y+AndroidUtils.px(4));
-        playPath.lineTo(x + AndroidUtils.px(5f), y);
-        playPath.lineTo(x, y-AndroidUtils.px(4));
+        playPath.moveTo(x, y+AndroidUtils.px(4.5f));
+        playPath.lineTo(x, y+AndroidUtils.px(4.5f));
+        playPath.lineTo(x + AndroidUtils.px(6.3f), y);
+        playPath.lineTo(x, y-AndroidUtils.px(4.5f));
         playPath.close();
         return playPath;
     }

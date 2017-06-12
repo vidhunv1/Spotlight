@@ -254,7 +254,7 @@ public class GifViewHelper {
                                             .crossFade()
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
-                                    sendFab.setOnClickListener(v -> sendGifListener.onSendGif(data.getLowGifUrl()));
+                                    sendFab.setOnClickListener(v -> sendGifListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight()));
                                     break;
                                 }
                             }
@@ -306,7 +306,7 @@ public class GifViewHelper {
                                 sendFab.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl());
+                                        sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl(), tenorGifResponse.getResults().get(position).getGif().getWidth(), tenorGifResponse.getResults().get(position).getGif().getHeight());
                                     }
                                 });
                             });
@@ -372,6 +372,6 @@ public class GifViewHelper {
     }
 
     public interface SendGifListener {
-        public void onSendGif(String url);
+        public void onSendGif(String url, int width, int height);
     }
 }

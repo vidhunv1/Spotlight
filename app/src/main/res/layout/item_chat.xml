@@ -43,6 +43,7 @@
                     android:layout_height="wrap_content"
                     android:text="Name"
                     android:textAppearance="@style/FontRobotoMedium"
+                    android:fontFamily="sans-serif-medium"
                     android:textColor="#262328"
                     android:paddingBottom="4.25dp"
                     android:textSize="17sp"

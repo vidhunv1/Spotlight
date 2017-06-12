@@ -39,7 +39,7 @@
             <com.chat.ichat.components.AudioMessageView
                 xmlns:appNs="http://schemas.android.com/apk/res-auto"
                 android:layout_width="190dp"
-                android:layout_height="35dp"
+                android:layout_height="36dp"
                 appNs:view_color="@color/receiveMessageBubble"
                 appNs:playing_color="@color/receiveMessageBubblePressed"
                 appNs:primary_color="@color/appElement"

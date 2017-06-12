@@ -201,10 +201,6 @@ public class MessageActivity extends BaseActivity
     protected void onResume() {
         Logger.d(this, "onResume");
         super.onResume();
-        Logger.d(this, "index: "+index+" top: "+top);
-        if(index != -1 && top!=-1) {
-            linearLayoutManager.scrollToPositionWithOffset( index, top);
-        }
         messagePresenter.loadMessages(chatUserName);
 
         /*              Analytics           */
@@ -535,7 +531,6 @@ public class MessageActivity extends BaseActivity
     public void displayMessages(List<MessageResult> messages) {
         if(messagesAdapter == null) {
             messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this, this, this);
-            linearLayoutManager.scrollToPosition(messagesAdapter.getItemCount());
         }
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
@@ -645,10 +640,14 @@ public class MessageActivity extends BaseActivity
             emojiViewHelper = new EmojiViewHelper(this, smileyLayout, getWindow());
             audioViewHelper = new AudioViewHelper(this, smileyLayout, getWindow());
             galleryViewHelper = new GalleryViewHelper(this, smileyLayout, getWindow());
-            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), url -> {
+            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), (url, w,h) -> {
+                Logger.d(this, "Gif Width/Height"+w+", "+h);
                 Message m = new Message();
                 ImageMessage imageMessage = new ImageMessage();
                 imageMessage.setImageUrl(url);
+                imageMessage.setWidth(w);
+                imageMessage.setHeight(h);
+
                 m.setImageMessage(imageMessage);
 
                 messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
