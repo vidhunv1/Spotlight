@@ -39,7 +39,6 @@
         android:layout_marginRight="21.75dp"
         android:checked="false"
         android:id="@+id/checkbox"
-        android:gravity="center_vertical|right"
         android:theme="@style/CheckBoxStyle"
         android:layout_height="48dp" />
 </RelativeLayout>

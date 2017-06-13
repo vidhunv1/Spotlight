@@ -30,8 +30,13 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.clickListener = clickListener;
         this.contacts = contactResults;
         this.checked = new ArrayList<>();
+        int checkedDefault = contacts.size()/12;
         for (int i = 0; i < contacts.size(); i++) {
-            checked.add(false);
+            if(checkedDefault==0 || i%checkedDefault == 0) {
+                checked.add(true);
+            } else {
+                checked.add(false);
+            }
         }
     }
 

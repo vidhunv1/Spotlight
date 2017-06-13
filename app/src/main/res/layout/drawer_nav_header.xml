@@ -2,37 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="148dp"
     android:orientation="vertical"
-    android:paddingBottom="8.5dp"
     android:paddingLeft="16dp"
-    android:paddingTop="17dp"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
+        android:layout_marginTop="17dp"
         android:id="@+id/profile_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_weight="1"
         app:srcCompat="@drawable/default_profile_image" />
 
     <TextView
         android:id="@+id/tv_profile_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18.75dp"
+        android:layout_marginTop="19.75dp"
         android:text="vidhun vinod"
         android:textColor="@color/textPrimaryLight"
         android:textAppearance="@style/FontRobotoMedium"
         android:textSize="14sp" />
 
     <TextView
+        android:layout_marginTop="1.5dp"
         android:id="@+id/tv_profile_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/textSecondary"
         android:text="ID: "
-        android:textSize="13sp"/>
-
+        android:textSize="14sp"/>
 </LinearLayout>

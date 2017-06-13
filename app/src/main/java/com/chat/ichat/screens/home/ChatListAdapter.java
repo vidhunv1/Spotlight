@@ -207,7 +207,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     class ChatItemViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
 

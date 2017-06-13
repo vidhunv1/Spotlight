@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
@@ -93,6 +94,8 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 public class MessageActivity extends BaseActivity
         implements  MessageContract.View,
@@ -429,6 +432,21 @@ public class MessageActivity extends BaseActivity
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
         }
         linearLayoutManager.scrollToPositionWithOffset(-1,-1);
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
+        long millis = sharedPreferences.getLong(contactDetails.getUsername(), 0);
+        if (millis == 0) {
+            if (contactDetails.getUsername().startsWith("o_")) {
+                presenceView.setText("Online");
+            } else {
+                presenceView.setText("Last seen recently");
+            }
+        } else if ((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
+            presenceView.setText("Online");
+        } else {
+            String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
+            presenceView.setText(this.getResources().getString(R.string.chat_presence_away, lastSeen));
+        }
     }
 
     @Override
@@ -932,9 +950,7 @@ public class MessageActivity extends BaseActivity
         if(time != null && !time.isEmpty()) {
             presenceView.setVisibility(View.VISIBLE);
             presenceView.setText(time);
-        } else {
-            presenceView.setVisibility(View.GONE);
-        }
+        } else {}
     }
 
     @Override

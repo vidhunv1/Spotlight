@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -57,6 +58,8 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.iv_userprofile_dp)
@@ -130,6 +133,21 @@ public class UserProfileActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        SharedPreferences sharedPreferences = this.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
+        long millis = sharedPreferences.getLong(username, 0);
+        if (millis == 0) {
+            if (username.startsWith("o_")) {
+                presenceView.setText("Online");
+            } else {
+                presenceView.setText("Last seen recently");
+            }
+        } else if ((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
+            presenceView.setText("Online");
+        } else {
+            String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
+            presenceView.setText(this.getResources().getString(R.string.chat_presence_away, lastSeen));
+        }
+
         if(contactProfileDP!=null && !contactProfileDP.isEmpty()) {
             Logger.d(this, "Setting DP: "+contactProfileDP);
             Context context = this;
@@ -152,7 +170,6 @@ public class UserProfileActivity extends BaseActivity {
         } else {
             profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
         }
-
         MessageController messageController = MessageController.getInstance();
         messageController.getLastActivity(this.username)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -162,7 +179,6 @@ public class UserProfileActivity extends BaseActivity {
             public void onCompleted() {}
             @Override
             public void onError(Throwable e) {
-                presenceView.setVisibility(View.GONE);
             }
 
             @Override

@@ -109,6 +109,7 @@
         <activity android:name=".screens.discover_bots.DiscoverBotsActivity" />
         <activity android:name=".screens.invite_friends.InviteFriendsActivity" />
         <activity android:name=".screens.settings.SettingsActivity" />
+        <activity android:name=".screens.blocked_contacts.BlockedContactsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
         <activity
             android:name=".screens.user_id.SetUserIdActivity"

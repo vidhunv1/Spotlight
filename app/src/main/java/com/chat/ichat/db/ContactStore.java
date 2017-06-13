@@ -49,13 +49,13 @@ public class ContactStore {
             ContentValues values = new ContentValues();
 
             for (ContactResult contactResult : contactResults) {
+                int isAdded = contactResult.isAdded()?1:0;
                 values.put(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
                 values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
                 values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
                 values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
+                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
 
                 String profileDp = "";
                 if(contactResult.getProfileDP()!=null)
@@ -278,8 +278,10 @@ public class ContactStore {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
-            values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, contactResult.isBlocked());
-            values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, contactResult.isAdded());
+            int isAdded = contactResult.isAdded()?1:0;
+            int isBlocked = contactResult.isBlocked()?1:0;
+            values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, isBlocked);
+            values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
             if(contactResult.getContactName()!=null && !contactResult.getContactName().isEmpty()) {
                 values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
             }

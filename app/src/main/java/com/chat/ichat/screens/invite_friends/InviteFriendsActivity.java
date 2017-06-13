@@ -199,6 +199,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             setInviteCount(size);
         });
         contactList.setAdapter(inviteFriendsAdapter);
+        setInviteCount(inviteFriendsAdapter.getSelected().size());
         RecyclerView.LayoutManager layoutManager = contactList.getLayoutManager();
         contactList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

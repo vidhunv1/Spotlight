@@ -214,14 +214,10 @@ public class HomePresenter implements HomeContract.Presenter {
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe(new Subscriber<PhoneContactResponse>() {
                                                 @Override
-                                                public void onCompleted() {
-
-                                                }
+                                                public void onCompleted() {}
 
                                                 @Override
-                                                public void onError(Throwable e) {
-
-                                                }
+                                                public void onError(Throwable e) {}
 
                                                 @Override
                                                 public void onNext(PhoneContactResponse phoneContactResponse) {
@@ -244,14 +240,10 @@ public class HomePresenter implements HomeContract.Presenter {
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe(new Subscriber<Boolean>() {
                                                                 @Override
-                                                                public void onCompleted() {
-
-                                                                }
+                                                                public void onCompleted() {}
 
                                                                 @Override
-                                                                public void onError(Throwable e) {
-
-                                                                }
+                                                                public void onError(Throwable e) {}
 
                                                                 @Override
                                                                 public void onNext(Boolean aBoolean) {
@@ -296,12 +288,10 @@ public class HomePresenter implements HomeContract.Presenter {
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(new Subscriber<Boolean>() {
                                             @Override
-                                            public void onCompleted() {
-                                            }
+                                            public void onCompleted() {}
 
                                             @Override
-                                            public void onError(Throwable e) {
-                                            }
+                                            public void onError(Throwable e) {}
 
                                             @Override
                                             public void onNext(Boolean aBoolean) {

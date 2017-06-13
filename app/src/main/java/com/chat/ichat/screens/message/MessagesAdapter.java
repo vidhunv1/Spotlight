@@ -90,8 +90,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private String chatUserName;
 
     private int lastPosition = -1;
-    private boolean shouldAnimate = false;
-
 
     private final int VIEW_TYPE_SEND_TEXT = 0;
     private final int VIEW_TYPE_RECV_TEXT = 1;
@@ -108,6 +106,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_SEND_AUDIO = 12;
     private final int VIEW_TYPE_RECV_AUDIO = 13;
     private final int VIEW_TYPE_NO_MESSAGES = 14;
+    private final int VIEW_TYPE_SEND_GIF = 15;
+    private final int VIEW_TYPE_RECV_GIF = 16;
+
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
@@ -437,7 +438,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition) {
+        if (position > lastPosition && messageList.size()>0 && quickReplies.size()==0) {
             holder.itemView.startAnimation(insertAnimation);
             lastPosition = position;
         }
@@ -1490,8 +1491,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             messageImage.requestLayout();
 
                             bubbleView.getLayoutParams().height = h;
-                            messageImage.getLayoutParams().width = w;
-                            messageImage.requestLayout();
+                            bubbleView.getLayoutParams().width = w;
+                            bubbleView.requestLayout();
                             Logger.d(this, "Width: "+w+", height:"+h);
                         }
                     });
@@ -1561,8 +1562,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 messageImage.requestLayout();
 
                                 bubbleView.getLayoutParams().height = h;
-                                messageImage.getLayoutParams().width = w;
-                                messageImage.requestLayout();
+                                bubbleView.getLayoutParams().width = w;
+                                bubbleView.requestLayout();
                                 Logger.d(this, "Width: " + w + ", height:" + h);
                             }
                         });
@@ -1616,7 +1617,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 deliveryStatusView.setImageResource(R.drawable.ic_delivery_read);
             }
             deliveryStatusText.setText(MessageResult.getDeliveryStatusText(messageStatus));
-
         }
 
         @OnClick(R.id.rl_bubble)
@@ -1691,9 +1691,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             if(imageUrl!=null && !imageUrl.isEmpty()) {
+                Logger.d(this, "Image url");
                 Glide
                         .with(context)
-                        .load(imageUrl)
+                        .load(imageUrl.replace("https://", "http://"))
                         .asBitmap()
                         .transcode(new BitmapSizeTranscoder(), Size.class)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -1713,14 +1714,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 messageImage.requestLayout();
 
                                 bubbleView.getLayoutParams().height = h;
-                                messageImage.getLayoutParams().width = w;
-                                messageImage.requestLayout();
+                                bubbleView.getLayoutParams().width = w;
+                                bubbleView.requestLayout();
                                 Logger.d(this, "Width: "+w+", height:"+h);
                             }
                         });
 
                 Glide.with(context).load(imageUrl.replace("https://", "http://"))
-                        .bitmapTransform(new CenterCrop(context), new RoundedCornerTransformation(context, (int) context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
+                        .bitmapTransform(new FitCenter(context), new RoundedCornerTransformation(context, (int) context.getResources().getDimension(R.dimen.bubble_full_corner_radius), 0, RoundedCornerTransformation.CornerType.RIGHT), roundedCornerTransformationB, roundedCornerTransformationT)
                         .into(messageImage);
             }
 
@@ -1917,7 +1918,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void navigateToGetLocation();
     }
 
-    class BitmapSizeTranscoder implements ResourceTranscoder<Bitmap, Size> {
+    private class BitmapSizeTranscoder implements ResourceTranscoder<Bitmap, Size> {
         @Override public Resource<Size> transcode(Resource<Bitmap> toTranscode) {
             Bitmap bitmap = toTranscode.get();
             Size size = new Size();

@@ -42,6 +42,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.api.StatusResponse;
+import com.chat.ichat.screens.blocked_contacts.BlockedContactsActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageService;
 import com.chat.ichat.R;
@@ -63,6 +65,9 @@ import java.io.IOException;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class SettingsActivity extends BaseActivity implements SettingsContract.View{
 
@@ -183,8 +188,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         }
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings_toolbar, menu);
@@ -269,6 +272,59 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @OnClick(R.id.settings_privacy_policy_row)
     public void onPrivacyPolicyClicked() {
         startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/privacy"));
+    }
+
+    @OnClick(R.id.clear_location_row)
+    public void onClearLocationClicked() {
+        LinearLayout parent = new LinearLayout(this);
+
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(18), (int)AndroidUtils.px(24), 0);
+
+        TextView textView1 = new TextView(this);
+        textView1.setText("Are you sure you want to remove your location?");
+        textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView1.setTextSize(16);
+
+        parent.addView(textView1);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.app_name));
+        builder.setPositiveButton("OK", ((dialog, which) -> {
+            if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+                progressDialog[0].dismiss();
+            }
+            progressDialog[0] = ProgressDialog.show(this, "", "Clearing location. Please wait...", true);
+            ApiManager.getLocationApi().delete()
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<StatusResponse>() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {
+                            if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+                                progressDialog[0].dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onNext(StatusResponse statusResponse) {
+                            SharedPreferences sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("last_known_location", Context.MODE_PRIVATE);
+                            sharedPreferences.edit().putLong("latitude", -99999999).apply();
+                            sharedPreferences.edit().putLong("longitude", -99999999).apply();
+                            if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+                                progressDialog[0].dismiss();
+                            }
+                        }
+                    });
+        }));
+        builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
+        builder.setView(parent);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @OnClick(R.id.settings_sound_row)
@@ -369,6 +425,11 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         builder.setView(parent);
         alertDialogPic = builder.create();
         alertDialogPic.show();
+    }
+
+    @OnClick(R.id.blocked_contacts_row)
+    public void onBlockedContactsClicked() {
+        startActivity(BlockedContactsActivity.callingIntent(this));
     }
 
     public void showAskAQuestionPopup() {
