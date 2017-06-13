@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vidhun on 07/12/16.
@@ -45,32 +47,76 @@ public class ContactStore {
     public Observable<Boolean> storeContacts(List<ContactResult> contactResults){
         Logger.d(this);
         return Observable.create(subscriber -> {
-            SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
-
+            List<Observable<Boolean>> observables = new ArrayList<>();
             for (ContactResult contactResult : contactResults) {
-                int isAdded = contactResult.isAdded()?1:0;
-                values.put(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
-                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
-                values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
-                values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
-                values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
-                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
+                observables.add(
+                        Observable.create(subsc -> {
+                            getContactByUserName(contactResult.getUsername())
+                                    .subscribeOn(Schedulers.newThread())
+                                    .subscribe(new Subscriber<ContactResult>() {
+                                        @Override
+                                        public void onCompleted() {}
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            e.printStackTrace();
+                                        }
 
-                String profileDp = "";
-                if(contactResult.getProfileDP()!=null)
-                    profileDp = contactResult.getProfileDP().replace("https://", "http://");
-                values.put(SQLiteContract.ContactsContract.COLUMN_PROFILE_DP, profileDp);
-                if(contactResult.getUserType()==null) {
-                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, _User.UserType.regular.name());
-                } else {
-                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, contactResult.getUserType().name());
-                }
-                long rowId = db.insert(SQLiteContract.ContactsContract.TABLE_NAME, null, values);
+                                        @Override
+                                        public void onNext(ContactResult cc) {
+                                            SQLiteDatabase db = databaseManager.openConnection();
+                                            if(cc==null) {
+                                                subsc.onNext(true);
+                                                int isAdded = contactResult.isAdded()?1:0;
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_PHONE_NUMBER, contactResult.getPhoneNumber());
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_COUNTRY_CODE, contactResult.getCountryCode());
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_USERNAME, contactResult.getUsername());
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_USER_ID, contactResult.getUserId());
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
+
+                                                String profileDp = "";
+                                                if(contactResult.getProfileDP()!=null)
+                                                    profileDp = contactResult.getProfileDP().replace("https://", "http://");
+                                                values.put(SQLiteContract.ContactsContract.COLUMN_PROFILE_DP, profileDp);
+                                                if(contactResult.getUserType()==null) {
+                                                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, _User.UserType.regular.name());
+                                                } else {
+                                                    values.put(SQLiteContract.ContactsContract.COLUMN_USER_TYPE, contactResult.getUserType().name());
+                                                }
+                                                long rowId = db.insert(SQLiteContract.ContactsContract.TABLE_NAME, null, values);
+                                            } else {
+                                                if(contactResult.isAdded() && !cc.isAdded()) {
+                                                    values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, 1);
+                                                    db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME + "='" + contactResult.getUsername() + "'", null);
+                                                }
+                                                subsc.onNext(false);
+                                            }
+                                            databaseManager.closeConnection();
+                                        }
+                                    });
+                        }));
             }
-            subscriber.onNext(true);
-            subscriber.onCompleted();
-            databaseManager.closeConnection();
+
+            Observable.zip(observables, (i) -> "Done")
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Subscriber<String>() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {
+                            e.printStackTrace();
+                            subscriber.onNext(true);
+                            subscriber.onCompleted();
+                        }
+
+                        @Override
+                        public void onNext(String s) {
+                            subscriber.onNext(true);
+                            subscriber.onCompleted();
+                        }
+                    });
         });
     }
 
@@ -274,44 +320,55 @@ public class ContactStore {
         });
     }
 
-    public Observable<ContactResult> update(ContactResult contactResult) {
+    public Observable<ContactResult> update(ContactResult contactResult){
+        List<ContactResult> contact = new ArrayList<>();
+        contact.add(contactResult);
+        return update(contact);
+    }
+
+    public Observable<ContactResult> update(List<ContactResult> contactResults) {
         return Observable.create(subscriber -> {
             SQLiteDatabase db = databaseManager.openConnection();
             ContentValues values = new ContentValues();
-            int isAdded = contactResult.isAdded()?1:0;
-            int isBlocked = contactResult.isBlocked()?1:0;
-            values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, isBlocked);
-            values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
-            if(contactResult.getContactName()!=null && !contactResult.getContactName().isEmpty()) {
-                values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
+
+            for (ContactResult contactResult : contactResults) {
+                int isAdded = contactResult.isAdded()?1:0;
+                int isBlocked = contactResult.isBlocked()?1:0;
+                values.put(SQLiteContract.ContactsContract.COLUMN_IS_BLOCKED, isBlocked);
+                values.put(SQLiteContract.ContactsContract.COLUMN_IS_ADDED, isAdded);
+                if(contactResult.getContactName()!=null && !contactResult.getContactName().isEmpty()) {
+                    values.put(SQLiteContract.ContactsContract.COLUMN_CONTACT_NAME, contactResult.getContactName());
+                }
+                if(contactResult.getProfileDP()!=null && !contactResult.getProfileDP().isEmpty()) {
+                    values.put(SQLiteContract.ContactsContract.COLUMN_PROFILE_DP, contactResult.getProfileDP());
+                }
+                if(contactResult.getUsername()!=null && !contactResult.getUsername().isEmpty()) {
+                    db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME + "='" + contactResult.getUsername() + "'", null);
+                    subscriber.onNext(contactResult);
+                    continue;
+                }
+                if(contactResult.getUserId()!=null && !contactResult.getUserId().isEmpty()) {
+                    db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USER_ID + "='" + contactResult.getUserId() + "'", null);
+                    subscriber.onNext(contactResult);
+                    continue;
+                }
+                if(contactResult.getProfileDP()!=null && !contactResult.getProfileDP().isEmpty()) {
+                    db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_PROFILE_DP + "='" + contactResult.getProfileDP() + "'", null);
+                    subscriber.onNext(contactResult);
+                }
             }
-            if(contactResult.getProfileDP()!=null && !contactResult.getProfileDP().isEmpty()) {
-                values.put(SQLiteContract.ContactsContract.COLUMN_PROFILE_DP, contactResult.getProfileDP());
-            }
-            if(contactResult.getUsername()!=null && !contactResult.getUsername().isEmpty()) {
-                db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USERNAME + "='" + contactResult.getUsername() + "'", null);
-                subscriber.onNext(contactResult);
-                subscriber.onCompleted();
-                databaseManager.closeConnection();
-                return;
-            }
-            if(contactResult.getUserId()!=null && !contactResult.getUserId().isEmpty()) {
-                db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_USER_ID + "='" + contactResult.getUserId() + "'", null);
-                subscriber.onNext(contactResult);
-                subscriber.onCompleted();
-                databaseManager.closeConnection();
-                return;
-            }
-            if(contactResult.getProfileDP()!=null && !contactResult.getProfileDP().isEmpty()) {
-                db.update(SQLiteContract.ContactsContract.TABLE_NAME, values, SQLiteContract.ContactsContract.COLUMN_PROFILE_DP + "='" + contactResult.getProfileDP() + "'", null);
-                subscriber.onNext(contactResult);
-                subscriber.onCompleted();
-                databaseManager.closeConnection();
-                return;
-            }
-            subscriber.onNext(null);
             subscriber.onCompleted();
             databaseManager.closeConnection();
         });
+    }
+
+    public boolean deleteContact(String u) {
+        SQLiteDatabase db = databaseManager.openConnection();
+        String table = SQLiteContract.ContactsContract.TABLE_NAME;
+        String whereClause = SQLiteContract.ContactsContract.COLUMN_USERNAME+"=?";
+        String[] whereArgs = new String[] { String.valueOf(u) };
+        boolean b = db.delete(table, whereClause, whereArgs) > 0;
+        databaseManager.closeConnection();
+        return b;
     }
 }

@@ -498,21 +498,7 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     public void delete(String username) {
-        Activity activity = this;
-        MessageStore.getInstance().deleteChat(username)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
-                    @Override
-                    public void onCompleted() {}
-
-                    @Override
-                    public void onError(Throwable e) {}
-
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        startActivity(HomeActivity.callingIntent(activity, 0, null));
-                    }
-                });
+        ContactStore.getInstance().deleteContact(username);
+        startActivity(HomeActivity.callingIntent(this, 0, null));
     }
 }

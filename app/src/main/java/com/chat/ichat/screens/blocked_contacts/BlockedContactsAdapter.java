@@ -140,6 +140,14 @@ public class BlockedContactsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 if(clickListener != null)
                     clickListener.onContactClicked(contactName.getTag().toString());
             });
+
+            chatListContent.setOnLongClickListener(view -> {
+                if(clickListener != null) {
+                    clickListener.onContactLongClicked(contactName.getTag().toString());
+                    return true;
+                }
+                return false;
+            });
         }
     }
 
@@ -151,6 +159,7 @@ public class BlockedContactsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     interface ClickListener {
         void onContactClicked(String userName);
+        void onContactLongClicked(String username);
     }
 }
 

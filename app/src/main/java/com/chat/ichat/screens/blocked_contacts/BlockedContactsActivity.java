@@ -49,7 +49,6 @@ public class BlockedContactsActivity extends BaseActivity {
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, BlockedContactsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         return intent;
     }
 
@@ -84,20 +83,9 @@ public class BlockedContactsActivity extends BaseActivity {
                             if(contactResult.isBlocked())
                                 cc.add(contactResult);
                         }
-                        BlockedContactsAdapter blockedContactsAdapter = new BlockedContactsAdapter(context, cc, userName -> {
-                            LinearLayout parent = new LinearLayout(context);
-
-                            parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-                            parent.setOrientation(LinearLayout.VERTICAL);
-                            parent.setPadding((int) AndroidUtils.px(16),(int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
-
-                            TextView textView1 = new TextView(context);
-                            textView1.setText("Unblock");
-                            textView1.setTextColor(ContextCompat.getColor(context, R.color.textColor));
-                            textView1.setTextSize(16);
-                            textView1.setGravity(Gravity.CENTER_VERTICAL);
-                            textView1.setHeight((int)AndroidUtils.px(48));
-                            textView1.setOnClickListener(v -> {
+                        BlockedContactsAdapter blockedContactsAdapter = new BlockedContactsAdapter(context, cc, new BlockedContactsAdapter.ClickListener() {
+                            @Override
+                            public void onContactClicked(String userName) {
                                 ContactStore.getInstance().getContactByUserName(userName)
                                         .subscribeOn(Schedulers.newThread())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -109,32 +97,66 @@ public class BlockedContactsActivity extends BaseActivity {
                                             public void onError(Throwable e) {}
 
                                             @Override
-                                            public void onNext(ContactResult crs) {
-                                                crs.setBlocked(false);
-                                                ContactStore.getInstance().update(crs)
-                                                        .subscribeOn(Schedulers.newThread())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(new Subscriber<ContactResult>() {
-                                                            @Override
-                                                            public void onCompleted() {}
-
-                                                            @Override
-                                                            public void onError(Throwable e) {}
-
-                                                            @Override
-                                                            public void onNext(ContactResult contactResult) {
-                                                                startActivity(UserProfileActivity.callingIntent(context, contactResult.getUsername(), contactResult.getUserId(), contactResult.getContactName(), contactResult.isBlocked(), contactResult.getProfileDP()));
-                                                            }
-                                                        });
+                                            public void onNext(ContactResult contactResult) {
+                                                startActivity(UserProfileActivity.callingIntent(context, contactResult.getUsername(), contactResult.getUserId(), contactResult.getContactName(), contactResult.isBlocked(), contactResult.getProfileDP()));
                                             }
                                         });
-                            });
+                            }
 
-                            parent.addView(textView1);
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setView(parent);
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.show();
+                            @Override
+                            public void onContactLongClicked(String username) {
+                                LinearLayout parent = new LinearLayout(context);
+
+                                parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+                                parent.setOrientation(LinearLayout.VERTICAL);
+                                parent.setPadding((int) AndroidUtils.px(16),(int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
+
+                                TextView textView1 = new TextView(context);
+                                textView1.setText("Unblock");
+                                textView1.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+                                textView1.setTextSize(16);
+                                textView1.setGravity(Gravity.CENTER_VERTICAL);
+                                textView1.setHeight((int)AndroidUtils.px(48));
+                                textView1.setOnLongClickListener(v -> {
+                                    ContactStore.getInstance().getContactByUserName(username)
+                                            .subscribeOn(Schedulers.newThread())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(new Subscriber<ContactResult>() {
+                                                @Override
+                                                public void onCompleted() {}
+
+                                                @Override
+                                                public void onError(Throwable e) {}
+
+                                                @Override
+                                                public void onNext(ContactResult crs) {
+                                                    crs.setBlocked(false);
+                                                    crs.setAdded(true);
+                                                    ContactStore.getInstance().update(crs)
+                                                            .subscribeOn(Schedulers.newThread())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(new Subscriber<ContactResult>() {
+                                                                @Override
+                                                                public void onCompleted() {}
+
+                                                                @Override
+                                                                public void onError(Throwable e) {}
+
+                                                                @Override
+                                                                public void onNext(ContactResult contactResult) {
+                                                                    startActivity(UserProfileActivity.callingIntent(context, contactResult.getUsername(), contactResult.getUserId(), contactResult.getContactName(), contactResult.isBlocked(), contactResult.getProfileDP()));
+                                                                }
+                                                            });
+                                                }
+                                            });
+                                    return true;
+                                });
+                                parent.addView(textView1);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setView(parent);
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
+                            }
                         });
                         blockedList.setAdapter(blockedContactsAdapter);
                     }

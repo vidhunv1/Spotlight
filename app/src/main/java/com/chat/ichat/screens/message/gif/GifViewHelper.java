@@ -38,7 +38,6 @@ import rx.schedulers.Schedulers;
  */
 public class GifViewHelper {
     Context mContext;
-
     private ViewGroup gifLayout;
     private View gifPickerLayout;
     private Window window;
@@ -141,13 +140,10 @@ public class GifViewHelper {
 
             search.setText("");
 
-            search.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if(hasFocus) {
-                        isSearchFocused = true;
-                        refreshView();
-                    }
+            search.setOnFocusChangeListener((v, hasFocus) -> {
+                if(hasFocus) {
+                    isSearchFocused = true;
+                    refreshView();
                 }
             });
 
@@ -185,7 +181,6 @@ public class GifViewHelper {
             gifLayout.setLayoutParams(layoutParams);
             gifLayout.requestFocus();
         } else {
-            Logger.d(this, "else");
             ViewGroup.LayoutParams layoutParams = gifLayout.getLayoutParams();
             layoutParams.height = composerViewHelper.getLayoutHeightpx();
             gifLayout.setLayoutParams(layoutParams);

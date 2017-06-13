@@ -588,7 +588,6 @@ public class MessageStore {
                     }
 
                     MessageResult.MessageStatus messageStatus = MessageResult.MessageStatus.valueOf(delivery);
-
                     MessageResult msg = new MessageResult(chatId, fromId, message);
                     msg.setMessageStatus(messageStatus);
                     msg.setTime(DateTime.parse(time));

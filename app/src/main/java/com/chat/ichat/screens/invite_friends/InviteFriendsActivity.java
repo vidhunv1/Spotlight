@@ -2,6 +2,7 @@ package com.chat.ichat.screens.invite_friends;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -63,6 +64,8 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
 
     InviteFriendsPresenter inviteFriendsPresenter;
     InviteFriendsAdapter inviteFriendsAdapter;
+
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, InviteFriendsActivity.class);
@@ -193,6 +196,9 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
 
     @Override
     public void displayInviteList(List<ContactResult> contactResultList) {
+        if(progressDialog[0].isShowing()) {
+            progressDialog[0].dismiss();
+        }
         inviteFriendsAdapter = new InviteFriendsAdapter(this, contactResultList, (phone, countryCode) -> {
             int size = inviteFriendsAdapter.getSelected().size();
             Logger.d(this, "onChecked total: "+size);
@@ -276,6 +282,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             case 102:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
+                    progressDialog[0].setMessage("Loading. Please wait...");
                     inviteFriendsPresenter.getInviteList();
                 } else {
                     //not granted

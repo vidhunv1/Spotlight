@@ -197,9 +197,7 @@ public class HomePresenter implements HomeContract.Presenter {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Subscriber<String>() {
                                 @Override
-                                public void onCompleted() {
-
-                                }
+                                public void onCompleted() {}
 
                                 @Override
                                 public void onError(Throwable e) {
@@ -235,20 +233,20 @@ public class HomePresenter implements HomeContract.Presenter {
                                                         c.setDisplayName(phoneContact.getName());
                                                         cr.add(c);
                                                     }
-                                                    contactStore.storeContacts(cr)
+                                                    contactStore.update(cr)
                                                             .subscribeOn(Schedulers.io())
                                                             .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribe(new Subscriber<Boolean>() {
+                                                            .subscribe(new Subscriber<ContactResult>() {
                                                                 @Override
-                                                                public void onCompleted() {}
+                                                                public void onCompleted() {
+                                                                    contactsView.onSyncSuccess();
+                                                                }
 
                                                                 @Override
                                                                 public void onError(Throwable e) {}
 
                                                                 @Override
-                                                                public void onNext(Boolean aBoolean) {
-                                                                    contactsView.onSyncSuccess();
-                                                                }
+                                                                public void onNext(ContactResult aBoolean) {}
                                                             });
                                                 }
                                             });

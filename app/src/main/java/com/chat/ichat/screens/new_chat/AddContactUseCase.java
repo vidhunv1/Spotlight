@@ -102,6 +102,7 @@ public class AddContactUseCase {
                                                 e.printStackTrace();
                                             }
                                             Logger.d(this, "b4 contactstore");
+
                                             contactStore.storeContact(contactResult).subscribe(new Subscriber<Boolean>() {
                                                 @Override
                                                 public void onCompleted() {}

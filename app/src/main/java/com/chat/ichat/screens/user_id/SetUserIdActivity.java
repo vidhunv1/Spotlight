@@ -93,12 +93,11 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<UserResponse>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -252,9 +251,7 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new Subscriber<UserResponse>() {
                                     @Override
-                                    public void onCompleted() {
-
-                                    }
+                                    public void onCompleted() {}
 
                                     @Override
                                     public void onError(Throwable e) {
