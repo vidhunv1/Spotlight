@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chat.ichat.R;
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.models.ContactResult;
 
 import java.util.ArrayList;
@@ -25,11 +26,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
     private ClickListener clickListener;
     private List<ContactResult> contacts;
     private List<Boolean> checked;
-    public InviteFriendsAdapter(Context context, List<ContactResult> contactResults, ClickListener clickListener) {
+    public InviteFriendsAdapter(Context context, ClickListener clickListener) {
         this.context = context;
         this.clickListener = clickListener;
-        this.contacts = contactResults;
+        this.contacts = new ArrayList<>();
         this.checked = new ArrayList<>();
+    }
+
+    public void setList(List<ContactResult> cl) {
+        Logger.d(this, "InviteAdapterSize: "+cl.size());
+        contacts.clear();
+        contacts.addAll(cl);
         int checkedDefault = contacts.size()/12;
         for (int i = 0; i < contacts.size(); i++) {
             if(checkedDefault==0 || i%checkedDefault == 0) {
@@ -38,6 +45,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 checked.add(false);
             }
         }
+        this.notifyDataSetChanged();
     }
 
     public String getFirstChar(int position) {

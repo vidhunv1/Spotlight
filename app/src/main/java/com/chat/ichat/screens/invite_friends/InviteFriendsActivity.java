@@ -33,6 +33,7 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.user_id.SetUserIdActivity;
 
 import java.util.List;
 
@@ -122,6 +123,13 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(0xff212121);
         }
+
+        inviteFriendsAdapter = new InviteFriendsAdapter(this, (phone, countryCode) -> {
+            int size = inviteFriendsAdapter.getSelected().size();
+            Logger.d(this, "onChecked total: "+size);
+            setInviteCount(size);
+        });
+        contactList.setAdapter(inviteFriendsAdapter);
     }
 
     @Override
@@ -196,15 +204,12 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
 
     @Override
     public void displayInviteList(List<ContactResult> contactResultList) {
-        if(progressDialog[0].isShowing()) {
+        Logger.d(this, "Invite List: "+contactResultList.size());
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
-        inviteFriendsAdapter = new InviteFriendsAdapter(this, contactResultList, (phone, countryCode) -> {
-            int size = inviteFriendsAdapter.getSelected().size();
-            Logger.d(this, "onChecked total: "+size);
-            setInviteCount(size);
-        });
-        contactList.setAdapter(inviteFriendsAdapter);
+
+        inviteFriendsAdapter.setList(contactResultList);
         setInviteCount(inviteFriendsAdapter.getSelected().size());
         RecyclerView.LayoutManager layoutManager = contactList.getLayoutManager();
         contactList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -282,7 +287,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             case 102:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
-                    progressDialog[0].setMessage("Loading. Please wait...");
+                    progressDialog[0] = ProgressDialog.show(InviteFriendsActivity.this, "", "Loading. Please wait...", true);
                     inviteFriendsPresenter.getInviteList();
                 } else {
                     //not granted
