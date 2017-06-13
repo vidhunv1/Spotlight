@@ -731,27 +731,66 @@ public class MessageActivity extends BaseActivity
             });
 
             audioButton.setOnClickListener(v -> {
-                shouldHandleBack = true;
-                emojiViewHelper.reset();
-                galleryViewHelper.reset();
-                gifViewHelper.reset();
-                audioViewHelper.audioButtonToggle();
-                if(!audioViewHelper.isAudioState()) {
-                    setComposerSelected(4);
+                int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO);
+                int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                int permission = PackageManager.PERMISSION_GRANTED;
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    if (!(perm1 == permission && perm2 == permission)) {
+                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
+                    } else {
+                        shouldHandleBack = true;
+                        emojiViewHelper.reset();
+                        galleryViewHelper.reset();
+                        gifViewHelper.reset();
+                        audioViewHelper.audioButtonToggle();
+                        if(!audioViewHelper.isAudioState()) {
+                            setComposerSelected(4);
+                        }
+                    }
+                } else {
+                    shouldHandleBack = true;
+                    emojiViewHelper.reset();
+                    galleryViewHelper.reset();
+                    gifViewHelper.reset();
+                    audioViewHelper.audioButtonToggle();
+                    if(!audioViewHelper.isAudioState()) {
+                        setComposerSelected(4);
+                    }
                 }
             });
 
             galleryButton.setOnClickListener(v -> {
-                shouldHandleBack = true;
-                audioViewHelper.reset();
-                emojiViewHelper.reset();
-                gifViewHelper.reset();
-                galleryViewHelper.galleryButtonToggle();
-                if(!galleryViewHelper.isGalleryState()) {
-                    setComposerSelected(2);
-                    galleryViewHelper.setListener(openGalleryClickListener);
+                int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+                int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                int permission = PackageManager.PERMISSION_GRANTED;
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    if (!(perm1 == permission && perm2 == permission)) {
+                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 102);
+                    } else {
+                        shouldHandleBack = true;
+                        audioViewHelper.reset();
+                        emojiViewHelper.reset();
+                        gifViewHelper.reset();
+                        galleryViewHelper.galleryButtonToggle();
+                        if(!galleryViewHelper.isGalleryState()) {
+                            setComposerSelected(2);
+                            galleryViewHelper.setListener(openGalleryClickListener);
+                        } else {
+                            galleryViewHelper.removeListener();
+                        }
+                    }
                 } else {
-                    galleryViewHelper.removeListener();
+                    shouldHandleBack = true;
+                    audioViewHelper.reset();
+                    emojiViewHelper.reset();
+                    gifViewHelper.reset();
+                    galleryViewHelper.galleryButtonToggle();
+                    if(!galleryViewHelper.isGalleryState()) {
+                        setComposerSelected(2);
+                        galleryViewHelper.setListener(openGalleryClickListener);
+                    } else {
+                        galleryViewHelper.removeListener();
+                    }
                 }
             });
 
