@@ -9,12 +9,17 @@ import com.chat.ichat.core.BaseView;
 
 public interface SignUpContract {
     interface View extends BaseView {
-        void navigateToSetUserID();
-        void showVerifyingOtp(String verificationUUID);
+//        void navigateToSetUserID();
+//        void showVerifyingOtp(String verificationUUID);
+        void onUserRegistered();
+        void showUserIdAvailable(String userId, boolean isAvailable);
+        void navigateToHome();
     }
 
     interface Presenter extends BasePresenter<SignUpContract.View> {
-        void registerUser(String fullName, String email, String password, String countryCode, String mobile, String imei);
-        void verifyOTP(String countryCode, String phone, String verificationCode, String verificationUUID);
+        void registerUser(String fullName, String email, String password, String countryCode, String mobile, String userId, String imei);
+        void checkUserIdAvailable(String userId);
+        void initialize();
+//        void verifyOTP(String countryCode, String phone, String verificationCode, String verificationUUID);
     }
 }

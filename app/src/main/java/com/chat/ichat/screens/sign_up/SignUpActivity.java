@@ -26,14 +26,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.api.StatusResponse;
+import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.config.AnalyticsContants;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.ContactsContent;
+import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.VerifyOtpActivity;
+import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
@@ -47,54 +56,50 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import swarajsaaj.smscodereader.interfaces.OTPListener;
 import swarajsaaj.smscodereader.receivers.OtpReader;
 
-public class SignUpActivity extends AppCompatActivity implements SignUpContract.View, OTPListener {
+public class SignUpActivity extends AppCompatActivity implements SignUpContract.View {
     @Bind(R.id.tb_sign_up)
     Toolbar toolbar;
 
     @Bind(R.id.sign_up_name)
     EditText nameET;
-
     @Bind(R.id.sign_up_password)
     EditText passwordET;
-
     @Bind(R.id.sign_up_mobile_number)
     EditText mobileNumberET;
-
-    @Bind(R.id.sign_up_tilMobile)
-    TextInputLayout mobileTIL;
-
-    @Bind(R.id.sign_up_tilName)
-    TextInputLayout nameTIL;
-
-    @Bind(R.id.sign_up_tilPassword)
-    TextInputLayout passwordTIL;
+    @Bind(R.id.sign_up_userid)
+    EditText useridET;
 
     @Bind(R.id.sign_up_btn)
     Button signupButton;
 
     @Bind(R.id.sign_up_name_divider)
     View nameDivider;
-
     @Bind(R.id.sign_up_password_divider)
     View passwordDivider;
-
     @Bind(R.id.sign_up_mobile_divider)
     View mobileDivider;
+    @Bind(R.id.sign_up_userid_divider)
+    View useridDivider;
 
     @Bind(R.id.full_name_error)
     TextView nameErrorView;
-
     @Bind(R.id.password_error)
     TextView passwordErrorView;
-
     @Bind(R.id.mobile_error)
     TextView mobileErrorView;
+    @Bind(R.id.userid_error)
+    TextView useridErrorView;
 
-    @Bind(R.id.sign_up_country_code)
-    EditText countryCodeView;
+    @Bind(R.id.pb_checking_userid)
+    ProgressBar userIdPB;
+    @Bind(R.id.iv_wrong_userid)
+    ImageView wrongUserIdIV;
 
     private String accountEmail = "";
 
@@ -106,12 +111,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     private String countryCode;
     private String mobile;
-    private String verificationUUID;
+
+    private String lastValidUserId = null;
 
     private FirebaseAnalytics firebaseAnalytics;
     private final String SCREEN_NAME = "signup";
-
-    private boolean isInFront = false;
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
@@ -131,19 +135,10 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(),
+                new ContactsContent(this),
+                ApiManager.getPhoneContactsApi(),
                 UserSessionManager.getInstance(),
                 PreferenceManager.getDefaultSharedPreferences(this));
-
-        // Permissions
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            int permission = PackageManager.PERMISSION_GRANTED;
-            int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
-            int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-
-            if(!(result1==permission && result2 == permission)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
-            }
-        }
 
         TelephonyManager manager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         //getNetworkCountryIso
@@ -152,11 +147,10 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         for(int i=0;i<rl.length;i++){
             String[] g=rl[i].split(",");
             if(g[1].trim().equals(CountryID.trim())){
-                countryCodeView.setText("+"+g[0]);
+                this.countryCode = "+"+g[0];
                 break;
             }
         }
-        OtpReader.bind(this,"AUT");
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
@@ -181,7 +175,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     protected void onResume() {
         super.onResume();
         signUpPresenter.attachView(this);
-        isInFront = true;
 
         /*              Analytics           */
         firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
@@ -190,38 +183,116 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Override
     protected void onPause() {
         super.onPause();
-        isInFront = false;
     }
 
     @Override
-    public void navigateToSetUserID() {
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        if(isInFront) {
-            startActivity(SetUserIdActivity.callingIntent(this));
-            finish();
-        }
-    }
-
-    @Override
-    public void showVerifyingOtp(String verificationUUID) {
-        this.verificationUUID = verificationUUID;
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        if(hasReadSMSPermission()) {
-            progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Waiting for OTP. Please wait...", true);
+    public void onUserRegistered() {
+        if(hasReadContactPermission()) {
+            if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
+                progressDialog[0].dismiss();
+                progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Initializing...", true);
+            }
+            signUpPresenter.initialize();
         } else {
-            navigateToSetUserID();
+            navigateToHome();
         }
+    }
 
-        new Handler().postDelayed(this::navigateToSetUserID, 60000);
+    @Override
+    public void showUserIdAvailable(String userId, boolean isAvailable) {
+        Logger.d(this, "UserIdAvailable: "+userId+", "+isAvailable);
+        if(useridET.getText().toString().equals(userId)) {
+            userIdPB.setVisibility(View.INVISIBLE);
+            if (isAvailable) {
+                lastValidUserId = userId;
+                useridErrorView.setVisibility(View.INVISIBLE);
+                wrongUserIdIV.setVisibility(View.VISIBLE);
+                wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_correct));
+            } else {
+                useridErrorView.setVisibility(View.VISIBLE);
+                wrongUserIdIV.setVisibility(View.VISIBLE);
+                wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
+                useridErrorView.setText("User ID taken");
+            }
+        }
+    }
+
+    @Override
+    public void navigateToHome() {
+        Context context = this;
+
+        ApiManager.getAppApi().appInit()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<StatusResponse>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startActivity(HomeActivity.callingIntent(context,0,null));
+                        finish();
+                    }
+
+                    @Override
+                    public void onNext(StatusResponse statusResponse) {
+                        ApiManager.getUserApi().findUserByUserId("teamichat")
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<UserResponse>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onNext(UserResponse userResponse) {
+                                        ContactResult contactResult1 = new ContactResult();
+                                        contactResult1.setUserId(userResponse.getUser().getUserId());
+                                        contactResult1.setContactName(userResponse.getUser().getName());
+                                        contactResult1.setUsername(userResponse.getUser().getUsername());
+                                        contactResult1.setAdded(true);
+                                        contactResult1.setBlocked(false);
+                                        contactResult1.setUserType(userResponse.getUser().getUserType());
+                                        contactResult1.setProfileDP(userResponse.getUser().getProfileDP());
+
+                                        ContactStore.getInstance().storeContact(contactResult1)
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Subscriber<Boolean>() {
+                                                    @Override
+                                                    public void onCompleted() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                                        finish();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(Boolean aBoolean) {
+                                                        Logger.d(this, "Added: "+contactResult1.toString());
+                                                        startActivity(HomeActivity.callingIntent(context,0,null));
+                                                        finish();
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
+
     }
 
     @Override
     public void showError(String title, String message) {
-        if(progressDialog[0].isShowing()) {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
         Logger.d(this, "Error: "+title+", "+message);
@@ -234,7 +305,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnTextChanged(R.id.sign_up_password)
     public void onPasswordTextChanged() {
-
         if(isPasswordValid(passwordET.getText())) {
             passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             passwordErrorView.setVisibility(View.INVISIBLE);
@@ -280,6 +350,40 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         }
     }
 
+    @OnTextChanged(R.id.sign_up_userid)
+    public void onUserIdTextChanged() {
+        CharSequence userid = useridET.getText();
+        useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        useridErrorView.setVisibility(View.INVISIBLE);
+        wrongUserIdIV.setVisibility(View.INVISIBLE);
+        userIdPB.setVisibility(View.INVISIBLE);
+        if(userid.length()>0) {
+            if (isUserIdValid(userid)) {
+                userIdPB.setVisibility(View.VISIBLE);
+                signUpPresenter.checkUserIdAvailable(useridET.getText().toString());
+            } else if (userid.length() < 6) {
+                wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
+                useridErrorView.setVisibility(View.VISIBLE);
+                wrongUserIdIV.setVisibility(View.VISIBLE);
+                useridErrorView.setText("User ID must have atleast 6 characters.");
+            } else {
+                wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
+                useridErrorView.setVisibility(View.VISIBLE);
+                wrongUserIdIV.setVisibility(View.VISIBLE);
+                useridErrorView.setText("This User ID is invalid.");
+            }
+        }
+    }
+
+    @OnFocusChange(R.id.sign_up_userid)
+    public void onUseridFocusChanged() {
+        if(useridET.isFocused()) {
+            useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else {
+            useridDivider.setBackgroundColor(Color.parseColor(dividerColor));
+        }
+    }
+
     @OnClick(R.id.sign_up_btn)
     public void onSignUpClicked() {
         if(!isNameValid(nameET.getText())) {
@@ -288,9 +392,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             alertDialog.setMessage("\nPlease enter your full name");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
-
             nameET.requestFocus();
-
             nameErrorView.setVisibility(View.VISIBLE);
             nameErrorView.setText("Please enter your full name");
             nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
@@ -325,8 +427,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             return;
         }
 
-        if (!hasReadSMSPermission()) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS}, 102);
+        if (!hasReadContactPermission()) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
         } else {
             registerUser();
         }
@@ -336,8 +438,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     private void registerUser() {
         String imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         this.mobile = mobileNumberET.getText().toString();
-        this.countryCode = countryCodeView.getText().toString();
-        signUpPresenter.registerUser(nameET.getText().toString(), accountEmail, passwordET.getText().toString(), this.countryCode, this.mobile, imei);
+        if(lastValidUserId!=null && lastValidUserId.equals(useridET.getText().toString())) {
+            signUpPresenter.registerUser(nameET.getText().toString(), accountEmail, passwordET.getText().toString(), this.countryCode, this.mobile, lastValidUserId, imei);
+        } else {
+            showError("Invalid UserId", "Please enter a valid User ID.");
+        }
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
     }
 
@@ -364,13 +469,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         return "";
     }
 
-    public boolean hasReadSMSPermission() {
+    public boolean hasReadContactPermission() {
         int permission = PackageManager.PERMISSION_GRANTED;
-        int result3 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
-        int result4 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1)
-            return (result3 == permission && result4 == permission);
-        return true;
+        int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || (result1 == permission && result2 == permission);
     }
 
     @Override
@@ -380,13 +483,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
                     accountEmail = getEmailAddress();
-                } else {
-                    //not granted
-                }
-                break;
-            case 102:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //granted
                     registerUser();
                 } else {
                     //not granted
@@ -398,23 +494,13 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         }
     }
 
-    @Override
-    public void otpReceived(String messageText) {
-        Logger.d(this, "OTP MESSAGE: "+messageText);
+    private boolean isUserIdValid(CharSequence userId) {
+        return userId.length()>=6 && !hasIllegalChars(userId);
+    }
 
-        Pattern pattern = Pattern.compile("(\\d{4,6})");
-
-        Matcher matcher = pattern.matcher(messageText);
-        String val = "";
-        if (matcher.find()) {
-            val = matcher.group(1);
-
-            if(progressDialog[0].isShowing()) {
-                progressDialog[0].dismiss();
-            }
-            if(isInFront)
-                progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Verifying OTP...", true);
-            signUpPresenter.verifyOTP(countryCode, mobile, val, verificationUUID);
-        }
+    private boolean hasIllegalChars(CharSequence userId) {
+        Pattern pattern = Pattern.compile("^[A-Z0-9a-z_]+$");
+        Matcher matcher = pattern.matcher(userId);
+        return !matcher.find();
     }
 }

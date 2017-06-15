@@ -299,6 +299,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
                             if(progressDialog[0].isShowing())
                                 progressDialog[0].dismiss();
                             progressDialog[0] = ProgressDialog.show(context, "", "Searching...", true);
+                            progressDialog[0].setCancelable(true);
                         } else {
                             Logger.d(this, "Null Location: ");
                             double latitude = Double.longBitsToDouble(sharedPreferences.getLong("latitude", -99999999));

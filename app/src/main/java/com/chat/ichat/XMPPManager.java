@@ -3,6 +3,7 @@ package com.chat.ichat;
 import android.os.AsyncTask;
 
 import com.chat.ichat.config.AppConfig;
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.ReadReceiptExtension;
 
 import org.jivesoftware.smack.ConnectionConfiguration;

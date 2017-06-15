@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by vidhun on 16/10/16.
  */
-
 public class _User {
     public _User(String countryCode, String phone) {
         this.phone = phone;

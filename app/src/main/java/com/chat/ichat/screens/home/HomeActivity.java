@@ -30,11 +30,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -125,6 +127,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	private final String SCREEN_NAME = "home";
 	public static final String APP_PREFS_FILE = "app_prefs";
 	public static final String KEY_LAST_SYNC = "last_sync";
+	public static final String KEY_SHOW_PEOPLE_NEARBY_NOTE = "show_people_nearby_note";
 
 	private SharedPreferences sharedPreferences;
 
@@ -302,6 +305,29 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
+	public void showPeopleNearbyPopup() {
+		LayoutInflater inflater = (LayoutInflater) this.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+		View view =  inflater.inflate(R.layout.layout_people_nearby_popup, null, false);
+		CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkbox);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Note");
+
+		builder.setPositiveButton("OK", ((dialog, which) -> {
+			if(checkBox.isChecked()) {
+				sharedPreferences.edit().putBoolean(KEY_SHOW_PEOPLE_NEARBY_NOTE, true).apply();
+			}
+			startActivity(PeopleNearbyActivity.callingIntent(this));
+		}));
+
+		builder.setNegativeButton("Cancel", ((dialog, which) -> {}));
+
+		builder.setView(view);
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+
+		alertDialog.getWindow().setLayout((int)AndroidUtils.px(312), ViewGroup.LayoutParams.WRAP_CONTENT);
+	}
 
 	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
 		AndroidUtils.hideSoftInput(this);
@@ -396,7 +422,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@OnClick(R.id.nav_item_people_nearby)
 	public void onPeopleNearbyClicked() {
-		new Handler().postDelayed(() -> startActivity(PeopleNearbyActivity.callingIntent(this)), 250);
+		if(sharedPreferences.getBoolean(KEY_SHOW_PEOPLE_NEARBY_NOTE, true)) {
+			new Handler().postDelayed(this::showPeopleNearbyPopup, 250);
+		} else {
+			new Handler().postDelayed(() -> startActivity(PeopleNearbyActivity.callingIntent(this)), 250);
+		}
 		drawer.closeDrawer(GravityCompat.START, true);
 	}
 
