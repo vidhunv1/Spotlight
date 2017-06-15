@@ -5,5 +5,5 @@ package com.chat.ichat.screens.message;
  */
 
 public class Size {
-        int width, height;
+    int width, height;
 }

@@ -1,26 +1,46 @@
 package com.chat.ichat;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.LongSparseArray;
 
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.bot.BotResponse;
+import com.chat.ichat.api.message.MessageDataResponse;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
+import com.chat.ichat.application.SpotlightApplication;
+import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.NotificationController;
 import com.chat.ichat.core.ReadReceiptExtension;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.db.core.DatabaseManager;
+import com.chat.ichat.db.core.SQLiteContract;
+import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.models.ImageMessage;
+import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -33,14 +53,29 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
+import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
+import org.joda.time.DateTime;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -75,12 +110,7 @@ public class MessageService extends Service {
     static final public String ACTION_INTERNET_CONNECTION_STATUS = "com.stairway.spotlight.MessageService.INTERNET_CONNECTION_STATUS";
     static final public String CONNECTION_STATE = "com.stairway.spotlight.MessageService.INTERNET_CONNECTION_STATE";
 
-    private boolean isOnlineNotified = false;
-    private final int RETRY_OFFLINE = 1;
-    private final int RETRY_ONLINE = 3;
-    private int retryInterval = 2; //seconds
     private Timer networkTimer = null;
-    private Timer connectTimer = null;
 
     private MessageStore messageStore;
     private ContactStore contactStore;
@@ -94,10 +124,17 @@ public class MessageService extends Service {
     private ReceiptReceivedListener receiptReceivedListener;
     private RosterListener presenceStateListener;
     private ConnectionListener connectionListener;
+    private PingFailedListener pingFailedListener;
     private PingManager pingManager;
 
+    private boolean isConnectionAvailable = true;
+
     private LocalBroadcastManager broadcaster;
-    Roster roster;
+    private Roster roster;
+
+    private DatabaseManager databaseManager;
+
+    private LongSparseArray<MessageData> messageDatas;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -116,6 +153,11 @@ public class MessageService extends Service {
         this.botApi = ApiManager.getBotApi();
         connection = XMPPManager.getInstance().getConnection();
         broadcaster = LocalBroadcastManager.getInstance(this);
+        databaseManager = DatabaseManager.getInstance();
+        messageDatas = new LongSparseArray<>();
+
+        //init
+        broadcastConnectionStatus(false);
 
         this.receiptReceivedListener = (fromJid, toJid, deliveryReceiptId, stanza) -> {
             String chatId = XMPPManager.getUserNameFromJid(fromJid);
@@ -138,14 +180,10 @@ public class MessageService extends Service {
             }
 
             @Override
-            public void entriesUpdated(Collection<String> addresses) {
-
-            }
+            public void entriesUpdated(Collection<String> addresses) {}
 
             @Override
-            public void entriesDeleted(Collection<String> addresses) {
-
-            }
+            public void entriesDeleted(Collection<String> addresses) {}
 
             @Override
             public void presenceChanged(Presence presence) {
@@ -306,19 +344,31 @@ public class MessageService extends Service {
                         ReadReceiptExtension readReceiptExtension = (ReadReceiptExtension)readElement;
 
                         if(readReceiptExtension!=null) {
-                            broadcastDeliveryReceipt("", participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
 
-                            messageStore.updateAllMessageStatus(readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ)
-                                    .subscribe(new Subscriber<Boolean>() {
+                            messageStore.getMessage(readReceiptExtension.getLastMessageReceiptId())
+                                    .subscribe(new Subscriber<MessageResult>() {
                                         @Override
                                         public void onCompleted() {}
 
                                         @Override
-                                        public void onError(Throwable e) {}
+                                        public void onError(Throwable e) {
+                                            broadcastDeliveryReceipt("", participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
+                                        }
 
                                         @Override
-                                        public void onNext(Boolean aBoolean) {
-                                            // updated
+                                        public void onNext(MessageResult messageResult) {
+                                            broadcastDeliveryReceipt(messageResult.getMessageId(), participant, readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ);
+                                            messageStore.updateAllMessageStatus(readReceiptExtension.getLastMessageReceiptId(), MessageResult.MessageStatus.READ)
+                                                    .subscribe(new Subscriber<Boolean>() {
+                                                        @Override
+                                                        public void onCompleted() {}
+
+                                                        @Override
+                                                        public void onError(Throwable e) {}
+
+                                                        @Override
+                                                        public void onNext(Boolean aBoolean) {}
+                                                    });
                                         }
                                     });
                         }
@@ -331,10 +381,7 @@ public class MessageService extends Service {
             @Override
             public void connected(XMPPConnection connection) {
                 Logger.d(this, "[-]Connected XMPP");
-                Logger.d(this, "XMPP connected.");
-                retryInterval = RETRY_ONLINE;
                 broadcastConnectionStatus(true);
-                isOnlineNotified = true;
                 sendUnsentMessages();
             }
 
@@ -346,15 +393,18 @@ public class MessageService extends Service {
             @Override
             public void connectionClosed() {
                 Logger.d(this, "[-]ConnectionClosed");
+                broadcastConnectionStatus(false);
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
                 Logger.d(this, "[-]connectionClosedOnError");
+                broadcastConnectionStatus(false);
             }
             @Override
             public void reconnectionSuccessful() {
                 Logger.d(this, "[-]reconnectionSuccessful");
+                broadcastConnectionStatus(true);
 
             }
             @Override
@@ -367,10 +417,18 @@ public class MessageService extends Service {
             }
         };
 
-        pingManager = PingManager.getInstanceFor(connection);
+        connection.addConnectionListener(connectionListener);
+
+        this.pingFailedListener = new PingFailedListener() {
+            @Override
+            public void pingFailed() {
+                connection.disconnect();
+                Logger.d(this, "[-]Ping failed");
+                broadcastConnectionStatus(false);
+            }
+        };
 
         ChatManager.getInstanceFor(connection).addChatListener(this.chatListener);
-        connection.addConnectionListener(connectionListener);
         DeliveryReceiptManager.getInstanceFor(connection)
                 .addReceiptReceivedListener(receiptReceivedListener);
         roster = Roster.getInstanceFor(connection);
@@ -378,12 +436,16 @@ public class MessageService extends Service {
         roster.addRosterListener(presenceStateListener);
 
         networkTimer = new Timer();
-        connectTimer = new Timer();
-        networkTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  retryInterval* 1000);
+        networkTimer.scheduleAtFixedRate(new TryXMPPConnection(), 0,  3* 1000);
+        pingManager = PingManager.getInstanceFor(connection);
+        pingManager.setPingInterval(5);
+        pingManager.registerPingFailedListener(pingFailedListener);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Logger.d(this, "onStartCommand");
+        sendUnsentMessages();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -396,6 +458,7 @@ public class MessageService extends Service {
         DeliveryReceiptManager.getInstanceFor(connection).removeReceiptReceivedListener(receiptReceivedListener);
         Roster.getInstanceFor(connection).removeRosterListener(presenceStateListener);
         connection.removeConnectionListener(connectionListener);
+        pingManager.unregisterPingFailedListener(pingFailedListener);
 
         try {
             connection.disconnect(new Presence(Presence.Type.unavailable));
@@ -406,68 +469,6 @@ public class MessageService extends Service {
         super.onDestroy();
     }
 
-//    class CheckConnection extends TimerTask {
-//        @Override
-//        public void run() {
-//            checkConnection();
-//        }
-//    }
-//
-//    private boolean checkConnection() {
-//        try {
-//            if(pingManager.pingMyServer()) {
-//                connectTimer.cancel();
-//                Logger.d(this, "Ping true. ");
-//                if(ForegroundDetector.getInstance().isForeground()) {
-//                    try {
-//                        if(!connection.isConnected()) {
-//                            connection.connect();
-//                            sendUnsentMessages();
-//                        }
-//                    } catch (SmackException e) {
-//                        e.printStackTrace();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    } catch (XMPPException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Logger.d(this, "Disconnect");
-//                    connection.disconnect(new Presence(Presence.Type.unavailable));
-//                }
-//            } else {
-//                Logger.d(this, "Ping false. ");
-//                connection.disconnect();
-//            }
-//        } catch (SmackException.NotConnectedException e) {
-//            connectTimer = new Timer();
-//            connectTimer.scheduleAtFixedRate(new TryConnect(), 0, 500);
-//            e.printStackTrace();
-//        }
-//        return true;
-//    }
-//
-//    class TryConnect extends TimerTask {
-//        @Override
-//        public void run() {
-//            tryConnect();
-//        }
-//    }
-//
-//    private boolean tryConnect() {
-//        Logger.d(this, "Try Connect");
-//        try {
-//            connection.connect();
-//        } catch (SmackException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (XMPPException e) {
-//            e.printStackTrace();
-//        }
-//        return true;
-//    }
-
     class TryXMPPConnection extends TimerTask{
         @Override
         public void run() {
@@ -476,17 +477,13 @@ public class MessageService extends Service {
     }
 
     private boolean tryConnect() {
-        // TODO: BUGGY
         if(ForegroundDetector.getInstance().isForeground()) {
-            if(!XMPPManager.getInstance().getConnection().isConnected() && XMPPManager.getInstance().getConnection().isConnected()) {
-                connection = XMPPManager.getInstance().getConnection();
+            if(!isNetworkOnline() || !XMPPManager.getInstance().getConnection().isConnected()) {
+                if(isNetworkOnline())
+                    connection = XMPPManager.getInstance().getConnection();
+                broadcastConnectionStatus(false);
             } else {
-                if(!isOnlineNotified) {
-                    retryInterval = RETRY_ONLINE;
-                    broadcastConnectionStatus(true);
-                    isOnlineNotified = true;
-                    sendUnsentMessages();
-                }
+                broadcastConnectionStatus(true);
             }
         } else {
             try {
@@ -498,43 +495,279 @@ public class MessageService extends Service {
         return true;
     }
 
-
     private void sendUnsentMessages() {
         //send unsent messages
-        Logger.d(this, " sending unsentMsgs");
-        messageStore.getUnsentMessages()
-                .subscribe(new Subscriber<MessageResult>() {
-                    @Override
-                    public void onCompleted() {}
-                    @Override
-                    public void onError(Throwable e) {}
-                    @Override
-                    public void onNext(MessageResult messageResult) {
-                        messageApi.sendMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
-                            @Override
-                            public void onCompleted() {}
-                            @Override
-                            public void onError(Throwable e) {}
-
-                            @Override
-                            public void onNext(MessageResult messageResult) {
-                                messageStore.updateMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
-                                    @Override
-                                    public void onCompleted() {}
-                                    @Override
-                                    public void onError(Throwable e) {}
-
-                                    @Override
-                                    public void onNext(MessageResult messageResult) {
-                                        Logger.d(this, "Unsent message sent: "+messageResult.toString());
-                                        broadcastDeliveryReceipt(messageResult.getMessageId(), messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+        getMessagesFromStore();
+        sendCacheMessages();
     }
+
+    private void getMessagesFromStore() {
+        Logger.d(this, "sending unsentMsgs");
+
+        SQLiteDatabase db = databaseManager.openConnection();
+
+        String selection = SQLiteContract.MessagesContract.COLUMN_MESSAGE_STATUS + "=?";
+
+        String[] selectionArgs = {MessageResult.MessageStatus.NOT_SENT.name()};
+        String[] columns = {
+                SQLiteContract.MessagesContract.COLUMN_CHAT_ID,
+                SQLiteContract.MessagesContract.COLUMN_FROM_ID,
+                SQLiteContract.MessagesContract.COLUMN_MESSAGE,
+                SQLiteContract.MessagesContract.COLUMN_MESSAGE_STATUS,
+                SQLiteContract.MessagesContract.COLUMN_ROW_ID,
+                SQLiteContract.MessagesContract.COLUMN_CREATED_AT};
+
+        try {
+            Cursor cursor = db.query(SQLiteContract.MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, "rowid ASC");
+            cursor.moveToFirst();
+            Logger.d(this, "MESSAGE:");
+            while(!cursor.isAfterLast()) {
+                String chatId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CHAT_ID));
+                String fromId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_FROM_ID));
+                String message = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_MESSAGE));
+                String delivery = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_MESSAGE_STATUS));
+                String messageId = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_ROW_ID));
+                String time = cursor.getString(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_CREATED_AT));
+                MessageResult.MessageStatus deliveryStatus = MessageResult.MessageStatus.valueOf(delivery);
+                if(deliveryStatus != MessageResult.MessageStatus.NOT_SENT)
+                    continue;
+
+                long mess = cursor.getLong(cursor.getColumnIndex(SQLiteContract.MessagesContract.COLUMN_ROW_ID));
+                MessageResult msg = new MessageResult(chatId, fromId, message);
+                msg.setMessageStatus(deliveryStatus);
+                msg.setTime(DateTime.parse(time));
+                msg.setMessageId(messageId);
+
+
+                MessageData messageData = new MessageData(msg, mess);
+                MessageData t = messageDatas.get(mess);
+
+                if(t==null ||  !t.isOpen()) {
+                    messageDatas.put(mess, messageData);
+                }
+                cursor.moveToNext();
+            }
+            cursor.close();
+            databaseManager.closeConnection();
+        } catch (Exception e) {
+            Logger.e(this, "MessageStore sqlite error: getUnsentMessages()-"+e.getMessage());
+            databaseManager.closeConnection();
+        }
+    }
+
+    public void sendCacheMessages() {
+        for(int i = 0; i < messageDatas.size(); i++) {
+            long key = messageDatas.keyAt(i);
+            // get the object by the key.
+            MessageData messageData = messageDatas.get(key);
+
+            MessageResult messageResult = messageData.openAndGet();
+            if(messageResult==null)
+                continue;
+
+            Message parseMessage = GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class);
+
+            if(parseMessage.getMessageType() == Message.MessageType.image) {
+                if(parseMessage.getImageMessage().getImageUrl() == null || parseMessage.getImageMessage().getImageUrl().isEmpty()) {
+                    uploadImage(parseMessage.getImageMessage().getFileUri(), messageResult.getChatId())
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(new Subscriber<MessageDataResponse>() {
+                                @Override
+                                public void onCompleted() {}
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    messageDatas.put(messageData.getMessageId(), messageData.close());
+                                }
+
+                                @Override
+                                public void onNext(MessageDataResponse dataResponse) {
+                                    Message m = new Message();
+                                    ImageMessage imageMessage = new ImageMessage();
+                                    imageMessage.setImageUrl(dataResponse.getDataUrl());
+                                    imageMessage.setFileUri(parseMessage.getImageMessage().getFileUri());
+                                    m.setImageMessage(imageMessage);
+                                    messageResult.setMessage(GsonProvider.getGson().toJson(m));
+                                    messageStore.updateMessage(messageResult)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeOn(Schedulers.io())
+                                            .subscribe(new Subscriber<MessageResult>() {
+                                                @Override
+                                                public void onCompleted() {}
+
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    e.printStackTrace();
+                                                    messageDatas.put(messageData.getMessageId(), messageData.close());
+                                                }
+
+                                                @Override
+                                                public void onNext(MessageResult messageResult) {
+                                                    sendMessage(messageResult, messageData.getMessageId());
+                                                }
+                                            });
+                                }
+                            });
+                } else {
+                    sendMessage(messageResult, messageData.getMessageId());
+                }
+            } else if(parseMessage.getMessageType() == Message.MessageType.audio) {
+                if(parseMessage.getAudioMessage().getAudioUrl() == null || parseMessage.getAudioMessage().getAudioUrl().isEmpty()) {
+                    uploadAudio(parseMessage.getAudioMessage().getFileUri())
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(new Subscriber<MessageDataResponse>() {
+                                @Override
+                                public void onCompleted() {}
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    messageDatas.put(messageData.getMessageId(), messageData.close());
+                                }
+
+                                @Override
+                                public void onNext(MessageDataResponse dataResponse) {
+                                    Message m = new Message();
+                                    AudioMessage audioMessage1 = new AudioMessage();
+                                    audioMessage1.setAudioUrl(dataResponse.getDataUrl());
+                                    audioMessage1.setFileUri(parseMessage.getAudioMessage().getFileUri());
+                                    m.setAudioMessage(audioMessage1);
+                                    messageResult.setMessage(GsonProvider.getGson().toJson(m));
+                                    messageStore.updateMessage(messageResult)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeOn(Schedulers.io())
+                                            .subscribe(new Subscriber<MessageResult>() {
+                                                @Override
+                                                public void onCompleted() {}
+
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    e.printStackTrace();
+                                                    messageDatas.put(messageData.getMessageId(), messageData.close());
+                                                }
+
+                                                @Override
+                                                public void onNext(MessageResult messageResult) {
+                                                    sendMessage(messageResult, messageData.getMessageId());
+                                                }
+                                            });
+                                }
+                            });
+                } else {
+                    sendMessage(messageResult, messageData.getMessageId());
+                }
+            } else {
+                sendMessage(messageResult, messageData.getMessageId());
+            }
+        }
+    }
+
+    private void sendMessage(MessageResult messageResult, long messageId) {
+        Logger.d(this, "sending message: "+messageResult.toString());
+        messageApi.sendMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+            @Override
+            public void onCompleted() {}
+            @Override
+            public void onError(Throwable e) {
+                messageDatas.put(messageId, messageDatas.get(messageId).close());
+            }
+
+            @Override
+            public void onNext(MessageResult messageResult) {
+                if(messageResult.getMessageStatus() != MessageResult.MessageStatus.NOT_SENT) {
+                    messageStore.updateMessage(messageResult).subscribe(new Subscriber<MessageResult>() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {
+                            messageDatas.put(messageId, messageDatas.get(messageId).close());
+                        }
+
+                        @Override
+                        public void onNext(MessageResult messageResult) {
+                            messageDatas.remove(messageId);
+                            broadcastDeliveryReceipt(messageResult.getMessageId(), messageResult.getChatId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+                        }
+                    });
+                } else {
+                    messageDatas.put(messageId, messageDatas.get(messageId).close());
+                }
+            }
+        });
+    }
+
+    private Observable<MessageDataResponse> uploadImage(String fileUri, String userId) {
+        File image = saveBitmapToFile(new File(fileUri));
+        Logger.d(this, "File size(MB): "+image.length()/(1024*1024));
+        String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        int i = image.getName().lastIndexOf('.');
+        if (i > 0) {
+            filename = filename + "_" + userId+ image.getName().substring(i);
+        } else {
+            filename = filename + "." + image.getName();
+        }
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), image);
+        MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("image", filename, requestBody);
+        return ApiManager.getMessageApi().uploadImageData(imageFileBody);
+    }
+
+    private Observable<MessageDataResponse> uploadAudio(String fileUri) {
+        File image = new File(fileUri);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String filename = timeStamp;
+        int i = image.getName().lastIndexOf('.');
+        if (i > 0) {
+            filename = filename + image.getName().substring(i);
+        } else {
+            filename = filename + "." + image.getName();
+        }
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), image);
+        MultipartBody.Part audioFileBody = MultipartBody.Part.createFormData("audio", filename, requestBody);
+        return ApiManager.getMessageApi().uploadAudioData(audioFileBody);
+    }
+
+    public File saveBitmapToFile(File file){
+        try {
+            // BitmapFactory options to downsize the image
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            o.inSampleSize = 6;
+            // factor of downsizing the image
+
+            FileInputStream inputStream = new FileInputStream(file);
+            //Bitmap selectedBitmap = null;
+            BitmapFactory.decodeStream(inputStream, null, o);
+            inputStream.close();
+
+            // The new size we want to scale to
+            final int REQUIRED_SIZE=75;
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            inputStream = new FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
+            inputStream.close();
+
+            // here i override the original image file
+            file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , outputStream);
+
+            return file;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     private void storeAndbroadcastReceivedMessage(MessageResult messageId, ContactResult from) {
         messageStore.storeMessage(messageId).subscribe(new Subscriber<MessageResult>() {
@@ -576,9 +809,16 @@ public class MessageService extends Service {
     }
 
     private void broadcastConnectionStatus(boolean isAvailable) {
-        Intent intent = new Intent(ACTION_INTERNET_CONNECTION_STATUS);
-        intent.putExtra(CONNECTION_STATE, isAvailable);
-        broadcaster.sendBroadcast(intent);
+        if(isAvailable)
+            sendCacheMessages();
+        if(!isConnectionAvailable && isAvailable || isConnectionAvailable && !isAvailable) {
+            sendUnsentMessages();
+            isConnectionAvailable = isAvailable;
+            Logger.d(this, "[-]BroadCastConnection status: "+isConnectionAvailable);
+            Intent intent = new Intent(ACTION_INTERNET_CONNECTION_STATUS);
+            intent.putExtra(CONNECTION_STATE, isAvailable);
+            broadcaster.sendBroadcast(intent);
+        }
     }
 
     private void broadcastPresenceState(String jid, Presence.Type type) {
@@ -586,5 +826,64 @@ public class MessageService extends Service {
         intent.putExtra(XMPP_RESULT_PRESENCE_TYPE, type);
         intent.putExtra(XMPP_RESULT_PRESENCE_FROM, XMPPManager.getUserNameFromJid(jid));
         broadcaster.sendBroadcast(intent);
+    }
+
+    public static boolean isNetworkOnline() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) SpotlightApplication.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+            if (netInfo != null && (netInfo.isConnectedOrConnecting() || netInfo.isAvailable())) {
+                return true;
+            }
+
+            netInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                return true;
+            } else {
+                netInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return true;
+        }
+        return false;
+    }
+
+    public class MessageData {
+        private MessageResult messageResult;
+        private AtomicInteger counter ;
+        private long messageId;
+
+        public MessageData(MessageResult messageResult, long messageId) {
+            this.messageResult = messageResult;
+            this.counter = new AtomicInteger(0);
+            this.messageId = messageId;
+        }
+
+        public synchronized MessageResult openAndGet() {
+            if(counter.intValue() == 0) {
+                counter.incrementAndGet();
+                return messageResult;
+            }
+            return null;
+        }
+
+        public boolean isOpen() {
+            return counter.intValue() == 1;
+        }
+
+        public synchronized MessageData close() {
+            if(counter.intValue() == 1) {
+                counter.decrementAndGet();
+            }
+            return MessageData.this;
+        }
+
+        public long getMessageId() {
+            return messageId;
+        }
     }
 }

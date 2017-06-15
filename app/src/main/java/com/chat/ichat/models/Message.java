@@ -119,7 +119,11 @@ public class Message {
                 return "Location";
             }
         } else if(getMessageType() == MessageType.image) {
-            return "Image";
+            if(getImageMessage().getDataType() == ImageMessage.ImageType.gif) {
+                return "GIF";
+            } else {
+                return "Image";
+            }
         } else if(getMessageType() == MessageType.audio) {
             return "Voice clip";
         }

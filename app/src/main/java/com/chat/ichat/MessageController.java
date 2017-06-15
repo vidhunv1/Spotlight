@@ -143,11 +143,13 @@ public class MessageController {
                         });
                     }
                 } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
                     message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
                     subscriber.onNext(message);
                     Logger.e(this, "XMPP error: "+e);
                 }
                 catch (StreamManagementException.StreamManagementNotEnabledException e) {
+                    e.printStackTrace();
                     message.setMessageStatus(MessageResult.MessageStatus.NOT_SENT);
                     subscriber.onNext(message);
                     Logger.e(this, "Stream management not enabled");

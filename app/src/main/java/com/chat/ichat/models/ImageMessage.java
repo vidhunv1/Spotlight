@@ -15,6 +15,27 @@ public class ImageMessage {
     private String width;
     @SerializedName("height")
     private String height;
+    @SerializedName("data_type")
+    private ImageType dataType;
+
+    public static enum ImageType {
+        @SerializedName("gif")
+        gif,
+        @SerializedName("image")
+        image
+    }
+
+    public ImageMessage() {
+        this.dataType = ImageType.image;
+    }
+
+    public void setDataType(ImageType dataType) {
+        this.dataType = dataType;
+    }
+
+    public ImageType getDataType() {
+        return dataType;
+    }
 
     public String getImageUrl() {
         return imageUrl;

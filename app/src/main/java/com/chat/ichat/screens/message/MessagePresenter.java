@@ -266,20 +266,20 @@ public class MessagePresenter implements MessageContract.Presenter {
 
                     @Override
                     public void onCompleted() {
-                        sendMessageUseCase.execute(result)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Subscriber<MessageResult>() {
-                                    @Override
-                                    public void onCompleted() {}
-
-                                    @Override
-                                    public void onError(Throwable e) {}
-
-                                    @Override
-                                    public void onNext(MessageResult messageResult) {
-                                        messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
-                                    }
-                                });
+//                        sendMessageUseCase.execute(result)
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe(new Subscriber<MessageResult>() {
+//                                    @Override
+//                                    public void onCompleted() {}
+//
+//                                    @Override
+//                                    public void onError(Throwable e) {}
+//
+//                                    @Override
+//                                    public void onNext(MessageResult messageResult) {
+//                                        messageView.updateDeliveryStatus(messageResult.getMessageId(), messageResult.getReceiptId(), messageResult.getMessageStatus());
+//                                    }
+//                                });
                     }
                 });
         compositeSubscription.add(subscription);
@@ -562,7 +562,6 @@ public class MessagePresenter implements MessageContract.Presenter {
             return null;
         }
     }
-
 
     @Override
     public void sendReadReceipt(String chatId) {

@@ -16,7 +16,6 @@ import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 
 import java.io.IOException;
 import java.io.Serializable;
-
 /**
  * Created by vidhun on 26/07/16.
  */
@@ -41,6 +40,7 @@ public class XMPPManager implements Serializable {
         connection = new XMPPTCPConnection(config.build());
         connection.setUseStreamManagement(true);
         connection.setUseStreamManagementResumption(true);
+        connection.setPacketReplyTimeout(1500);
         XMPPTCPConnection.setUseStreamManagementDefault(true);
         XMPPTCPConnection.setUseStreamManagementResumptionDefault(true);
         DeliveryReceiptManager.getInstanceFor(this.getConnection()).setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
@@ -51,7 +51,6 @@ public class XMPPManager implements Serializable {
         if (instance == null) {
             throw new IllegalStateException();
         }
-
         return instance;
     }
 
@@ -116,47 +115,4 @@ public class XMPPManager implements Serializable {
     public String getChatId() {
         return userName;
     }
-
-//    public boolean isConnected() {
-//        return connection!=null;
-//    }
-
-//    public void setPresenceOnline() {
-//        Presence presenceOnline = new Presence(Presence.Type.available);
-//
-//        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                if(connection!=null)
-//                    try {
-//                        connection.sendStanza(presenceOnline);
-//                    } catch (SmackException.NotConnectedException e) {
-//                        e.printStackTrace();
-//                    }
-//                return null;
-//            }
-//        };
-//        connectionThread.execute();
-//    }
-//
-//    public void setPresenceOffline() {
-//        Presence presenceOffline = new Presence(Presence.Type.unavailable);
-//
-//        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                if(connection!=null)
-//                    try {
-//                        connection.sendStanza(presenceOffline);
-//                        if(isConnected())
-//                            connection.disconnect();
-//                    } catch (SmackException.NotConnectedException e) {
-//                        e.printStackTrace();
-////                        initConnection();
-//                    }
-//                return null;
-//            }
-//        };
-//        connectionThread.execute();
-//    }
 }

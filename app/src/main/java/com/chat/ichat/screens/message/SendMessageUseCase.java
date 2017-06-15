@@ -6,7 +6,6 @@ import com.chat.ichat.models.MessageResult;
 
 import rx.Observable;
 import rx.Subscriber;
-
 /**
  * Created by vidhun on 08/08/16.
  */

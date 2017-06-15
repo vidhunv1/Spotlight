@@ -248,7 +248,6 @@ public class GalleryViewHelper {
                     imageView.requestLayout();
                     done.setVisibility(View.GONE);
                 }
-
                 Glide.with(context).load(uri)
                         .centerCrop()
                         .crossFade()

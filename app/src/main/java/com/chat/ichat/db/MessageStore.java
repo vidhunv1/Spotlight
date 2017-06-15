@@ -165,6 +165,55 @@ public class MessageStore {
         });
     }
 
+    public Observable<MessageResult> getMessage(String receiptId) {
+        return Observable.create(subscriber -> {
+
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            String selection = MessagesContract.COLUMN_RECEIPT_ID + " = ? ";
+            String[] selectionArgs = {receiptId};
+            String[] columns = {
+                    MessagesContract.COLUMN_CHAT_ID,
+                    MessagesContract.COLUMN_FROM_ID,
+                    MessagesContract.COLUMN_MESSAGE,
+                    MessagesContract.COLUMN_MESSAGE_STATUS,
+                    MessagesContract.COLUMN_ROW_ID,
+                    MessagesContract.COLUMN_CREATED_AT,
+                    MessagesContract.COLUMN_RECEIPT_ID};
+
+            try{
+                Cursor cursor = db.query(MessagesContract.TABLE_NAME, columns, selection, selectionArgs, null, null, MessagesContract.COLUMN_CHAT_ID+" DESC");
+                cursor.moveToFirst();
+                if(!cursor.isAfterLast()) {
+                    String chatId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CHAT_ID));
+                    String fromId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_FROM_ID));
+                    String m = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE));
+                    String messageStatus = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_MESSAGE_STATUS));
+                    String messageId = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_ROW_ID));
+                    String time = cursor.getString(cursor.getColumnIndex(MessagesContract.COLUMN_CREATED_AT));
+
+                    MessageResult msg = new MessageResult(chatId, fromId, m);
+                    msg.setMessageStatus(MessageResult.MessageStatus.valueOf(messageStatus));
+                    msg.setTime(DateTime.parse(time));
+                    msg.setMessageId(messageId);
+                    msg.setReceiptId(receiptId);
+                    subscriber.onNext(msg);
+                    subscriber.onCompleted();
+                }
+                cursor.close();
+
+                databaseManager.closeConnection();
+            } catch (Exception e) {
+                Logger.e(this, "MessageStore sqlite error"+e.getMessage());
+                e.printStackTrace();
+                databaseManager.closeConnection();
+                subscriber.onError(e);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+
     // Get the last message for which read receipt is not sent.
     public Observable<MessageResult> getLastUnsentReceipt(String chatId) {
         return Observable.create(subscriber -> {

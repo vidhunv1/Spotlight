@@ -79,15 +79,27 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     List<ChatItem> updateDeliveryStatus(String messageId, String deliveryReceiptId, MessageResult.MessageStatus deliveryStatus) {
+        Logger.d(this, "updateDeliveryStatus "+messageId+", "+deliveryReceiptId+", "+deliveryStatus.name());
         for (int i = 0; i < chatList.size(); i++) {
-            if(chatList.get(i).isMe() && chatList.get(i).getReceiptId()!=null && (chatList.get(i).getReceiptId().equals(deliveryReceiptId) || chatList.get(i).getProfileDP().equals(deliveryReceiptId))) {
-                ChatItem tt = chatList.get(i);
-                tt.setMessageStatus(deliveryStatus);
+            Logger.d(this, ""+chatList.get(i).toString());
+            ChatItem item = chatList.get(i);
+            if(messageId!=null && item.getMessageId()!=null && item.getMessageId().equals(messageId)) {
+                if(!messageId.isEmpty())
+                    item.setMessageId(messageId);
+            }
+            if(deliveryReceiptId!=null && item.getReceiptId()!=null && item.getReceiptId().equals(deliveryReceiptId)) {
+                if(!deliveryReceiptId.isEmpty())
+                    item.setReceiptId(deliveryReceiptId);
+            }
+            chatList.set(i, item);
+            if(item.isMe() && ((item.getReceiptId()!=null && deliveryReceiptId!=null && item.getReceiptId().equals(deliveryReceiptId))
+                    || (messageId!=null && item.getMessageId()!=null && item.getMessageId().equals(messageId)))) {
+                item.setMessageStatus(deliveryStatus);
+                chatList.set(i, item);
                 notifyItemChanged(i);
                 break;
             }
         }
-
         return chatList;
     }
 
@@ -292,12 +304,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT) {
                 deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
-            }
-            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT || chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
+            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT || chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
                 deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
-            }
-            else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.READ) {
+            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
+                deliveryStatus.setVisibility(View.VISIBLE);
+                deliveryStatus.setImageResource(R.drawable.ic_delivery_delivered);
+            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.READ) {
                 deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
             } else {

@@ -117,12 +117,17 @@ public class ChatItem implements Serializable{
 
     @Override
     public String toString() {
-        return "ChatListItemModel{" +
+        return "ChatItem{" +
                 "chatId='" + chatId + '\'' +
                 ", chatName='" + chatName + '\'' +
                 ", lastMessage='" + lastMessage + '\'' +
-                ", time='" + time + '\'' +
+                ", time=" + time +
                 ", notificationCount=" + notificationCount +
+                ", receiptId='" + receiptId + '\'' +
+                ", messageStatus=" + messageStatus +
+                ", isMe=" + isMe +
+                ", profileDP='" + profileDP + '\'' +
+                ", messageId='" + messageId + '\'' +
                 '}';
     }
 }

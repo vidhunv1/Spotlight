@@ -249,7 +249,10 @@ public class GifViewHelper {
                                             .crossFade()
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
-                                    sendFab.setOnClickListener(v -> sendGifListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight()));
+                                    sendFab.setOnClickListener(v -> {
+                                        sendGifListener.onSendGif(data.getLowGifUrl(), data.getGifWidth(), data.getGifHeight());
+                                        fullGifLayout.setVisibility(View.GONE);
+                                    });
                                     break;
                                 }
                             }
@@ -298,11 +301,9 @@ public class GifViewHelper {
                                         .crossFade()
                                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                         .into(fullGifImage);
-                                sendFab.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl(), tenorGifResponse.getResults().get(position).getGif().getWidth(), tenorGifResponse.getResults().get(position).getGif().getHeight());
-                                    }
+                                sendFab.setOnClickListener(v -> {
+                                    sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl(), tenorGifResponse.getResults().get(position).getGif().getWidth(), tenorGifResponse.getResults().get(position).getGif().getHeight());
+                                    fullGifLayout.setVisibility(View.GONE);
                                 });
                             });
                             gifsGrid.setAdapter(tenorGifAdapter);

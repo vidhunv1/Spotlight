@@ -441,6 +441,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void displayChatList(List<ChatItem> chats) {
+		Logger.d(this, "DisplayChatList: "+chats.get(0).toString());
 		this.chats = chats;
 		chatListAdapter.setChatList(chats);
 	}
@@ -529,7 +530,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	public void onMessageStatusReceived(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
 		super.onMessageStatusReceived(messageId, chatId, deliveryReceiptId, messageStatus);
-
+		Logger.d(this, "deliveryStatus: "+messageStatus.name());
 		chatListAdapter.updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus);
 	}
 

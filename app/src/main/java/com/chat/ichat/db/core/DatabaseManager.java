@@ -47,7 +47,6 @@ public class DatabaseManager {
     }
 
     public synchronized SQLiteDatabase openConnection() {
-        Logger.d(this, "openConnection: "+connectionCounter);
         if(connectionCounter.incrementAndGet() == 1) {
             database = sqliteHelper.getWritableDatabase();
         }

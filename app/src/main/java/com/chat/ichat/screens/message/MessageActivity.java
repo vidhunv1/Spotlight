@@ -46,6 +46,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.chat.ichat.MessageController;
+import com.chat.ichat.MessageService;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
@@ -151,6 +152,8 @@ public class MessageActivity extends BaseActivity
     View smileySelector, audioSelector, gifSelector;
     ImageButton emojiButton, audioButton, gifButton;
 
+    private Intent messageServiceIntent;
+
     public static Intent callingIntent(Context context, String chatUserName) {
         Logger.d("[MessageActivity] "+chatUserName);
         Intent intent = new Intent(context, MessageActivity.class);
@@ -163,6 +166,9 @@ public class MessageActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        messageServiceIntent = new Intent(this, MessageService.class);
+        messageServiceIntent.putExtra(MessageService.TAG_ACTIVITY_NAME, this.getClass().getName());
+
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
         messagePresenter = new MessagePresenter(MessageStore.getInstance(), MessageController.getInstance(), BotDetailsStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), ApiManager.getBotApi(), ApiManager.getMessageApi());
@@ -182,15 +188,12 @@ public class MessageActivity extends BaseActivity
 
         index = -1;
         top = -1;
-
-
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         if(linearLayoutManager!=null) {
             index = linearLayoutManager.findFirstVisibleItemPosition();
             View v = messageList.getChildAt(0);
@@ -314,7 +317,11 @@ public class MessageActivity extends BaseActivity
                 sendView.show();
             }, 125);
             for (String selectedImage : selectedImages) {
-                messagePresenter.sendImageMessage(chatUserName, currentUser, selectedImage);
+                Message m = new Message();
+                ImageMessage imageMessage = new ImageMessage();
+                imageMessage.setFileUri(selectedImage);
+                m.setImageMessage(imageMessage);
+                messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
             }
             selectedImages.clear();
             galleryViewHelper.removeSelections();
@@ -665,7 +672,7 @@ public class MessageActivity extends BaseActivity
                 imageMessage.setImageUrl(url);
                 imageMessage.setWidth(w);
                 imageMessage.setHeight(h);
-
+                imageMessage.setDataType(ImageMessage.ImageType.gif);
                 m.setImageMessage(imageMessage);
 
                 messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
@@ -828,7 +835,7 @@ public class MessageActivity extends BaseActivity
                     AudioMessage audioMessage = new AudioMessage();
                     audioMessage.setFileUri(fileName);
                     m.setAudioMessage(audioMessage);
-                    messagePresenter.sendAudioMessage(chatUserName, currentUser, fileName);
+                    messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
                 }
 
                 @Override
@@ -969,6 +976,7 @@ public class MessageActivity extends BaseActivity
         if(messagesAdapter!=null) {
             messagesAdapter.addMessage(message);
             messageList.scrollToPosition(messagesAdapter.getItemCount()-1);
+            startService(messageServiceIntent);
         }
     }
 
@@ -1077,7 +1085,7 @@ public class MessageActivity extends BaseActivity
     public void onMessageStatusReceived(String messageId, String chatId, String deliveryReceiptId, MessageResult.MessageStatus messageStatus) {
         super.onMessageStatusReceived(messageId, chatId, deliveryReceiptId, messageStatus);
         if(this.chatUserName.equals(chatId)) {
-            updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus);
+            new Handler().postDelayed(() -> updateDeliveryStatus(messageId, deliveryReceiptId, messageStatus), 200);
         }
     }
 
@@ -1087,7 +1095,12 @@ public class MessageActivity extends BaseActivity
         if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data!=null) {
             if(currentPhotoPath!=null) {
                 Logger.d(this, "Got image");
-                messagePresenter.sendImageMessage(chatUserName, currentUser, currentPhotoPath);
+                Message m = new Message();
+                ImageMessage imageMessage = new ImageMessage();
+                imageMessage.setFileUri(currentPhotoPath);
+                m.setImageMessage(imageMessage);
+
+                messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
             }
         } else if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data!=null) {
             Logger.d(this, "Gallery");
@@ -1101,8 +1114,12 @@ public class MessageActivity extends BaseActivity
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 String picturePath = cursor.getString(columnIndex);
                 Logger.d(this, "Got gallery pic: " + picturePath);
+                Message m = new Message();
+                ImageMessage imageMessage = new ImageMessage();
+                imageMessage.setFileUri(picturePath);
+                m.setImageMessage(imageMessage);
 
-                messagePresenter.sendImageMessage(chatUserName, currentUser, picturePath);
+                messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
                 cursor.close();
             }
         } else if (requestCode == REQUEST_PLACE_PICKER_SEND) {
