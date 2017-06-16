@@ -77,16 +77,10 @@ import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import swarajsaaj.smscodereader.interfaces.OTPListener;
-import swarajsaaj.smscodereader.receivers.OtpReader;
-
-import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener{
 	@Bind(R.id.fab)

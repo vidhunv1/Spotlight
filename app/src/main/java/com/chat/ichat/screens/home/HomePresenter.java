@@ -167,14 +167,13 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void performSync() {
         // TODO: Change sync to messageService
-        Logger.d(this, "SYncing..");
+        Logger.d(this, "Syncing..");
         this.contactStore.getContacts()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<ContactResult>>() {
                     @Override
                     public void onCompleted() {}
-
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
@@ -185,6 +184,9 @@ public class HomePresenter implements HomeContract.Presenter {
                         Logger.d(this, "Getting: 1"+contactResults);
                         List<Observable<Boolean>> observables = new ArrayList<>();
                         for (ContactResult contactResult : contactResults) {
+                            if(!contactResult.isAdded()) {
+                                continue;
+                            }
                             if(contactResult.getUserType() == _User.UserType.official) {
                                 Logger.d("Getting: 2"+contactResult);
                                 observables.add(getBotDetails(contactResult.getUsername()));
@@ -312,14 +314,9 @@ public class HomePresenter implements HomeContract.Presenter {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<UserResponse>() {
                         @Override
-                        public void onCompleted() {
-
-                        }
-
+                        public void onCompleted() {}
                         @Override
-                        public void onError(Throwable e) {
-
-                        }
+                        public void onError(Throwable e) {}
 
                         @Override
                         public void onNext(UserResponse userResponse) {
@@ -337,14 +334,10 @@ public class HomePresenter implements HomeContract.Presenter {
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(new Subscriber<ContactResult>() {
                                             @Override
-                                            public void onCompleted() {
-
-                                            }
+                                            public void onCompleted() {}
 
                                             @Override
-                                            public void onError(Throwable e) {
-
-                                            }
+                                            public void onError(Throwable e) {}
 
                                             @Override
                                             public void onNext(ContactResult contactResult) {

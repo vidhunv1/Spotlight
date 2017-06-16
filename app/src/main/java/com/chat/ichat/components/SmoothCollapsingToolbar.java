@@ -21,7 +21,6 @@ import com.chat.ichat.R;
  * Created by henrytao on 9/24/15.
  */
 public class SmoothCollapsingToolbar extends LinearLayout {
-
     public static boolean DEBUG = false;
 
     private static void log(String s, Object... args) {

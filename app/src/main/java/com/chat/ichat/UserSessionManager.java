@@ -1,13 +1,10 @@
 package com.chat.ichat;
-
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.models.UserSession;
 import java.util.Date;
-
 /**
  * Created by vidhun on 29/01/17.
  */

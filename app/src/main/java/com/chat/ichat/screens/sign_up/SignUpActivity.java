@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -21,6 +20,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +31,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
@@ -41,10 +42,7 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
-import com.chat.ichat.screens.VerifyOtpActivity;
 import com.chat.ichat.screens.home.HomeActivity;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
-import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -59,8 +57,6 @@ import butterknife.OnTextChanged;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import swarajsaaj.smscodereader.interfaces.OTPListener;
-import swarajsaaj.smscodereader.receivers.OtpReader;
 
 public class SignUpActivity extends AppCompatActivity implements SignUpContract.View {
     @Bind(R.id.tb_sign_up)
@@ -96,10 +92,26 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Bind(R.id.userid_error)
     TextView useridErrorView;
 
+    @Bind(R.id.sign_up_tilName)
+    TextInputLayout tilName;
+
     @Bind(R.id.pb_checking_userid)
     ProgressBar userIdPB;
+
     @Bind(R.id.iv_wrong_userid)
     ImageView wrongUserIdIV;
+    @Bind(R.id.iv_wrong_password)
+    ImageView wrondPasswordIV;
+
+    @Bind(R.id.iv_clear_name)
+    ImageView clearNameIV;
+    @Bind(R.id.iv_clear_userid)
+    ImageView clearUseridIV;
+    @Bind(R.id.iv_clear_password)
+    ImageView clearPasswordIV;
+
+    @Bind(R.id.terms_privacy)
+    TextView termsTV;
 
     private String accountEmail = "";
 
@@ -144,13 +156,21 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         //getNetworkCountryIso
         String CountryID= manager.getSimCountryIso().toUpperCase();
         String[] rl=this.getResources().getStringArray(R.array.CountryCodes);
-        for(int i=0;i<rl.length;i++){
+        for(int i=0;i<rl.length;i++) {
             String[] g=rl[i].split(",");
-            if(g[1].trim().equals(CountryID.trim())){
+            if(g[1].trim().equals(CountryID.trim())) {
                 this.countryCode = "+"+g[0];
                 break;
             }
         }
+        String text2 = "By tapping \"Sign Up\" you agree to iChat's terms and privacy policy";
+
+        Spannable spannable = new SpannableString(text2);
+
+        spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)), 41, 47, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)), 51, 66, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        termsTV.setText(spannable, TextView.BufferType.SPANNABLE);
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
@@ -202,7 +222,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     public void showUserIdAvailable(String userId, boolean isAvailable) {
         Logger.d(this, "UserIdAvailable: "+userId+", "+isAvailable);
         if(useridET.getText().toString().equals(userId)) {
-            userIdPB.setVisibility(View.INVISIBLE);
+            userIdPB.setVisibility(View.GONE);
             if (isAvailable) {
                 lastValidUserId = userId;
                 useridErrorView.setVisibility(View.INVISIBLE);
@@ -226,8 +246,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<StatusResponse>() {
                     @Override
-                    public void onCompleted() {
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
@@ -266,9 +285,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe(new Subscriber<Boolean>() {
                                                     @Override
-                                                    public void onCompleted() {
-
-                                                    }
+                                                    public void onCompleted() {}
 
                                                     @Override
                                                     public void onError(Throwable e) {
@@ -287,7 +304,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                                 });
                     }
                 });
-
     }
 
     @Override
@@ -309,6 +325,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             passwordErrorView.setVisibility(View.INVISIBLE);
         }
+        if(passwordET.getText().length()>0) {
+            clearPasswordIV.setVisibility(View.VISIBLE);
+        } else {
+            clearPasswordIV.setVisibility(View.GONE);
+        }
     }
 
     @OnFocusChange(R.id.sign_up_password)
@@ -324,6 +345,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     public void onNameTextChanged() {
         nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         nameErrorView.setVisibility(View.INVISIBLE);
+        if(nameET.getText().toString().length()>0) {
+            clearNameIV.setVisibility(View.VISIBLE);
+        } else {
+            clearNameIV.setVisibility(View.GONE);
+        }
     }
 
     @OnFocusChange(R.id.sign_up_name)
@@ -355,9 +381,10 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         CharSequence userid = useridET.getText();
         useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         useridErrorView.setVisibility(View.INVISIBLE);
-        wrongUserIdIV.setVisibility(View.INVISIBLE);
-        userIdPB.setVisibility(View.INVISIBLE);
+        wrongUserIdIV.setVisibility(View.GONE);
+        userIdPB.setVisibility(View.GONE);
         if(userid.length()>0) {
+            clearUseridIV.setVisibility(View.VISIBLE);
             if (isUserIdValid(userid)) {
                 userIdPB.setVisibility(View.VISIBLE);
                 signUpPresenter.checkUserIdAvailable(useridET.getText().toString());
@@ -372,6 +399,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 useridErrorView.setText("This User ID is invalid.");
             }
+        } else {
+            clearUseridIV.setVisibility(View.GONE);
         }
     }
 
@@ -418,9 +447,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             alertDialog.setMessage("\nThis phone number is invalid.");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
             alertDialog.show();
-
             mobileNumberET.requestFocus();
-
             mobileErrorView.setVisibility(View.VISIBLE);
             mobileErrorView.setText("Please enter a valid phone number");
             mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
@@ -433,6 +460,21 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             registerUser();
         }
         firebaseAnalytics.logEvent(AnalyticsContants.Event.SIGNUP_BUTTON_CLICK, null);
+    }
+
+    @OnClick(R.id.iv_clear_name)
+    public void onClearNameClicked() {
+        nameET.setText("");
+    }
+
+    @OnClick(R.id.iv_clear_password)
+    public void onClearPasswordClicked() {
+        passwordET.setText("");
+    }
+
+    @OnClick(R.id.iv_clear_userid)
+    public void onClearUseridClicked() {
+        useridET.setText("");
     }
 
     private void registerUser() {

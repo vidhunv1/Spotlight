@@ -81,4 +81,9 @@
         <item name="colorControlHighlight">@color/appElement</item>
     </style>
 
+    <style name="TextAppearence.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textColor">#939393</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

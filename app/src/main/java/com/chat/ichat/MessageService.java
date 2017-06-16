@@ -538,7 +538,6 @@ public class MessageService extends Service {
                 msg.setTime(DateTime.parse(time));
                 msg.setMessageId(messageId);
 
-
                 MessageData messageData = new MessageData(msg, mess);
                 MessageData t = messageDatas.get(mess);
 
@@ -726,7 +725,7 @@ public class MessageService extends Service {
         return ApiManager.getMessageApi().uploadAudioData(audioFileBody);
     }
 
-    public File saveBitmapToFile(File file){
+    public File saveBitmapToFile(File file) {
         try {
             // BitmapFactory options to downsize the image
             BitmapFactory.Options o = new BitmapFactory.Options();

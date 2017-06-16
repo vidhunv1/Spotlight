@@ -262,7 +262,7 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
 
-                progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait...", true);
+                progressDialog[0] = ProgressDialog.show(NewChatActivity.this, "", "Loading. Please wait…", true);
                 newChatPresenter.addContact(editText.getText().toString());
 
                 /*              Analytics           */
