@@ -250,7 +250,7 @@ public class GifViewHelper {
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
                                     sendFab.setOnClickListener(v -> {
-                                        sendGifListener.onSendGif(data.getLowGifUrl(), data.getGifWidth(), data.getGifHeight());
+                                        sendGifListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight());
                                         fullGifLayout.setVisibility(View.GONE);
                                     });
                                     break;
@@ -295,7 +295,7 @@ public class GifViewHelper {
                                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                                 fullGifLayout.setVisibility(View.VISIBLE);
 
-                                Glide.with(mContext).load(tenorGifResponse.getResults().get(position).getGif().getUrl().replace("https://", "http://"))
+                                Glide.with(mContext).load(tenorGifResponse.getResults().get(position).getMediumGif().getUrl().replace("https://", "http://"))
                                         .bitmapTransform(new FitCenter(mContext))
                                         .placeholder(0xFF000000)
                                         .crossFade()
