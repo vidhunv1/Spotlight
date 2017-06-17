@@ -109,5 +109,6 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     @Override
     public void navigateToMessage(String username) {
         startActivity(MessageActivity.callingIntent(this, username));
+        finish();
     }
 }

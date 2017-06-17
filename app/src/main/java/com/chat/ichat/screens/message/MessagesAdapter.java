@@ -106,9 +106,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_SEND_AUDIO = 12;
     private final int VIEW_TYPE_RECV_AUDIO = 13;
     private final int VIEW_TYPE_NO_MESSAGES = 14;
-    private final int VIEW_TYPE_SEND_GIF = 15;
-    private final int VIEW_TYPE_RECV_GIF = 16;
-
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;

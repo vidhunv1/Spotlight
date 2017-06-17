@@ -183,7 +183,6 @@ public class UserProfileActivity extends BaseActivity {
 
             @Override
             public void onNext(String time) {
-                presenceView.setVisibility(View.VISIBLE);
                 presenceView.setText(time);
             }
         });

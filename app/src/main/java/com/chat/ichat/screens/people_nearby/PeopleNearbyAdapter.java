@@ -92,10 +92,7 @@ public class PeopleNearbyAdapter extends RecyclerView.Adapter<PeopleNearbyAdapte
             time.setVisibility(View.INVISIBLE);
 
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(userLocation.getUser().getName(), userLocation.getUser().getUserId(), 18));
-            int dst = (int) userLocation.getDistance();
-            if(dst==0) {
-                dst = 1;
-            }
+            double dst = userLocation.getDistance();
             distance.setText("within "+dst+"km");
             contactName.setText(userLocation.getUser().getName());
             if(userLocation.getUser().getProfileDP()!=null && !userLocation.getUser().getProfileDP().isEmpty()) {

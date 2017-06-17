@@ -40,7 +40,7 @@
                     android:layout_marginLeft="12dp"
                     android:layout_marginTop="29dp"
                     android:layout_toRightOf="@+id/iv_profile_image"
-                    android:textColor="@color/textPrimaryLight" />
+                    android:textColor="@color/textSecondary" />
                 <ImageView
                     android:id="@+id/iv_profile_image"
                     android:layout_width="42dp"

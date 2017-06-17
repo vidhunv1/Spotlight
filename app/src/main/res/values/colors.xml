@@ -25,7 +25,7 @@
     <!--text-->
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textColor">#212121</color>
-    <color name="textSecondary">#BBDDBB</color>
+    <color name="textSecondary">#C7f5CC</color>
     <color name="textHintColor">#BBDDBB</color>
 
     <color name="buttonText">@color/colorPrimary</color>

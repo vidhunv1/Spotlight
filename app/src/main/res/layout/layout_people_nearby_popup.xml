@@ -9,6 +9,7 @@
         android:textSize="17sp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
+        android:textColor="@color/textColor"
         android:text="By enabling your Location you are allowing people nearby to find you. To remove yourself, choose Clear Location from the top-right menu."/>
 
     <LinearLayout
@@ -28,6 +29,7 @@
         <TextView
             android:paddingLeft="10dp"
             android:text="Do not show again"
+            android:textColor="@color/appElement"
             android:textSize="14sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

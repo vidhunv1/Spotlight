@@ -61,13 +61,12 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:visibility="gone"
                     android:id="@+id/profile_presence"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:layout_marginTop="0.25dp"
-                    android:textColor="@color/textPrimaryLight"
+                    android:textColor="@color/textSecondary"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
