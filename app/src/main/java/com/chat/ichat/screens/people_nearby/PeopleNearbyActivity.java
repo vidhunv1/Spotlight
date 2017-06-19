@@ -29,7 +29,9 @@ import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.location.UserLocation;
 import com.chat.ichat.application.SpotlightApplication;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.models.ContactResult;
@@ -42,6 +44,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
@@ -68,6 +71,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     private LocationManager locationManager;
     private PeopleNearbyPresenter peopleNearbyPresenter;
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
+    private FirebaseAnalytics firebaseAnalytics;
 
     public static Intent callingIntent(Context context) {
         return new Intent(context, PeopleNearbyActivity.class);
@@ -102,6 +106,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
         }
 
         peopleNearbyPresenter = new PeopleNearbyPresenter();
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -114,6 +119,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     protected void onResume() {
         super.onResume();
         peopleNearbyPresenter.attachView(this);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.PEOPLE_NEARBY_SCREEN, null);
     }
 
     @Override
@@ -126,10 +132,11 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if ((id == android.R.id.home)) {
-            super.onBackPressed();
+            onBackPressed();
             finish();
             return true;
         } else if(id == R.id.action_clear_location) {
+            firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.PEOPLE_NEARBY_CLEAR_LOCATION, null);
             peopleNearbyPresenter.clearLocation();
         }
         return super.onOptionsItemSelected(item);
@@ -137,6 +144,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
 
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.PEOPLE_NEARBY_BACK, null);
         if(progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
@@ -145,6 +153,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
 
     @OnClick(R.id.btn_allow)
     public void onAllowClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_LOCATION_SHOW, null);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 101);
     }
 
@@ -156,10 +165,11 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
                     //granted
                     permissionLayout.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
-
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_LOCATION_ALLOW, null);
                     googleApiClient.connect();
                 } else {
                     //not granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_LOCATION_DENY, null);
                     permissionLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 }
@@ -334,9 +344,24 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     @Override
     public void updatePeopleNearby(List<UserLocation> nearbyPeopleResponseList) {
         progressDialog[0].dismiss();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         PeopleNearbyAdapter peopleNearbyAdapter = new PeopleNearbyAdapter(this, nearbyPeopleResponseList, this);
         recyclerView.setAdapter(peopleNearbyAdapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                final View child = RecyclerViewHelper.findOneVisibleChild(recyclerView, 0, linearLayoutManager.getChildCount(), true, false);
+                int pos = child == null ? RecyclerView.NO_POSITION : recyclerView.getChildAdapterPosition(child);
+                if(pos < nearbyPeopleResponseList.size()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, nearbyPeopleResponseList.get(pos).getUser().getUserId());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PEOPLE_NEARBY_SCROLL, bundle);
+                }
+            }
+        });
     }
 
     @Override
@@ -352,6 +377,10 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
 
     @Override
     public void onContactItemClicked(String username, String userId) {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, userId);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.PEOPLE_NEARBY_CHAT_OPEN, bundle);
+
         progressDialog[0].dismiss();
         Context context = this;
         Activity activity = PeopleNearbyActivity.this;

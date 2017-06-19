@@ -93,7 +93,7 @@ public class PeopleNearbyAdapter extends RecyclerView.Adapter<PeopleNearbyAdapte
 
             profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(userLocation.getUser().getName(), userLocation.getUser().getUserId(), 18));
             double dst = userLocation.getDistance();
-            distance.setText("within "+dst+"km");
+            distance.setText("within "+String.format("%.1f", dst)+"km");
             contactName.setText(userLocation.getUser().getName());
             if(userLocation.getUser().getProfileDP()!=null && !userLocation.getUser().getProfileDP().isEmpty()) {
                 Glide.with(context)

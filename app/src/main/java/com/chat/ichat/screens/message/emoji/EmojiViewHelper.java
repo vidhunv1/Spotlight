@@ -15,9 +15,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Emojicon;
@@ -26,6 +26,7 @@ import com.chat.ichat.screens.message.emoji.emoji_objects.Objects;
 import com.chat.ichat.screens.message.emoji.emoji_objects.People;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Places;
 import com.chat.ichat.screens.message.emoji.emoji_objects.Symbols;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -219,6 +220,7 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
 
     @Override
     public void onPageSelected(int position) {
+        FirebaseAnalytics.getInstance(mContext).logEvent(String.format(AnalyticsConstants.Event.MESSAGE_SMILEYS_CLICK_CATEGORY, position), null);
         if(position == 1) {
             mEmojiTabs[1].setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_emoticon_selected));
         } else if(position == 0) {

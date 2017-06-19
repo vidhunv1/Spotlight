@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -47,7 +48,7 @@ import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.R;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
@@ -117,6 +118,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private int lastClickedPosition;
     private Animation insertAnimation;
 
+    private FirebaseAnalytics firebaseAnalytics;
     public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
@@ -139,6 +141,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         lastClickedPosition=-1;
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
 
     public void setMessages(List<MessageResult> messages) {
@@ -581,7 +584,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return lastClickedPosition == position && lastClickedPosition>=0;
     }
 
-    private void showMessageActionPopup(RecyclerView.ViewHolder viewHolder, int position, String text) {
+    private void handleMessageClick(RecyclerView.ViewHolder viewHolder, int position, String text) {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+        bundle.putString(AnalyticsConstants.Param.MESSAGE, text);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_MSG, null);
+    }
+
+    private void handleMessageLongClick(RecyclerView.ViewHolder viewHolder, int position, String text) {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+        bundle.putString(AnalyticsConstants.Param.MESSAGE, text);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_LONG_CLICK_MSG, bundle);
+
         TextView copyTextAction, deleteAction, detailsAction;
         LinearLayout parent = new LinearLayout(context);
 
@@ -620,13 +635,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
+        alertDialog.setOnDismissListener(dialog -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_MESSAGE_ACTION_DISMISS, bundle);
+        });
+
         copyTextAction.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_MESSAGE_ACTION_COPY, bundle);
             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("messageText", text);
             clipboard.setPrimaryClip(clip);
             alertDialog.dismiss();
         });
         deleteAction.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_MESSAGE_ACTION_DELETE, bundle);
             Logger.d(this, "Deleting message at:" +position);
             MessageStore.getInstance().deleteMessage(messageList.get(position).getReceiptId())
                     .subscribeOn(Schedulers.io())
@@ -647,17 +668,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             alertDialog.dismiss();
         });
         detailsAction.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_MESSAGE_ACTION_DETAILS, bundle);
             if(viewHolder instanceof SendTextViewHolder) {
                 ((SendTextViewHolder) viewHolder).onMessageClicked();
             }
             alertDialog.dismiss();
         });
-
-        /*              Analytics           */
-        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(context);
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.SELECT_MESSAGE, bundle);
     }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
@@ -805,6 +821,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             bubbleView.setOnClickListener(v -> {
+                handleMessageClick(this, position, messageView.getText().toString());
                 if(deliveryStatusText.getVisibility() == View.VISIBLE) {
                     if(!shouldShowTime) {
                         timeView.setVisibility(View.GONE);
@@ -821,7 +838,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, position, messageView.getText().toString());
+            handleMessageLongClick(this, position, messageView.getText().toString());
             return true;
         }
     }
@@ -888,6 +905,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             bubbleView.setOnClickListener(v -> {
+                handleMessageClick(this, position, messageView.getText().toString());
                 if(!shouldShowTime) {
                     if(timeView.getVisibility() == View.VISIBLE) {
                         timeView.setVisibility(View.GONE);
@@ -902,7 +920,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, this.postition, messageView.getText().toString());
+            handleMessageLongClick(this, this.postition, messageView.getText().toString());
             return true;
         }
     }
@@ -980,6 +998,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
+            handleMessageClick(this, position, messageView.getText().toString());
             boolean shouldShowTime = shouldShowTime(position);
 
             if(isMessagePressed(position)) {
@@ -1001,7 +1020,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, position, messageView.getText().toString());
+            handleMessageLongClick(this, position, messageView.getText().toString());
             return true;
         }
     }
@@ -1086,6 +1105,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
+            handleMessageClick(this, position, "");
             // Open Maps Activity
             String label = locationMessage.getPlaceName();
             String uriBegin = "geo:"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude();
@@ -1099,7 +1119,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, position, placeName.getText().toString());
+            handleMessageLongClick(this, position, placeName.getText().toString());
             return true;
         }
     }
@@ -1188,6 +1208,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnClick(R.id.rl_bubble)
         public void onMessageClicked() {
+            handleMessageClick(this, position, "");
             // Open Maps Activity
             String label = locationMessage.getPlaceName();
             String uriBegin = "geo:"+ locationMessage.getLatitude()+","+ locationMessage.getLongitude();
@@ -1201,7 +1222,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, position, placeName.getText().toString());
+            handleMessageLongClick(this, position, placeName.getText().toString());
             return true;
         }
     }
@@ -1278,6 +1299,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             bubbleView.setOnClickListener(v -> {
+                handleMessageClick(this, position, messageView.getText().toString());
                 if(isMessagePressed(position)) {
                     if(!shouldShowTime) {
                         timeView.setVisibility(View.GONE);
@@ -1297,7 +1319,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnLongClick(R.id.rl_bubble)
         public boolean onMessageLongClicked() {
-            showMessageActionPopup(this, position, messageView.getText().toString());
+            handleMessageLongClick(this, position, messageView.getText().toString());
             return true;
         }
     }

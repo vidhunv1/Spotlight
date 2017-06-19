@@ -92,7 +92,7 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         public void onViewClick() {
             Logger.d(this, "Clicked: "+name.getTag().toString());
             if(contactClickListener!=null) {
-                contactClickListener.onContactItemClicked(name.getTag().toString());
+                contactClickListener.onContactItemClicked(name.getTag().toString(),2);
             }
         }
     }

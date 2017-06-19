@@ -51,7 +51,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.PersistentMenu;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
@@ -145,7 +145,6 @@ public class MessageActivity extends BaseActivity
     private TextView sendFABBadge;
 
     private FirebaseAnalytics firebaseAnalytics;
-    private final String SCREEN_NAME = "message";
     // userName: id for ejabberd xmpp. userId: id set by user
 
     //composer
@@ -210,7 +209,7 @@ public class MessageActivity extends BaseActivity
         messagePresenter.loadMessages(chatUserName);
 
         /*              Analytics           */
-        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.MESSAGE_SCREEN, null);
     }
 
     @Override
@@ -231,6 +230,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void onBackPressed() {
         if(shouldHandleBack) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_BACK, null);
             super.onBackPressed();
         } else {
             AndroidUtils.hideSoftInput(this);
@@ -255,6 +255,12 @@ public class MessageActivity extends BaseActivity
         if((id == android.R.id.home)) {
             AndroidUtils.hideSoftInput(this);
             this.finish();
+        } else if(id == R.id.block) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_BLOCK_CONTACT, null);
+        } else if(id == R.id.view_contact) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_VIEW_CONTACT, null);
+        } else if(id == R.id.delete) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_DELETE_CONTACT, null);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -272,20 +278,39 @@ public class MessageActivity extends BaseActivity
 
         /*              Analytics           */
         Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_TITLE_CLICK, bundle);
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_DP, bundle);
     }
 
     @OnClick(R.id.iv_profile_image)
-    public void onProfileDPCLiked() {
+    public void onDPClicked() {
+        AndroidUtils.hideSoftInput(this);
+        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
+
         /*              Analytics           */
         Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_DP_CLICK, bundle);
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TITLE, bundle);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_DP, bundle);
+    }
+
+    @OnClick(R.id.tb_message_presence)
+    public void onPresenceClicked() {
+        AndroidUtils.hideSoftInput(this);
+        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
+
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TITLE, bundle);
     }
 
     public void onSendClicked() {
         String message = messageBox.getText().toString().trim();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+        bundle.putString(AnalyticsConstants.Param.MESSAGE, message);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_SEND, null);
 
         if(message.length()>=1) {
             messageBox.setText("");
@@ -326,12 +351,6 @@ public class MessageActivity extends BaseActivity
             selectedImages.clear();
             galleryViewHelper.removeSelections();
         }
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.MESSAGE, message);
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.SEND_MESSAGE, bundle);
     }
 
     public void onMessageChanged() {
@@ -382,6 +401,10 @@ public class MessageActivity extends BaseActivity
                 itemsTV.get(i).setText(persistentMenus.get(i).getTitle());
                 PersistentMenu menu = persistentMenus.get(i);
                 itemsLL.get(i).setOnClickListener(v -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AnalyticsConstants.Param.MESSAGE, menu.getTitle());
+                    bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_ITEM, bundle);
                     bottomSheetDialog.dismiss();
                     if(menu.getType() == PersistentMenu.Type.postback) {
                         this.sendPostbackMessage(menu.getTitle(), menu.getPayload());
@@ -392,20 +415,23 @@ public class MessageActivity extends BaseActivity
             }
 
             ImageView close = (ImageView) menuItemsView.findViewById(R.id.close);
-            close.setOnClickListener(v -> bottomSheetDialog.dismiss());
+            close.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_CLOSE, bundle);
+                bottomSheetDialog.dismiss();
+            });
 
             LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
             enterText.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_WAM, bundle);
                 bottomSheetDialog.dismiss();
                 messageBox.requestFocus();
             });
             bottomSheetDialog.show();
         }
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.CLICK_BOT_MENU, bundle);
     }
 
     @Override
@@ -474,8 +500,8 @@ public class MessageActivity extends BaseActivity
 
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsContants.Event.OTHER_ADD_CONTACT, bundle);
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_ADD_CONTACT, bundle);
             });
             blockView.setOnClickListener(v -> {
                 String message = "Are you sure you want to block <b>" + AndroidUtils.displayNameStyle(contactDetails.getContactName()) + "</b>?";;
@@ -496,10 +522,9 @@ public class MessageActivity extends BaseActivity
                     alertDialog.show();
                 }
 
-                /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsContants.Event.BLOCK_USER, bundle);
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_BLOCK_CONTACT, bundle);
             });
         } else {
             addBlockView.setVisibility(View.GONE);
@@ -572,7 +597,10 @@ public class MessageActivity extends BaseActivity
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
             RelativeLayout sendView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
-            botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> onMessageMenuClicked());
+            botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> {
+                onMessageMenuClicked();
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_PERSISTENT_MENU, null);
+            });
 
             // remove later after regular keyboard change. -------------------------------------------------------
             messageBox.addTextChangedListener(new TextWatcher() {
@@ -619,11 +647,14 @@ public class MessageActivity extends BaseActivity
             GalleryViewHelper.Listener openGalleryClickListener = new GalleryViewHelper.Listener() {
                 @Override
                 public void onOpenGalleryClicked() {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_OPEN_GALLERY, null);
+
                     int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
                     int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                     int permission = PackageManager.PERMISSION_GRANTED;
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                         if (!(perm1 == permission && perm2 == permission)) {
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_SHOW, null);
                             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
                         } else {
                             Intent loadIntent = new Intent(Intent.ACTION_PICK,
@@ -635,6 +666,10 @@ public class MessageActivity extends BaseActivity
 
                 @Override
                 public void onImagesClicked(ArrayList<String> uris) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(AnalyticsConstants.Param.COUNT, uris.size());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GALLERY_CLICK_IMAGE, bundle);
+
                     selectedImages.clear();
                     selectedImages.addAll(uris);
                     if(uris.size()>0) {
@@ -703,6 +738,7 @@ public class MessageActivity extends BaseActivity
             });
 
             messageEditText.setOnTouchListener((v, event) -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TEXTBOX, null);
                 shouldHandleBack = false;
                 setComposerSelected(0);
 
@@ -731,18 +767,19 @@ public class MessageActivity extends BaseActivity
                     setComposerSelected(1);
                 }
 
-                /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_SMILEY, bundle);
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_SMILEYS, bundle);
             });
 
             audioButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_AUDIO, null);
                 int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO);
                 int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 int permission = PackageManager.PERMISSION_GRANTED;
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                     if (!(perm1 == permission && perm2 == permission)) {
+                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_SHOW, null);
                         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
                     } else {
                         shouldHandleBack = true;
@@ -767,6 +804,7 @@ public class MessageActivity extends BaseActivity
             });
 
             galleryButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_GALLERY, null);
                 int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
                 int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 int permission = PackageManager.PERMISSION_GRANTED;
@@ -802,6 +840,7 @@ public class MessageActivity extends BaseActivity
             });
 
             gifButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_GIF, null);
                 shouldHandleBack = true;
                 audioViewHelper.reset();
                 emojiViewHelper.reset();
@@ -813,7 +852,10 @@ public class MessageActivity extends BaseActivity
                 }
             });
 
-            emojiViewHelper.setOnEmojiconBackspaceClickedListener(v -> messageEditText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)));
+            emojiViewHelper.setOnEmojiconBackspaceClickedListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_SMILEYS_CLICK_BACKSPACE, null);
+                messageEditText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+            });
             emojiViewHelper.setOnEmojiconClickedListener(v -> {
                 String text = messageEditText.getText() + v.getEmoji();
                 messageEditText.setText(text);
@@ -821,8 +863,8 @@ public class MessageActivity extends BaseActivity
 
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsContants.Event.SMILEY_SELECTED, bundle);
+                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, this.chatUserName);
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_SMILEYS_CLICK_SMILEY, bundle);
             });
 
             audioViewHelper.setAudioRecordListener(new AudioRecord.AudioRecordListener() {
@@ -843,6 +885,7 @@ public class MessageActivity extends BaseActivity
             });
 
             cameraButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_CAMERA, null);
                 audioViewHelper.reset();
                 emojiViewHelper.reset();
                 galleryViewHelper.reset();
@@ -864,14 +907,10 @@ public class MessageActivity extends BaseActivity
                         startActivityForResult(cameraIntent, REQUEST_CAMERA);
                     }
                 }
-
-                /*              Analytics           */
-                Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsContants.Event.MESSAGE_CAMERA, bundle);
             });
 
             locationButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_LOCATION, null);
                 audioViewHelper.reset();
                 emojiViewHelper.reset();
                 galleryViewHelper.reset();
@@ -911,7 +950,9 @@ public class MessageActivity extends BaseActivity
                 public void afterTextChanged(Editable s) {}
             });
 
-            sendView.setOnClickListener(v -> onSendClicked());
+            sendView.setOnClickListener(v -> {
+                onSendClicked();
+            });
             String draft = GenericCache.getInstance().get("draft_"+chatUserName);
             if(draft!=null) {
                 messageBox.setText("");
@@ -1161,9 +1202,20 @@ public class MessageActivity extends BaseActivity
             case 101:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_ALLOW, null);
                     Intent loadIntent = new Intent(Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(loadIntent, REQUEST_GALLERY);
+                } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_DENY, null);
+                }
+                break;
+            case 103:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_ALLOW, null);
+                } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_DENY, null);
                 }
                 break;
             default:

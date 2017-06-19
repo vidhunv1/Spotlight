@@ -299,7 +299,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             contactListContent.setOnClickListener(view -> {
                 if(contactClickListener != null)
-                    contactClickListener.onContactItemClicked(contactName.getTag().toString());
+                    contactClickListener.onContactItemClicked(contactName.getTag().toString(), 0);
             });
         }
     }
@@ -406,7 +406,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                                 @Override
                                 public void onNext(ContactResult contactResult) {
-                                    contactClickListener.onContactItemClicked(searchUser.getUsername());
+                                    contactClickListener.onContactItemClicked(searchUser.getUsername(), 1);
                                 }
                             });
                 }
@@ -492,6 +492,6 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     interface ContactClickListener {
-        void onContactItemClicked(String username);
+        void onContactItemClicked(String username, int from);
     }
 }

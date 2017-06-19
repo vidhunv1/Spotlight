@@ -19,7 +19,7 @@ import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
@@ -185,7 +185,6 @@ public class SetUserIdActivity extends BaseActivity implements SetUserIdContract
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_done) {
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.SET_USERID_BUTTON_CLICK, null);
             if(!isUserIdValid(userIdEt.getText())) {
                 showError("User ID", "User ID must have atleast 6 characters.");
             } else {

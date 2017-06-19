@@ -106,7 +106,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
             checkbox.setOnCheckedChangeListener((buttonView, isChecked1) -> {
                 checked.set(position, isChecked1);
-                clickListener.onCheckedChange(number.getText().toString(), name.getText().toString());
+                clickListener.onCheckedChange(number.getText().toString(), name.getText().toString(), isChecked1);
             });
 
             this.setIsRecyclable(false);
@@ -114,6 +114,6 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     interface ClickListener {
-        void onCheckedChange(String phone, String countryCode);
+        void onCheckedChange(String phone, String countryCode, boolean isChecked);
     }
 }

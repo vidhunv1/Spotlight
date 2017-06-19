@@ -10,12 +10,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.chat.ichat.ForegroundDetector;
-import com.chat.ichat.R;
 import com.chat.ichat.application.SpotlightApplication;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.MessageService;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.UserSession;
@@ -102,6 +101,7 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_BACK, null);
         super.onBackPressed();
     }
 
@@ -122,8 +122,9 @@ public class BaseActivity extends AppCompatActivity{
 
         /*              Analytics           */
         Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, from.getUsername());
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.RECEIVE_MESSAGE, bundle);
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, from.getUsername());
+        bundle.putString(AnalyticsConstants.Param.MESSAGE, messageId.getMessage());
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.RECEIVE_MESSAGE, bundle);
     }
 
     public void onPresenceChanged(String username, Presence.Type type) {

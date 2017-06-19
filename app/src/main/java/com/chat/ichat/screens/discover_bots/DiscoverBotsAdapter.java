@@ -1,6 +1,7 @@
 package com.chat.ichat.screens.discover_bots;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +11,10 @@ import android.widget.TextView;
 
 import com.chat.ichat.R;
 import com.chat.ichat.api.bot.DiscoverBotsResponse;
+import com.chat.ichat.config.AnalyticsConstants;
+import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.models.ContactResult;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +134,22 @@ public class DiscoverBotsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(new BotsAdapter(context, contactsModels, contactClickListener));
+
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    final View child = RecyclerViewHelper.findOneVisibleChild(recyclerView, 0, layoutManager.getChildCount(), true, false);
+                    int pos = child == null ? RecyclerView.NO_POSITION : recyclerView.getChildAdapterPosition(child);
+                    if(pos < contactsModels.size()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(AnalyticsConstants.Param.RECIPIENT_NAME, contactsModels.get(pos).getContactName());
+                        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactsModels.get(pos).getUserId());
+
+                        FirebaseAnalytics.getInstance(context).logEvent(AnalyticsConstants.Event.DISCOVER_BOTS_SCROLL, bundle);
+                    }
+                }
+            });
         }
     }
 

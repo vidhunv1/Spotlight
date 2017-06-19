@@ -8,12 +8,12 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/view_block"
+        android:id="@+id/block"
         android:title="Block"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/view_delete"
+        android:id="@+id/delete"
         android:title="Delete"
         app:showAsAction="never" />
 </menu>

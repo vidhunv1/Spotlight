@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -32,6 +33,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -50,7 +52,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.application.SpotlightApplication;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
@@ -92,6 +94,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @Bind(R.id.settings_in_app_browser)
     Switch inAppBrowserSwitch;
 
+    @Bind(R.id.settings_auto_add_phone_contacts)
+    Switch autoAddContacts;
+
     @Bind(R.id.tv_user_profile_id)
     TextView profileIdText;
 
@@ -114,6 +119,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     public static final String KEY_LED_COLOR = "led_color";
     public static final String KEY_IN_APP_BROWSER = "in_app_browser";
     public static final String KEY_SEND_BY_ENTER = "send_by_enter";
+    public static final String KEY_AUTO_ADD_CONTACTS = "key_auto_add_contacts";
     public static final String KEY_TEXT_SIZE = "text_size";
 
     static enum VibrateOptions {DISABLED, DEFAULT, SHORT, LONG, ONLY_IF_SILENT};
@@ -126,7 +132,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     AlertDialog alertDialogPic = null;
 
     private FirebaseAnalytics firebaseAnalytics;
-    private final String SCREEN_NAME = "settings";
     public static Intent callingIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
@@ -136,6 +141,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         userSession = UserSessionManager.getInstance().load();
         settingsPresenter = new SettingsPresenter(ApiManager.getUserApi(), UserSessionManager.getInstance(), PreferenceManager.getDefaultSharedPreferences(this));
@@ -157,10 +164,40 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         sendByEnterSwitch.setChecked(sharedPreferences.getBoolean(KEY_SEND_BY_ENTER, false));
         alertSwitch.setChecked(sharedPreferences.getBoolean(KEY_ALERT, true));
         inAppBrowserSwitch.setChecked(sharedPreferences.getBoolean(KEY_IN_APP_BROWSER, true));
+        autoAddContacts.setChecked(sharedPreferences.getBoolean(KEY_AUTO_ADD_CONTACTS, true));
 
-        alertSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_ALERT, alertSwitch.isChecked()).apply());
-        sendByEnterSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_SEND_BY_ENTER, sendByEnterSwitch.isChecked()).apply());
-        inAppBrowserSwitch.setOnClickListener(v -> sharedPreferences.edit().putBoolean(KEY_IN_APP_BROWSER, inAppBrowserSwitch.isChecked()).apply());
+        alertSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CHECK_ALERT, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_UNCHECK_ALERT, null);
+            }
+            sharedPreferences.edit().putBoolean(KEY_ALERT, isChecked).apply();
+        });
+        sendByEnterSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CHECK_SENDBYENTER, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_UNCHECK_SENDBYENTER, null);
+            }
+            sharedPreferences.edit().putBoolean(KEY_SEND_BY_ENTER, isChecked).apply();
+        });
+        inAppBrowserSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CHECK_INAPPBROWSER, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_UNCHECK_INAPPBROWSER, null);
+            }
+            sharedPreferences.edit().putBoolean(KEY_IN_APP_BROWSER, isChecked).apply();
+        });
+        autoAddContacts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CHECK_AUTOADDCONTACTS, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_UNCHECK_AUTOADDCONTACTS, null);
+            }
+            sharedPreferences.edit().putBoolean(KEY_AUTO_ADD_CONTACTS, isChecked).apply();
+        });
         String versionName;
         try {
             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -168,7 +205,6 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             versionName = "v1.0.0";
         }
         versionNameText.setText(this.getResources().getString(R.string.settings_app_version, this.getResources().getString(R.string.app_name), versionName));
-        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
             Context context = this;
@@ -198,18 +234,14 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == android.R.id.home) {
-            super.onBackPressed();
+            onBackPressed();
         } else if(id == R.id.action_logout) {
             showLogoutPopup();
 
-            /*              Analytics           */
-            Bundle bundle = new Bundle();
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.LOGOUT, bundle);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_LOGOUT, null);
         } else if(id == R.id.action_edit_name) {
 
-            /*              Analytics           */
-            Bundle bundle = new Bundle();
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.EDIT_NAME, bundle);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_EDIT_NAME, null);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -223,7 +255,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         settingsPresenter.attachView(this);
 
         /*              Analytics           */
-        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SETTINGS_SCREEN, null);
     }
 
     public void showError(String title, String message) {
@@ -252,30 +284,38 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @OnClick(R.id.settings_vibrate_row)
     public void onVibrateClicked() {
         showVibratePopup();
+
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_VIBRATE, null);
     }
 
     @OnClick(R.id.settings_ledcolor_row)
     public void onLedColorClicked() {
         showLedColorPopup();
+
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_LEDCOLOR, null);
     }
 
     @OnClick(R.id.settings_askquestion_row)
     public void onAskQuestionClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_ASKAQUESTION, null);
         showAskAQuestionPopup();
     }
 
     @OnClick(R.id.settings_faq_row)
     public void onFaqClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_FAQ, null);
         startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq"));
     }
 
     @OnClick(R.id.settings_privacy_policy_row)
     public void onPrivacyPolicyClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_PRIVACY, null);
         startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/privacy"));
     }
 
     @OnClick(R.id.clear_location_row)
     public void onClearLocationClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_CLEARLOCATION, null);
         LinearLayout parent = new LinearLayout(this);
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
@@ -312,6 +352,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
                         @Override
                         public void onNext(StatusResponse statusResponse) {
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_ON_LOCATIONCLEARED, null);
                             SharedPreferences sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("last_known_location", Context.MODE_PRIVATE);
                             sharedPreferences.edit().putLong("latitude", -99999999).apply();
                             sharedPreferences.edit().putLong("longitude", -99999999).apply();
@@ -329,6 +370,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     @OnClick(R.id.settings_sound_row)
     public void onSoundClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_SOUND, null);
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Ringtone");
@@ -339,6 +381,8 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     @OnClick(R.id.settings_take_pic)
     public void onCameraClicked() {
         LinearLayout parent = new LinearLayout(this);
+
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_UPDATE_DP, null);
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         parent.setOrientation(LinearLayout.VERTICAL);
@@ -351,6 +395,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView1.setGravity(Gravity.CENTER_VERTICAL);
         textView1.setHeight((int)AndroidUtils.px(48));
         textView1.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_EDIT_DP_FROM_CAMERA, null);
             // ** Load image from camera **
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             PackageManager pm = this.getPackageManager();
@@ -377,6 +422,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView2.setGravity(Gravity.CENTER_VERTICAL);
         textView2.setTextColor(ContextCompat.getColor(this, R.color.textColor));
         textView2.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_EDIT_DP_FROM_GALLERY, null);
             // ** Load image from gallery **
             // Permissions
             int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -384,6 +430,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             int permission = PackageManager.PERMISSION_GRANTED;
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                 if (!(perm1 == permission && perm2 == permission)) {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_SHOW, null);
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
                 } else {
                     Intent loadIntent = new Intent(Intent.ACTION_PICK,
@@ -400,6 +447,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         textView3.setGravity(Gravity.CENTER_VERTICAL);
         textView3.setTextColor(ContextCompat.getColor(this, R.color.textColor));
         textView3.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_EDIT_DP_DELETE_PHOTO, null);
             UserSession u = new UserSession();
             u.setProfilePicPath("");
             UserSessionManager.getInstance().save(u);
@@ -407,12 +455,9 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             Handler mainHandler = new Handler(this.getMainLooper());
 
             Context context = this;
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    alertDialogPic.dismiss();
-                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
-                }
+            Runnable myRunnable = () -> {
+                alertDialogPic.dismiss();
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
             };
             mainHandler.post(myRunnable);
         });
@@ -425,10 +470,15 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
         builder.setView(parent);
         alertDialogPic = builder.create();
         alertDialogPic.show();
+
+        alertDialogPic.setOnDismissListener(dialog -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_EDIT_DP_DISMISS, null);
+        });
     }
 
     @OnClick(R.id.blocked_contacts_row)
     public void onBlockedContactsClicked() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_CLICK_BLOCKEDCONTACTS, null);
         startActivity(BlockedContactsActivity.callingIntent(this));
     }
 
@@ -587,6 +637,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
 
     @Override
     public void updateProfileDP(String url) {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_ON_DP_SET, null);
         Logger.d(this, "Setting profile DP: "+url);
         Context context = this;
         Glide.with(this).load(url.replace("https://", "http://")).asBitmap().centerCrop()
@@ -613,6 +664,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
             if (uri != null) {
                 //chosen ringtone
                 Logger.d(this, "Chosen ringtone: "+uri.toString());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_ONRINGTONESET, null);
             } else {
                 //chosen ringtone null
             }
@@ -646,6 +698,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 101:
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_ALLOW, null);
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
                     Intent loadIntent = new Intent(Intent.ACTION_PICK,
@@ -653,6 +706,7 @@ public class SettingsActivity extends BaseActivity implements SettingsContract.V
                     startActivityForResult(loadIntent, REQUEST_GALLERY);
                 } else {
                     //not granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_DENY, null);
                 }
                 break;
             default:

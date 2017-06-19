@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -42,7 +43,7 @@ import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
@@ -99,7 +100,6 @@ public class UserProfileActivity extends BaseActivity {
     private static String KEY_PROFILE_DP = "UserProfileActivity.KEY_PROFILE_DP";
 
     private FirebaseAnalytics firebaseAnalytics;
-    private final String SCREEN_NAME = "user_profile";
     public static Intent callingIntent(Context context, String username, String userid, String contactName, boolean isBlocked, String contactDP) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -216,9 +216,7 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        /*              Analytics           */
-        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.USER_PROFILE_SCREEN, null);
     }
 
     @Override
@@ -313,10 +311,10 @@ public class UserProfileActivity extends BaseActivity {
                                 });
                     }
                 });
-
     }
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_BACK, null);
         super.onBackPressed();
     }
 
@@ -351,10 +349,9 @@ public class UserProfileActivity extends BaseActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-            /*              Analytics           */
             Bundle bundle = new Bundle();
-            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.BLOCK_USER, bundle);
+            bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_BLOCK, bundle);
         } else if(id == R.id.action_delete_contact) {
             LinearLayout parent = new LinearLayout(this);
 
@@ -379,15 +376,13 @@ public class UserProfileActivity extends BaseActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-            /*              Analytics           */
             Bundle bundle = new Bundle();
-            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.DELETE_USER, bundle);
+            bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_DELETE, bundle);
         } else if(id == R.id.action_add_shortcut) {
-            /*              Analytics           */
             Bundle bundle = new Bundle();
-            bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
-            firebaseAnalytics.logEvent(AnalyticsContants.Event.ADD_SHORTCUT, bundle);
+            bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_ADD_SHORTCUT, bundle);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -396,14 +391,17 @@ public class UserProfileActivity extends BaseActivity {
     public void onMessageClicked() {
         onBackPressed();
 
-        /*              Analytics           */
         Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsContants.Param.OTHER_USER_NAME, this.username);
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.PROFILE_MESSAGE_USER, bundle);
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_MESSAGE, bundle);
     }
 
     @OnClick(R.id.profile_first_line)
     public void onUserIDClicked() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_INFO, bundle);
+
         LinearLayout parent = new LinearLayout(this);
 
         parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
@@ -425,6 +423,7 @@ public class UserProfileActivity extends BaseActivity {
         alertDialog.show();
 
         textView1.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_INFO_COPY, bundle);
             ClipboardManager clipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("userId", userId);
             clipboard.setPrimaryClip(clip);
@@ -434,11 +433,18 @@ public class UserProfileActivity extends BaseActivity {
 
     @OnClick(R.id.user_profile_shared_media)
     public void onSharedMediaClicked() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_SHARED_MEDIA, bundle);
         startActivity(SharedMediaActivity.callingIntent(this, username));
     }
 
     @OnClick(R.id.user_profile_notifications)
     public void onNotificationsClicked() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_NOTIFICATIONS, bundle);
+
         TextView t1, t2, t3, t4, t5;
         LinearLayout parent = new LinearLayout(this);
 
@@ -474,10 +480,16 @@ public class UserProfileActivity extends BaseActivity {
         alertDialog.show();
 
         t1.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_ON, bundle);
             alertDialog.dismiss();
         });
         t5.setOnClickListener(v -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_OFF, bundle);
             alertDialog.dismiss();
+        });
+
+        alertDialog.setOnDismissListener(dialog -> {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_DISMISS, bundle);
         });
     }
 

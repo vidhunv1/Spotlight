@@ -416,13 +416,21 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Bind(R.id.tv_chatItem_contactName)
         TextView name;
 
+        private String contactName;
+
         InviteContactsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(String contactName) {
+            this.contactName = contactName;
             name.setText(contactName);
+        }
+
+        @OnClick(R.id.layout)
+        public void onClick() {
+            contactClickListener.onInviteContact(contactName, "");
         }
     }
 
@@ -434,7 +442,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @OnClick(R.id.layout)
         void onClick() {
-            context.startActivity(InviteFriendsActivity.callingIntent(context));
+            contactClickListener.onInviteFriendsClicked();
         }
     }
 
@@ -473,5 +481,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     interface ContactClickListener {
         void onContactItemClicked(String userId);
+        void onInviteFriendsClicked();
+        void onInviteContact(String contactName, String number);
     }
 }

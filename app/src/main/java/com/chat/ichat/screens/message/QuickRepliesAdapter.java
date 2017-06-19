@@ -1,6 +1,7 @@
 package com.chat.ichat.screens.message;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,9 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.chat.ichat.R;
-import com.chat.ichat.application.SpotlightApplication;
-import com.chat.ichat.core.Logger;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.models.QuickReply;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
 
     private List<QuickReply> quickReplies;
     private Context context;
+    private FirebaseAnalytics firebaseAnalytics;
     public QuickRepliesAdapter(Context context, MessagesAdapter.PostbackClickListener quickReplyClickListener, MessagesAdapter.QuickReplyActionListener quickReplyActionListener, List<QuickReply> quickReplies) {
         this.quickReplyClickListener = quickReplyClickListener;
         this.quickReplyActionListener = quickReplyActionListener;
@@ -36,6 +38,7 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
 
         this.quickReplies = new ArrayList<>();
         this.quickReplies.addAll(quickReplies);
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
 
     @Override
@@ -102,8 +105,12 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
                     textView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
                     if(event.getAction() == MotionEvent.ACTION_UP) {
                         if(qr.getContentType()!=null && qr.getContentType() == QuickReply.ContentType.location) {
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_QUICK_REPLY_CLICK_LOCATION, null);
                             quickReplyActionListener.navigateToGetLocation();
                         } else {
+                            Bundle bundle = new Bundle();
+                            bundle.putString(AnalyticsConstants.Param.MESSAGE, qr.getTitle());
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_QUICK_REPLY_CLICK_MESSAGE, bundle);
                             quickReplyClickListener.sendPostbackMessage(qr.getTitle(), qr.getPayload());
                         }
                     }

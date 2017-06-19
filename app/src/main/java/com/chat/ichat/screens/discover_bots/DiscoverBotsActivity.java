@@ -12,9 +12,10 @@ import android.view.MenuItem;
 
 import com.chat.ichat.R;
 import com.chat.ichat.api.bot.DiscoverBotsResponse;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.screens.message.MessageActivity;
-import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,6 +30,7 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     RecyclerView recyclerView;
 
     DiscoverBotsPresenter discoverBotsPresenter;
+    private FirebaseAnalytics firebaseAnalytics;
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     public static Intent callingIntent(Context context) {
@@ -56,12 +58,20 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
     protected void onResume() {
         discoverBotsPresenter.attachView(this);
         super.onResume();
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.DISCOVER_BOTS_SCREEN, null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.DISCOVER_BOTS_BACK, null);
+        super.onBackPressed();
     }
 
     @Override
@@ -74,7 +84,7 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if ((id == android.R.id.home)) {
-            super.onBackPressed();
+            onBackPressed();
             finish();
             return true;
         }
@@ -96,13 +106,18 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     public void displayBots(DiscoverBotsResponse discoverBotsResponse) {
         if(progressDialog[0].isShowing())
             progressDialog[0].dismiss();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         DiscoverBotsAdapter discoverBotsAdapter = new DiscoverBotsAdapter(this, discoverBotsResponse, this);
         recyclerView.setAdapter(discoverBotsAdapter);
     }
 
     @Override
     public void onContactItemClicked(String userId) {
+        /*              Analytics           */
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, userId);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.DISCOVER_BOTS_CHAT_OPEN, bundle);
         discoverBotsPresenter.openContact(userId);
     }
 

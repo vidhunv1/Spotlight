@@ -17,9 +17,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.GenericCache;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -66,6 +68,7 @@ public class AudioMessageView extends View {
     GenericCache genericCache;
 
     private AudioReadyListener audioReadyListener;
+    private FirebaseAnalytics firebaseAnalytics;
     public AudioMessageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
@@ -79,13 +82,16 @@ public class AudioMessageView extends View {
         this.playPerc = 0f;
         isRunning = false;
 
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         this.setOnClickListener(v -> {
             if(isReady) {
                 if (isRunning) {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_AUDIOMSG_PAUSE, null);
                     timer.cancel();
                     isRunning = false;
                     mediaPlayer.pause();
                 } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_AUDIOMSG_PLAY, null);
                     isRunning = true;
                     timer = new Timer();
                     timer.scheduleAtFixedRate(new ViewRefresher(), 0, delayMilli);

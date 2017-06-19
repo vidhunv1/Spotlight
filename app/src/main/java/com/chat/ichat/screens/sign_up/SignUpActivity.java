@@ -37,12 +37,13 @@ import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
-import com.chat.ichat.config.AnalyticsContants;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.screens.home.HomeActivity;
+import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -127,7 +128,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     private String lastValidUserId = null;
 
     private FirebaseAnalytics firebaseAnalytics;
-    private final String SCREEN_NAME = "signup";
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
@@ -145,7 +145,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         signUpPresenter = new SignUpPresenter(ApiManager.getUserApi(),
                 new ContactsContent(this),
                 ApiManager.getPhoneContactsApi(),
@@ -171,11 +171,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)), 51, 66, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         termsTV.setText(spannable, TextView.BufferType.SPANNABLE);
-        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_BACK, null);
         startActivity(WelcomeActivity.callingIntent(this));
         this.overridePendingTransition(0,0);
         finish();
@@ -197,7 +197,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         signUpPresenter.attachView(this);
 
         /*              Analytics           */
-        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SIGNUP_SCREEN, null);
     }
 
     @Override
@@ -207,6 +207,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @Override
     public void onUserRegistered() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_SUCCESS, null);
         if(hasReadContactPermission()) {
             if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
                 progressDialog[0].dismiss();
@@ -228,11 +229,22 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 useridErrorView.setVisibility(View.INVISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_correct));
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_USERID, bundle);
             } else {
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
                 useridErrorView.setText("User ID taken");
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "User ID taken");
+                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             }
         }
     }
@@ -327,6 +339,23 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         }
         if(passwordET.getText().length()>0) {
             clearPasswordIV.setVisibility(View.VISIBLE);
+
+            if(isPasswordValid(passwordET.getText())) {
+                passwordErrorView.setVisibility(View.INVISIBLE);
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.TEXT, passwordET.getText().length()+"-****");
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_PASSWORD, bundle);
+            } else {
+                passwordErrorView.setVisibility(View.VISIBLE);
+                passwordErrorView.setText("Passwords must be at least six characters long");
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "Inavlid Password");
+                bundle.putString(AnalyticsConstants.Param.TEXT, passwordET.getText().length()+"-****");
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_PASSWORD, bundle);
+            }
         } else {
             clearPasswordIV.setVisibility(View.GONE);
         }
@@ -334,8 +363,14 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnFocusChange(R.id.sign_up_password)
     public void onPasswordFocusChanged() {
+        clearNameIV.setVisibility(View.INVISIBLE);
+        clearUseridIV.setVisibility(View.INVISIBLE);
+
         if(passwordET.isFocused()) {
             passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_FOCUS_PASSWORD, null);
         } else {
             passwordDivider.setBackgroundColor(Color.parseColor(dividerColor));
         }
@@ -347,15 +382,24 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         nameErrorView.setVisibility(View.INVISIBLE);
         if(nameET.getText().toString().length()>0) {
             clearNameIV.setVisibility(View.VISIBLE);
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsConstants.Param.TEXT, nameET.getText().toString());
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_FULLNAME, bundle);
         } else {
             clearNameIV.setVisibility(View.GONE);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_FULLNAME, null);
         }
     }
 
     @OnFocusChange(R.id.sign_up_name)
     public void onNameFocusChanged() {
         if(nameET.isFocused()) {
+            clearPasswordIV.setVisibility(View.INVISIBLE);
+            clearUseridIV.setVisibility(View.INVISIBLE);
+
             nameDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_FOCUS_FULLNAME, null);
         } else {
             nameDivider.setBackgroundColor(Color.parseColor(dividerColor));
         }
@@ -365,12 +409,26 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     public void onMobileTextChanged() {
         mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         mobileErrorView.setVisibility(View.INVISIBLE);
+
+        if(mobileNumberET.getText().length()>0) {
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsConstants.Param.TEXT, mobileNumberET.getText().toString());
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_MOBILE, bundle);
+        } else {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_MOBILE, null);
+        }
     }
 
     @OnFocusChange(R.id.sign_up_mobile_number)
     public void onMobileFocusChanged() {
         if(mobileNumberET.isFocused()) {
+            clearNameIV.setVisibility(View.INVISIBLE);
+            clearPasswordIV.setVisibility(View.INVISIBLE);
+            clearUseridIV.setVisibility(View.INVISIBLE);
+
             mobileDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_FOCUS_MOBILE, null);
         } else {
             mobileDivider.setBackgroundColor(Color.parseColor(dividerColor));
         }
@@ -393,11 +451,22 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 useridErrorView.setText("User ID must have atleast 6 characters.");
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "User ID must have atleast 6 characters.");
+                bundle.putString(AnalyticsConstants.Param.TEXT, userid.toString());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             } else {
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 useridErrorView.setText("This User ID is invalid.");
+
+                /*              Analytics           */
+                Bundle bundle = new Bundle();
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "This User ID is invalid.");
+                bundle.putString(AnalyticsConstants.Param.TEXT, userid.toString());
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             }
         } else {
             clearUseridIV.setVisibility(View.GONE);
@@ -407,7 +476,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @OnFocusChange(R.id.sign_up_userid)
     public void onUseridFocusChanged() {
         if(useridET.isFocused()) {
+            clearNameIV.setVisibility(View.INVISIBLE);
+            clearPasswordIV.setVisibility(View.INVISIBLE);
+
             useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            /*              Analytics           */
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_FOCUS_USERID, null);
         } else {
             useridDivider.setBackgroundColor(Color.parseColor(dividerColor));
         }
@@ -455,26 +529,42 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         }
 
         if (!hasReadContactPermission()) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_SHOW, null);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS}, 101);
         } else {
             registerUser();
         }
-        firebaseAnalytics.logEvent(AnalyticsContants.Event.SIGNUP_BUTTON_CLICK, null);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_SIGNUP, null);
     }
 
     @OnClick(R.id.iv_clear_name)
     public void onClearNameClicked() {
         nameET.setText("");
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_FULLNAME_CLEAR, null);
     }
 
     @OnClick(R.id.iv_clear_password)
     public void onClearPasswordClicked() {
         passwordET.setText("");
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_PASSWORD_CLEAR, null);
     }
 
     @OnClick(R.id.iv_clear_userid)
     public void onClearUseridClicked() {
         useridET.setText("");
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_USERID_CLEAR, null);
+    }
+
+    @OnClick(R.id.btn_privacy_policy)
+    public void onPrivacyPolicyClicked() {
+        startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/privacy"));
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_PRIVACY_POLICY, null);
+    }
+
+    @OnClick(R.id.btn_terms)
+    public void onTermsClicked() {
+        startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/terms"));
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_CLICK_TERMS, null);
     }
 
     private void registerUser() {
@@ -526,9 +616,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                     //granted
                     accountEmail = getEmailAddress();
                     registerUser();
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_ALLOW, null);
                 } else {
                     //not granted
                     registerUser();
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_DENY, null);
                 }
                 break;
             default:

@@ -10,14 +10,18 @@ import android.view.WindowManager;
 
 import com.chat.ichat.R;
 
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.screens.login.LoginActivity;
 import com.chat.ichat.screens.sign_up.SignUpActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
 public class WelcomeActivity extends AppCompatActivity implements WelcomeContract.View {
+    private FirebaseAnalytics firebaseAnalytics;
+
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -36,16 +40,30 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(0xffcfd0d4);
         }
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*              Analytics           */
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.WELCOME_SCREEN, null);
     }
 
     @OnClick(R.id.welcome_signup)
     public void signUpClicked() {
+        /*              Analytics           */
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_BTN_SIGNUP, null);
+
         startActivity(SignUpActivity.callingIntent(this));
         finish();
     }
 
     @OnClick(R.id.welcome_login)
     public void loginClicked() {
+        /*              Analytics           */
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_BTN_LOGIN, null);
+
         startActivity(LoginActivity.callingIntent(this));
         finish();
     }

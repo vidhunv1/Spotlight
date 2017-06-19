@@ -3,6 +3,7 @@ package com.chat.ichat.screens.message.gif;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -26,10 +27,13 @@ import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.application.SpotlightApplication;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.screens.message.MessageEditText;
 import com.chat.ichat.screens.message.audio.ComposerViewHelper;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -61,6 +65,8 @@ public class GifViewHelper {
     private FloatingActionButton sendFab;
     private View.OnClickListener sendClickListener;
 
+    private FirebaseAnalytics firebaseAnalytics;
+
     private SendGifListener sendGifListener;
 
     private GridView gifsGrid;
@@ -74,6 +80,7 @@ public class GifViewHelper {
         this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("gif_preferences", Context.MODE_PRIVATE);
         this.gifApi = ApiManager.getRetrofitClient().create(GifApi.class);
         this.sendGifListener = sendGifListener;
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
     }
 
     private void addGifView() {
@@ -98,6 +105,7 @@ public class GifViewHelper {
             progressBar.setVisibility(View.VISIBLE);
 
             back.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_BACK, null);
                 fullGifLayout.setVisibility(View.GONE);
             });
 
@@ -125,6 +133,8 @@ public class GifViewHelper {
             }
 
             trendingButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_TRENDING, null);
+
                 trendingButton.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_trending_up_selected));
                 categoryButton.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_view_compact));
                 sharedPreferences.edit().putInt("last_selected", 0).apply();
@@ -132,6 +142,8 @@ public class GifViewHelper {
             });
 
             categoryButton.setOnClickListener(v -> {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_CATEGORY, null);
+
                 trendingButton.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_trending_up));
                 categoryButton.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_view_compact_selected));
                 sharedPreferences.edit().putInt("last_selected", 1).apply();
@@ -142,6 +154,7 @@ public class GifViewHelper {
 
             search.setOnFocusChangeListener((v, hasFocus) -> {
                 if(hasFocus) {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEARCH, null);
                     isSearchFocused = true;
                     refreshView();
                 }
@@ -161,6 +174,9 @@ public class GifViewHelper {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AnalyticsConstants.Param.TEXT, s.toString());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_SEARCH_QUERY, bundle);
                     search(s);
                 }
 
@@ -209,6 +225,9 @@ public class GifViewHelper {
                         gifsGrid.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                         GifCategoryAdapter g = new GifCategoryAdapter(mContext, tenorTagsResponse, searchQuery -> {
+                            Bundle bundle = new Bundle();
+                            bundle.putString(AnalyticsConstants.Param.TEXT, searchQuery);
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CATEGORY_SELECT, bundle);
                             search.setText("");
                             search.append(searchQuery);
                             search(searchQuery);
@@ -240,6 +259,7 @@ public class GifViewHelper {
                         gifsGrid.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                         GiphyGifAdapter g = new GiphyGifAdapter(mContext, giphyGifResponse, id -> {
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_GIF, null);
                             for (GiphyGifResponse.Data data : giphyGifResponse.getData()) {
                                 if(data.getId().equals(id)) {
                                     fullGifLayout.setVisibility(View.VISIBLE);
@@ -250,6 +270,7 @@ public class GifViewHelper {
                                             .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                             .into(fullGifImage);
                                     sendFab.setOnClickListener(v -> {
+                                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEND, null);
                                         sendGifListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight());
                                         fullGifLayout.setVisibility(View.GONE);
                                     });
@@ -302,6 +323,7 @@ public class GifViewHelper {
                                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                         .into(fullGifImage);
                                 sendFab.setOnClickListener(v -> {
+                                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEND, null);
                                     sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl(), tenorGifResponse.getResults().get(position).getGif().getWidth(), tenorGifResponse.getResults().get(position).getGif().getHeight());
                                     fullGifLayout.setVisibility(View.GONE);
                                 });

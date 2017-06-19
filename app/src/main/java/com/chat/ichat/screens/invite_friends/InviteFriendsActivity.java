@@ -28,12 +28,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.screens.user_id.SetUserIdActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
@@ -63,6 +66,8 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
     @Bind(R.id.invite_tick)
     ImageView inviteTick;
 
+    private FirebaseAnalytics firebaseAnalytics;
+
     InviteFriendsPresenter inviteFriendsPresenter;
     InviteFriendsAdapter inviteFriendsAdapter;
 
@@ -85,6 +90,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         contactList.setLayoutManager(new LinearLayoutManager(this));
         RecyclerView.ItemAnimator animator = contactList.getItemAnimator();
         if (animator instanceof SimpleItemAnimator)
@@ -97,6 +103,11 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
         setInviteCount(0);
 
         selectAll.setOnCheckedChangeListener((buttonView , isChecked) -> {
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_CHECK_SELECTALL, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_UNCHECK_SELECTALL, null);
+            }
             if(inviteFriendsAdapter!=null) {
                 inviteFriendsAdapter.setAllSelected(isChecked);
                 int size = inviteFriendsAdapter.getSelected().size();
@@ -110,6 +121,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             int result2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
 
             if(!(result2 == permission)) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_SHOW, null);
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 102);
             } else {
                 inviteFriendsPresenter.getInviteList();
@@ -124,10 +136,15 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             window.setStatusBarColor(0xff212121);
         }
 
-        inviteFriendsAdapter = new InviteFriendsAdapter(this, (phone, countryCode) -> {
+        inviteFriendsAdapter = new InviteFriendsAdapter(this, (phone, countryCode, isChecked) -> {
             int size = inviteFriendsAdapter.getSelected().size();
             Logger.d(this, "onChecked total: "+size);
             setInviteCount(size);
+            if(isChecked) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_CHECK_CONTACT, null);
+            } else {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_UNCHECK_CONTACT, null);
+            }
         });
         contactList.setAdapter(inviteFriendsAdapter);
     }
@@ -136,6 +153,8 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
     protected void onResume() {
         super.onResume();
         inviteFriendsPresenter.attachView(this);
+
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.INVITE_FRIENDS_SCREEN, null);
     }
 
     @Override
@@ -146,6 +165,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
 
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_BACK, null);
         super.onBackPressed();
     }
 
@@ -153,6 +173,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if((id == android.R.id.home)) {
+            onBackPressed();
             finish();
             return true;
         }
@@ -161,12 +182,17 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
 
     @OnClick(R.id.rl_invite_friends)
     public void onInviteFriendsClicked() {
+        Bundle bundle = new Bundle();
+        if(inviteFriendsAdapter!=null)
+            bundle.putInt(AnalyticsConstants.Param.COUNT, inviteFriendsAdapter.getSelected().size());
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_CLICK_INVITE, bundle);
         // Permissions
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             int permission = PackageManager.PERMISSION_GRANTED;
             int result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
 
             if(!(result1==permission)) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_SEND_SMS_SHOW, null);
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, 101);
             } else {
                 inviteFriends();
@@ -181,6 +207,11 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             Toast.makeText(getApplicationContext(), "Inviting", Toast.LENGTH_SHORT).show();
             List<ContactResult> cr = inviteFriendsAdapter.getSelected();
             Logger.d(this, "Inviting: "+cr.size());
+
+            Bundle bundle = new Bundle();
+            bundle.putInt(AnalyticsConstants.Param.COUNT, cr.size());
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.INVITE_FRIENDS_ONINVITESEND, bundle);
+
             SmsManager smsManager = SmsManager.getDefault();
             PendingIntent sentPI;
             sentPI = PendingIntent.getBroadcast(this, 0,new Intent("SMS_SENT"), 0);
@@ -216,7 +247,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                final View child = findOneVisibleChild(0, layoutManager.getChildCount(), true, false);
+                final View child = RecyclerViewHelper.findOneVisibleChild(contactList, 0, layoutManager.getChildCount(), true, false);
                 int pos = child == null ? RecyclerView.NO_POSITION : contactList.getChildAdapterPosition(child);
                 if(pos <= 0) {
                     listIdentifier.setText("Favorites");
@@ -225,39 +256,6 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
                 }
             }
         });
-    }
-
-    View findOneVisibleChild(int fromIndex, int toIndex, boolean completelyVisible,
-                             boolean acceptPartiallyVisible) {
-        OrientationHelper helper;
-
-        if (contactList.getLayoutManager().canScrollVertically()) {
-            helper = OrientationHelper.createVerticalHelper(contactList.getLayoutManager());
-        } else {
-            helper = OrientationHelper.createHorizontalHelper(contactList.getLayoutManager());
-        }
-
-        final int start = helper.getStartAfterPadding();
-        final int end = helper.getEndAfterPadding();
-        final int next = toIndex > fromIndex ? 1 : -1;
-        View partiallyVisible = null;
-        for (int i = fromIndex; i != toIndex; i += next) {
-            final View child = contactList.getLayoutManager().getChildAt(i);
-            final int childStart = helper.getDecoratedStart(child);
-            final int childEnd = helper.getDecoratedEnd(child);
-            if (childStart < end && childEnd > start) {
-                if (completelyVisible) {
-                    if (childStart >= start && childEnd <= end) {
-                        return child;
-                    } else if (acceptPartiallyVisible && partiallyVisible == null) {
-                        partiallyVisible = child;
-                    }
-                } else {
-                    return child;
-                }
-            }
-        }
-        return partiallyVisible;
     }
 
     public void setInviteCount(int count) {
@@ -279,17 +277,21 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             case 101:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_SEND_SMS_ALLOW, null);
                     inviteFriends();
                 } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_SEND_SMS_DENY, null);
                     //not granted
                 }
                 break;
             case 102:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_ALLOW, null);
                     //granted
                     progressDialog[0] = ProgressDialog.show(InviteFriendsActivity.this, "", "Loading. Please wait...", true);
                     inviteFriendsPresenter.getInviteList();
                 } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_READ_CONTACT_DENY, null);
                     //not granted
                 }
             default:

@@ -11,12 +11,14 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ public class SharedMediaActivity extends BaseActivity {
     @Bind(R.id.date)
     TextView date;
 
+    private FirebaseAnalytics firebaseAnalytics;
     private static String KEY_USER_NAME = "UserProfileActivity.USER_NAME";
     public static Intent callingIntent(Context context, String username) {
         Intent intent = new Intent(context, SharedMediaActivity.class);
@@ -92,6 +95,20 @@ public class SharedMediaActivity extends BaseActivity {
 
                     }
                 });
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SHARED_MEDIA_SCREEN, null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SHARED_MEDIA_BACK, null);
     }
 
     @Override

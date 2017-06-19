@@ -11,8 +11,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class AudioRecord extends View {
 
     private MediaRecorder recorder = null;
     private String recordFileName;
+    private FirebaseAnalytics firebaseAnalytics;
 
     private int micColor = 0xFFFE4034;
 
@@ -55,6 +58,8 @@ public class AudioRecord extends View {
         paint.setAntiAlias(true);
         this.timer = new Timer();
         running = false;
+
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
 
     public void setRadiusMin(int radiusMin) {
@@ -80,6 +85,7 @@ public class AudioRecord extends View {
                     if(recordListener!=null) {
                         startRecording();
                         recordListener.onRecordStart();
+                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_AUDIO_START_RECORD, null);
                     }
 
                     Logger.d(this, "Recording...");
@@ -94,6 +100,7 @@ public class AudioRecord extends View {
                     if(recordListener!=null) {
                         stopRecording();
                         recordListener.onRecordStop(recordFileName);
+                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_AUDIO_STOP_RECORD, null);
                     }
 
                     Logger.d(this, "Release");
@@ -104,6 +111,7 @@ public class AudioRecord extends View {
                     if(recordListener!=null) {
                         stopRecording();
                         recordListener.onRecordCancel();
+                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_AUDIO_CANCEL_RECORD, null);
                     }
 
                     Logger.d(this, "Cancel");

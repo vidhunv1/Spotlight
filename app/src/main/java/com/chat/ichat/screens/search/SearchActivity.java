@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import com.chat.ichat.R;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.screens.message.MessageActivity;
@@ -39,7 +40,6 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     private SearchAdapter searchAdapter;
 
     private FirebaseAnalytics firebaseAnalytics;
-    private final String SCREEN_NAME = "search";
 
     public static Intent callingIntent(Context context) {
         Intent intent = new Intent(context, SearchActivity.class);
@@ -79,7 +79,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         super.onResume();
 
         /*              Analytics           */
-        firebaseAnalytics.setCurrentScreen(this, SCREEN_NAME, null);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SEARCH_SCREEN, null);
     }
 
     @Override
@@ -94,22 +94,26 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
 
     @Override
     public void onBackPressed() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_BACK, null);
         super.onBackPressed();
     }
 
     @OnClick(R.id.ib_search_clear)
     public void onSearchClear() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_CLEAR, null);
         search.setText("");
     }
 
     @OnTextChanged(R.id.et_search)
     public void onQueryChanged() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.TEXT, search.getText().toString());
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_QUERY, null);
         if(search.getText().length()>0) {
             clearSearchView.setVisibility(View.VISIBLE);
             clearSearchView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_close_active));
             searchPresenter.searchContacts(search.getText().toString());
-        }
-        else {
+        } else {
             clearSearchView.setVisibility(View.GONE);
             searchPresenter.init();
         }
@@ -138,7 +142,16 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     }
 
     @Override
-    public void onContactItemClicked(String userName) {
+    public void onContactItemClicked(String userName, int from) {
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, userName);
+        if(from == 0) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_CONTACT_CHAT_OPEN, bundle);
+        } else if(from == 1) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_USERNAME_CHAT_OPEN, bundle);
+        } else if(from == 2) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_SUGGESTED_CHAT_OPEN, bundle);
+        }
         startActivity(MessageActivity.callingIntent(this, userName));
     }
 }
