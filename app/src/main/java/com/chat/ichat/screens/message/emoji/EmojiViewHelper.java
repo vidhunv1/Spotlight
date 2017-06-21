@@ -114,6 +114,11 @@ public class EmojiViewHelper implements ViewPager.OnPageChangeListener, Emojicon
         isEmojiState = true;
         removeEmojiPickerView();
     }
+
+    public void hide() {
+        isEmojiState = true;
+    }
+
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.emojicons_layout, null, false);

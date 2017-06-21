@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="#FFFFFF"
+    android:layout_marginTop="19.5dp"
+    android:layout_marginBottom="19.5dp"
+    android:layout_height="191.5dp">
+    <TextView
+        android:id="@+id/tv_line1"
+        android:layout_width="match_parent"
+        android:layout_height="43.25dp"
+        android:gravity="center_vertical"
+        android:textSize="14sp"
+        android:textColor="@color/textColor"
+        android:layout_marginLeft="20.5dp"
+        android:text="This sender is not in yout contact list"/>
+
+    <LinearLayout
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/tv_line1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_below="@+id/tv_line1"
+            android:id="@+id/iv_line2"
+            app:srcCompat="@drawable/ic_thumb_down"/>
+        <TextView
+            android:id="@+id/tv_line2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textAppearance="@style/FontRobotoMedium"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true"
+            android:layout_marginLeft="16.5dp"
+            android:textColor="@color/colorPrimary"
+            android:text="REPORT SPAM"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line3"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/line2"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:id="@+id/iv_line3"
+            app:srcCompat="@drawable/ic_block_primary"/>
+        <TextView
+            android:id="@+id/tv_line3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="15sp"
+            android:textAppearance="@style/FontRobotoMedium"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true"
+            android:layout_marginLeft="16.5dp"
+            android:textColor="@color/colorPrimary"
+            android:text="block"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line4"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/line3"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_below="@+id/tv_line3"
+            android:id="@+id/iv_line4"
+            app:srcCompat="@drawable/ic_contact_add_primary"/>
+
+        <TextView
+            android:id="@+id/tv_line4"
+            android:layout_below="@+id/tv_line3"
+            android:layout_toRightOf="@+id/iv_line4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textAppearance="@style/FontRobotoMedium"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true"
+            android:layout_marginLeft="16.5dp"
+            android:textColor="@color/colorPrimary"
+            android:text="add to contacts"/>
+    </LinearLayout>
+</RelativeLayout>

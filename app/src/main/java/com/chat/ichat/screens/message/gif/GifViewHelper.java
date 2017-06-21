@@ -67,11 +67,11 @@ public class GifViewHelper {
 
     private FirebaseAnalytics firebaseAnalytics;
 
-    private SendGifListener sendGifListener;
+    private GifViewListener gifViewListener;
 
     private GridView gifsGrid;
     private TextView error;
-    public GifViewHelper(Context mContext, final ViewGroup viewGroup, Window window, SendGifListener sendGifListener) {
+    public GifViewHelper(Context mContext, final ViewGroup viewGroup, Window window, GifViewListener gifViewListener) {
         this.mContext = mContext;
         this.gifLayout = viewGroup;
         this.window = window;
@@ -79,7 +79,7 @@ public class GifViewHelper {
         composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
         this.sharedPreferences = SpotlightApplication.getContext().getSharedPreferences("gif_preferences", Context.MODE_PRIVATE);
         this.gifApi = ApiManager.getRetrofitClient().create(GifApi.class);
-        this.sendGifListener = sendGifListener;
+        this.gifViewListener = gifViewListener;
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
     }
 
@@ -156,6 +156,7 @@ public class GifViewHelper {
                 if(hasFocus) {
                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEARCH, null);
                     isSearchFocused = true;
+                    gifViewListener.onFocusChanged(true);
                     refreshView();
                 }
             });
@@ -163,6 +164,7 @@ public class GifViewHelper {
             search.setOnEditTextImeBackListener(() -> {
                 if(isSearchFocused) {
                     isSearchFocused = false;
+                    gifViewListener.onFocusChanged(false);
                 } else {
                     removeGifPickerView();
                 }
@@ -200,6 +202,14 @@ public class GifViewHelper {
             ViewGroup.LayoutParams layoutParams = gifLayout.getLayoutParams();
             layoutParams.height = composerViewHelper.getLayoutHeightpx();
             gifLayout.setLayoutParams(layoutParams);
+        }
+    }
+
+    public void handleBackPress() {
+        if(isSearchFocused) {
+            Logger.d(this, "Gif Refresh noSearch");
+            isSearchFocused = false;
+            refreshView();
         }
     }
 
@@ -263,7 +273,7 @@ public class GifViewHelper {
                             for (GiphyGifResponse.Data data : giphyGifResponse.getData()) {
                                 if(data.getId().equals(id)) {
                                     fullGifLayout.setVisibility(View.VISIBLE);
-                                    Glide.with(mContext).load(data.getLowGifUrl().replace("https://", "http://"))
+                                    Glide.with(mContext).load(data.getHighGifUrl().replace("https://", "http://"))
                                             .bitmapTransform(new FitCenter(mContext))
                                             .placeholder(0xFF000000)
                                             .crossFade()
@@ -271,7 +281,7 @@ public class GifViewHelper {
                                             .into(fullGifImage);
                                     sendFab.setOnClickListener(v -> {
                                         firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEND, null);
-                                        sendGifListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight());
+                                        gifViewListener.onSendGif(data.getHighGifUrl(), data.getGifWidth(), data.getGifHeight());
                                         fullGifLayout.setVisibility(View.GONE);
                                     });
                                     break;
@@ -324,7 +334,7 @@ public class GifViewHelper {
                                         .into(fullGifImage);
                                 sendFab.setOnClickListener(v -> {
                                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_GIF_CLICK_SEND, null);
-                                    sendGifListener.onSendGif(tenorGifResponse.getResults().get(position).getGif().getUrl(), tenorGifResponse.getResults().get(position).getGif().getWidth(), tenorGifResponse.getResults().get(position).getGif().getHeight());
+                                    gifViewListener.onSendGif(tenorGifResponse.getResults().get(position).getMediumGif().getUrl(), tenorGifResponse.getResults().get(position).getMediumGif().getWidth(), tenorGifResponse.getResults().get(position).getMediumGif().getHeight());
                                     fullGifLayout.setVisibility(View.GONE);
                                 });
                             });
@@ -348,13 +358,20 @@ public class GifViewHelper {
     }
 
     public void removeGifPickerView() {
+        Logger.d(this, "remove");
         if(isGifViewInflated) {
-            isGifViewInflated = false;
-            ViewGroup.LayoutParams layoutParams = gifLayout.getLayoutParams();
-            layoutParams.height = 0;
-            gifLayout.setLayoutParams(layoutParams);
-            gifLayout.removeAllViews();
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            if(!isSearchFocused) {
+                isGifViewInflated = false;
+                isGifState = true;
+                ViewGroup.LayoutParams layoutParams = gifLayout.getLayoutParams();
+                layoutParams.height = 0;
+                gifLayout.setLayoutParams(layoutParams);
+                gifLayout.removeAllViews();
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            } else {
+                isSearchFocused = false;
+                refreshView();
+            }
         }
     }
 
@@ -380,8 +397,17 @@ public class GifViewHelper {
     }
 
     public void reset() {
+        Logger.d(this, "reset");
         isGifState = true;
         removeGifPickerView();
+    }
+
+    public void hide() {
+        isGifState = true;
+    }
+
+    public boolean isInSearch() {
+        return isSearchFocused;
     }
 
     private View createCustomView() {
@@ -389,7 +415,9 @@ public class GifViewHelper {
         return inflater.inflate(R.layout.gif_layout, null, false);
     }
 
-    public interface SendGifListener {
+    public interface GifViewListener {
         public void onSendGif(String url, int width, int height);
+        public void blockBackPress(boolean shouldBlock);
+        public void onFocusChanged(boolean hasFocus);
     }
 }

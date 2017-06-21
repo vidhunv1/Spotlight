@@ -312,6 +312,7 @@ public class UserProfileActivity extends BaseActivity {
                     }
                 });
     }
+
     @Override
     public void onBackPressed() {
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_BACK, null);
@@ -509,7 +510,21 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     public void delete(String username) {
-        ContactStore.getInstance().deleteContact(username);
+        MessageStore.getInstance().deleteChat(username)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Boolean>() {
+                @Override
+                public void onCompleted() {}
+
+                @Override
+                public void onError(Throwable e) {}
+
+                @Override
+                public void onNext(Boolean aBoolean) {
+                    ContactStore.getInstance().deleteContactUsername(username);
+                }
+            });
         startActivity(HomeActivity.callingIntent(this, 0, null));
     }
 }

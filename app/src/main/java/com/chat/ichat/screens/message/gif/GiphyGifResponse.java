@@ -52,11 +52,11 @@ public class GiphyGifResponse {
         }
 
         public int getGifWidth() {
-            return image.lowGifData.width;
+            return image.highGifData.width;
         }
 
         public int getGifHeight() {
-            return image.lowGifData.height;
+            return image.highGifData.height;
         }
 
         public String getId() {

@@ -145,7 +145,7 @@ public class PeopleNearbyActivity extends AppCompatActivity implements GoogleApi
     @Override
     public void onBackPressed() {
         firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.PEOPLE_NEARBY_BACK, null);
-        if(progressDialog[0].isShowing()) {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing()) {
             progressDialog[0].dismiss();
         }
         super.onBackPressed();

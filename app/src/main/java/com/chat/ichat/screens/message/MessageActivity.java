@@ -22,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -33,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -49,8 +51,10 @@ import com.chat.ichat.MessageController;
 import com.chat.ichat.MessageService;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
+import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.PersistentMenu;
+import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.GsonProvider;
@@ -69,6 +73,7 @@ import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.message.audio.AudioRecord;
 import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
@@ -95,6 +100,10 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
@@ -102,6 +111,7 @@ public class MessageActivity extends BaseActivity
         implements  MessageContract.View,
                     MessagesAdapter.PostbackClickListener,
                     MessagesAdapter.UrlClickListener,
+                    MessagesAdapter.ContactActionListener,
                     MessagesAdapter.QuickReplyActionListener{
     private MessagePresenter messagePresenter;
 
@@ -145,6 +155,7 @@ public class MessageActivity extends BaseActivity
     private TextView sendFABBadge;
 
     private FirebaseAnalytics firebaseAnalytics;
+    private Menu menu;
     // userName: id for ejabberd xmpp. userId: id set by user
 
     //composer
@@ -188,6 +199,7 @@ public class MessageActivity extends BaseActivity
         index = -1;
         top = -1;
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        NotificationController.getInstance().clearNotification();
     }
 
     @Override
@@ -256,10 +268,13 @@ public class MessageActivity extends BaseActivity
             AndroidUtils.hideSoftInput(this);
             this.finish();
         } else if(id == R.id.block) {
+            blockUnblockContact(!contactDetails.isBlocked());
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_BLOCK_CONTACT, null);
         } else if(id == R.id.view_contact) {
+            startActivity(UserProfileActivity.callingIntent(this, contactDetails.getUsername(), contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_VIEW_CONTACT, null);
         } else if(id == R.id.delete) {
+            delete(contactDetails.getUsername(), true);
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_DELETE_CONTACT, null);
         }
         return super.onOptionsItemSelected(item);
@@ -267,7 +282,9 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.messages_toolbar, menu);
+        menu.findItem(R.id.block);
         return true;
     }
 
@@ -443,7 +460,7 @@ public class MessageActivity extends BaseActivity
 
         linearLayoutManager = new WrapContentLinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contact.getProfileDP(), this, this, this);
+        messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contact.getProfileDP(), contact.isAdded(),this, this, this, this);
         messageList.setLayoutManager(linearLayoutManager);
 
         RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
@@ -451,7 +468,7 @@ public class MessageActivity extends BaseActivity
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
         messageList.setAdapter(messagesAdapter);
-        showAddBlock(!contact.isAdded());
+//        showAddBlock(!contact.isAdded());
 
         if(contact.getProfileDP()!=null && !contact.getProfileDP().isEmpty()) {
             Glide.with(this)
@@ -480,6 +497,12 @@ public class MessageActivity extends BaseActivity
             String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
             presenceView.setText(this.getResources().getString(R.string.chat_presence_away, lastSeen));
         }
+
+        if(contactDetails.isBlocked()) {
+            menu.findItem(R.id.block).setTitle("Unblock");
+        } else {
+            menu.findItem(R.id.block).setTitle("Block");
+        }
     }
 
     @Override
@@ -495,36 +518,10 @@ public class MessageActivity extends BaseActivity
             }
             addBlockView.setVisibility(View.VISIBLE);
             addView.setOnClickListener(v -> {
-                messagePresenter.addContact(contactDetails.getUserId());
-                progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
-
-                /*              Analytics           */
-                Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_ADD_CONTACT, bundle);
+                onContactAddClicked();
             });
             blockView.setOnClickListener(v -> {
-                String message = "Are you sure you want to block <b>" + AndroidUtils.displayNameStyle(contactDetails.getContactName()) + "</b>?";;
-                AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
-                alertDialog.setMessage(Html.fromHtml(message));
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", (dialog, which) -> {
-                    messagePresenter.blockContact(contactDetails.getUserId(), true);
-                    progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
-                    dialog.dismiss();
-                });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", (dialog, which) -> {
-                    dialog.cancel();
-                });
-                if(contactDetails.isBlocked()) {
-                    messagePresenter.blockContact(contactDetails.getUserId(), false);
-                    progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
-                } else {
-                    alertDialog.show();
-                }
-
-                Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_BLOCK_CONTACT, bundle);
+                onContactBlockedClicked();
             });
         } else {
             addBlockView.setVisibility(View.GONE);
@@ -545,8 +542,10 @@ public class MessageActivity extends BaseActivity
         alertDialog.show();
 
         alertDialog.setOnDismissListener(dialog -> {
+            messagesAdapter.setContactAdded(true);
             showAddBlock(false);
         });
+
     }
 
     @Override
@@ -580,7 +579,7 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         if(messagesAdapter == null) {
-            messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this, this, this);
+            messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this.contactDetails.isAdded(), this, this, this, this);
         }
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
@@ -700,39 +699,70 @@ public class MessageActivity extends BaseActivity
             emojiViewHelper = new EmojiViewHelper(this, smileyLayout, getWindow());
             audioViewHelper = new AudioViewHelper(this, smileyLayout, getWindow());
             galleryViewHelper = new GalleryViewHelper(this, smileyLayout, getWindow());
-            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), (url, w,h) -> {
-                Logger.d(this, "Gif Width/Height"+w+", "+h);
-                Message m = new Message();
-                ImageMessage imageMessage = new ImageMessage();
-                imageMessage.setImageUrl(url);
-                imageMessage.setWidth(w);
-                imageMessage.setHeight(h);
-                imageMessage.setDataType(ImageMessage.ImageType.gif);
-                m.setImageMessage(imageMessage);
 
-                messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
-            });
-
-            messageEditText.setOnEditTextImeBackListener(() -> {
-                if(!emojiViewHelper.isEmojiState() || !audioViewHelper.isAudioState() || !galleryViewHelper.isGalleryState() || !gifViewHelper.isGifState()) {
-                    shouldHandleBack = false;
+            gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), new GifViewHelper.GifViewListener() {
+                @Override
+                public void onSendGif(String url, int w, int h) {
                     emojiViewHelper.reset();
                     audioViewHelper.reset();
                     galleryViewHelper.reset();
                     gifViewHelper.reset();
+                    setComposerSelected(0);
 
                     messageEditText.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(messageEditText, InputMethodManager.SHOW_IMPLICIT);
 
-                } else {
-                    shouldHandleBack = true;
+                    Logger.d(this, "Gif Width/Height"+w+", "+h);
+                    Message m = new Message();
+                    ImageMessage imageMessage = new ImageMessage();
+                    imageMessage.setImageUrl(url);
+                    imageMessage.setWidth(w);
+                    imageMessage.setHeight(h);
+                    imageMessage.setDataType(ImageMessage.ImageType.gif);
+                    m.setImageMessage(imageMessage);
+
+                    messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
                 }
 
-                emojiViewHelper.removeEmojiPickerView();
-                audioViewHelper.removeAudioPickerView();
-                galleryViewHelper.removeGalleryPickerView();
-                gifViewHelper.removeGifPickerView();
+                @Override
+                public void blockBackPress(boolean shouldBlock) {
+                    shouldHandleBack = !shouldBlock;
+                }
+
+                @Override
+                public void onFocusChanged(boolean hasFocus) {
+                    if(!hasFocus) {
+                        messageEditText.requestFocus();
+                    }
+                }
+            });
+
+            messageEditText.setOnEditTextImeBackListener(() -> {
+                if(!emojiViewHelper.isEmojiState() || !audioViewHelper.isAudioState() || !galleryViewHelper.isGalleryState() || !gifViewHelper.isGifState()) {
+                    if(!gifViewHelper.isGifState()) {
+                        gifViewHelper.refreshView();
+                    }
+                    messageEditText.requestFocus();
+                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .showSoftInput(messageEditText, InputMethodManager.SHOW_FORCED);
+                    // TODO: hack for showing soft input.
+                    new Handler().postDelayed(() -> ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .showSoftInput(messageEditText, InputMethodManager.SHOW_FORCED), 500);
+
+                    shouldHandleBack = false;
+
+                    emojiViewHelper.hide();
+                    audioViewHelper.hide();
+                    galleryViewHelper.hide();
+                    gifViewHelper.hide();
+                } else {
+                    emojiViewHelper.removeEmojiPickerView();
+                    audioViewHelper.removeAudioPickerView();
+                    galleryViewHelper.removeGalleryPickerView();
+                    gifViewHelper.removeGifPickerView();
+                    shouldHandleBack = true;
+                }
 
                 setComposerSelected(0);
             });
@@ -1131,6 +1161,81 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
+    public void onContactAddClicked() {
+        Logger.d(this, "onContactAAddClicked");
+        messagePresenter.addContact(contactDetails.getUserId());
+        progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_ADD_CONTACT, bundle);
+    }
+
+    @Override
+    public void onContactBlockedClicked() {
+        LinearLayout parent = new LinearLayout(this);
+
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding((int)AndroidUtils.px(24), (int)AndroidUtils.px(8), (int)AndroidUtils.px(24), 0);
+
+        TextView textView1 = new TextView(this);
+        textView1.setText("Are you sure want to block this contact?");
+        textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView1.setTextSize(16);
+
+        parent.addView(textView1);
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.app_name));
+        builder.setPositiveButton("OK", ((dialog, which) -> {
+            blockUnblockContact(!contactDetails.isAdded());
+            progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
+        }));
+        builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
+        builder.setView(parent);
+        android.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_BLOCK_CONTACT, bundle);
+    }
+
+    @Override
+    public void onContactReportSpamClicked() {
+        LinearLayout parent = new LinearLayout(this);
+
+        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setPadding((int)AndroidUtils.px(24), (int)AndroidUtils.px(8), (int)AndroidUtils.px(24), 0);
+
+        TextView textView1 = new TextView(this);
+        textView1.setText("Are you sure want to report and block this contact?");
+        textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+        textView1.setTextSize(16);
+
+        parent.addView(textView1);
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.app_name));
+        builder.setPositiveButton("REPORT AND BLOCK", ((dialog, which) -> {
+            blockUnblockContact(true);
+            delete(contactDetails.getUsername(), false);
+            progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
+        }));
+        builder.setNegativeButton("CANCEL", ((dialog, which) -> {}));
+        builder.setView(parent);
+        android.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void showAddBlock() {
+        showAddBlock(true);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data!=null) {
@@ -1243,5 +1348,106 @@ public class MessageActivity extends BaseActivity
     @OnClick(R.id.iv_back)
     public void onBackClick() {
         super.onBackPressed();
+    }
+
+    public void blockUnblockContact(boolean shouldBlock) {
+        ContactResult contactResult = new ContactResult();
+        contactResult.setUserId(contactDetails.getUserId());
+        contactResult.setBlocked(shouldBlock);
+        Activity activity = MessageActivity.this;
+        ApiManager.getContactApi().blockContact(contactDetails.getUserId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<UserResponse>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(UserResponse userResponse) {
+                        Observable<UserResponse> a;
+                        if(shouldBlock) {
+                            a = ApiManager.getContactApi().blockContact(contactDetails.getUserId());
+                        } else {
+                            a = ApiManager.getContactApi().unblockContact(contactDetails.getUserId());
+                        }
+                        a.subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<UserResponse>() {
+                                    @Override
+                                    public void onCompleted() {}
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                        ApiError error = new ApiError(e);
+                                        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(activity).create();
+                                        alertDialog.setTitle(error.getTitle());
+                                        alertDialog.setMessage("\n"+error.getMessage());
+                                        alertDialog.setButton(android.app.AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+                                        alertDialog.show();
+                                    }
+
+                                    @Override
+                                    public void onNext(UserResponse userResponse) {
+                                        contactResult.setBlocked(shouldBlock);
+                                        ContactStore.getInstance().update(contactResult)
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Subscriber<ContactResult>() {
+                                                    @Override
+                                                    public void onCompleted() {}
+
+                                                    @Override
+                                                    public void onError(Throwable e) {}
+
+                                                    @Override
+                                                    public void onNext(ContactResult contactResult) {
+                                                        if(progressDialog[0].isShowing()) {
+                                                            progressDialog[0].dismiss();
+                                                        }
+                                                        String message;
+                                                        if(shouldBlock) {
+                                                            message = "This contact has been blocked.";
+                                                            menu.findItem(R.id.action_block_contact).setTitle("Unblock");
+                                                        }
+                                                        else {
+                                                            message = "This contact has been unblocked.";
+                                                            menu.findItem(R.id.action_block_contact).setTitle("Block");
+                                                        }
+                                                        contactDetails.setBlocked(!contactDetails.isBlocked());
+
+                                                        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(activity).create();
+                                                        alertDialog.setMessage(Html.fromHtml(message));
+                                                        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
+                                                        alertDialog.show();
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
+    }
+
+    public void delete(String username, boolean closeActivity) {
+        MessageStore.getInstance().deleteChat(username)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        ContactStore.getInstance().deleteContactUsername(username);
+                    }
+                });
+        if(closeActivity)
+            startActivity(HomeActivity.callingIntent(this, 0, null));
     }
 }

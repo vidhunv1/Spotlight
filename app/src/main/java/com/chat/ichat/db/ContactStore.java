@@ -362,11 +362,21 @@ public class ContactStore {
         });
     }
 
-    public boolean deleteContact(String u) {
+    public boolean deleteContactUsername(String username) {
         SQLiteDatabase db = databaseManager.openConnection();
         String table = SQLiteContract.ContactsContract.TABLE_NAME;
         String whereClause = SQLiteContract.ContactsContract.COLUMN_USERNAME+"=?";
-        String[] whereArgs = new String[] { String.valueOf(u) };
+        String[] whereArgs = new String[] { String.valueOf(username) };
+        boolean b = db.delete(table, whereClause, whereArgs) > 0;
+        databaseManager.closeConnection();
+        return b;
+    }
+
+    public boolean deleteContactUserId(String userId) {
+        SQLiteDatabase db = databaseManager.openConnection();
+        String table = SQLiteContract.ContactsContract.TABLE_NAME;
+        String whereClause = SQLiteContract.ContactsContract.COLUMN_USER_ID+"=?";
+        String[] whereArgs = new String[] { String.valueOf(userId) };
         boolean b = db.delete(table, whereClause, whereArgs) > 0;
         databaseManager.closeConnection();
         return b;

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -107,22 +106,27 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int VIEW_TYPE_SEND_AUDIO = 12;
     private final int VIEW_TYPE_RECV_AUDIO = 13;
     private final int VIEW_TYPE_NO_MESSAGES = 14;
+    private final int VIEW_TYPE_CONTACT_UNKNOWN_FOOTER = 15;
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
     private QuickReplyActionListener quickReplyActionListener;
     private Drawable textProfileDrawable;
     private DrawableRequestBuilder dp;
+    private boolean isContactAdded;
+    private boolean isAllMessageReceived;
+    private ContactActionListener contactActionListener;
 
     private boolean isTyping;
     private int lastClickedPosition;
     private Animation insertAnimation;
 
     private FirebaseAnalytics firebaseAnalytics;
-    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener) {
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, boolean isContactAdded, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener, ContactActionListener contactActionListener) {
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.quickReplyActionListener = qrActionListener;
+        this.contactActionListener = contactActionListener;
         insertAnimation = AnimationUtils.loadAnimation(context, R.anim.push_bottom_up);
 
         this.context = context;
@@ -131,6 +135,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
         this.chatUserName = chatUserName;
         this.isTyping = false;
+        this.isContactAdded = isContactAdded;
 
         if(dpUrl!=null && !dpUrl.isEmpty()) {
             dp = Glide.with(context)
@@ -155,6 +160,24 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         else
             this.notifyItemChanged(0);
         setQuickReplies();
+
+        isAllMessageReceived = true;
+        for (MessageResult message : messages) {
+            if(message.isMe()) {
+                isAllMessageReceived = false;
+                if(!isContactAdded)
+                    contactActionListener.showAddBlock();
+            }
+        }
+    }
+
+    public void setContactAdded(boolean a) {
+        this.isContactAdded = a;
+        notifyDataSetChanged();
+    }
+
+    public boolean isAllMessageReceived() {
+        return isAllMessageReceived;
     }
 
     public void addMessage(MessageResult messageResult) {
@@ -167,6 +190,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.notifyItemInserted(messageList.size()-1);
         this.notifyItemChanged(messageList.size()-2);
         setQuickReplies();
+        if(messageResult.isMe()) {
+            if(!isContactAdded)
+                contactActionListener.showAddBlock();
+            isAllMessageReceived = false;
+            if(!isTyping && messageCache.get(messageList.size()-1).getQuickReplies()==null) {
+                this.notifyItemChanged(messageList.size());
+            } else {
+                this.notifyItemChanged(messageList.size()+1);
+            }
+            this.notifyItemChanged(0);
+        }
     }
 
     private void setQuickReplies() {
@@ -263,9 +297,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(position == messageList.size()) {
             if(isTyping) {
                 return VIEW_TYPE_TYPING;
-            } else {
+            } else if(messageCache.get(messageList.size()-1).getQuickReplies()!=null){
                 return VIEW_TYPE_QUICK_REPLIES;
+            } else {
+                return VIEW_TYPE_CONTACT_UNKNOWN_FOOTER;
             }
+        }
+        if(position == messageList.size()+1) {
+            return VIEW_TYPE_CONTACT_UNKNOWN_FOOTER;
         }
 
         Message parsedMessage;
@@ -345,12 +384,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
+        Logger.d(this, "isadded"+isContactAdded+", "+isAllMessageReceived);
+        int add = !isContactAdded && isAllMessageReceived?1:0;
+        Logger.d(this, "Add: "+add);
         if(messageList.size() == 0) {
-            return 1;
+            return 1 + add;
         }
         if(quickReplies!=null && quickReplies.size()>=1 || isTyping)
-            return messageList.size()+1;
-        return messageList.size();
+            return messageList.size()+1 + add;
+        return messageList.size() + add;
     }
 
     @Override
@@ -427,6 +469,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 View view15 = inflater.inflate(R.layout.item_message_no_messages, parent, false);
                 viewHolder = new NoMessagesViewHolder(view15);
                 break;
+            case VIEW_TYPE_CONTACT_UNKNOWN_FOOTER:
+                View view16 = inflater.inflate(R.layout.item_message_info_unknown, parent, false);
+                viewHolder = new NoContactViewHolderFooter(view16);
+                break;
+//            case VIEW_TYPE_CONTACT_UNKNOWN_HEADER:
+//                View view17 = inflater.inflate(R.layout.item_message_info_unknown_header, parent, false);
+//                viewHolder = new NoContactViewHolderHeader(view17);
+//                break;
             default:
                 return null;
         }
@@ -511,6 +561,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 NoMessagesViewHolder noMessagesViewHolder = (NoMessagesViewHolder) holder;
                 noMessagesViewHolder.renderItem("No messages here yet...");
                 break;
+            case VIEW_TYPE_CONTACT_UNKNOWN_FOOTER:
+                NoContactViewHolderFooter noContactViewHolderFooter = (NoContactViewHolderFooter) holder;
+                noContactViewHolderFooter.renderItem();
+                break;
+//            case VIEW_TYPE_CONTACT_UNKNOWN_HEADER:
+//                NoContactViewHolderHeader noContactViewHolderHeader = (NoContactViewHolderHeader) holder;
+//                noContactViewHolderHeader.renderItem();
+//                break;
         }
     }
 
@@ -675,6 +733,40 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             alertDialog.dismiss();
         });
     }
+
+    class NoContactViewHolderFooter extends RecyclerView.ViewHolder {
+        NoContactViewHolderFooter(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem() {
+        }
+
+        @OnClick(R.id.tv_line2)
+        public void onReportSpamClicked() {
+            contactActionListener.onContactReportSpamClicked();
+        }
+
+        @OnClick(R.id.tv_line3)
+        public void onBlockClicked() {
+            contactActionListener.onContactBlockedClicked();
+        }
+
+        @OnClick(R.id.tv_line4)
+        public void onAddContactClicked() {
+            contactActionListener.onContactAddClicked();
+        }
+    }
+
+//    class NoContactViewHolderHeader extends RecyclerView.ViewHolder {
+//        NoContactViewHolderHeader(View itemView) {
+//            super(itemView);
+//        }
+//
+//        void renderItem() {
+//        }
+//    }
 
     class QuickRepliesViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.rv_quick_replies)
@@ -1614,9 +1706,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 bubbleView.requestLayout();
             }
 
-            Glide.with(context).load(imageUrl)
-                    .bitmapTransform(new FitCenter(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius) - (int)AndroidUtils.px(4), 0, RoundedCornerTransformation.CornerType.ALL))
-                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+            Glide.with(context).load(imageUrl.replace("https://", "http://"))
+                    .bitmapTransform(new CenterCrop(context))
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .into(messageImage);
 
             render(time, messageStatus, position);
@@ -2055,6 +2148,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     interface QuickReplyActionListener {
         void navigateToGetLocation();
+    }
+
+    interface ContactActionListener {
+        void onContactAddClicked();
+        void onContactBlockedClicked();
+        void onContactReportSpamClicked();
+        void showAddBlock();
     }
 
     private class BitmapSizeTranscoder implements ResourceTranscoder<Bitmap, Size> {

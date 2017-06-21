@@ -128,6 +128,11 @@ public class GalleryViewHelper {
         removeGalleryPickerView();
     }
 
+
+    public void hide() {
+        isGalleryState = true;
+    }
+
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.gallery_layout, null, false);

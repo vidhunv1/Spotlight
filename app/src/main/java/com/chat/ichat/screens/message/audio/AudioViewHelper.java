@@ -107,6 +107,11 @@ public class AudioViewHelper{
         removeAudioPickerView();
     }
 
+
+    public void hide() {
+        isAudioState = true;
+    }
+
     private View createCustomView() {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.audio_layout, null, false);

@@ -304,6 +304,13 @@ public class NotificationController {
         showNotificationAndAlert(false);
     }
 
+    public void clearNotification() {
+        Context context = SpotlightApplication.getContext();
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+    }
+
     public void dismissNotification() {
         Context context = SpotlightApplication.getContext();
         NotificationManager mNotificationManager = (NotificationManager) context
