@@ -25,7 +25,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/tv_time"
         android:layout_marginRight="12dp">
-        <com.chat.ichat.core.lib.RoundRectCornerImageView
+        <com.chat.ichat.components.RoundRectCornerImageView
             android:background="@drawable/bg_msg_receive_full"
             android:id="@+id/message_image"
             android:scaleType="fitXY"

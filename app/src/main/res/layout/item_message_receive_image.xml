@@ -35,12 +35,12 @@
             android:id="@+id/rl_bubble"
             android:maxWidth="258dp"
             android:layout_marginRight="26dp">
-            <ImageView
+            <com.chat.ichat.components.RoundRectCornerImageView
                 android:background="@drawable/bg_msg_receive_full"
                 android:id="@+id/message_image"
+                android:scaleType="fitXY"
                 android:layout_width="150dp"
-                android:layout_height="235dp"
-                android:layout_alignParentBottom="true" />
+                android:layout_height="235dp" />
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

@@ -1628,31 +1628,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Logger.d(this, "iWidth: "+iWidth+", "+iHeight);
             this.imageUrl = imageUrl;
             int bubbleType = bubbleType(position);
-            RoundedCornerTransformation roundedCornerTransformationT = null;
-            RoundedCornerTransformation roundedCornerTransformationB = null;
             Logger.d(this, "Radius: "+(int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius));
             int fullRadius = (int)AndroidUtils.px(20);
             int midRadius = (int)AndroidUtils.px(20);
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
             }
 
@@ -1872,30 +1862,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 timeView.setPadding(0,0 ,0,(int)AndroidUtils.px(2));
             }
 
-            RoundedCornerTransformation roundedCornerTransformationT = null;
-            RoundedCornerTransformation roundedCornerTransformationB = null;
             int fullRadius = 26;
             int midRadius = 22;
             switch (bubbleType) {
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    roundedCornerTransformationT = new RoundedCornerTransformation(context, midRadius, 0, RoundedCornerTransformation.CornerType.TOP_RIGHT);
-                    roundedCornerTransformationB = new RoundedCornerTransformation(context, fullRadius, 0, RoundedCornerTransformation.CornerType.BOTTOM_RIGHT);
                     break;
             }
 
@@ -1949,9 +1929,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 bubbleView.requestLayout();
             }
 
-            Glide.with(context).load(imageUrl)
-                    .bitmapTransform(new FitCenter(context), new RoundedCornerTransformation(context, (int)context.getResources().getDimension(R.dimen.bubble_full_corner_radius) - (int)AndroidUtils.px(4), 0, RoundedCornerTransformation.CornerType.ALL))
-                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+            Glide.with(context).load(imageUrl.replace("https://", "http://"))
+                    .bitmapTransform(new CenterCrop(context))
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .into(messageImage);
 
             if(hasProfileDP(position)) {

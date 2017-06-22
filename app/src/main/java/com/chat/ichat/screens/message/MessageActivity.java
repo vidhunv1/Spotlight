@@ -43,7 +43,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
@@ -86,17 +85,14 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -703,10 +699,7 @@ public class MessageActivity extends BaseActivity
             gifViewHelper = new GifViewHelper(this, smileyLayout, getWindow(), new GifViewHelper.GifViewListener() {
                 @Override
                 public void onSendGif(String url, int w, int h) {
-                    emojiViewHelper.reset();
-                    audioViewHelper.reset();
-                    galleryViewHelper.reset();
-                    gifViewHelper.reset();
+                    gifViewHelper.hide();
                     setComposerSelected(0);
 
                     messageEditText.requestFocus();

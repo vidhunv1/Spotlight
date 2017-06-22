@@ -32,14 +32,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputLayout
+        <com.chat.ichat.components.textinputlayout.TextInputLayoutFix
             android:id="@+id/sign_up_tilName"
             android:layout_width="fill_parent"
-            android:hint="Full Name"
             android:layout_height="wrap_content"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
             android:layout_centerVertical="true">
-            <EditText
+            <android.support.design.widget.TextInputEditText
+                android:hint="Full Name"
                 android:id="@+id/sign_up_name"
                 android:layout_width="match_parent"
                 android:background="@android:color/transparent"
@@ -52,8 +52,7 @@
                 android:textColor="#373A4B"
                 android:textColorHint="#BDBDBD"
                 android:textSize="16sp" />
-        </android.support.design.widget.TextInputLayout>
-
+        </com.chat.ichat.components.textinputlayout.TextInputLayoutFix>
             <ImageView
                 android:id="@+id/iv_clear_name"
                 android:layout_width="24dp"
@@ -70,6 +69,7 @@
             android:layout_height="0.5dp"
             android:id="@+id/sign_up_name_divider"
             android:background="@color/divider" />
+
         <TextView
             android:id="@+id/full_name_error"
             android:layout_marginTop="2.75dp"
@@ -83,7 +83,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputLayout
+            <com.chat.ichat.components.textinputlayout.TextInputLayoutFix
                 android:id="@+id/sign_up_tilUserid"
                 android:layout_width="fill_parent"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
@@ -103,7 +103,7 @@
                     android:textColor="#373A4B"
                     android:textColorHint="#BDBDBD"
                     android:textSize="16sp" />
-            </android.support.design.widget.TextInputLayout>
+            </com.chat.ichat.components.textinputlayout.TextInputLayoutFix>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -160,13 +160,13 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputLayout
+            <com.chat.ichat.components.textinputlayout.TextInputLayoutFix
             android:id="@+id/sign_up_tilPassword"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:layout_centerVertical="true">
-            <android.support.design.widget.TextInputEditText
+             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sign_up_password"
                 android:layout_width="match_parent"
                 android:background="@android:color/transparent"
@@ -180,7 +180,7 @@
                 android:textCursorDrawable="@drawable/bg_cursor_message"
                 android:inputType="textPassword"
                 android:textSize="16sp" />
-        </android.support.design.widget.TextInputLayout>
+        </com.chat.ichat.components.textinputlayout.TextInputLayoutFix>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:orientation="horizontal"
@@ -222,7 +222,7 @@
             android:visibility="invisible"
             android:gravity="end" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.chat.ichat.components.textinputlayout.TextInputLayoutFix
             android:id="@+id/sign_up_tilMobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -244,7 +244,7 @@
                 android:paddingBottom="4.5dp"
                 android:paddingTop="5.5dp"
                 android:textSize="16sp" />
-        </android.support.design.widget.TextInputLayout>
+        </com.chat.ichat.components.textinputlayout.TextInputLayoutFix>
 
         <View
             android:layout_width="fill_parent"

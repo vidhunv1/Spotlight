@@ -29,7 +29,7 @@
         <TextView
             android:paddingLeft="10dp"
             android:text="Do not show again"
-            android:textColor="@color/appElement"
+            android:textColor="@color/textColor"
             android:textSize="14sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

@@ -1,75 +1,57 @@
-package com.chat.ichat.components;
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-        import android.content.Context;
-        import android.content.res.ColorStateList;
-        import android.graphics.Canvas;
-        import android.graphics.Color;
-        import android.graphics.Paint;
-        import android.graphics.PorterDuff;
-        import android.graphics.Rect;
-        import android.graphics.Typeface;
-        import android.graphics.drawable.ColorDrawable;
-        import android.graphics.drawable.Drawable;
-        import android.graphics.drawable.DrawableContainer;
-        import android.os.Build;
-        import android.os.Parcel;
-        import android.os.Parcelable;
-        import android.support.annotation.DrawableRes;
-        import android.support.annotation.NonNull;
-        import android.support.annotation.Nullable;
-        import android.support.annotation.StringRes;
-        import android.support.annotation.StyleRes;
-        import android.support.annotation.VisibleForTesting;
-        import android.support.design.R;
-        import android.support.v4.content.ContextCompat;
-        import android.support.v4.graphics.drawable.DrawableCompat;
-        import android.support.v4.os.ParcelableCompat;
-        import android.support.v4.os.ParcelableCompatCreatorCallbacks;
-        import android.support.v4.view.AbsSavedState;
-        import android.support.v4.view.AccessibilityDelegateCompat;
-        import android.support.v4.view.GravityCompat;
-        import android.support.v4.view.ViewCompat;
-        import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
-        import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-        import android.support.v4.widget.Space;
-        import android.support.v4.widget.TextViewCompat;
-        import android.support.v7.content.res.AppCompatResources;
-        import android.support.v7.widget.AppCompatDrawableManager;
-        import android.support.v7.widget.AppCompatTextView;
-        import android.support.v7.widget.TintTypedArray;
-        import android.text.Editable;
-        import android.text.TextUtils;
-        import android.text.TextWatcher;
-        import android.text.method.PasswordTransformationMethod;
-        import android.util.AttributeSet;
-        import android.util.Log;
-        import android.util.SparseArray;
-        import android.view.Gravity;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.view.accessibility.AccessibilityEvent;
-        import android.view.animation.AccelerateInterpolator;
-        import android.view.animation.AnimationUtils;
-        import android.widget.EditText;
-        import android.widget.FrameLayout;
-        import android.widget.LinearLayout;
-        import android.widget.TextView;
+package com.chat.ichat.components.textinputlayout;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
+import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
+import android.support.annotation.VisibleForTesting;
+import android.support.design.R;
+import android.support.design.widget.*;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.os.ParcelableCompat;
+import android.support.v4.os.ParcelableCompatCreatorCallbacks;
+import android.support.v4.view.AbsSavedState;
+import android.support.v4.view.AccessibilityDelegateCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.Space;
+import android.support.v4.widget.TextViewCompat;
+import android.support.v7.content.res.AppCompatResources;
+import android.support.v7.widget.AppCompatTextView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.util.SparseArray;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.AccelerateInterpolator;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * Layout which wraps an {@link android.widget.EditText} (or descendant) to show a floating label
@@ -112,7 +94,7 @@ package com.chat.ichat.components;
  * may not return the TextInputLayout itself, but rather an intermediate View. If you need
  * to access a View directly, set an {@code android:id} and use {@link View#findViewById(int)}.
  */
-public class TextInputLayout extends LinearLayout {
+public class TextInputLayoutFix extends LinearLayout {
 
     private static final int ANIMATION_DURATION = 200;
     private static final int INVALID_MAX_LENGTH = -1;
@@ -164,6 +146,7 @@ public class TextInputLayout extends LinearLayout {
 
     // Only used for testing
     private boolean mHintExpanded;
+    private Typeface mCollapsedTypeface;
 
     final CollapsingTextHelper mCollapsingTextHelper = new CollapsingTextHelper(this);
 
@@ -175,15 +158,15 @@ public class TextInputLayout extends LinearLayout {
 
     private boolean mRestoringSavedState;
 
-    public TextInputLayout(Context context) {
+    public TextInputLayoutFix(Context context) {
         this(context, null);
     }
 
-    public TextInputLayout(Context context, AttributeSet attrs) {
+    public TextInputLayoutFix(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TextInputLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TextInputLayoutFix(Context context, AttributeSet attrs, int defStyleAttr) {
         // Can't call through to super(Context, AttributeSet, int) since it doesn't exist on API 10
         super(context, attrs);
 
@@ -200,6 +183,8 @@ public class TextInputLayout extends LinearLayout {
         mCollapsingTextHelper.setTextSizeInterpolator(AnimationUtils.FAST_OUT_SLOW_IN_INTERPOLATOR);
         mCollapsingTextHelper.setPositionInterpolator(new AccelerateInterpolator());
         mCollapsingTextHelper.setCollapsedTextGravity(Gravity.TOP | GravityCompat.START);
+
+        mHintExpanded = mCollapsingTextHelper.getExpansionFraction() == 1f;
 
         final TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, attrs,
                 R.styleable.TextInputLayout, defStyleAttr, R.style.Widget_Design_TextInputLayout);
@@ -261,7 +246,7 @@ public class TextInputLayout extends LinearLayout {
                     ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
 
-        ViewCompat.setAccessibilityDelegate(this, new TextInputAccessibilityDelegate());
+        ViewCompat.setAccessibilityDelegate(this, new TextInputLayoutFix.TextInputAccessibilityDelegate());
     }
 
     @Override
@@ -343,7 +328,7 @@ public class TextInputLayout extends LinearLayout {
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                updateLabelState(!mRestoringSavedState);
+                updateLabelState(!mRestoringSavedState, s.length()>0);
                 if (mCounterEnabled) {
                     updateCounter(s.length());
                 }
@@ -353,7 +338,9 @@ public class TextInputLayout extends LinearLayout {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateLabelState(true, s.length()>0);
+            }
         });
 
         // Use the EditText's hint colors if we don't have one set
@@ -378,8 +365,8 @@ public class TextInputLayout extends LinearLayout {
 
         updatePasswordToggleView();
 
-        // Update the label visibility with no animation, but force a state change
-        updateLabelState(false, true);
+        // Update the label visibility with no animation
+        updateLabelState(false, false);
     }
 
     private void updateInputLayoutMargins() {
@@ -405,11 +392,7 @@ public class TextInputLayout extends LinearLayout {
         }
     }
 
-    void updateLabelState(boolean animate) {
-        updateLabelState(animate, false);
-    }
-
-    void updateLabelState(final boolean animate, final boolean force) {
+    void updateLabelState(boolean animate, boolean shouldCollapse) {
         final boolean isEnabled = isEnabled();
         final boolean hasText = mEditText != null && !TextUtils.isEmpty(mEditText.getText());
         final boolean isFocused = arrayContains(getDrawableState(), android.R.attr.state_focused);
@@ -427,14 +410,14 @@ public class TextInputLayout extends LinearLayout {
             mCollapsingTextHelper.setCollapsedTextColor(mDefaultTextColor);
         }
 
-        if (hasText || (isEnabled() && (isFocused || isErrorShowing))) {
+        if (hasText || (isEnabled() && (shouldCollapse || isErrorShowing))) {
             // We should be showing the label so do so if it isn't already
-            if (force || mHintExpanded) {
+            if (mHintExpanded) {
                 collapseHint(animate);
             }
         } else {
             // We should not be showing the label so hide it
-            if (force || !mHintExpanded) {
+            if (!mHintExpanded) {
                 expandHint(animate);
             }
         }
@@ -543,7 +526,7 @@ public class TextInputLayout extends LinearLayout {
         mFocusedTextColor = mCollapsingTextHelper.getCollapsedTextColor();
 
         if (mEditText != null) {
-            updateLabelState(false);
+            updateLabelState(false, mEditText.length()>0);
             // Text size might have changed so update the top margin
             updateInputLayoutMargins();
         }
@@ -745,7 +728,7 @@ public class TextInputLayout extends LinearLayout {
         }
 
         updateEditTextBackground();
-        updateLabelState(animate);
+        updateLabelState(animate, mEditText.length()>0);
     }
 
     /**
@@ -860,7 +843,7 @@ public class TextInputLayout extends LinearLayout {
                     length, mCounterMaxLength));
         }
         if (mEditText != null && wasCounterOverflowed != mCounterOverflowed) {
-            updateLabelState(false);
+            updateLabelState(false, mEditText.length()>0);
             updateEditTextBackground();
         }
     }
@@ -877,7 +860,7 @@ public class TextInputLayout extends LinearLayout {
 
         ensureBackgroundDrawableStateWorkaround();
 
-        if (android.support.v7.widget.DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
+        if (DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
             editTextBackground = editTextBackground.mutate();
         }
 
@@ -921,7 +904,7 @@ public class TextInputLayout extends LinearLayout {
                 // If we have a Drawable container, we can try and set it's constant state via
                 // reflection from the new Drawable
                 mHasReconstructedEditTextBackground =
-                        DrawableUtils.setContainerConstantState(
+                        DrawableUtils1.setContainerConstantState(
                                 (DrawableContainer) bg, newBg.getConstantState());
             }
 
@@ -962,16 +945,16 @@ public class TextInputLayout extends LinearLayout {
                     + " error=" + error + "}";
         }
 
-        public static final Creator<SavedState> CREATOR = ParcelableCompat.newCreator(
+        public static final Creator<TextInputLayoutFix.SavedState> CREATOR = ParcelableCompat.newCreator(
                 new ParcelableCompatCreatorCallbacks<SavedState>() {
                     @Override
-                    public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                        return new SavedState(in, loader);
+                    public TextInputLayoutFix.SavedState createFromParcel(Parcel in, ClassLoader loader) {
+                        return new TextInputLayoutFix.SavedState(in, loader);
                     }
 
                     @Override
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
+                    public TextInputLayoutFix.SavedState[] newArray(int size) {
+                        return new TextInputLayoutFix.SavedState[size];
                     }
                 });
     }
@@ -979,7 +962,7 @@ public class TextInputLayout extends LinearLayout {
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
+        TextInputLayoutFix.SavedState ss = new TextInputLayoutFix.SavedState(superState);
         if (mErrorShown) {
             ss.error = getError();
         }
@@ -988,11 +971,11 @@ public class TextInputLayout extends LinearLayout {
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if (!(state instanceof SavedState)) {
+        if (!(state instanceof TextInputLayoutFix.SavedState)) {
             super.onRestoreInstanceState(state);
             return;
         }
-        SavedState ss = (SavedState) state;
+        TextInputLayoutFix.SavedState ss = (TextInputLayoutFix.SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         setError(ss.error);
         requestLayout();
@@ -1347,7 +1330,7 @@ public class TextInputLayout extends LinearLayout {
 
             mCollapsingTextHelper.setExpandedBounds(
                     l, rect.top + mEditText.getCompoundPaddingTop(),
-                    r, rect.bottom - mEditText.getCompoundPaddingBottom());
+                    r, rect.bottom);
 
             // Set the collapsed bounds to be the the full height (minus padding) to match the
             // EditText's editable area
@@ -1387,7 +1370,7 @@ public class TextInputLayout extends LinearLayout {
         boolean changed = false;
 
         // Drawable state has changed so see if we need to update the label
-        updateLabelState(ViewCompat.isLaidOut(this) && isEnabled());
+        updateLabelState(ViewCompat.isLaidOut(this) && isEnabled(), mEditText!=null && mEditText.length()>0);
 
         updateEditTextBackground();
 
@@ -1446,7 +1429,7 @@ public class TextInputLayout extends LinearLayout {
         @Override
         public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
             super.onInitializeAccessibilityEvent(host, event);
-            event.setClassName(TextInputLayout.class.getSimpleName());
+            event.setClassName(android.support.design.widget.TextInputLayout.class.getSimpleName());
         }
 
         @Override
@@ -1462,7 +1445,7 @@ public class TextInputLayout extends LinearLayout {
         @Override
         public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
             super.onInitializeAccessibilityNodeInfo(host, info);
-            info.setClassName(TextInputLayout.class.getSimpleName());
+            info.setClassName(android.support.design.widget.TextInputLayout.class.getSimpleName());
 
             final CharSequence text = mCollapsingTextHelper.getText();
             if (!TextUtils.isEmpty(text)) {

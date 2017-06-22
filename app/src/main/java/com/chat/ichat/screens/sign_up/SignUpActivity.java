@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +36,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
+import com.chat.ichat.components.textinputlayout.TextInputLayoutFix;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
@@ -94,7 +94,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     TextView useridErrorView;
 
     @Bind(R.id.sign_up_tilName)
-    TextInputLayout tilName;
+    TextInputLayoutFix tilName;
 
     @Bind(R.id.pb_checking_userid)
     ProgressBar userIdPB;
