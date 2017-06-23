@@ -100,7 +100,7 @@ public class Message {
     }
 
     public String getDisplayText() {
-        String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor(SpotlightApplication.getContext(), R.color.colorPrimary) & 0x00ffffff );
+        String highlightColor = "#09874a";//+Integer.toHexString(ContextCompat.getColor(SpotlightApplication.getContext(), R.color.colorPrimary) & 0x00ffffff );
         if(getMessageType() == MessageType.text) {
             return getText();
         } else if(getMessageType() == MessageType.button_template) {

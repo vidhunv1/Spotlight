@@ -27,7 +27,7 @@
         android:textSize="16sp"
         android:cursorVisible="true"
         android:inputType="textCapSentences"
-        android:textCursorDrawable="@drawable/bg_cursor_message"
+        android:textCursorDrawable="@drawable/bg_cursor_black"
         android:textColorHint="@color/appElement">
         <requestFocus/>
     </com.chat.ichat.screens.message.MessageEditText>

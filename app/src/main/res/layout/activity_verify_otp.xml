@@ -34,7 +34,7 @@
                 android:layout_height="58dp"
                 android:text="Code"
                 android:textColor="#373A4B"
-                android:textCursorDrawable="@drawable/bg_cursor_message"
+                android:textCursorDrawable="@drawable/bg_cursor_black"
                 android:inputType="number"
                 android:gravity="center_vertical|left"
                 android:textSize="16sp" />

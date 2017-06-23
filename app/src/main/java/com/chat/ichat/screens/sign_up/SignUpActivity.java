@@ -3,12 +3,15 @@ package com.chat.ichat.screens.sign_up;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,9 +25,13 @@ import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +46,7 @@ import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.components.textinputlayout.TextInputLayoutCustom;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
@@ -58,6 +66,9 @@ import butterknife.OnTextChanged;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.chat.ichat.screens.message.audio.ComposerViewHelper.KEY_KEYBOARD_HEIGHT;
+import static com.chat.ichat.screens.message.audio.ComposerViewHelper.PREFS_NAME;
 
 public class SignUpActivity extends AppCompatActivity implements SignUpContract.View {
     @Bind(R.id.tb_sign_up)
@@ -113,6 +124,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @Bind(R.id.terms_privacy)
     TextView termsTV;
+
+    @Bind(R.id.layout)
+    View layout;
 
     private String accountEmail = "";
 
@@ -171,6 +185,43 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)), 51, 66, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         termsTV.setText(spannable, TextView.BufferType.SPANNABLE);
+
+        /* App Initializations */
+        SharedPreferences sharedPreferences = this.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
+        ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = () -> {
+            Rect r = new Rect();
+            layout.getWindowVisibleDisplayFrame(r);
+
+            int screenHeight = getUsableScreenHeight();
+            int heightDifference = screenHeight - (r.bottom - r.top);
+            int resourceId = this.getResources()
+                    .getIdentifier("status_bar_height",
+                            "dimen", "android");
+            if (resourceId > 0) {
+                heightDifference -= this.getResources().getDimensionPixelSize(resourceId);
+            }
+            if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
+                    editor.apply();
+            } else
+                Log.d("DEF", "CLOSE");
+        };
+        layout.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+    }
+
+    private int getUsableScreenHeight() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            DisplayMetrics metrics = new DisplayMetrics();
+
+            WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+            windowManager.getDefaultDisplay().getMetrics(metrics);
+
+            return metrics.heightPixels;
+
+        } else {
+            return layout.getRootView().getHeight();
+        }
     }
 
     @Override
@@ -238,7 +289,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
-                useridErrorView.setText("User ID taken");
+                useridErrorView.setText("iChat ID taken");
 
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
@@ -342,11 +393,13 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
             if(isPasswordValid(passwordET.getText())) {
                 passwordErrorView.setVisibility(View.INVISIBLE);
+                passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
                 bundle.putString(AnalyticsConstants.Param.TEXT, passwordET.getText().length()+"-****");
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_PASSWORD, bundle);
             } else {
+                passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
                 passwordErrorView.setVisibility(View.VISIBLE);
                 passwordErrorView.setText("Passwords must be at least six characters long");
 
@@ -358,6 +411,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             }
         } else {
             clearPasswordIV.setVisibility(View.GONE);
+            passwordErrorView.setVisibility(View.INVISIBLE);
+            passwordDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         }
     }
 
@@ -446,30 +501,36 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             if (isUserIdValid(userid)) {
                 userIdPB.setVisibility(View.VISIBLE);
                 signUpPresenter.checkUserIdAvailable(useridET.getText().toString());
+                useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             } else if (userid.length() < 6) {
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
-                useridErrorView.setText("User ID must have atleast 6 characters.");
+                useridErrorView.setText("iChat ID must have atleast 6 characters.");
+                useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "User ID must have atleast 6 characters.");
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "iChat ID must have atleast 6 characters.");
                 bundle.putString(AnalyticsConstants.Param.TEXT, userid.toString());
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             } else {
+                useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.error));
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
                 useridErrorView.setVisibility(View.VISIBLE);
                 wrongUserIdIV.setVisibility(View.VISIBLE);
-                useridErrorView.setText("This User ID is invalid.");
+                useridErrorView.setText("This iChat ID is invalid.");
 
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "This User ID is invalid.");
+                bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "This iChat ID is invalid.");
                 bundle.putString(AnalyticsConstants.Param.TEXT, userid.toString());
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             }
         } else {
             clearUseridIV.setVisibility(View.GONE);
+            useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            useridErrorView.setVisibility(View.INVISIBLE);
+            wrongUserIdIV.setVisibility(View.GONE);
         }
     }
 
@@ -573,7 +634,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
         if(lastValidUserId!=null && lastValidUserId.equals(useridET.getText().toString())) {
             signUpPresenter.registerUser(nameET.getText().toString(), accountEmail, passwordET.getText().toString(), this.countryCode, this.mobile, lastValidUserId, imei);
         } else {
-            showError("Invalid UserId", "Please enter a valid User ID.");
+            showError("Invalid iChat ID", "Please enter a valid iChat ID.");
         }
         progressDialog[0] = ProgressDialog.show(SignUpActivity.this, "", "Loading. Please wait...", true);
     }

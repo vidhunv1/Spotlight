@@ -16,6 +16,7 @@ import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -32,7 +33,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 04/03/17.
  */
-
 public class SharedMediaActivity extends BaseActivity {
     @Bind(R.id.tb_shared_media)
     Toolbar toolbar;
@@ -82,7 +82,7 @@ public class SharedMediaActivity extends BaseActivity {
                         List<String> images = new ArrayList<>();
                         for (MessageResult messageResult : messageResults) {
                             Message message = GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class);
-                            if(message.getMessageType() == Message.MessageType.image) {
+                            if(message.getMessageType() == Message.MessageType.image && message.getImageMessage().getDataType() == ImageMessage.ImageType.image) {
                                 if(messageResult.isMe())
                                     images.add(message.getImageMessage().getFileUri());
                                 else

@@ -161,6 +161,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.notifyItemChanged(0);
         setQuickReplies();
 
+        if(!isContactAdded && messages.size()==0)
+            contactActionListener.showAddBlock();
+
         isAllMessageReceived = true;
         for (MessageResult message : messages) {
             if(message.isMe()) {
@@ -486,7 +489,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (quickReplies!=null && messageList!=null && position > lastPosition && messageList.size()>0 && quickReplies.size()==0) {
+        if (quickReplies!=null && messageList!=null && position > lastPosition && messageList.size()>0 && quickReplies.size()==0 && getItemViewType(position)!=VIEW_TYPE_CONTACT_UNKNOWN_FOOTER) {
+
             holder.itemView.startAnimation(insertAnimation);
             lastPosition = position;
         }

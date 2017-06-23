@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -47,7 +48,7 @@
                 android:layout_gravity="right"
                 android:paddingBottom="4.5dp"
                 android:paddingTop="5.5dp"
-                android:textCursorDrawable="@drawable/bg_cursor_message"
+                android:textCursorDrawable="@drawable/bg_cursor_primary"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:textColor="#373A4B"
                 android:textColorHint="#BDBDBD"
@@ -95,10 +96,10 @@
                     android:background="@android:color/transparent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:hint="User ID"
+                    android:hint="iChat ID"
                     android:paddingBottom="4.5dp"
                     android:paddingTop="5.5dp"
-                    android:textCursorDrawable="@drawable/bg_cursor_message"
+                    android:textCursorDrawable="@drawable/bg_cursor_primary"
                     android:inputType="textNoSuggestions|textVisiblePassword"
                     android:textColor="#373A4B"
                     android:textColorHint="#BDBDBD"
@@ -177,7 +178,7 @@
                 android:textColorHint="#bdbdbd"
                 android:paddingBottom="4.5dp"
                 android:paddingTop="5.5dp"
-                android:textCursorDrawable="@drawable/bg_cursor_message"
+                 android:textCursorDrawable="@drawable/bg_cursor_primary"
                 android:inputType="textPassword"
                 android:textSize="16sp" />
         </com.chat.ichat.components.textinputlayout.TextInputLayoutCustom>
@@ -239,7 +240,7 @@
                 android:hint="Mobile Number"
                 android:textColor="#373A4B"
                 android:textColorHint="#BDBDBD"
-                android:textCursorDrawable="@drawable/bg_cursor_message"
+                android:textCursorDrawable="@drawable/bg_cursor_primary"
                 android:inputType="phone"
                 android:paddingBottom="4.5dp"
                 android:paddingTop="5.5dp"
@@ -264,20 +265,25 @@
             android:gravity="end" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/sign_up_btn"
-        android:layout_width="match_parent"
-        android:layout_height="45.5dp"
-        android:textAllCaps="true"
+    <FrameLayout
         android:layout_marginTop="8dp"
-        android:background="@drawable/bg_signup_button"
-        android:text="Sign Up"
+        android:layout_width="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:textColor="#ffffff"
-        android:elevation="0dp"
-        android:stateListAnimator="@null"
-        android:textSize="16sp" />
+        android:background="@drawable/ripple_signup"
+        android:layout_height="wrap_content">
+        <Button
+            android:background="@drawable/ripple_signup"
+            android:id="@+id/sign_up_btn"
+            android:layout_width="match_parent"
+            android:layout_height="45.5dp"
+            android:textAllCaps="true"
+            android:text="Sign Up"
+            android:textColor="#ffffff"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
+            android:textSize="16sp" />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -15,18 +15,29 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <ImageButton
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginRight="4dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="12.5dp"
-            android:paddingTop="11.5dp"
-            app:srcCompat="@drawable/ic_keyboard_menu"
-            android:background="@android:color/transparent"
-            android:id="@+id/message_menu" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="4dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="12.5dp"
+                android:paddingTop="11.5dp"
+                app:srcCompat="@drawable/ic_keyboard_menu"
+                android:background="@android:color/transparent"
+                android:id="@+id/message_menu" />
+
+            <View
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_marginLeft="28dp"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/bg_dot"/>
+        </RelativeLayout>
 
         <EditText
             android:layout_weight="1"
@@ -41,7 +52,7 @@
             android:textColor="#000000"
             android:textSize="16sp"
             android:cursorVisible="true"
-            android:textCursorDrawable="@drawable/bg_cursor_message"
+            android:textCursorDrawable="@drawable/bg_cursor_black"
             android:textColorHint="#FF607D8B">
         </EditText>
 

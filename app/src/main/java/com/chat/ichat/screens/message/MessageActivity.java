@@ -157,6 +157,7 @@ public class MessageActivity extends BaseActivity
     //composer
     View smileySelector, audioSelector, gifSelector;
     ImageButton emojiButton, audioButton, gifButton;
+    GalleryViewHelper.Listener openGalleryClickListener;
 
     private Intent messageServiceIntent;
 
@@ -639,7 +640,7 @@ public class MessageActivity extends BaseActivity
             gifSelector = regularKeyboardView.findViewById(R.id.gif_selector);
             Context context = this;
             Activity activity = this;
-            GalleryViewHelper.Listener openGalleryClickListener = new GalleryViewHelper.Listener() {
+            openGalleryClickListener = new GalleryViewHelper.Listener() {
                 @Override
                 public void onOpenGalleryClicked() {
                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_OPEN_GALLERY, null);
@@ -796,70 +797,11 @@ public class MessageActivity extends BaseActivity
             });
 
             audioButton.setOnClickListener(v -> {
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_AUDIO, null);
-                int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO);
-                int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                int permission = PackageManager.PERMISSION_GRANTED;
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    if (!(perm1 == permission && perm2 == permission)) {
-                        firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_SHOW, null);
-                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
-                    } else {
-                        shouldHandleBack = true;
-                        emojiViewHelper.reset();
-                        galleryViewHelper.reset();
-                        gifViewHelper.reset();
-                        audioViewHelper.audioButtonToggle();
-                        if(!audioViewHelper.isAudioState()) {
-                            setComposerSelected(4);
-                        }
-                    }
-                } else {
-                    shouldHandleBack = true;
-                    emojiViewHelper.reset();
-                    galleryViewHelper.reset();
-                    gifViewHelper.reset();
-                    audioViewHelper.audioButtonToggle();
-                    if(!audioViewHelper.isAudioState()) {
-                        setComposerSelected(4);
-                    }
-                }
+                showAudioLayout();
             });
 
             galleryButton.setOnClickListener(v -> {
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_GALLERY, null);
-                int perm1 = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-                int perm2 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                int permission = PackageManager.PERMISSION_GRANTED;
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    if (!(perm1 == permission && perm2 == permission)) {
-                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 102);
-                    } else {
-                        shouldHandleBack = true;
-                        audioViewHelper.reset();
-                        emojiViewHelper.reset();
-                        gifViewHelper.reset();
-                        galleryViewHelper.galleryButtonToggle();
-                        if(!galleryViewHelper.isGalleryState()) {
-                            setComposerSelected(2);
-                            galleryViewHelper.setListener(openGalleryClickListener);
-                        } else {
-                            galleryViewHelper.removeListener();
-                        }
-                    }
-                } else {
-                    shouldHandleBack = true;
-                    audioViewHelper.reset();
-                    emojiViewHelper.reset();
-                    gifViewHelper.reset();
-                    galleryViewHelper.galleryButtonToggle();
-                    if(!galleryViewHelper.isGalleryState()) {
-                        setComposerSelected(2);
-                        galleryViewHelper.setListener(openGalleryClickListener);
-                    } else {
-                        galleryViewHelper.removeListener();
-                    }
-                }
+                showGalleryLayout();
             });
 
             gifButton.setOnClickListener(v -> {
@@ -982,6 +924,73 @@ public class MessageActivity extends BaseActivity
                 messageBox.append(draft);
                 sendView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                 sendView.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_white));
+            }
+        }
+    }
+
+    public void showAudioLayout() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_AUDIO, null);
+        int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = PackageManager.PERMISSION_GRANTED;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (!(perm1 == permission && perm2 == permission)) {
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_SHOW, null);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
+            } else {
+                shouldHandleBack = true;
+                emojiViewHelper.reset();
+                galleryViewHelper.reset();
+                gifViewHelper.reset();
+                audioViewHelper.audioButtonToggle();
+                if(!audioViewHelper.isAudioState()) {
+                    setComposerSelected(4);
+                }
+            }
+        } else {
+            shouldHandleBack = true;
+            emojiViewHelper.reset();
+            galleryViewHelper.reset();
+            gifViewHelper.reset();
+            audioViewHelper.audioButtonToggle();
+            if(!audioViewHelper.isAudioState()) {
+                setComposerSelected(4);
+            }
+        }
+    }
+
+    public void showGalleryLayout() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_GALLERY, null);
+        int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = PackageManager.PERMISSION_GRANTED;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (!(perm1 == permission && perm2 == permission)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 102);
+            } else {
+                shouldHandleBack = true;
+                audioViewHelper.reset();
+                emojiViewHelper.reset();
+                gifViewHelper.reset();
+                galleryViewHelper.galleryButtonToggle();
+                if(!galleryViewHelper.isGalleryState()) {
+                    setComposerSelected(2);
+                    galleryViewHelper.setListener(openGalleryClickListener);
+                } else {
+                    galleryViewHelper.removeListener();
+                }
+            }
+        } else {
+            shouldHandleBack = true;
+            audioViewHelper.reset();
+            emojiViewHelper.reset();
+            gifViewHelper.reset();
+            galleryViewHelper.galleryButtonToggle();
+            if(!galleryViewHelper.isGalleryState()) {
+                setComposerSelected(2);
+                galleryViewHelper.setListener(openGalleryClickListener);
+            } else {
+                galleryViewHelper.removeListener();
             }
         }
     }
@@ -1308,10 +1317,20 @@ public class MessageActivity extends BaseActivity
                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_DENY, null);
                 }
                 break;
+            case 102:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_ALLOW, null);
+                    showGalleryLayout();
+                } else {
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_STORAGE_DENY, null);
+                }
+                break;
             case 103:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //granted
                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_ALLOW, null);
+                    showAudioLayout();
                 } else {
                     firebaseAnalytics.logEvent(AnalyticsConstants.Event.PERMISSION_RECORD_AUDIO_DENY, null);
                 }

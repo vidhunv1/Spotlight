@@ -54,7 +54,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Integer> filteredList;
     private String filterQuery;
     private SharedPreferences sharedPreferences;
-    private String highlightColor = "#0f9D58";
+    private String highlightColor = "#09874a";
 
     public NewChatAdapter(Context context, ContactClickListener contactClickListener) {
         this.sharedPreferences = context.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
@@ -66,9 +66,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void setContactList(List<NewChatItemModel> contactItems) {
+        Logger.d(this, "Contacts size: "+contactItems.size());
         for (int i = 0; i < contactItems.size(); i++) {
             NewChatItemModel contactItem = contactItems.get(i);
             if(contactItem.isRegistered()) {
+                Logger.d(this, "ContactItem: "+contactItem.toString());
                 long millis = sharedPreferences.getLong(contactItem.getUserName(), 0);
                 String onlineHtml = "<font color=\"" + highlightColor + "\">Online</font>";
                 if (millis == 0) {
@@ -145,7 +147,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return NO_RESULT;
         } else if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
             return CONTACTS_NUMBER;
-        } else if(position == itemList.size()+1 && filterQuery.isEmpty() && filteredList.size()==0) {
+        } else if(position == itemList.size()+2 && filterQuery.isEmpty() && filteredList.size()==0) {
             if(itemList.size()==0) {
                 return NO_CONTACTS;
             } else {
@@ -297,6 +299,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, boolean isStart, boolean isEnd) {
+            Logger.d(this, "render: "+contactItem.getContactName());
             contactName.setText(contactItem.getContactName());
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                 statusView.setText(Html.fromHtml(contactItem.getPresence(), Html.FROM_HTML_MODE_LEGACY));
@@ -359,6 +362,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @SuppressWarnings("deprecation")
         void renderItem(NewChatItemModel contactItem, String query) {
+            Logger.d(this, "renderSearch: ");
             deliveryStatus.setVisibility(View.GONE);
 
             String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
@@ -408,6 +412,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void renderItem(String categoryName) {
+            Logger.d(this, "renderCategory: ");
             categoryTextView.setText(categoryName);
         }
     }
@@ -424,6 +429,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void renderItem(String contactName) {
+            Logger.d(this, "renderInviteContacts: ");
             this.contactName = contactName;
             name.setText(contactName);
         }
@@ -442,6 +448,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @OnClick(R.id.layout)
         void onClick() {
+            Logger.d(this, "renderFriends:");
             contactClickListener.onInviteFriendsClicked();
         }
     }
@@ -456,6 +463,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void renderItem(int number) {
+            Logger.d(this, "renderContactsNumber: ");
             contactNumber.setVisibility(View.GONE);
         }
     }
@@ -469,6 +477,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void renderItem(String filterQuery) {
+            Logger.d(this, "renderNoResult: ");
             noResult.setText("No results found for '"+filterQuery+"'");
         }
     }
@@ -476,6 +485,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class NoContactsViewHolder extends RecyclerView.ViewHolder {
         public NoContactsViewHolder(View itemView) {
             super(itemView);
+            Logger.d(this, "renderNoContacts: ");
         }
     }
 

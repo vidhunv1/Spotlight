@@ -23,8 +23,8 @@ public class ComposerViewHelper {
     private SharedPreferences sharedPreferences;
     private ViewGroup layout;
 
-    private static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
-    private static String PREFS_NAME = "ComposerViewHelper";
+    public static String KEY_KEYBOARD_HEIGHT = "KeyboardHeight";
+    public static String PREFS_NAME = "ComposerViewHelper";
 
     public ComposerViewHelper(Context context, ViewGroup layout) {
         this.layout = layout;
