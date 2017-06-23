@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.components.textinputlayout.TextInputLayoutCustom;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
@@ -53,10 +54,10 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     EditText passwordET;
 
     @Bind(R.id.login_tilAccount)
-    TextInputLayout accountTIL;
+    TextInputLayoutCustom accountTIL;
 
     @Bind(R.id.login_tilPassword)
-    TextInputLayout passwordTIL;
+    TextInputLayoutCustom passwordTIL;
 
     @Bind(R.id.login_btn)
     Button loginButton;

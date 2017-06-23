@@ -284,7 +284,7 @@ public final class AppCompatDrawableManager {
         return drawable;
     }
 
-    private Drawable loadDrawableFromDelegates(@NonNull Context context, @DrawableRes int resId) {
+    private Drawable loadDrawableFromDelegates(@NonNull Context context, int resId) {
         if (mDelegates != null && !mDelegates.isEmpty()) {
             if (mKnownDrawableIdTags != null) {
                 final String cachedTagName = mKnownDrawableIdTags.get(resId);

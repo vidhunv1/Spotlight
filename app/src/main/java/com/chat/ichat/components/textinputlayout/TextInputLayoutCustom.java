@@ -94,7 +94,7 @@ import android.widget.TextView;
  * may not return the TextInputLayout itself, but rather an intermediate View. If you need
  * to access a View directly, set an {@code android:id} and use {@link View#findViewById(int)}.
  */
-public class TextInputLayoutFix extends LinearLayout {
+public class TextInputLayoutCustom extends LinearLayout {
 
     private static final int ANIMATION_DURATION = 200;
     private static final int INVALID_MAX_LENGTH = -1;
@@ -158,15 +158,15 @@ public class TextInputLayoutFix extends LinearLayout {
 
     private boolean mRestoringSavedState;
 
-    public TextInputLayoutFix(Context context) {
+    public TextInputLayoutCustom(Context context) {
         this(context, null);
     }
 
-    public TextInputLayoutFix(Context context, AttributeSet attrs) {
+    public TextInputLayoutCustom(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TextInputLayoutFix(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TextInputLayoutCustom(Context context, AttributeSet attrs, int defStyleAttr) {
         // Can't call through to super(Context, AttributeSet, int) since it doesn't exist on API 10
         super(context, attrs);
 
@@ -246,7 +246,7 @@ public class TextInputLayoutFix extends LinearLayout {
                     ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
 
-        ViewCompat.setAccessibilityDelegate(this, new TextInputLayoutFix.TextInputAccessibilityDelegate());
+        ViewCompat.setAccessibilityDelegate(this, new TextInputLayoutCustom.TextInputAccessibilityDelegate());
     }
 
     @Override
@@ -945,16 +945,16 @@ public class TextInputLayoutFix extends LinearLayout {
                     + " error=" + error + "}";
         }
 
-        public static final Creator<TextInputLayoutFix.SavedState> CREATOR = ParcelableCompat.newCreator(
+        public static final Creator<TextInputLayoutCustom.SavedState> CREATOR = ParcelableCompat.newCreator(
                 new ParcelableCompatCreatorCallbacks<SavedState>() {
                     @Override
-                    public TextInputLayoutFix.SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                        return new TextInputLayoutFix.SavedState(in, loader);
+                    public TextInputLayoutCustom.SavedState createFromParcel(Parcel in, ClassLoader loader) {
+                        return new TextInputLayoutCustom.SavedState(in, loader);
                     }
 
                     @Override
-                    public TextInputLayoutFix.SavedState[] newArray(int size) {
-                        return new TextInputLayoutFix.SavedState[size];
+                    public TextInputLayoutCustom.SavedState[] newArray(int size) {
+                        return new TextInputLayoutCustom.SavedState[size];
                     }
                 });
     }
@@ -962,7 +962,7 @@ public class TextInputLayoutFix extends LinearLayout {
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
-        TextInputLayoutFix.SavedState ss = new TextInputLayoutFix.SavedState(superState);
+        TextInputLayoutCustom.SavedState ss = new TextInputLayoutCustom.SavedState(superState);
         if (mErrorShown) {
             ss.error = getError();
         }
@@ -971,11 +971,11 @@ public class TextInputLayoutFix extends LinearLayout {
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if (!(state instanceof TextInputLayoutFix.SavedState)) {
+        if (!(state instanceof TextInputLayoutCustom.SavedState)) {
             super.onRestoreInstanceState(state);
             return;
         }
-        TextInputLayoutFix.SavedState ss = (TextInputLayoutFix.SavedState) state;
+        TextInputLayoutCustom.SavedState ss = (TextInputLayoutCustom.SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         setError(ss.error);
         requestLayout();

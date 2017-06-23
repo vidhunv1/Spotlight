@@ -36,7 +36,7 @@ import com.chat.ichat.R;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
-import com.chat.ichat.components.textinputlayout.TextInputLayoutFix;
+import com.chat.ichat.components.textinputlayout.TextInputLayoutCustom;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.ContactStore;
@@ -94,7 +94,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     TextView useridErrorView;
 
     @Bind(R.id.sign_up_tilName)
-    TextInputLayoutFix tilName;
+    TextInputLayoutCustom tilName;
 
     @Bind(R.id.pb_checking_userid)
     ProgressBar userIdPB;
