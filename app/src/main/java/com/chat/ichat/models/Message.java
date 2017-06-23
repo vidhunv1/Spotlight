@@ -1,5 +1,9 @@
 package com.chat.ichat.models;
 
+import android.support.v4.content.ContextCompat;
+
+import com.chat.ichat.R;
+import com.chat.ichat.application.SpotlightApplication;
 import com.google.gson.annotations.SerializedName;
 import com.chat.ichat.core.Logger;
 import java.util.List;
@@ -96,36 +100,37 @@ public class Message {
     }
 
     public String getDisplayText() {
+        String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor(SpotlightApplication.getContext(), R.color.colorPrimary) & 0x00ffffff );
         if(getMessageType() == MessageType.text) {
             return getText();
         } else if(getMessageType() == MessageType.button_template) {
             if(buttonTemplate.getText()!=null) {
                 return buttonTemplate.getText();
             } else {
-                return "Template";
+                return "<font color=\""+highlightColor+"\">"+ "Template" +"</font>";
             }
         } else if(getMessageType() == MessageType.generic_template) {
             if(genericTemplate.get(0).getTitle()!=null) {
                 return genericTemplate.get(0).getTitle();
             } else {
-                return "Template";
+                return "<font color=\""+highlightColor+"\">"+ "Template" +"</font>";
             }
         } else if(getMessageType() == MessageType.location) {
             if(locationMessage.getAddress()!=null && !locationMessage.getAddress().isEmpty()) {
-                return "Location: " + locationMessage.getAddress();
+                return "<font color=\""+highlightColor+"\">"+ "Location: " + locationMessage.getAddress() +"</font>";
             } else if(locationMessage.getPlaceName()!=null && !locationMessage.getPlaceName().isEmpty()) {
-                return "Location: " + locationMessage.getPlaceName();
+                return "<font color=\""+highlightColor+"\">"+ "Location: " + locationMessage.getPlaceName() +"</font>";
             } else {
-                return "Location";
+                return "<font color=\""+highlightColor+"\">"+ "Location"+"</font>";
             }
         } else if(getMessageType() == MessageType.image) {
             if(getImageMessage().getDataType() == ImageMessage.ImageType.gif) {
-                return "GIF";
+                return "<font color=\""+highlightColor+"\">"+ "GIF" +"</font>";
             } else {
-                return "Image";
+                return "<font color=\""+highlightColor+"\">"+ "Image" +"</font>";
             }
         } else if(getMessageType() == MessageType.audio) {
-            return "Voice clip";
+            return "<font color=\""+highlightColor+"\">"+ "Voice Message" +"</font>";
         }
         else
             return "";

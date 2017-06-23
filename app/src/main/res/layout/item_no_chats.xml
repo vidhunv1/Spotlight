@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="Not chats yet..."
+        android:textColor="@color/appElement"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:textColor="@color/appElement"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="Start messaging by pressing the new message in the bottom right corner or tap the menu button for more options."
+        android:textSize="16sp"/>
+</LinearLayout>

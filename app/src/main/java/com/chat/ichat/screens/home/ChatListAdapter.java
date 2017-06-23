@@ -38,6 +38,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private ChatClickListener chatClickListener;
     private final int VIEW_CHAT = 0;
     private final int VIEW_EMPTY = 1;
+    private final int VIEW_NO_CHAT = 2;
 
     public ChatListAdapter(Context context, ChatClickListener chatClickListener) {
         this.chatClickListener = chatClickListener;
@@ -157,6 +158,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
+        if(chatList.size()==0)
+            return VIEW_NO_CHAT;
         if(position<chatList.size())
             return VIEW_CHAT;
         else
@@ -181,6 +184,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case VIEW_EMPTY:
                 View emptyView = inflater.inflate(R.layout.item_chat, parent, false);
                 viewHolder = new EmptyViewHolder(emptyView);
+                break;
+            case VIEW_NO_CHAT:
+                View noChatViewHolder = inflater.inflate(R.layout.item_no_chats, parent, false);
+                viewHolder = new NoChatViewHolder(noChatViewHolder);
                 break;
             default:
                 return null;
@@ -279,7 +286,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             try {
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
-                lastMessage.setText(message.getDisplayText());
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                    lastMessage.setText(Html.fromHtml(message.getDisplayText(), Html.FROM_HTML_MODE_LEGACY));
+                else
+                    lastMessage.setText(Html.fromHtml(message.getDisplayText()));
             } catch(JsonSyntaxException e) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                     lastMessage.setText(Html.fromHtml(chatListItem.getLastMessage(), Html.FROM_HTML_MODE_LEGACY));
@@ -334,6 +344,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             chatListContent.setVisibility(View.INVISIBLE);
             dividerLine.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    class NoChatViewHolder extends RecyclerView.ViewHolder {
+        NoChatViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 

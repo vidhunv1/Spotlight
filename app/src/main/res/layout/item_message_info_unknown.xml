@@ -15,7 +15,7 @@
         android:textSize="14sp"
         android:textColor="@color/textColor"
         android:layout_marginLeft="20.5dp"
-        android:text="This sender is not in yout contact list"/>
+        android:text="This sender is not in your contact list"/>
 
     <LinearLayout
         android:id="@+id/line2"

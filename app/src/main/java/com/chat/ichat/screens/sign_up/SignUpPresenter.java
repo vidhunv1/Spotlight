@@ -184,10 +184,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                                         List<Observable<ContactResult>> observables = new ArrayList<>();
                                         for (ContactResult contactResult : contacts) {
                                             // default behaviour, we auto add phone contacts
-                                            //TODO: [1]Sync phone contacts not working
                                             if(contactResult.isRegistered()) {
                                                 MessageController.getInstance().getLastActivity(contactResult.getUsername());
-                                                observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+                                                observables.add(addContactUseCase.execute(contactResult.getUserId(), true));
                                             }
                                         }
 

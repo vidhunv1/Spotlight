@@ -57,9 +57,8 @@
     <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
         android:layout_below="@+id/appbar"
         android:id="@+id/fast_scroller"
-        android:layout_width="5dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_width="24dp"
+        android:padding="9dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         app:rfs_barColor="#00000000"
