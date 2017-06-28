@@ -749,16 +749,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @OnClick(R.id.tv_line2)
         public void onReportSpamClicked() {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_UNKNOWN_REPORT_SPAM, null);
             contactActionListener.onContactReportSpamClicked();
         }
 
         @OnClick(R.id.tv_line3)
         public void onBlockClicked() {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_UNKNOWN_BLOCK, null);
             contactActionListener.onContactBlockedClicked();
         }
 
         @OnClick(R.id.tv_line4)
         public void onAddContactClicked() {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_UNKNOWN_BLOCK, null);
             contactActionListener.onContactAddClicked();
         }
     }
@@ -1322,8 +1325,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return true;
         }
     }
-
-
 
     class ReceiveTextViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_messageitem_message)

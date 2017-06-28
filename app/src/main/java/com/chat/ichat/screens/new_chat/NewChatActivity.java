@@ -26,7 +26,9 @@ import android.widget.TextView;
 
 import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.db.ContactsContent;
+import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.invite_friends.InviteFriendsActivity;
+import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.config.AnalyticsConstants;
@@ -294,7 +296,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         imm.hideSoftInputFromWindow(toolbarSearch.getWindowToken(), 0);
 
         this.navigateToMessageActivity(userId);
-        /*              Analytics           */
         Bundle bundle = new Bundle();
         bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, userId);
         firebaseAnalytics.logEvent(String.format(AnalyticsConstants.Event.CONTACTS_CHAT_OPEN, SCREEN_NAME), bundle);
@@ -309,6 +310,18 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     @Override
     public void onInviteContact(String contactName, String number) {
         firebaseAnalytics.logEvent(String.format(AnalyticsConstants.Event.CONTACTS_CLICK_INVITECONTACT, SCREEN_NAME), null);
+    }
+
+    @Override
+    public void onDiscoverBotsClicked() {
+        firebaseAnalytics.logEvent(String.format(AnalyticsConstants.Event.CONTACTS_CLICK_DISCOVERBOTS, SCREEN_NAME), null);
+        startActivity(DiscoverBotsActivity.callingIntent(this));
+    }
+
+    @Override
+    public void onPeopleNearbyClicked() {
+        firebaseAnalytics.logEvent(String.format(AnalyticsConstants.Event.CONTACTS_CLICK_PEOPLENEARBY, SCREEN_NAME), null);
+        startActivity(PeopleNearbyActivity.callingIntent(this));
     }
 
     @Override

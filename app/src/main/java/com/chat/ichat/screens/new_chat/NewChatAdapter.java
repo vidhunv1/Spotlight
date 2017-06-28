@@ -42,7 +42,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int CONTACTS_NUMBER = 2;
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
-    private final int INVITE_FRIENDS = 8;
+    private final int INVITE_FRIENDS = 10;
+    private final int DISCOVER_BOTS = 8;
+    private final int PEOPLE_NEARBY = 9;
     private final int NO_CONTACTS = 5;
     private final int SEARCH = 6;
     private final int INVITE_CONTACT = 7;
@@ -147,17 +149,22 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return NO_RESULT;
         } else if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
             return CONTACTS_NUMBER;
-        } else if(position == itemList.size()+2 && filterQuery.isEmpty() && filteredList.size()==0) {
+        } else if(position == itemList.size()+4 && filterQuery.isEmpty() && filteredList.size()==0) {
             if(itemList.size()==0) {
                 return NO_CONTACTS;
             } else {
                 return CONTACTS_NUMBER;
             }
-        } else if(position == 1 && filterQuery.isEmpty()) {
+        } else if(position == 3 && filterQuery.isEmpty()) {
             return HEADER;
-        } else if(position == 0 && filterQuery.isEmpty()) {
+        } else if(position == 2 && filterQuery.isEmpty()) {
             return INVITE_FRIENDS;
-        } else {
+        } else if(position == 0 && filterQuery.isEmpty()) {
+            return DISCOVER_BOTS;
+        } else if(position == 1 && filterQuery.isEmpty()) {
+            return PEOPLE_NEARBY;
+        }
+        else {
             if(filterQuery.length() == 0) {
                 if(position < invitePosition || invitePosition == -1) {
                     return CONTACT;
@@ -208,6 +215,14 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View inviteFriends = inflater.inflate(R.layout.item_invite_friends, parent, false);
                 viewHolder = new InviteFriendsViewHolder(inviteFriends);
                 break;
+            case DISCOVER_BOTS:
+                View discoverBots = inflater.inflate(R.layout.item_discover_bots, parent, false);
+                viewHolder = new DiscoverBotsViewHolder(discoverBots);
+                break;
+            case PEOPLE_NEARBY:
+                View peopleNearby = inflater.inflate(R.layout.item_people_nearby, parent, false);
+                viewHolder = new PeopleNearbyViewHolder(peopleNearby);
+                break;
             default:
                 return null;
         }
@@ -220,7 +235,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(!filterQuery.isEmpty() && filteredList.size() > 0 && vPos < filteredList.size())
             position = filteredList.get(vPos);
         else
-            position = vPos - 2;
+            position = vPos - 4;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
@@ -453,6 +468,32 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    class DiscoverBotsViewHolder extends RecyclerView.ViewHolder {
+        DiscoverBotsViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @OnClick(R.id.layout)
+        void onClick() {
+            Logger.d(this, "renderFriends:");
+            contactClickListener.onDiscoverBotsClicked();
+        }
+    }
+
+    class PeopleNearbyViewHolder extends RecyclerView.ViewHolder {
+        PeopleNearbyViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @OnClick(R.id.layout)
+        void onClick() {
+            Logger.d(this, "renderFriends:");
+            contactClickListener.onPeopleNearbyClicked();
+        }
+    }
+
     class ContactsNumber extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_chatItem_contact)
         TextView contactNumber;
@@ -492,6 +533,8 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     interface ContactClickListener {
         void onContactItemClicked(String userId);
         void onInviteFriendsClicked();
+        void onDiscoverBotsClicked();
+        void onPeopleNearbyClicked();
         void onInviteContact(String contactName, String number);
     }
 }

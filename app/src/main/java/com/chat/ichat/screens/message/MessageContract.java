@@ -27,6 +27,7 @@ public interface MessageContract {
         void updateLastActivity(String time);
         void setKeyboardType(boolean isBotKeyboard);
         void initBotMenu(List<PersistentMenu> persistentMenus);
+        void showHidePersistentMenu(boolean shouldShow);
     }
 
     interface Presenter extends BasePresenter<MessageContract.View> {

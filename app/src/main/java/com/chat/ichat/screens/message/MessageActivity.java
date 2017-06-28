@@ -160,6 +160,7 @@ public class MessageActivity extends BaseActivity
     //composer
     View smileySelector, audioSelector, gifSelector;
     ImageButton emojiButton, audioButton, gifButton;
+    View persistentMenuButton;
     GalleryViewHelper.Listener openGalleryClickListener;
     PersistentMenuViewHelper.Listener persistentMenuListener;
 
@@ -387,71 +388,6 @@ public class MessageActivity extends BaseActivity
         }
     }
 
-    public void onMessageMenuClicked() {
-        if(persistentMenus!=null) {
-            View menuItemsView;
-            BottomSheetDialog bottomSheetDialog;
-            bottomSheetDialog = new BottomSheetDialog(this);
-            menuItemsView = this.getLayoutInflater().inflate(R.layout.bottomsheet_menu_message, null);
-
-            bottomSheetDialog.setContentView(menuItemsView);
-
-            List<TextView> itemsTV = new ArrayList<>(5);
-            List<LinearLayout> itemsLL = new ArrayList<>(5);
-            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item1));
-            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item2));
-            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item3));
-            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item4));
-            itemsLL.add((LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_item5));
-
-            for (LinearLayout linearLayout : itemsLL) {
-                linearLayout.setVisibility(View.GONE);
-            }
-
-            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item1));
-            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item2));
-            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item3));
-            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item4));
-            itemsTV.add((TextView) menuItemsView.findViewById(R.id.tv_bottomsheet_item5));
-
-            for (int i = 0; i < persistentMenus.size(); i++) {
-                itemsLL.get(i).setVisibility(View.VISIBLE);
-                itemsTV.get(i).setText(persistentMenus.get(i).getTitle());
-                PersistentMenu menu = persistentMenus.get(i);
-                itemsLL.get(i).setOnClickListener(v -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putString(AnalyticsConstants.Param.MESSAGE, menu.getTitle());
-                    bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
-                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_ITEM, bundle);
-                    bottomSheetDialog.dismiss();
-                    if(menu.getType() == PersistentMenu.Type.postback) {
-                        this.sendPostbackMessage(menu.getTitle(), menu.getPayload());
-                    } else if(menu.getType() == PersistentMenu.Type.web_url) {
-                        startActivity(WebViewActivity.callingIntent(this, menu.getUrl()));
-                    }
-                });
-            }
-
-            ImageView close = (ImageView) menuItemsView.findViewById(R.id.close);
-            close.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_CLOSE, bundle);
-                bottomSheetDialog.dismiss();
-            });
-
-            LinearLayout enterText = (LinearLayout) menuItemsView.findViewById(R.id.ll_bottomsheet_entertext);
-            enterText.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_WAM, bundle);
-                bottomSheetDialog.dismiss();
-                messageBox.requestFocus();
-            });
-            bottomSheetDialog.show();
-        }
-    }
-
     @Override
     public void setContactDetails(ContactResult contact) {
         Logger.d(this, "ContactDetails: "+contact);
@@ -578,6 +514,21 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
+    public void showHidePersistentMenu(boolean shouldShow) {
+        Logger.d(this, "showHidePersistentMenu: "+shouldShow);
+        if(shouldShow) {
+            persistentMenuButton.setVisibility(View.GONE);
+            shouldHandleBack = true;
+            persistentMenuViewHelper.addPMView();
+            messageBox.requestFocus();
+        } else {
+            shouldHandleBack = false;
+            persistentMenuButton.setVisibility(View.VISIBLE);
+            persistentMenuViewHelper.removePMPickerView();
+        }
+    }
+
+    @Override
     public void displayMessages(List<MessageResult> messages) {
         if(messagesAdapter == null) {
             messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this.contactDetails.isAdded(), this, this, this, this);
@@ -595,15 +546,22 @@ public class MessageActivity extends BaseActivity
         rootLayout.removeViewAt(rootLayout.getChildCount()-1);
         if(isBotKeyboard) {
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
-            View persistentMenuButton = botKeyboardView.findViewById(R.id.message_menu);
+            persistentMenuButton = botKeyboardView.findViewById(R.id.message_menu);
             RelativeLayout sendView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             FrameLayout pmLayout = (FrameLayout) botKeyboardView.findViewById(R.id.pm_layout);
             MessageEditText messageEditText = (MessageEditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
             Context context = this;
             messageBox = messageEditText;
+
+            messageEditText.setCursorVisible(false);
             persistentMenuViewHelper = new PersistentMenuViewHelper(this, persistentMenus, pmLayout, getWindow(), new PersistentMenuViewHelper.Listener() {
                 @Override
                 public void onPostbackClicked(String title, String payload) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AnalyticsConstants.Param.MESSAGE, title);
+                    bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_ITEM, bundle);
+
                     sendPostbackMessage(title, payload);
                     new Handler().postDelayed(() -> {
                         persistentMenuViewHelper.reset();
@@ -613,11 +571,14 @@ public class MessageActivity extends BaseActivity
 
                 @Override
                 public void onUrlClicked(String url) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AnalyticsConstants.Param.MESSAGE, url);
+                    bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, contactDetails.getUserId());
+                    firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_PERSISTENT_MENU_CLICK_ITEM, bundle);
+
                     startActivity(WebViewActivity.callingIntent(context, url));
                 }
             });
-            persistentMenuViewHelper.pmButtonToggle();
-            persistentMenuButton.setVisibility(View.GONE);
 
             // remove later after regular keyboard change. -------------------------------------------------------
             messageEditText.addTextChangedListener(new TextWatcher() {
@@ -647,6 +608,7 @@ public class MessageActivity extends BaseActivity
 
             persistentMenuButton.setOnClickListener(v -> {
 //                onMessageMenuClicked();
+                messageEditText.setCursorVisible(false);
                 persistentMenuButton.setVisibility(View.GONE);
                 messageEditText.requestFocus();
                 shouldHandleBack = false;
@@ -656,10 +618,11 @@ public class MessageActivity extends BaseActivity
             messageEditText.setOnEditTextImeBackListener(() -> {
                 persistentMenuButton.setVisibility(View.VISIBLE);
                 persistentMenuViewHelper.removePMPickerView();
-                shouldHandleBack = persistentMenuViewHelper.isPMState();
+                shouldHandleBack = false;
                 messageEditText.requestFocus();
             });
             messageEditText.setOnClickListener(v -> {
+                messageEditText.setCursorVisible(true);
                 persistentMenuButton.setVisibility(View.VISIBLE);
             });
 
@@ -1143,6 +1106,7 @@ public class MessageActivity extends BaseActivity
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
+            showError("Error", "Google play services is not available");
         }
     }
 

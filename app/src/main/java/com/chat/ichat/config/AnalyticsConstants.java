@@ -94,6 +94,8 @@ public class AnalyticsConstants {
         public static final String CONTACTS_CHAT_OPEN = "%s_chat_open";
         public static final String CONTACTS_SCROLL = "%s_scroll";
         public static final String CONTACTS_CLICK_INVITECONTACT = "%s_click_inviteContact";
+        public static final String CONTACTS_CLICK_DISCOVERBOTS = "%s_click_discoverBots";
+        public static final String CONTACTS_CLICK_PEOPLENEARBY = "%s_click_peopleNearby";
         public static final String CONTACTS_SEARCH = "%s_search";
 
         /* DiscoverBots */
@@ -172,8 +174,6 @@ public class AnalyticsConstants {
         public static final String MESSAGE_CLICK_SEND = "message_click_send";
         public static final String MESSAGE_CLICK_PERSISTENT_MENU = "message_click_persistentMenu";
         public static final String MESSAGE_PERSISTENT_MENU_CLICK_ITEM = "message_persistentMenu_click_msg";
-        public static final String MESSAGE_PERSISTENT_MENU_CLICK_CLOSE = "message_persistentMenu_close";
-        public static final String MESSAGE_PERSISTENT_MENU_CLICK_WAM = "message_persistentMenu_wam";
         public static final String MESSAGE_QUICK_REPLY_CLICK_MESSAGE = "message_quickReply_click_message";
         public static final String MESSAGE_QUICK_REPLY_CLICK_LOCATION = "message_quickReply_click_loc";
         public static final String MESSAGE_CLICK_ADD_CONTACT = "message_add_contact";
@@ -198,6 +198,10 @@ public class AnalyticsConstants {
         public static final String MESSAGE_AUDIO_START_RECORD = "message_audio_start_record";
         public static final String MESSAGE_AUDIO_STOP_RECORD = "message_audio_stop_record";
         public static final String MESSAGE_AUDIO_CANCEL_RECORD = "message_audio_cancel_record";
+        public static final String MESSAGE_UNKNOWN_ADD_CONTACT = "message_unknown_add_contact";
+        public static final String MESSAGE_UNKNOWN_REPORT_SPAM = "message_unknown_report_spam";
+        public static final String MESSAGE_UNKNOWN_BLOCK = "message_unknown_block";
+
 
         /* UserProfile */
         public static final String USER_PROFILE_SCREEN = "userProfile_screen";

@@ -197,6 +197,13 @@ public class MessagePresenter implements MessageContract.Presenter {
                     @Override
                     public void onNext(List<MessageResult> messageResults) {
                         messageView.displayMessages(messageResults);
+                        if(chatUserName.toLowerCase().startsWith("o_")) {
+                            Logger.d(this, "CHAT_USER_OFFICIAL");
+//                            MessageResult messageResult = messageResults.get(messageResults.size()-1);
+//                            Message message = GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class);
+//                            messageView.showHidePersistentMenu(!(message.getQuickReplies() != null && message.getQuickReplies().size() > 0));
+                            messageView.showHidePersistentMenu(messageResults.size()==0);
+                        }
                     }
                 });
         compositeSubscription.add(subscription);
