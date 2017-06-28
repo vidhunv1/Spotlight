@@ -220,7 +220,7 @@ public class InviteFriendsActivity extends BaseActivity implements InviteFriends
             for (ContactResult contactResult : cr) {
                 String phone = contactResult.getCountryCode()+contactResult.getPhoneNumber();
                 try {
-                    smsManager.sendTextMessage(phone, null, "Try out iChat!", sentPI, null);
+                    smsManager.sendTextMessage(phone, null, "Try out iChat. Talk to friends and businesses on iChat. Download now: http://goo.gl/4XkmcV", sentPI, null);
                     Toast.makeText(this, "SMS Sent to "+contactResult.getContactName(), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Toast.makeText(this, "SMS to "+contactResult.getContactName()+"failed, please try again later!", Toast.LENGTH_SHORT).show();

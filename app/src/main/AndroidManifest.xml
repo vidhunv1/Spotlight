@@ -41,14 +41,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBafLPQHeTSZp93K-tob8VizMr6AiMPFP8" />
 
-        <receiver
-            android:name="swarajsaaj.smscodereader.receivers.OtpReader"
-            android:permission="android.permission.BROADCAST_SMS">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".screens.launcher.LauncherActivity"
             android:noHistory="true">
@@ -76,14 +68,16 @@
 
         <service
             android:name=".core.FCMMessageHandler"
-            android:exported="false">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
             android:name=".core.FCMRegistrationIntentService"
-            android:exported="false">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:layout_width="match_parent"
-    android:layout_height="46dp"
+    android:layout_height="wrap_content"
+    android:minHeight="46dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
     android:orientation="vertical"
@@ -15,67 +16,64 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageButton
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginRight="4dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:paddingBottom="12.5dp"
-                android:paddingTop="11.5dp"
-                app:srcCompat="@drawable/ic_keyboard_menu"
-                android:background="@android:color/transparent"
-                android:id="@+id/message_menu" />
-
-            <View
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_marginLeft="28dp"
-                android:layout_marginTop="13dp"
-                android:background="@drawable/bg_dot"/>
-        </RelativeLayout>
-
-        <EditText
-            android:layout_weight="1"
-            android:layout_marginLeft="20dp"
-            android:paddingBottom="0.25dp"
+        <com.chat.ichat.screens.message.MessageEditText
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:minHeight="47dp"
+            android:maxLines="5"
+            android:layout_height="wrap_content"
             android:id="@+id/et_sendmessage_message"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/transparent"
             android:hint="@string/keyboard_hint"
-            android:textColor="#000000"
+            android:textColor="#333333"
             android:textSize="16sp"
             android:cursorVisible="true"
+            android:inputType="textCapSentences|textMultiLine"
             android:textCursorDrawable="@drawable/bg_cursor_black"
-            android:textColorHint="#FF607D8B">
-        </EditText>
+            android:textColorHint="@color/appElement">
+            <requestFocus/>
+            </com.chat.ichat.screens.message.MessageEditText>
+
+        <ImageButton
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingBottom="12.5dp"
+            android:paddingTop="11.5dp"
+            app:srcCompat="@drawable/ic_keyboard_menu"
+            android:background="@android:color/transparent"
+            android:id="@+id/message_menu" />
 
         <RelativeLayout
             android:visibility="gone"
-            android:layout_gravity="center_vertical"
-            android:layout_width="49dp"
-            android:layout_height="34dp"
             android:id="@+id/btn_sendMessage_send"
-            android:background="@drawable/bg_send_active"
-            android:layout_marginRight="10dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-            <TextView
-                android:textColor="#FFFFFF"
-                android:text="SEND"
-                android:textSize="15sp"
-                android:layout_gravity="center"
-                android:layout_weight="0"
-                android:layout_width="wrap_content"
-                android:textAlignment="center"
-                android:layout_height="wrap_content"
-                />
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="7dp"
+                app:srcCompat="@drawable/ic_send_primary"
+                android:background="@android:color/transparent" />
         </RelativeLayout>
     </LinearLayout>
+    <View
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/smiley_layout"
+        android:background="#D9D9D9" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/pm_layout">
+    </FrameLayout>
 </LinearLayout>

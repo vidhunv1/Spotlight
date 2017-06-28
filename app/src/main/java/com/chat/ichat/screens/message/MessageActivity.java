@@ -78,6 +78,8 @@ import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
 import com.chat.ichat.screens.message.gallery.GalleryViewHelper;
 import com.chat.ichat.screens.message.gif.GifViewHelper;
+import com.chat.ichat.screens.message.persistent_menu.PersistentMenuViewHelper;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -127,6 +129,7 @@ public class MessageActivity extends BaseActivity
     private AudioViewHelper audioViewHelper;
     private GalleryViewHelper galleryViewHelper;
     private GifViewHelper gifViewHelper;
+    private PersistentMenuViewHelper persistentMenuViewHelper;
 
     private List<PersistentMenu> persistentMenus;
     private WrapContentLinearLayoutManager linearLayoutManager;
@@ -158,6 +161,7 @@ public class MessageActivity extends BaseActivity
     View smileySelector, audioSelector, gifSelector;
     ImageButton emojiButton, audioButton, gifButton;
     GalleryViewHelper.Listener openGalleryClickListener;
+    PersistentMenuViewHelper.Listener persistentMenuListener;
 
     private Intent messageServiceIntent;
 
@@ -591,24 +595,42 @@ public class MessageActivity extends BaseActivity
         rootLayout.removeViewAt(rootLayout.getChildCount()-1);
         if(isBotKeyboard) {
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
+            View persistentMenuButton = botKeyboardView.findViewById(R.id.message_menu);
             RelativeLayout sendView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
-            messageBox = (EditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
-            botKeyboardView.findViewById(R.id.message_menu).setOnClickListener(v -> {
-                onMessageMenuClicked();
-                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_PERSISTENT_MENU, null);
+            FrameLayout pmLayout = (FrameLayout) botKeyboardView.findViewById(R.id.pm_layout);
+            MessageEditText messageEditText = (MessageEditText) botKeyboardView.findViewById(R.id.et_sendmessage_message);
+            Context context = this;
+            messageBox = messageEditText;
+            persistentMenuViewHelper = new PersistentMenuViewHelper(this, persistentMenus, pmLayout, getWindow(), new PersistentMenuViewHelper.Listener() {
+                @Override
+                public void onPostbackClicked(String title, String payload) {
+                    sendPostbackMessage(title, payload);
+                    new Handler().postDelayed(() -> {
+                        persistentMenuViewHelper.reset();
+                        persistentMenuButton.setVisibility(View.VISIBLE);
+                    }, 500);
+                }
+
+                @Override
+                public void onUrlClicked(String url) {
+                    startActivity(WebViewActivity.callingIntent(context, url));
+                }
             });
+            persistentMenuViewHelper.pmButtonToggle();
+            persistentMenuButton.setVisibility(View.GONE);
 
             // remove later after regular keyboard change. -------------------------------------------------------
-            messageBox.addTextChangedListener(new TextWatcher() {
+            messageEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (s.length() >= 1) {
+                        persistentMenuButton.setVisibility(View.GONE);
                         sendView.setVisibility(View.VISIBLE);
-                        sendView.setBackgroundResource(R.drawable.bg_send_active);
                     } else {
+                        persistentMenuButton.setVisibility(View.VISIBLE);
                         sendView.setVisibility(View.GONE);
                     }
                     onMessageChanged();
@@ -621,6 +643,24 @@ public class MessageActivity extends BaseActivity
 
             sendView.setOnClickListener(v -> {
                 onSendClicked();
+            });
+
+            persistentMenuButton.setOnClickListener(v -> {
+//                onMessageMenuClicked();
+                persistentMenuButton.setVisibility(View.GONE);
+                messageEditText.requestFocus();
+                shouldHandleBack = false;
+                persistentMenuViewHelper.addPMView();
+                firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_PERSISTENT_MENU, null);
+            });
+            messageEditText.setOnEditTextImeBackListener(() -> {
+                persistentMenuButton.setVisibility(View.VISIBLE);
+                persistentMenuViewHelper.removePMPickerView();
+                shouldHandleBack = persistentMenuViewHelper.isPMState();
+                messageEditText.requestFocus();
+            });
+            messageEditText.setOnClickListener(v -> {
+                persistentMenuButton.setVisibility(View.VISIBLE);
             });
 
         } else {
