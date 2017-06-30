@@ -273,7 +273,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     @Override
     public void showUserIdAvailable(String userId, boolean isAvailable) {
         Logger.d(this, "UserIdAvailable: "+userId+", "+isAvailable);
-        if(useridET.getText().toString().equals(userId)) {
+        if(useridET.getText().toString().toLowerCase().equals(userId)) {
             userIdPB.setVisibility(View.GONE);
             if (isAvailable) {
                 lastValidUserId = userId;
@@ -283,7 +283,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
-                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString());
+                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString().toLowerCase());
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_VALID_USERID, bundle);
             } else {
                 useridErrorView.setVisibility(View.VISIBLE);
@@ -294,7 +294,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
                 /*              Analytics           */
                 Bundle bundle = new Bundle();
                 bundle.putString(AnalyticsConstants.Param.ERROR_NAME, "User ID taken");
-                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString());
+                bundle.putString(AnalyticsConstants.Param.TEXT, useridET.getText().toString().toLowerCase());
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_USERID, bundle);
             }
         }
@@ -491,7 +491,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
 
     @OnTextChanged(R.id.sign_up_userid)
     public void onUserIdTextChanged() {
-        CharSequence userid = useridET.getText();
+        CharSequence userid = useridET.getText().toString().toLowerCase();
         useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         useridErrorView.setVisibility(View.INVISIBLE);
         wrongUserIdIV.setVisibility(View.GONE);
@@ -500,7 +500,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
             clearUseridIV.setVisibility(View.VISIBLE);
             if (isUserIdValid(userid)) {
                 userIdPB.setVisibility(View.VISIBLE);
-                signUpPresenter.checkUserIdAvailable(useridET.getText().toString());
+                signUpPresenter.checkUserIdAvailable(useridET.getText().toString().toLowerCase());
                 useridDivider.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             } else if (userid.length() < 6) {
                 wrongUserIdIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_wrong));
@@ -631,7 +631,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpContract.
     private void registerUser() {
         String imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         this.mobile = mobileNumberET.getText().toString();
-        if(lastValidUserId!=null && lastValidUserId.equals(useridET.getText().toString())) {
+        if(lastValidUserId!=null && lastValidUserId.equals(useridET.getText().toString().toLowerCase())) {
             signUpPresenter.registerUser(nameET.getText().toString(), accountEmail, passwordET.getText().toString(), this.countryCode, this.mobile, lastValidUserId, imei);
         } else {
             showError("Invalid iChat ID", "Please enter a valid iChat ID.");
