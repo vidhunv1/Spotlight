@@ -38,7 +38,6 @@ import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.message.MessageActivity;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
-import com.chat.ichat.screens.sign_up.SignUpActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;

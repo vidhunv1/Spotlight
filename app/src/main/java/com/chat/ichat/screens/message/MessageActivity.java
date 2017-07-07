@@ -117,9 +117,6 @@ public class MessageActivity extends BaseActivity
     @Bind(R.id.tb_message) Toolbar toolbar;
     @Bind(R.id.tb_message_title) TextView title;
     @Bind(R.id.container) RelativeLayout rootLayout;
-    @Bind(R.id.message_add_block) LinearLayout addBlockView;
-    @Bind(R.id.iv_profile_image) ImageView profileImage;
-    @Bind(R.id.tb_message_presence)
     TextView presenceView;
 
     EditText messageBox;
@@ -269,15 +266,8 @@ public class MessageActivity extends BaseActivity
         if((id == android.R.id.home)) {
             AndroidUtils.hideSoftInput(this);
             this.finish();
-        } else if(id == R.id.block) {
-            blockUnblockContact(!contactDetails.isBlocked());
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_BLOCK_CONTACT, null);
-        } else if(id == R.id.view_contact) {
-            startActivity(UserProfileActivity.callingIntent(this, contactDetails.getUsername(), contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_VIEW_CONTACT, null);
-        } else if(id == R.id.delete) {
-            delete(contactDetails.getUsername(), true);
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_DELETE_CONTACT, null);
+        } else if(id == R.id.info) {
+            startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -286,7 +276,6 @@ public class MessageActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
         getMenuInflater().inflate(R.menu.messages_toolbar, menu);
-        menu.findItem(R.id.block);
         return true;
     }
 
@@ -299,28 +288,6 @@ public class MessageActivity extends BaseActivity
         Bundle bundle = new Bundle();
         bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_DP, bundle);
-    }
-
-    @OnClick(R.id.iv_profile_image)
-    public void onDPClicked() {
-        AndroidUtils.hideSoftInput(this);
-        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
-
-        /*              Analytics           */
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TITLE, bundle);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_DP, bundle);
-    }
-
-    @OnClick(R.id.tb_message_presence)
-    public void onPresenceClicked() {
-        AndroidUtils.hideSoftInput(this);
-        startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
-
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TITLE, bundle);
     }
 
     public void onSendClicked() {
@@ -407,17 +374,6 @@ public class MessageActivity extends BaseActivity
         messageList.setAdapter(messagesAdapter);
 //        showAddBlock(!contact.isAdded());
 
-        if(contact.getProfileDP()!=null && !contact.getProfileDP().isEmpty()) {
-            Glide.with(this)
-                    .load(contact.getProfileDP().replace("https://", "http://"))
-                    .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18))
-                    .bitmapTransform(new CenterCrop(this), new CircleTransformation(this))
-                    .into(profileImage);
-        } else {
-            profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contact.getContactName(), contact.getUsername(), 18));
-        }
         linearLayoutManager.scrollToPositionWithOffset(-1,-1);
 
         SharedPreferences sharedPreferences = this.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
@@ -434,55 +390,6 @@ public class MessageActivity extends BaseActivity
             String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
             presenceView.setText(this.getResources().getString(R.string.chat_presence_away, lastSeen));
         }
-
-        if(contactDetails.isBlocked()) {
-            menu.findItem(R.id.block).setTitle("Unblock");
-        } else {
-            menu.findItem(R.id.block).setTitle("Block");
-        }
-    }
-
-    @Override
-    public void showAddBlock(boolean shouldShow) {
-        Logger.d(this, "showAddBlock: "+shouldShow);
-        if(shouldShow) {
-            TextView addView = (TextView) findViewById(R.id.message_add);
-            TextView blockView = (TextView) findViewById(R.id.message_block);
-            if(contactDetails.isBlocked()) {
-                blockView.setText("UNBLOCK");
-            } else {
-                blockView.setText("BLOCK");
-            }
-            addBlockView.setVisibility(View.VISIBLE);
-            addView.setOnClickListener(v -> {
-                onContactAddClicked();
-            });
-            blockView.setOnClickListener(v -> {
-                onContactBlockedClicked();
-            });
-        } else {
-            addBlockView.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void showContactAddedSuccess() {
-        String message;
-        if(progressDialog[0].isShowing()) {
-            progressDialog[0].dismiss();
-        }
-        message = "<b>" + AndroidUtils.displayNameStyle(contactDetails.getContactName()) + "</b> is added to your contacts on iChat.";
-
-        AlertDialog alertDialog = new AlertDialog.Builder(MessageActivity.this).create();
-        alertDialog.setMessage(Html.fromHtml(message));
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
-        alertDialog.show();
-
-        alertDialog.setOnDismissListener(dialog -> {
-            messagesAdapter.setContactAdded(true);
-            showAddBlock(false);
-        });
-
     }
 
     @Override
@@ -502,10 +409,6 @@ public class MessageActivity extends BaseActivity
         alertDialog.setMessage(Html.fromHtml(message));
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
-
-        alertDialog.setOnDismissListener(dialog -> {
-            showAddBlock(true);
-        });
     }
 
     @Override
@@ -617,8 +520,11 @@ public class MessageActivity extends BaseActivity
             });
             messageEditText.setOnEditTextImeBackListener(() -> {
                 persistentMenuButton.setVisibility(View.VISIBLE);
+                if(!persistentMenuViewHelper.isPMState())
+                    shouldHandleBack = true;
+                else
+                    shouldHandleBack = false;
                 persistentMenuViewHelper.removePMPickerView();
-                shouldHandleBack = false;
                 messageEditText.requestFocus();
             });
             messageEditText.setOnClickListener(v -> {
@@ -1167,17 +1073,6 @@ public class MessageActivity extends BaseActivity
     }
 
     @Override
-    public void onContactAddClicked() {
-        Logger.d(this, "onContactAAddClicked");
-        messagePresenter.addContact(contactDetails.getUserId());
-        progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Please wait a moment", true);
-
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.chatUserName);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_ADD_CONTACT, bundle);
-    }
-
-    @Override
     public void onContactBlockedClicked() {
         LinearLayout parent = new LinearLayout(this);
 
@@ -1234,11 +1129,6 @@ public class MessageActivity extends BaseActivity
         builder.setView(parent);
         android.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    @Override
-    public void showAddBlock() {
-        showAddBlock(true);
     }
 
     @Override

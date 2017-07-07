@@ -21,7 +21,7 @@ public interface UserApi {
     Observable<UserResponse> createUser(@Body UserRequest userRequest);
 
     @POST("users/verify")
-    Observable<StatusResponse> verifyUser(@Body VerifyRequest userRequest);
+    Observable<UserResponse> verifyUser(@Body VerifyRequest userRequest);
 
     @PUT("users")
     Observable<UserResponse> updateUser(@Body UserRequest userRequest);

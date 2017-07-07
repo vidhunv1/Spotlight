@@ -34,6 +34,13 @@ public class UserResponse {
     @Expose
     @SerializedName("verification_uuid")
     private String verificationUuid;
+    @Expose
+    @SerializedName("is_verification_success")
+    boolean isVerificationSuccess;
+
+    public boolean isVerificationSuccess() {
+        return isVerificationSuccess;
+    }
 
     public ErrorResponse getError() {
         return error;

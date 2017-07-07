@@ -12,17 +12,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.chat.ichat.MessageController;
 import com.chat.ichat.R;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.screens.home.ChatItem;
 import com.chat.ichat.screens.message.MessageActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
 
 public class SearchActivity extends BaseActivity implements SearchContract.View, SearchAdapter.ContactClickListener {
 
@@ -54,8 +60,8 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         search.requestFocus();
 
@@ -63,12 +69,28 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         RecyclerView.ItemAnimator animator = contactsSearchList.getItemAnimator();
         if (animator instanceof SimpleItemAnimator)
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
-        searchAdapter = new SearchAdapter(this, this);
-        contactsSearchList.setAdapter(searchAdapter);
+
+        SearchActivity searchActivity = SearchActivity.this;
+        MessageController.getInstance().getChatList()
+                .subscribe(new Subscriber<List<ChatItem>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {}
+
+                    @Override
+                    public void onNext(List<ChatItem> chatItems) {
+                        searchAdapter = new SearchAdapter(searchActivity, searchActivity, chatItems);
+                        contactsSearchList.setAdapter(searchAdapter);
+                        searchAdapter.initSearch("",new ArrayList<>(), new ArrayList<>(), null);
+                    }
+                });
         searchPresenter = new SearchPresenter();
 
         searchPresenter.attachView(this);
-        searchAdapter.initSearch("",new ArrayList<>(), new ArrayList<>(), null);
         searchPresenter.init();
 
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -131,18 +153,20 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
     @Override
     public void displaySearch(SearchModel searchModel) {
         Logger.d(this, "displaySearch");
-        searchAdapter.displaySearch(searchModel.getSearchTerm(), searchModel.getContactsModelList(), searchModel.getSuggestedModelList(), searchModel.getSearchUser());
+        if(searchAdapter!=null)
+            searchAdapter.displaySearch(searchModel.getSearchTerm(), searchModel.getContactsModelList(), searchModel.getSuggestedModelList(), searchModel.getSearchUser());
     }
 
     @Override
     public void initSearch(SearchModel searchModel) {
         Logger.d(this, "initSearch");
-        if(search.getText().length()==0)
+        if(search.getText().length()==0 && searchAdapter!=null)
             searchAdapter.initSearch(searchModel.getSearchTerm(), searchModel.getContactsModelList(), searchModel.getSuggestedModelList(), searchModel.getSearchUser());
     }
 
     @Override
     public void onContactItemClicked(String userName, int from) {
+        Logger.d(this, "onContactItemClicked: "+userName);
         Bundle bundle = new Bundle();
         bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, userName);
         if(from == 0) {
@@ -153,5 +177,10 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.SEARCH_SUGGESTED_CHAT_OPEN, bundle);
         }
         startActivity(MessageActivity.callingIntent(this, userName));
+    }
+
+    @OnClick(R.id.iv_back)
+    public void onBackClicked() {
+        super.onBackPressed();
     }
 }

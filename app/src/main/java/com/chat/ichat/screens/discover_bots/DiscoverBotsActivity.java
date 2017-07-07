@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.chat.ichat.R;
@@ -15,14 +16,16 @@ import com.chat.ichat.api.bot.DiscoverBotsResponse;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.screens.message.MessageActivity;
+import com.chat.ichat.screens.search.SearchActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 /**
  * Created by vidhun on 30/05/17.
  */
-public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsContract.View, DiscoverBotsAdapter.ContactClickListener{
+public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsContract.View, DiscoverBotsAdapter.ContactClickListener {
     @Bind(R.id.tb)
     Toolbar toolbar;
 
@@ -55,8 +58,8 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
         discoverBotsPresenter.discoverBots();
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
@@ -87,8 +90,16 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
             onBackPressed();
             finish();
             return true;
+        } else if(id == R.id.search) {
+            startActivity(SearchActivity.callingIntent(this));
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.discoverbots_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -125,5 +136,10 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     public void navigateToMessage(String username) {
         startActivity(MessageActivity.callingIntent(this, username));
         finish();
+    }
+
+    @OnClick(R.id.iv_back)
+    public void onBackClicked() {
+        super.onBackPressed();
     }
 }

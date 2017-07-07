@@ -46,11 +46,11 @@ public abstract class AndroidUtils {
         return dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static float dp(float px){
+    public static int dp(float px){
         Context context = SpotlightApplication.getContext();
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        return px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return (int)Math.ceil(px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     public static String displayNameStyle(String text) {

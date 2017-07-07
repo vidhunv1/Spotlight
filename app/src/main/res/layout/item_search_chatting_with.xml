@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_item_chat"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal">
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="56.5dp"
+        android:id="@+id/iv_chatItem_profileImage"
+        android:src="@drawable/default_profile_image"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="12dp"/>
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ll_chatItem_content">
+        <TextView
+            android:layout_width="190dp"
+            tools:ignore="MissingPrefix"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textColor="#373A4B"
+            android:textSize="16sp"
+            android:id="@+id/tv_chatItem_contactName"
+            android:maxWidth="190dp" />
+
+        <TextView
+            android:layout_toRightOf="@+id/iv_delivery_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:textColor="#7A7D8D"
+            android:id="@+id/tv_chatItem_message"
+            android:ellipsize="end"
+            android:text="messageasdasdasdaasdadasdadssadsadsadsad" />
+    </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.25px"
+        android:id="@+id/view_contactItem_divider"
+        android:layout_marginLeft="84dp"
+        android:background="@color/divider" />
+</LinearLayout>

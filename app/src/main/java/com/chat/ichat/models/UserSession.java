@@ -114,6 +114,14 @@ public class UserSession {
         return new Date().after(this.expires);
     }
 
+    public void setExpires(Date expires) {
+        this.expires = expires;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +

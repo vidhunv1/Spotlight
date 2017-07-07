@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">iChat</string>
+    <string name="app_name">BotChat</string>
 
     <string-array name="CountryCodes">
         <item>93,AF</item>

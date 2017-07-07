@@ -11,8 +11,11 @@ import android.view.WindowManager;
 import com.chat.ichat.R;
 
 import com.chat.ichat.config.AnalyticsConstants;
+import com.chat.ichat.screens.bot_intro.BotIntroActivity;
 import com.chat.ichat.screens.login.LoginActivity;
-import com.chat.ichat.screens.sign_up.SignUpActivity;
+import com.chat.ichat.screens.sign_up.PhoneVerifyActivity;
+import com.chat.ichat.screens.sign_up.SetNameActivity;
+import com.chat.ichat.screens.sign_up.SignUpActivity1;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.ButterKnife;
@@ -55,7 +58,7 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
         /*              Analytics           */
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_BTN_SIGNUP, null);
 
-        startActivity(SignUpActivity.callingIntent(this));
+        startActivity(SignUpActivity1.callingIntent(this));
         finish();
     }
 
@@ -64,7 +67,7 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
         /*              Analytics           */
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_BTN_LOGIN, null);
 
-        startActivity(LoginActivity.callingIntent(this));
+        startActivity(BotIntroActivity.callingIntent(this));
         finish();
     }
 

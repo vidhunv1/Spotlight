@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone verification"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="sans-serif-medium"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:id="@+id/tb_message_title" />
+
+            <ImageView
+                android:layout_alignParentRight="true"
+                android:id="@+id/iv_done"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_done_active"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="8dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="14dp"
+        android:paddingTop="16dp">
+
+        <TextView
+            android:paddingRight="18dp"
+            android:paddingLeft="18dp"
+            android:id="@+id/country_selector"
+            android:layout_width="match_parent"
+            android:text="We've send an SMS with an activation code to your phone +91 948939336."
+            android:textSize="14sp"
+            android:gravity="center_vertical"
+            android:lineSpacingExtra="2dp"
+            android:layout_height="35dp" />
+
+        <RelativeLayout
+            android:layout_marginTop="18dp"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="20dp"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:layout_marginRight="14dp"
+                android:layout_marginLeft="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:hint="Code"
+                android:textCursorDrawable="@drawable/bg_cursor_black"
+                android:theme="@style/EditTextStyle"
+                android:id="@+id/verify_code"
+                android:inputType="numberPassword"
+                android:paddingBottom="13.5dp"
+                android:cursorVisible="true">
+                <requestFocus/>
+            </EditText>
+
+            <TextView
+                android:paddingLeft="18dp"
+                android:layout_marginTop="23dp"
+                android:layout_below="@+id/verify_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="We will call your in "/>
+
+            <TextView
+                android:paddingLeft="18dp"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:textColor="#0000FF"
+                android:gravity="bottom"
+                android:textSize="14sp"
+                android:text="Wrong number?"/>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

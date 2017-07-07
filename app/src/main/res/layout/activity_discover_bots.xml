@@ -12,19 +12,48 @@
         android:layout_height="wrap_content">
         <android.support.v7.widget.Toolbar
             android:id="@+id/tb"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:minHeight="?attr/actionBarSize"
-            android:background="@color/colorPrimary">
-            <TextView
-                android:text="Discover Bots"
-                android:textSize="20sp"
-                android:textAppearance="@style/FontRobotoMedium"
-                android:textColor="@color/textPrimaryLight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            android:background="@color/actionBar">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginLeft="20.5dp"
+                    android:text="Discover Bots"
+                    android:textSize="20sp"
+                    android:layout_centerVertical="true"
+                    android:textColor="#373A4B"
+                    android:layout_toRightOf="@+id/iv_back"
+                    android:id="@+id/tb_message_title" />
+
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_back"
+                    android:layout_width="48dp"
+                    android:layout_height="42dp"
+                    android:paddingRight="12dp"
+                    android:paddingLeft="12dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/tb_message"
+        android:id="@+id/view_contactItem_divider"
+        android:background="#E0E1E9" />
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

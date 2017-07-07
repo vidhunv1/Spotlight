@@ -53,17 +53,33 @@
         <activity
             android:name=".screens.message.MessageActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+
         <activity
-            android:name=".screens.sign_up.SignUpActivity"
+            android:name=".screens.sign_up.SignUpActivity1"
             android:label="@string/app_name"
             android:noHistory="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
+        <activity
+            android:name=".screens.sign_up.PhoneVerifyActivity"
+            android:label="@string/app_name"
+            android:noHistory="false"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+        <activity
+            android:name=".screens.sign_up.SetNameActivity"
+            android:label="@string/app_name"
+            android:noHistory="false"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+
         <activity
             android:name=".screens.login.LoginActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateAlwaysVisible" />
         <activity
             android:name=".screens.welcome.WelcomeActivity"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name=".screens.bot_intro.BotIntroActivity"
             android:label="@string/app_name" />
 
         <service
@@ -86,7 +102,6 @@
             android:name=".MessageService"
             android:description="@string/service_message_description"
             android:exported="false" />
-
         <activity android:name=".screens.user_profile.UserProfileActivity" />
         <activity
             android:name=".screens.home.HomeActivity"
@@ -102,6 +117,12 @@
         <activity android:name=".screens.discover_bots.DiscoverBotsActivity" />
         <activity android:name=".screens.invite_friends.InviteFriendsActivity" />
         <activity android:name=".screens.settings.SettingsActivity" />
+        <activity android:name=".screens.settings.SettingsActivity1" />
+        <activity android:name=".screens.settings.SettingsNotificationActivity" />
+        <activity android:name=".screens.settings.SettingsAccountActivity" />
+        <activity android:name=".screens.settings.SettingsChatActivity" />
+        <activity android:name=".screens.settings.SettingsPrivacyActivity" />
+        <activity android:name=".screens.settings.SettingsHelpActivity" />
         <activity android:name=".screens.blocked_contacts.BlockedContactsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
         <activity android:name=".screens.VerifyOtpActivity"/>

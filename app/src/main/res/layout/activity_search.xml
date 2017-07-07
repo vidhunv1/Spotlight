@@ -4,46 +4,66 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/tb_search"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            android:elevation="0dp"
+            android:background="@color/actionBar"
             android:minHeight="?attr/actionBarSize">
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="horizontal" android:layout_width="match_parent"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
                 <EditText
+                    android:layout_marginLeft="4.5dp"
                     android:layout_width="242dp"
                     android:layout_height="48dp"
                     android:maxLines="1"
                     android:background="@android:color/transparent"
                     android:id="@+id/et_search"
-                    android:hint="Name or Username"
+                    android:hint="Name or Bot ID"
+                    android:inputType="textFilter"
+                    android:layout_toRightOf="@+id/iv_back"
                     android:textCursorDrawable="@drawable/bg_cursor_search"
                     android:textColorHint="@color/textHintColor"
-                    android:textSize="18sp"
-                    android:textColor="@color/textPrimaryLight" >
+                    android:textSize="16sp"
+                    android:textColor="@color/textColor" >
                     <requestFocus/>
                 </EditText>
 
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_back"
+                    android:layout_width="48dp"
+                    android:layout_height="42dp"
+                    android:paddingRight="12dp"
+                    android:paddingLeft="12dp"
+                    android:layout_marginLeft="3.75dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"/>
                 <ImageButton
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:paddingRight="17dp"
                     android:paddingLeft="7dp"
+                    android:layout_alignParentRight="true"
                     android:visibility="gone"
                     android:id="@+id/ib_search_clear"
                     android:layout_gravity="center_vertical|right"
                     android:background="#00000000"/>
-            </LinearLayout>
+            </RelativeLayout>
         </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/tb_message"
+        android:id="@+id/view_contactItem_divider"
+        android:background="#E0E1E9" />
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.models.ContactResult;
@@ -49,7 +50,7 @@ public class BotsAdapter extends RecyclerView.Adapter<BotsAdapter.DiscoverBotsVi
 
     @Override
     public void onBindViewHolder(DiscoverBotsViewHolder holder, int position) {
-        holder.renderItem(contactsModels.get(position));
+        holder.renderItem(contactsModels.get(position), position);
     }
 
     @Override
@@ -66,13 +67,19 @@ public class BotsAdapter extends RecyclerView.Adapter<BotsAdapter.DiscoverBotsVi
 
         @Bind(R.id.tv_chatItem_name)
         TextView name;
+
         public DiscoverBotsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void renderItem(ContactResult contactsModel) {
+        public void renderItem(ContactResult contactsModel, int position) {
             Logger.d(this, "ContactsModel: "+contactsModel);
+            if(position == 0) {
+                ViewGroup.MarginLayoutParams i = (ViewGroup.MarginLayoutParams) discoverBotsView.getLayoutParams();
+                i.setMargins((int) AndroidUtils.px(5),0,0,0);
+                discoverBotsView.requestLayout();
+            }
             name.setText(contactsModel.getContactName());
             name.setTag(contactsModel.getUserId());
             if(contactsModel.getProfileDP()!=null && !contactsModel.getProfileDP().isEmpty()) {

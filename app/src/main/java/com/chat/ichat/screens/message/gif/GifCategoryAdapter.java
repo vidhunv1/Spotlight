@@ -18,7 +18,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
-
 /**
  * Created by vidhun on 28/05/17.
  */

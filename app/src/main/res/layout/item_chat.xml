@@ -15,22 +15,49 @@
         android:focusable="true"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:id="@+id/iv_chatItem_profileImage"
-            android:src="@drawable/default_profile_image"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="9dp"
-            android:paddingRight="11dp"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="71dp"
+                android:id="@+id/iv_chatItem_profileImage"
+                android:src="@drawable/default_profile_image"
+                android:paddingTop="5.25dp"
+                android:paddingBottom="6dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"/>
+
+            <FrameLayout
+                android:id="@+id/chat_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <View
+                    android:background="@drawable/bg_chat_notification_white"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="9.25dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"/>
+                <View
+                    android:background="@drawable/bg_chat_notification"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="10.25dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"/>
+            </FrameLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ll_chatItem_content"
-            android:paddingTop="10.75dp">
+            android:layout_marginRight="16dp"
+            android:paddingTop="14.5dp">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -42,11 +69,8 @@
                     tools:ignore="MissingPrefix"
                     android:layout_height="wrap_content"
                     android:text="Name"
-                    android:textAppearance="@style/FontRobotoMedium"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#262328"
-                    android:paddingBottom="4.25dp"
-                    android:textSize="17sp"
+                    android:textColor="#373A4B"
+                    android:textSize="16sp"
                     android:id="@+id/tv_chatItem_contactName"
                     android:maxWidth="190dp" />
 
@@ -54,73 +78,49 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="right">
-
                     <TextView
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/tv_chatItem_time"
-                        android:paddingTop="4.5dp"
-                        android:paddingRight="15dp"
                         android:text="9:47 P.M."
-                        android:textSize="13sp"
-                        android:textColor="#546e7a"
+                        android:textSize="14sp"
+                        android:textColor="#A9ADC1"
                         android:layout_gravity="right" />
-
-                    <ImageView
-                        android:layout_marginRight="5dp"
-                        android:layout_width="13dp"
-                        android:paddingTop="1.25dp"
-                        android:layout_height="24dp"
-                        app:srcCompat="@drawable/ic_delivery_read"
-                        android:layout_toLeftOf="@id/tv_chatItem_time"
-                        android:layout_gravity="top"
-                        android:id="@+id/iv_delivery_status" />
                 </RelativeLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:orientation="horizontal"
+            <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="match_parent">
+                android:gravity="center_vertical"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_marginRight="5dp"
+                    android:layout_width="11dp"
+                    android:layout_centerVertical="true"
+                    android:layout_height="13dp"
+                    app:srcCompat="@drawable/ic_delivery_read"
+                    android:id="@+id/iv_delivery_status" />
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_toRightOf="@+id/iv_delivery_status"
+                    android:layout_marginTop="0.5dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxWidth="256dp"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:maxLines="1"
-                    android:textColor="#546e7a"
+                    android:textColor="#7A7D8D"
                     android:id="@+id/tv_chatItem_message"
                     android:ellipsize="end"
-                    android:text="messageasdasdasdasdadasdadssadsadsadsad" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="23dp">
-                    <TextView
-                        android:id="@+id/tv_chatlist_notification"
-                        android:layout_width="23dp"
-                        android:layout_height="23dp"
-                        tools:ignore="MissingPrefix"
-                        android:layout_alignParentRight="true"
-                        android:textAppearance="@style/FontRobotoMedium"
-                        android:layout_marginRight="13.5dp"
-                        android:text="11"
-                        android:gravity="center"
-                        android:visibility="gone"
-                        android:layout_gravity="center_vertical|right"
-                        android:textSize="11.25sp"
-                        android:textColor="#ffffff"
-                        android:maxLines="1"
-                        android:background="@drawable/bg_chat_notification" />
-                </RelativeLayout>
-            </LinearLayout>
+                    android:text="messageasdasdasdaasdadasdadssadsadsadsad" />
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1px"
+        android:layout_height="0.25px"
         android:id="@+id/view_contactItem_divider"
-        android:layout_marginLeft="72dp"
+        android:layout_marginLeft="84dp"
         android:background="@color/divider" />
 </LinearLayout>

@@ -12,316 +12,115 @@
         android:layout_height="56dp"
         android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize">
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="Sign Up"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
-            android:textAppearance="@style/FontRobotoMedium"
-            android:id="@+id/tb_message_title" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your phone"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="sans-serif-medium"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:id="@+id/tb_message_title" />
+
+            <ImageView
+                android:layout_alignParentRight="true"
+                android:id="@+id/iv_done"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_done_active"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="8dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:layout_marginTop="10.25dp"
         android:paddingTop="16dp">
 
-        <RelativeLayout
+        <TextView
+            android:layout_marginRight="18dp"
+            android:id="@+id/country_selector"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <com.chat.ichat.components.textinputlayout.TextInputLayoutCustom
-            android:id="@+id/sign_up_tilName"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
-            android:layout_centerVertical="true">
-            <android.support.design.widget.TextInputEditText
-                android:hint="Full Name"
-                android:id="@+id/sign_up_name"
-                android:layout_width="match_parent"
-                android:background="@android:color/transparent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:paddingBottom="4.5dp"
-                android:paddingTop="5.5dp"
-                android:textCursorDrawable="@drawable/bg_cursor_primary"
-                android:inputType="textNoSuggestions|textVisiblePassword"
-                android:textColor="#373A4B"
-                android:textColorHint="#BDBDBD"
-                android:textSize="16sp" />
-        </com.chat.ichat.components.textinputlayout.TextInputLayoutCustom>
-            <ImageView
-                android:id="@+id/iv_clear_name"
-                android:layout_width="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_height="24dp"
-                android:padding="2dp"
-                android:visibility="gone"
-                android:layout_alignParentRight="true"
-                app:srcCompat="@drawable/ic_clear_circle"/>
-        </RelativeLayout>
-
+            android:text="India"
+            android:textSize="18sp"
+            android:gravity="bottom"
+            android:layout_marginLeft="22dp"
+            android:layout_marginBottom="4.25dp"
+            android:layout_height="32dp" />
         <View
+            android:layout_marginRight="18dp"
+            android:layout_marginLeft="22dp"
             android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:id="@+id/sign_up_name_divider"
+            android:layout_height="1dp"
             android:background="@color/divider" />
 
-        <TextView
-            android:id="@+id/full_name_error"
-            android:layout_marginTop="2.75dp"
-            android:layout_width="match_parent"
-            android:layout_height="16.25dp"
-            android:textColor="@color/error"
-            android:textSize="12dp"
-            android:text="ERROR"
-            android:visibility="invisible"
-            android:gravity="end" />
         <RelativeLayout
+            android:layout_marginTop="15.75dp"
+            android:id="@+id/ll_number_view"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <com.chat.ichat.components.textinputlayout.TextInputLayoutCustom
-                android:id="@+id/sign_up_tilUserid"
-                android:layout_width="fill_parent"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
+            <EditText
+                android:layout_width="63dp"
+                android:layout_marginLeft="15.25dp"
+                android:paddingLeft="13dp"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/sign_up_userid"
-                    android:layout_width="match_parent"
-                    android:background="@android:color/transparent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:hint="iChat ID"
-                    android:paddingBottom="4.5dp"
-                    android:paddingTop="5.5dp"
-                    android:textCursorDrawable="@drawable/bg_cursor_primary"
-                    android:inputType="textNoSuggestions|textVisiblePassword"
-                    android:textColor="#373A4B"
-                    android:textColorHint="#BDBDBD"
-                    android:textSize="16sp" />
-            </com.chat.ichat.components.textinputlayout.TextInputLayoutCustom>
+                android:textSize="18sp"
+                android:inputType="number"
+                android:textColor="@color/textColor"
+                android:theme="@style/EditTextStyle"
+                android:id="@+id/country_code"
+                android:paddingBottom="13.25dp"
+                android:cursorVisible="true"
+                android:text="91"/>
 
-            <LinearLayout
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="18dp"
+                android:paddingBottom="4dp"
                 android:layout_width="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentRight="true"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:id="@+id/iv_clear_userid"
-                    android:layout_width="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_height="24dp"
-                    android:padding="2dp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_clear_circle"/>
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/iv_wrong_userid"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginTop="16dp"
-                        android:visibility="gone"
-                        android:layout_alignParentRight="true"
-                        app:srcCompat="@drawable/ic_wrong"/>
-                    <ProgressBar
-                        android:layout_width="24dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginTop="16dp"
-                        android:id="@+id/pb_checking_userid"
-                        android:visibility="gone"
-                        android:layout_height="24dp" />
-                </FrameLayout>
-            </LinearLayout>
-        </RelativeLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:id="@+id/sign_up_userid_divider"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/userid_error"
-            android:layout_marginTop="2.75dp"
-            android:layout_width="match_parent"
-            android:layout_height="16.25dp"
-            android:textColor="@color/error"
-            android:textSize="12dp"
-            android:text="ERROR"
-            android:visibility="invisible"
-            android:gravity="end" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.chat.ichat.components.textinputlayout.TextInputLayoutCustom
-            android:id="@+id/sign_up_tilPassword"
-            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:layout_centerVertical="true">
-             <android.support.design.widget.TextInputEditText
-                android:id="@+id/sign_up_password"
-                android:layout_width="match_parent"
-                android:background="@android:color/transparent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="Password"
-                android:textColor="#373A4B"
-                android:textColorHint="#bdbdbd"
-                android:paddingBottom="4.5dp"
-                android:paddingTop="5.5dp"
-                 android:textCursorDrawable="@drawable/bg_cursor_primary"
-                android:inputType="textPassword"
-                android:textSize="16sp" />
-        </com.chat.ichat.components.textinputlayout.TextInputLayoutCustom>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentRight="true"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:id="@+id/iv_clear_password"
-                    android:layout_width="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_height="24dp"
-                    android:padding="2dp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_clear_circle"/>
-                <ImageView
-                    android:id="@+id/iv_wrong_password"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_wrong"/>
-            </LinearLayout>
-        </RelativeLayout>
+                android:textSize="18sp"
+                android:textColor="@color/textColor"
+                android:text="+"/>
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/sign_up_password_divider"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/password_error"
-            android:layout_marginTop="2.75dp"
-            android:layout_width="match_parent"
-            android:layout_height="16.25dp"
-            android:textColor="@color/error"
-            android:textSize="12dp"
-            android:text=""
-            android:visibility="invisible"
-            android:gravity="end" />
-
-        <com.chat.ichat.components.textinputlayout.TextInputLayoutCustom
-            android:id="@+id/sign_up_tilMobile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout"
-            android:layout_gravity="bottom">
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/sign_up_mobile_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_lock"
-                android:drawableRight="@drawable/ic_lock"
-                android:background="@android:color/transparent"
-                android:layout_gravity="right"
-                android:hint="Mobile Number"
-                android:textColor="#373A4B"
-                android:textColorHint="#BDBDBD"
-                android:textCursorDrawable="@drawable/bg_cursor_primary"
+            <com.chat.ichat.components.HintEditText
+                android:layout_toRightOf="@id/country_code"
+                xmlns:appNs="http://schemas.android.com/apk/res-auto"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="14dp"
+                android:paddingBottom="13.25dp"
+                android:textCursorDrawable="@drawable/bg_cursor_black"
+                android:cursorVisible="true"
+                android:digits="0123456789"
                 android:inputType="phone"
-                android:paddingBottom="4.5dp"
-                android:paddingTop="5.5dp"
-                android:textSize="16sp" />
-        </com.chat.ichat.components.textinputlayout.TextInputLayoutCustom>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:id="@+id/sign_up_mobile_divider"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/mobile_error"
-            android:layout_marginTop="2.75dp"
-            android:layout_width="match_parent"
-            android:layout_height="16.25dp"
-            android:textColor="@color/error"
-            android:visibility="invisible"
-            android:textSize="12dp"
-            android:text="ERROR"
-            android:gravity="end" />
+                appNs:hint_text_color="@color/appElement"
+                android:maxLines="1"
+                android:theme="@style/EditTextStyle"
+                android:id="@+id/verify_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </RelativeLayout>
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_marginTop="8dp"
+    <TextView
+        android:layout_marginTop="21.75dp"
+        android:id="@+id/terms_privacy"
         android:layout_width="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/ripple_signup"
-        android:layout_height="wrap_content">
-        <Button
-            android:background="@drawable/ripple_signup"
-            android:id="@+id/sign_up_btn"
-            android:layout_width="match_parent"
-            android:layout_height="45.5dp"
-            android:textAllCaps="true"
-            android:text="Sign Up"
-            android:textColor="#ffffff"
-            android:elevation="0dp"
-            android:stateListAnimator="@null"
-            android:textSize="16sp" />
-    </FrameLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/terms_privacy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="13.5dp"
-            android:text="By tapping &quot;Sign Up&quot; you agree to iChat&apos;s terms and privacy policy"
-            android:textAlignment="center"
-            android:textColor="#BDBDBD"
-            android:textSize="11.25sp" />
-
-        <Button
-            android:id="@+id/btn_privacy_policy"
-            android:background="#00FFFFFF"
-            android:textAllCaps="false"
-            android:text="privacy policy"
-            android:textColor="#00000000"
-            android:layout_marginRight="17dp"
-            android:layout_marginTop="8dp"
-            android:layout_alignParentRight="true"
-            android:layout_width="70dp"
-            android:layout_height="24dp"
-            android:textSize="11.25sp"/>
-
-        <Button
-            android:id="@+id/btn_terms"
-            android:background="#00FFFFFF"
-            android:textAllCaps="false"
-            android:text="terms"
-            android:textColor="#00000000"
-            android:layout_marginRight="18dp"
-            android:layout_marginTop="8dp"
-            android:layout_toLeftOf="@+id/btn_privacy_policy"
-            android:layout_width="40dp"
-            android:layout_height="24dp"
-            android:textSize="11.25sp"/>
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:text="Please confirm your country code and enter your phone number"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:textColor="@color/textColor"
+        android:textSize="14sp" />
 </LinearLayout>

@@ -20,12 +20,20 @@ public class VerifyRequest {
     @SerializedName("verification_uuid")
     @Expose
     private String verificationUUID;
+    @SerializedName("password")
+    @Expose
+    private String password;
+    @SerializedName("notification_token")
+    @Expose
+    private String notificationToken;
 
-    public VerifyRequest(String countryCode, String phone, String verificationCode, String verificationUUID) {
+    public VerifyRequest(String countryCode, String phone, String verificationCode, String verificationUUID, String password, String notificationToken) {
         this.countryCode = countryCode;
         this.phone = phone;
         this.verificationCode = verificationCode;
         this.verificationUUID = verificationUUID;
+        this.password = password;
+        this.notificationToken = notificationToken;
     }
 
     public void setCountryCode(String countryCode) {

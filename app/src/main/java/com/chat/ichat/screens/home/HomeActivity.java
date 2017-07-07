@@ -53,6 +53,7 @@ import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
+import com.chat.ichat.screens.settings.SettingsActivity1;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
@@ -83,15 +84,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, HomeContract.View, ChatListAdapter.ChatClickListener{
+public class HomeActivity extends BaseActivity implements HomeContract.View, ChatListAdapter.ChatClickListener{
 	@Bind(R.id.fab)
 	FloatingActionButton fab;
-
-	@Bind(R.id.drawer_layout)
-	DrawerLayout drawer;
-
-	@Bind(R.id.nav_view)
-	NavigationView navigationView;
 
 	@Bind(R.id.rv_chat_list)
 	RecyclerView chatList;
@@ -101,9 +96,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
-
-	@Bind(R.id.header)
-	View header;
 
 	private ActionBarDrawerToggle toggle;
 
@@ -152,11 +144,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		userSession = UserSessionManager.getInstance().load();
 		Logger.d(this, "AccessToken: "+userSession.getAccessToken());
 
-		TextView profileIdView = (TextView)header.findViewById(R.id.tv_profile_id);
-		TextView profileNameView = (TextView)header.findViewById(R.id.tv_profile_name);
-		profileNameView.setText(userSession.getName());
-		profileIdView.setText("ID: "+userSession.getUserId());
-
 		layoutManager = new LinearLayoutManager(this);
 		chatList.setLayoutManager(layoutManager);
 		RecyclerView.ItemAnimator animator = chatList.getItemAnimator();
@@ -165,33 +152,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		chatListAdapter = new ChatListAdapter(this, this);
 		chatList.setAdapter(chatListAdapter);
 
-		toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
-		toggle.setDrawerIndicatorEnabled(false);
-		Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_menu, this.getTheme());
-		toggle.setHomeAsUpIndicator(drawable);
-		toggle.setToolbarNavigationClickListener(v -> {
-			if (drawer.isDrawerVisible(GravityCompat.START)) {
-				drawer.closeDrawer(GravityCompat.START);
-				firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_DRAWER_MENU_CLOSE, null);
-			} else {
-				drawer.openDrawer(GravityCompat.START);
-				firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_DRAWER_MENU_OPEN, null);
-			}
-		});
-		drawer.addDrawerListener(toggle);
-		toggle.syncState();
-		navigationView.setNavigationItemSelectedListener(this);
-
-        View header = navigationView.findViewById(R.id.header);
-        ImageView navDP = (ImageView) header.findViewById(R.id.profile_image);
-        navDP.setOnClickListener(v -> {
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_DP, null);
-        });
-
 		fab.setOnClickListener(view -> {
-			startActivity(NewChatActivity.callingIntent(this, true));
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_NEWCHAT, null);
+			startActivity(SearchActivity.callingIntent(this));
 		});
 
 		try {
@@ -229,27 +191,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		}
 		presenter.loadChatList();
 		userSession = UserSessionManager.getInstance().load();
-		ImageView profileDp = (ImageView)header.findViewById(R.id.profile_image);
-		if(userSession.getProfilePicPath()!=null && !userSession.getProfilePicPath().isEmpty()) {
-			Logger.d(this, "Setting DP: "+userSession.getProfilePicPath());
-			Context context = this;
-			Glide.with(this)
-					.load(userSession.getProfilePicPath())
-					.asBitmap().centerCrop()
-					.diskCacheStrategy(DiskCacheStrategy.ALL)
-					.placeholder(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18))
-					.into(new BitmapImageViewTarget(profileDp) {
-						@Override
-						protected void setResource(Bitmap resource) {
-							RoundedBitmapDrawable circularBitmapDrawable =
-									RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-							circularBitmapDrawable.setCircular(true);
-							profileDp.setImageDrawable(circularBitmapDrawable);
-						}
-					});
-		} else {
-			profileDp.setImageDrawable(ImageUtils.getDefaultProfileImage(userSession.getName(), userSession.getUserId(), 18));
-		}
 
 		/*              Analytics           */
 		firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.HOME_SCREEN, null);
@@ -258,93 +199,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 	@Override
 	protected void onPause() {
 		super.onPause();
-	}
-
-	public void showAddContactPopup() {
-		LinearLayout parent = new LinearLayout(this);
-
-		parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		parent.setOrientation(LinearLayout.VERTICAL);
-		parent.setPadding((int)AndroidUtils.px(24),(int)AndroidUtils.px(8), (int)AndroidUtils.px(24), 0);
-
-		EditText editText = new EditText(this);
-		ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		editText.setLayoutParams(lparams);
-		editText.setHint(getResources().getString(R.string.add_contact_hint));
-		editText.setHintTextColor(Color.parseColor("#9E9E9E"));
-		parent.addView(editText);
-
-		TextView tv = new TextView(this);
-		tv.setText(getResources().getString(R.string.add_contact_subtitle));
-		tv.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-		tv.setTextSize(12);
-		parent.addView(tv);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Add a contact");
-
-		builder.setPositiveButton("ADD", ((dialog, which) -> {
-			/*              Analytics           */
-			Bundle bundle = new Bundle();
-			bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, editText.getText().toString());
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_ADD_CONTACT_ADD, bundle);
-
-			if(editText.getText().length()>=1) {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-				progressDialog[0] = ProgressDialog.show(HomeActivity.this, "", "Loading. Please wait...", true);
-				presenter.addContact(editText.getText().toString());
-			}
-		}));
-		builder.setView(parent);
-		AlertDialog alertDialog = builder.create();
-		alertDialog.show();
-
-		alertDialog.setOnDismissListener(dialog -> {
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_ADD_CONTACT_DISMISS, null);
-		});
-
-		editText.requestFocus();
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-	}
-
-	public void showPeopleNearbyPopup() {
-		LayoutInflater inflater = (LayoutInflater) this.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-		View view =  inflater.inflate(R.layout.layout_people_nearby_popup, null, false);
-		CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkbox);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Note");
-
-		checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-			if(isChecked)
-				firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_PEOPLE_NEARBY_CHECK_DO_NOT_SHOW, null);
-			else
-				firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_PEOPLE_NEARBY_UNCHECK_DO_NOT_SHOW, null);
-        });
-
-		builder.setPositiveButton("OK", ((dialog, which) -> {
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_PEOPLE_NEARBY_OK, null);
-			if(checkBox.isChecked()) {
-				sharedPreferences.edit().putBoolean(KEY_SHOW_PEOPLE_NEARBY_NOTE, true).apply();
-			}
-			startActivity(PeopleNearbyActivity.callingIntent(this));
-		}));
-
-		builder.setNegativeButton("Cancel", ((dialog, which) -> {
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_PEOPLE_NEARBY_CANCEL, null);
-		}));
-
-		builder.setView(view);
-		AlertDialog alertDialog = builder.create();
-		alertDialog.show();
-
-		alertDialog.setOnDismissListener(dialog -> {
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_PEOPLE_NEARBY_DISMISS, null);
-        });
-
-		alertDialog.getWindow().setLayout((int)AndroidUtils.px(312), ViewGroup.LayoutParams.WRAP_CONTENT);
 	}
 
 	public void showContactAddedSuccess(String name, String username, boolean isExistingContact) {
@@ -413,61 +267,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		alertDialog.show();
 	}
 
-	@OnClick(R.id.nav_item_contacts)
-	public void onNavigationContactsClicked() {
-		final Activity homeActivity = this;
-		new Handler().postDelayed(() -> startActivity(NewChatActivity.callingIntent(homeActivity, false)), 250);
-		drawer.closeDrawer(GravityCompat.START, true);
-
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_CONTACTS, null);
-	}
-
-	@OnClick(R.id.nav_item_settings)
-	public void onNavigationSettingsClicked() {
-		final Activity homeActivity = this;
-		new Handler().postDelayed(() -> startActivity(SettingsActivity.callingIntent(homeActivity)), 250);
-		drawer.closeDrawer(GravityCompat.START, true);
-
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_SETTINGS, null);
-	}
-
-	@OnClick(R.id.nav_item_faq)
-	public void onNavigationFAQClicked() {
-		new Handler().postDelayed(() -> startActivity(WebViewActivity.callingIntent(this, "http://ichatapp.org/faq")), 250);
-		drawer.closeDrawer(GravityCompat.START, true);
-
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_FAQ, null);
-	}
-
-	@OnClick(R.id.nav_item_add_contact)
-	public void onAddContactClicked() {
-		final Handler handler = new Handler();
-		handler.postDelayed(this::showAddContactPopup, 250);
-		drawer.closeDrawer(GravityCompat.START, true);
-		/*    Analytics    */
-		firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_ADD_CONTACT, null);
-	}
-
-	@OnClick(R.id.nav_item_people_nearby)
-	public void onPeopleNearbyClicked() {
-		if(sharedPreferences.getBoolean(KEY_SHOW_PEOPLE_NEARBY_NOTE, true)) {
-			new Handler().postDelayed(this::showPeopleNearbyPopup, 250);
-		} else {
-			new Handler().postDelayed(() -> startActivity(PeopleNearbyActivity.callingIntent(this)), 250);
-		}
-		drawer.closeDrawer(GravityCompat.START, true);
-
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_PEOPLE_NEARBY, null);
-	}
-
-	@OnClick(R.id.nav_item_discover_bots)
-	public void onDiscoverBotsClicked() {
-		new Handler().postDelayed(() -> startActivity(DiscoverBotsActivity.callingIntent(this)), 250);
-		drawer.closeDrawer(GravityCompat.START, true);
-
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_NAV_CLICK_DISCOVER_BOTS, null);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.home_toolbar, menu);
@@ -480,10 +279,8 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 		if (id == android.R.id.home) {
 			onBackPressed();
 			return true;
-		} else if(id == R.id.action_search) {
-			startActivity(SearchActivity.callingIntent(this));
-			/*              Analytics           */
-			firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_SEARCH, null);
+		} else if(id == R.id.action_settings) {
+			startActivity(SettingsActivity1.callingIntent(this));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -538,18 +335,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 			Logger.d(this, "ChatState: "+chatState.name());
 			chatListAdapter.resetChatState(from);
 		}
-	}
-
-	@Override
-	public boolean onNavigationItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		switch(id) {
-			case android.R.id.home:
-				onBackPressed();
-				drawer.closeDrawer(GravityCompat.START);
-				break;
-		}
-		return true;
 	}
 
 	@Override
@@ -618,13 +403,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
 	@Override
 	public void onBackPressed() {
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START);
-		} else {
-			toggle.setDrawerIndicatorEnabled(true);
-			fab.setVisibility(View.VISIBLE);
-			super.onBackPressed();
-		}
+		super.onBackPressed();
 	}
 
 	@Override

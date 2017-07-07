@@ -16,10 +16,8 @@ import java.util.List;
  */
 public interface MessageContract {
     interface View extends BaseView {
-        void showContactAddedSuccess();
         void showContactBlockedSuccess(boolean isBlocked);
         void setContactDetails(ContactResult contactName);
-        void showAddBlock(boolean shouldShow);
         void displayMessages(List<MessageResult> result);
         void addMessageToList(MessageResult message);
         void updateDeliveryStatus(MessageResult messageResult);

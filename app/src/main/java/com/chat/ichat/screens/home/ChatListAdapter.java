@@ -244,8 +244,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.view_contactItem_divider)
         View dividerLine;
 
-        @Bind(R.id.tv_chatlist_notification)
-        TextView notification;
+        @Bind(R.id.chat_notification)
+        View chatNotification;
+
+//        @Bind(R.id.tv_chatlist_notification)
+//        TextView notification;
 
         @Bind(R.id.iv_delivery_status)
         ImageView deliveryStatus;
@@ -268,12 +271,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         void renderItem(ChatItem chatListItem, boolean isLineVisible) {
             if(chatListItem.getNotificationCount()==0) {
-                notification.setVisibility(View.GONE);
-                lastMessage.setMaxWidth((int)AndroidUtils.px(256));
+                chatNotification.setVisibility(View.GONE);
             } else {
                 lastMessage.setMaxWidth((int)AndroidUtils.px(226));
-                notification.setVisibility(View.VISIBLE);
-                notification.setText(chatListItem.getNotificationCount()+"");
+                chatNotification.setVisibility(View.VISIBLE);
             }
 
             contactName.setText(AndroidUtils.displayNameStyle(chatListItem.getChatName()));
@@ -312,19 +313,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT) {
-                deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
             } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT || chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
-                deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
             } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
-                deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_delivered);
             } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.READ) {
-                deliveryStatus.setVisibility(View.VISIBLE);
                 deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
             } else {
-                deliveryStatus.setVisibility(View.GONE);
+                deliveryStatus.setImageResource(R.drawable.ic_arrow_right);
             }
 
             contactName.setTag(chatListItem.getChatId());

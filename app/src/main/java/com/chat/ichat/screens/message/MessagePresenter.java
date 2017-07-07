@@ -101,8 +101,6 @@ public class MessagePresenter implements MessageContract.Presenter {
                     public void onNext(ContactResult contactResult) {
                         if(contactResult == null) {
                             messageView.showError("Error", "There was an error adding this contact.");
-                        } else {
-                            messageView.showContactAddedSuccess();
                         }
                     }
                 });

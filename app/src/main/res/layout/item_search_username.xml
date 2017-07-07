@@ -1,87 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_item_chat"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="?android:selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:visibility="gone"
+            android:layout_width="36dp"
+            android:layout_height="56.5dp"
+            android:id="@+id/iv_chatItem_profileImage"
+            android:src="@drawable/default_profile_image"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="12dp"/>
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="12dp"
+            android:layout_width="36dp"
+            android:layout_height="56.5dp" />
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_item_chat"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:background="?android:selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="horizontal">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:id="@+id/iv_chatItem_profileImage"
-                android:src="@drawable/default_profile_image"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="9dp"
-                android:visibility="gone"
-                android:paddingRight="11dp"/>
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:padding="20dp"/>
-        </RelativeLayout>
-
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:visibility="gone"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:id="@+id/text_content"
-                android:paddingTop="10.75dp">
-
-                <TextView
-                    android:layout_width="190dp"
-                    tools:ignore="MissingPrefix"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textAppearance="@style/FontRobotoMedium"
-                    android:textColor="#212121"
-                    android:paddingBottom="4.25dp"
-                    android:textSize="17sp"
-                    android:id="@+id/tv_chatItem_contactName"
-                    android:maxWidth="190dp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxWidth="256dp"
-                    android:textSize="16sp"
-                    android:maxLines="1"
-                    android:textColor="#546e7a"
-                    android:id="@+id/tv_chatItem_message"
-                    android:ellipsize="end"
-                    android:text="messageasdasdasdasdadasdadssadsadsadsad" />
-            </LinearLayout>
+            android:layout_height="wrap_content"
+            android:id="@+id/text_content">
+            <TextView
+                android:layout_width="190dp"
+                tools:ignore="MissingPrefix"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textColor="#373A4B"
+                android:textSize="16sp"
+                android:id="@+id/tv_chatItem_contactName"
+                android:maxWidth="190dp" />
 
             <TextView
-                android:id="@+id/searching"
+                android:layout_toRightOf="@+id/iv_delivery_status"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:textSize="17sp"
-                android:text="Searching..."/>
-        </RelativeLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:textColor="#7A7D8D"
+                android:id="@+id/tv_chatItem_message"
+                android:ellipsize="end"
+                android:text="messageasdasdasdaasdadasdadssadsadsadsad" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/searching"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textSize="17sp"
+            android:text="Searching..."/>
+    </RelativeLayout>
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1px"
+        android:layout_height="0.25px"
         android:id="@+id/view_contactItem_divider"
+        android:layout_marginLeft="84dp"
         android:background="@color/divider" />
 </LinearLayout>

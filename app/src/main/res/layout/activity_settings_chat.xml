@@ -1,0 +1,222 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            app:elevation="0dp"
+            android:id="@+id/appbar"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetEnd="0dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minHeight="55.75dp"
+                android:background="@color/actionBar">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginLeft="20.5dp"
+                        android:text="Chat Settings"
+                        android:textSize="20sp"
+                        android:layout_centerVertical="true"
+                        android:textColor="#373A4B"
+                        android:layout_toRightOf="@+id/iv_back"
+                        android:id="@+id/tb_message_title" />
+
+                    <ImageView
+                        android:id="@+id/iv_back"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_back"
+                        android:layout_width="48dp"
+                        android:layout_height="42dp"
+                        android:paddingRight="12dp"
+                        android:paddingLeft="12dp"
+                        android:layout_marginLeft="3.75dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"/>
+                </RelativeLayout>
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.25dp"
+            android:layout_below="@+id/tb"
+            android:id="@+id/view_contactItem_divider"
+            android:background="#E0E1E9" />
+
+        <RelativeLayout
+            android:id="@+id/viewB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical" >
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:id="@+id/profile_first_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:layout_below="@id/profile_first_line_divider"
+                android:layout_marginLeft="16dp"
+                android:gravity="center_vertical"
+                android:paddingRight="16dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enter Key Send"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Play a sound when a new message is received"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/appElement"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <Switch
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:checked="false"
+                android:layout_below="@id/profile_first_line_divider"
+                android:layout_toRightOf="@id/ll_settings_account"
+                android:layout_above="@+id/profile_second_line_divider" />
+
+            <View
+                android:layout_below="@id/ll_settings_account"
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/profile_second_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_below="@id/profile_second_line_divider"
+                android:layout_marginLeft="16dp"
+                android:paddingRight="24dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chat bubble color"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <View
+                android:layout_below="@id/ll_settings_notification"
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/profile_third_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_below="@id/profile_third_line_divider"
+                android:gravity="center_vertical"
+                android:id="@+id/ll_settings_autoDownloadVideos"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto Download Videos"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <View
+                android:layout_below="@id/ll_settings_autoDownloadVideos"
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/profile_fourth_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_privacy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:layout_below="@id/profile_fourth_line_divider"
+                android:layout_marginLeft="16dp"
+                android:paddingRight="16dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto Play Videos"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BotChat may automatically download and play certain videos that are less than 1MB in size"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/appElement"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <Switch
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/ll_settings_privacy"
+                android:layout_above="@+id/profile_fifth_line_divider" />
+
+            <View
+                android:layout_below="@id/ll_settings_privacy"
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:id="@+id/profile_fifth_line_divider"
+                android:background="#d9d9d9" />
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

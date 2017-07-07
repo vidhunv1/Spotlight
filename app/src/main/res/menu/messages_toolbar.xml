@@ -2,18 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/view_contact"
+        android:id="@+id/info"
+        android:title="Info"
         android:icon="@drawable/ic_info"
-        android:title="View Contact"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/block"
-        android:title="Block"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/delete"
-        android:title="Delete"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

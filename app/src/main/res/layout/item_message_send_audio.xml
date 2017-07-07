@@ -11,9 +11,11 @@
         android:layout_alignParentTop="true"
         android:paddingTop="2dp"
         android:text="9:47 PM"
-        android:textColor="@color/messageInfoText"
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="@style/FontRobotoMedium"
+        android:textColor="@color/messageInfo"
         android:paddingRight="0.25dp"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:id="@+id/tv_time"
         android:gravity="center" />
 
@@ -52,8 +54,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/rl_bubble"
         android:text="Seen"
-        android:textColor="@color/messageInfoText"
-        android:textSize="12sp"
+        android:textColor="@color/messageInfo"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="@style/FontRobotoMedium"
         android:id="@+id/tv_delivery_status"
         android:layout_marginRight="24dp"
         android:gravity="right" />

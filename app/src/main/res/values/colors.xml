@@ -2,16 +2,18 @@
 <resources>
 
     <!--App-->
+    <color name="actionBar">#FAFAFA</color>
     <color name="colorPrimary">#0f9D58</color>
     <color name="colorPrimaryDark">#0B8043</color>
     <color name="colorPrimaryInactive">#800070e0</color>
     <color name="colorPrimaryLight">#5cb3ff</color>
-    <color name="appElement">#607D8B</color>
+    <color name="appElement">#7A7D8D</color>
+    <color name="messageElement">#A9ADC1</color>
     <color name="colorAccent">@color/colorPrimary</color>
     <color name="background_default">#FFFFFF</color>
-    <color name="statusBar">@color/colorPrimaryDark</color>
+    <color name="statusBar">#CFD0D4</color>
     <color name="activeIndicator">@color/colorPrimary</color>
-    <color name="messageBackground">#FFECEFF1</color>
+    <color name="messageBackground">#FFFFFF</color>
 
     <!--chat-->
     <color name="sendMessageBubble">#CFD8DC</color>
@@ -19,14 +21,15 @@
     <color name="receiveMessageBubble">#FFFFFF</color>
     <color name="receiveMessageText">#263238</color>
     <color name="sendMessageBubblePressed">#9ea7aa</color>
-    <color name="receiveMessageBubblePressed">#F6F6F6</color>
-    <color name="messageInfoText">#607D8B</color>
+    <color name="receiveMessageBubblePressed">#AFB0B7</color>
+    <color name="receiveMessageStroke">#E5E6EC</color>
+    <color name="messageInfo">#A9ADC1</color>
 
     <!--text-->
     <color name="textPrimaryLight">#ffffff</color>
     <color name="textColor">#212121</color>
     <color name="textSecondary">#C7f5CC</color>
-    <color name="textHintColor">#BBDDBB</color>
+    <color name="textHintColor">#55000000</color>
 
     <color name="buttonText">@color/colorPrimary</color>
     <color name="searchHighlight">#32AFFF</color>
@@ -34,7 +37,7 @@
     <!--icons-->
     <color name="iconPrimary">#ffffff</color>
     <color name="iconSecondary">#BBDDBB</color>
-    <color name="divider">#E0E0E0</color>
+    <color name="divider">#EEEFF3</color>
 
     <color name="drawerText">#37474f</color>
     <color name="drawerIcon">#37474f</color>

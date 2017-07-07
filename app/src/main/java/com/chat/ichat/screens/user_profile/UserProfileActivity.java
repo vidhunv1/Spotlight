@@ -66,23 +66,14 @@ public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.iv_userprofile_dp)
     ImageView profileDP;
 
-    @Bind(R.id.tb_user_profile)
+    @Bind(R.id.tb)
     Toolbar toolbar;
-
-    @Bind(R.id.user_profile_message)
-    FloatingActionButton fab;
 
     @Bind(R.id.tv_contact_name)
     TextView contactNameView;
 
     @Bind(R.id.tv_user_profile_id)
     TextView userIdView;
-
-    @Bind(R.id.profile_presence)
-    TextView presenceView;
-
-    @Bind(R.id.tv_shared_media_count)
-    TextView sharedMediaCount;
 
     private Menu menu;
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
@@ -130,23 +121,8 @@ public class UserProfileActivity extends BaseActivity {
         userIdView.setText(userId);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        SharedPreferences sharedPreferences = this.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
-        long millis = sharedPreferences.getLong(username, 0);
-        if (millis == 0) {
-            if (username.startsWith("o_")) {
-                presenceView.setText("Online");
-            } else {
-                presenceView.setText("Last seen recently");
-            }
-        } else if ((new DateTime(millis).plusSeconds(5).getMillis() >= DateTime.now().getMillis())) {
-            presenceView.setText("Online");
-        } else {
-            String lastSeen = AndroidUtils.lastActivityAt(new DateTime(millis));
-            presenceView.setText(this.getResources().getString(R.string.chat_presence_away, lastSeen));
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         if(contactProfileDP!=null && !contactProfileDP.isEmpty()) {
             Logger.d(this, "Setting DP: "+contactProfileDP);
@@ -170,45 +146,6 @@ public class UserProfileActivity extends BaseActivity {
         } else {
             profileDP.setImageDrawable(ImageUtils.getDefaultProfileImage(contactName, username, 25.5));
         }
-        MessageController messageController = MessageController.getInstance();
-        messageController.getLastActivity(this.username)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {}
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(String time) {
-                presenceView.setText(time);
-            }
-        });
-
-        MessageStore.getInstance().getMessages(receivedIntent.getStringExtra(KEY_USER_NAME))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<MessageResult>>() {
-                    @Override
-                    public void onCompleted() {}
-
-                    @Override
-                    public void onError(Throwable e) {}
-
-                    @Override
-                    public void onNext(List<MessageResult> messageResults) {
-                        int count = 0;
-                        for (MessageResult messageResult : messageResults) {
-                            if(GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class).getMessageType() == Message.MessageType.image) {
-                                count++;
-                            }
-                        }
-                        sharedMediaCount.setText(count+"");
-                    }
-                });
-
 
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
@@ -319,6 +256,11 @@ public class UserProfileActivity extends BaseActivity {
         super.onBackPressed();
     }
 
+    @OnClick(R.id.iv_back)
+    public void onBackClick() {
+        super.onBackPressed();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -386,127 +328,6 @@ public class UserProfileActivity extends BaseActivity {
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_ADD_SHORTCUT, bundle);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @OnClick(R.id.user_profile_message)
-    public void onMessageClicked() {
-        onBackPressed();
-
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_MESSAGE, bundle);
-    }
-
-    @OnClick(R.id.profile_first_line)
-    public void onUserIDClicked() {
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_INFO, bundle);
-
-        LinearLayout parent = new LinearLayout(this);
-
-        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-        parent.setOrientation(LinearLayout.VERTICAL);
-        parent.setPadding((int) AndroidUtils.px(16),(int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
-
-        TextView textView1 = new TextView(this);
-        textView1.setText("Copy");
-        textView1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-        textView1.setTextSize(16);
-        textView1.setGravity(Gravity.CENTER_VERTICAL);
-        textView1.setHeight((int)AndroidUtils.px(48));
-
-        parent.addView(textView1);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(parent);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        textView1.setOnClickListener(v -> {
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_INFO_COPY, bundle);
-            ClipboardManager clipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("userId", userId);
-            clipboard.setPrimaryClip(clip);
-            alertDialog.dismiss();
-        });
-    }
-
-    @OnClick(R.id.user_profile_shared_media)
-    public void onSharedMediaClicked() {
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_SHARED_MEDIA, bundle);
-        startActivity(SharedMediaActivity.callingIntent(this, username));
-    }
-
-    @OnClick(R.id.user_profile_notifications)
-    public void onNotificationsClicked() {
-        Bundle bundle = new Bundle();
-        bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, this.username);
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.USER_PROFILE_CLICK_NOTIFICATIONS, bundle);
-
-        TextView t1, t2, t3, t4, t5;
-        LinearLayout parent = new LinearLayout(this);
-
-        parent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-        parent.setOrientation(LinearLayout.VERTICAL);
-        parent.setPadding((int)AndroidUtils.px(24), (int)AndroidUtils.px(8), 0, (int)AndroidUtils.px(8));
-
-        t1 = new TextView(this);
-        t1.setText("Turn On");
-        t1.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-        t1.setTextSize(16);
-        t1.setHeight((int)AndroidUtils.px(48));
-        t1.setGravity(Gravity.CENTER_VERTICAL);
-        t1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_volume_up_dark, 0, 0, 0);
-        t1.setCompoundDrawablePadding((int)AndroidUtils.px(24));
-
-        t5 = new TextView(this);
-        t5.setText("Turn Off");
-        t5.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-        t5.setTextSize(16);
-        t5.setHeight((int)AndroidUtils.px(48));
-        t5.setGravity(Gravity.CENTER_VERTICAL);
-        t5.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_volume_off_dark, 0, 0, 0);
-        t5.setCompoundDrawablePadding((int)AndroidUtils.px(24));
-
-        parent.addView(t1);
-        parent.addView(t5);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Notifications");
-        builder.setView(parent);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        t1.setOnClickListener(v -> {
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_ON, bundle);
-            alertDialog.dismiss();
-        });
-        t5.setOnClickListener(v -> {
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_OFF, bundle);
-            alertDialog.dismiss();
-        });
-
-        alertDialog.setOnDismissListener(dialog -> {
-            firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_USER_PROFILE_NOTIFICATIONS_DISMISS, bundle);
-        });
-    }
-
-    @Override
-    public void onPresenceChanged(String username, Presence.Type type) {
-        if(this.username.equals(username)) {
-            Resources res = getResources();
-            if(type == Presence.Type.available) {
-                presenceView.setVisibility(View.VISIBLE);
-                presenceView.setText(res.getString(R.string.chat_presence_online));
-            } else if(type == Presence.Type.unavailable) {
-                DateTime timeNow = DateTime.now();
-                presenceView.setVisibility(View.VISIBLE);
-                presenceView.setText(getResources().getString(R.string.chat_presence_away, AndroidUtils.lastActivityAt(timeNow)));
-            }
-        }
     }
 
     public void delete(String username) {

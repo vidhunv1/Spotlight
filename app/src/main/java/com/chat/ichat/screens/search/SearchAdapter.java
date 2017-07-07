@@ -27,6 +27,7 @@ import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.home.ChatItem;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
 
 import org.joda.time.DateTime;
@@ -47,8 +48,11 @@ import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
  */
 class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ContactResult> suggestedUsersList;
+    private List<ChatItem> chatItems;
     private List<ContactResult> contactsList;
     private String searchQuery;
+
+    private int chatPosition = -1;
 
     private Context context;
     private ContactClickListener contactClickListener;
@@ -60,17 +64,20 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_SUGGESTIONS = 5;
     private final int VIEW_TYPE_CATEGORY_USERNAME_SEARCH = 6;
     private final int VIEW_TYPE_USERNAME_SEARCH = 7;
+    private final int VIEW_TYPE_CATEGORY_CHATTING_WITH = 8;
+    private final int VIEW_TYPE_CHATTING_WITH = 9;
 
     private List<Integer> itemType;
     private SharedPreferences sharedPreferences;
 
-    public SearchAdapter(Context context, ContactClickListener contactClickListener) {
+    public SearchAdapter(Context context, ContactClickListener contactClickListener, List<ChatItem> chatItems) {
         this.context = context;
         this.contactClickListener = contactClickListener;
         this.contactsList = new ArrayList<>();
         this.suggestedUsersList = new ArrayList<>();
         this.searchQuery = "";
         this.itemType = new ArrayList<>();
+        this.chatItems = chatItems;
         this.sharedPreferences = context.getSharedPreferences(LAST_SEEN_PREFS_FILE, Context.MODE_PRIVATE);
     }
 
@@ -103,6 +110,11 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (suggestedUsersList != null && suggestedUsersList.size() > 0) {
                 itemType.add(VIEW_TYPE_SUGGESTIONS);
             }
+            itemType.add(VIEW_TYPE_CATEGORY_CHATTING_WITH);
+            chatPosition = itemType.size();
+            for (int i = 0; i < chatItems.size(); i++) {
+                itemType.add(VIEW_TYPE_CHATTING_WITH);
+            }
         } else {
             if (contactsList != null && contactsList.size() > 0) {
                 itemType.add(VIEW_TYPE_CATEGORY_CONTACTS);
@@ -130,8 +142,8 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         switch (viewType) {
             case VIEW_TYPE_CONTACT:
-                View contactView = inflater.inflate(R.layout.item_chat, parent, false);
-                viewHolder = new ContactViewHolder(contactView);
+                View contactView = inflater.inflate(R.layout.item_search_chatting_with, parent, false);
+                viewHolder = new ChattingWithViewHolder(contactView);
                 break;
             case VIEW_TYPE_CATEGORY_CONTACTS:
                 View categoryView = inflater.inflate(R.layout.item_search_category, parent, false);
@@ -157,6 +169,14 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 View usernameSearch = inflater.inflate(R.layout.item_search_username, parent, false);
                 viewHolder = new UsernameSearchViewHolder(usernameSearch);
                 break;
+            case VIEW_TYPE_CATEGORY_CHATTING_WITH:
+                View categoryChattingWith = inflater.inflate(R.layout.item_search_category, parent, false);
+                viewHolder = new CategoryViewHolder(categoryChattingWith);
+                break;
+            case VIEW_TYPE_CHATTING_WITH:
+                View chattingWith = inflater.inflate(R.layout.item_search_chatting_with, parent, false);
+                viewHolder = new ChattingWithViewHolder(chattingWith);
+                break;
             default:
                 return null;
         }
@@ -168,7 +188,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_CONTACT:
-                ContactViewHolder contactViewHolder = (ContactViewHolder) holder;
+                ChattingWithViewHolder contactViewHolder = (ChattingWithViewHolder) holder;
                 contactViewHolder.renderContactItem(contactsList.get(position-3), searchQuery);
                 break;
             case VIEW_TYPE_CATEGORY_CONTACTS:
@@ -194,6 +214,14 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case VIEW_TYPE_USERNAME_SEARCH:
                 UsernameSearchViewHolder usernameSearchViewHolder = (UsernameSearchViewHolder) holder;
                 usernameSearchViewHolder.renderItem(searchQuery);
+                break;
+            case VIEW_TYPE_CATEGORY_CHATTING_WITH:
+                CategoryViewHolder categoryViewHolder12 = (CategoryViewHolder) holder;
+                categoryViewHolder12.renderItem("Chatting With");
+                break;
+            case VIEW_TYPE_CHATTING_WITH:
+                ChattingWithViewHolder categoryViewHolder13 = (ChattingWithViewHolder) holder;
+                categoryViewHolder13.renderItem(chatItems.get(position-chatPosition));
                 break;
         }
     }
@@ -319,6 +347,89 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    class ChattingWithViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.tv_chatItem_contactName)
+        TextView name;
+        @Bind(R.id.tv_chatItem_message)
+        TextView userId;
+        @Bind(R.id.iv_chatItem_profileImage)
+        ImageView imageView;
+        @Bind(R.id.ll_item_chat)
+        LinearLayout layout;
+
+        public ChattingWithViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void renderItem(ChatItem chatItem) {
+            name.setText(chatItem.getChatName());
+            userId.setText(chatItem.getChatId());
+            name.setTag(chatItem.getChatId());
+
+            if(chatItem.getProfileDP()!=null && !chatItem.getProfileDP().isEmpty()) {
+                Glide.with(context)
+                        .load(chatItem.getProfileDP().replace("https://", "http://"))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .crossFade()
+                        .placeholder(ImageUtils.getDefaultProfileImage(chatItem.getChatName(), chatItem.getChatId(), 18))
+                        .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
+                        .into(imageView);
+            } else {
+                imageView.setImageDrawable(ImageUtils.getDefaultProfileImage(chatItem.getChatName(), chatItem.getChatId(), 18));
+            }
+
+            layout.setOnClickListener(view -> {
+                Logger.d(this, "layout.setOnClickListener");
+                if(contactClickListener != null)
+                    contactClickListener.onContactItemClicked(name.getTag().toString(), 0);
+            });
+        }
+
+        @SuppressWarnings("deprecation")
+        void renderContactItem(ContactResult contactItem, String searchQuery) {
+            String highlightColor = "#"+Integer.toHexString(ContextCompat.getColor( context, R.color.searchHighlight) & 0x00ffffff );
+
+            String contactLower = contactItem.getContactName().toLowerCase();
+            int startPos = contactLower.indexOf(searchQuery.toLowerCase());
+            if(!searchQuery.isEmpty() && startPos>=0) {
+                String textHTML = contactItem.getContactName().substring(0,startPos)
+                        +"<font color=\""+highlightColor+"\">"+contactItem.getContactName().substring(startPos, startPos+searchQuery.length()) +"</font>"
+                        +contactItem.getContactName().substring(startPos+searchQuery.length());
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                    name.setText(Html.fromHtml(textHTML, Html.FROM_HTML_MODE_LEGACY));
+                else
+                    name.setText(Html.fromHtml(textHTML));
+            } else {
+                name.setText(contactItem.getContactName());
+            }
+
+            userId.setText(contactItem.getUserId());
+            name.setTag(contactItem.getUsername());
+
+            imageView.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18));
+
+            if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
+                Logger.d(this, "Setting profile dp: "+contactItem.getProfileDP());
+                Glide.with(context)
+                        .load(contactItem.getProfileDP().replace("https://", "http://"))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .crossFade()
+                        .placeholder(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18))
+                        .bitmapTransform(new CenterCrop(context), new CircleTransformation(context))
+                        .into(imageView);
+            } else {
+                imageView.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserId(), 18));
+            }
+
+            layout.setOnClickListener(view -> {
+                if(contactClickListener != null)
+                    contactClickListener.onContactItemClicked(name.getTag().toString(), 0);
+            });
+        }
+    }
+
     class CategoryViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_search_category)
         TextView categoryTextView;
@@ -348,25 +459,18 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     class UsernameSearchViewHolder extends RecyclerView.ViewHolder {
-
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
-
         @Bind(R.id.iv_chatItem_profileImage)
         ImageView profileImage;
-
         @Bind(R.id.tv_chatItem_contactName)
         TextView contactName;
-
         @Bind(R.id.tv_chatItem_message)
         TextView lastMessage;
-
         @Bind(R.id.progress_bar)
         ProgressBar progressBar;
-
         @Bind(R.id.searching)
         TextView searching;
-
         @Bind(R.id.text_content)
         LinearLayout textContent;
 
@@ -390,9 +494,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Subscriber<ContactResult>() {
                                 @Override
-                                public void onCompleted() {
-
-                                }
+                                public void onCompleted() {}
 
                                 @Override
                                 public void onError(Throwable e) {
@@ -459,7 +561,6 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             textContent.setVisibility(View.VISIBLE);
                             searching.setVisibility(View.GONE);
                             profileImage.setVisibility(View.VISIBLE);
-                            profileImage.setPadding((int)AndroidUtils.px(9),(int)AndroidUtils.px(10),(int)AndroidUtils.px(11),(int)AndroidUtils.px(10));
                             _User user = userResponse.getUser();
                             contactName.setText(AndroidUtils.displayNameStyle(user.getName()));
                             lastMessage.setText("ID: "+user.getUserId());

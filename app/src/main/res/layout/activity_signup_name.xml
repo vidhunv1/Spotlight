@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your name"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="sans-serif-medium"
+                android:textAppearance="@style/FontRobotoMedium"
+                android:id="@+id/tb_message_title" />
+
+            <ImageView
+                android:layout_alignParentRight="true"
+                android:id="@+id/iv_done"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_done_active"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="8dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="38dp">
+
+        <TextView
+            android:paddingRight="18dp"
+            android:paddingLeft="18dp"
+            android:id="@+id/country_selector"
+            android:layout_width="match_parent"
+            android:text="Set up your first and last name"
+            android:textSize="14sp"
+            android:gravity="center_vertical"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:layout_marginTop="20.75dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:hint="First name(required)"
+                android:layout_marginRight="14dp"
+                android:layout_marginLeft="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textCursorDrawable="@drawable/bg_cursor_black"
+                android:theme="@style/EditTextStyle"
+                android:id="@+id/first_name"
+                android:paddingBottom="14dp"
+                android:cursorVisible="true">
+                <requestFocus/>
+            </EditText>
+
+            <EditText
+                android:hint="Last name(optional)"
+                android:layout_marginTop="46dp"
+                android:layout_marginRight="14dp"
+                android:layout_marginLeft="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textCursorDrawable="@drawable/bg_cursor_black"
+                android:theme="@style/EditTextStyle"
+                android:id="@+id/last_name"
+                android:paddingBottom="14dp"
+                android:cursorVisible="true">
+                <requestFocus/>
+            </EditText>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

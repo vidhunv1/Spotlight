@@ -162,14 +162,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         setQuickReplies();
 
         if(!isContactAdded && messages.size()==0)
-            contactActionListener.showAddBlock();
 
         isAllMessageReceived = true;
         for (MessageResult message : messages) {
             if(message.isMe()) {
                 isAllMessageReceived = false;
-                if(!isContactAdded)
-                    contactActionListener.showAddBlock();
             }
         }
     }
@@ -194,8 +191,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.notifyItemChanged(messageList.size()-2);
         setQuickReplies();
         if(messageResult.isMe()) {
-            if(!isContactAdded)
-                contactActionListener.showAddBlock();
             isAllMessageReceived = false;
             if(!isTyping && messageCache.get(messageList.size()-1).getQuickReplies()==null) {
                 this.notifyItemChanged(messageList.size());
@@ -762,7 +757,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @OnClick(R.id.tv_line4)
         public void onAddContactClicked() {
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_UNKNOWN_BLOCK, null);
-            contactActionListener.onContactAddClicked();
         }
     }
 
@@ -2137,10 +2131,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     interface ContactActionListener {
-        void onContactAddClicked();
         void onContactBlockedClicked();
         void onContactReportSpamClicked();
-        void showAddBlock();
     }
 
     private class BitmapSizeTranscoder implements ResourceTranscoder<Bitmap, Size> {
