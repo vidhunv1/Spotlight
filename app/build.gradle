@@ -78,6 +78,7 @@ dependencies {
     compile 'com.googlecode.libphonenumber:libphonenumber:7.1.1'
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'com.github.clans:fab:1.6.4'
     testCompile 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'

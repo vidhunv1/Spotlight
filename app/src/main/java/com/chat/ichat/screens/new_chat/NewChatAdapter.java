@@ -39,12 +39,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private ContactClickListener contactClickListener;
     private List<NewChatItemModel> itemList;
     private final int CONTACT  = 1;
-    private final int CONTACTS_NUMBER = 2;
     private final int NO_RESULT = 3;
     private final int HEADER = 4;
-    private final int INVITE_FRIENDS = 10;
     private final int DISCOVER_BOTS = 8;
-    private final int PEOPLE_NEARBY = 9;
     private final int NO_CONTACTS = 5;
     private final int SEARCH = 6;
     private final int INVITE_CONTACT = 7;
@@ -147,24 +144,11 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if(filteredList.size()==0 && !filterQuery.isEmpty()) {
             return NO_RESULT;
-        } else if(position==filteredList.size() && !filterQuery.isEmpty() && filteredList.size()!=0) {
-            return CONTACTS_NUMBER;
-        } else if(position == itemList.size()+4 && filterQuery.isEmpty() && filteredList.size()==0) {
-            if(itemList.size()==0) {
-                return NO_CONTACTS;
-            } else {
-                return CONTACTS_NUMBER;
-            }
-        } else if(position == 3 && filterQuery.isEmpty()) {
+        } else if(position == 1 && filterQuery.isEmpty()) {
             return HEADER;
-        } else if(position == 2 && filterQuery.isEmpty()) {
-            return INVITE_FRIENDS;
         } else if(position == 0 && filterQuery.isEmpty()) {
             return DISCOVER_BOTS;
-        } else if(position == 1 && filterQuery.isEmpty()) {
-            return PEOPLE_NEARBY;
-        }
-        else {
+        } else {
             if(filterQuery.length() == 0) {
                 if(position < invitePosition || invitePosition == -1) {
                     return CONTACT;
@@ -191,10 +175,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View searchView = inflater.inflate(R.layout.item_chat, parent, false);
                 viewHolder = new SearchViewHolder(searchView);
                 break;
-            case CONTACTS_NUMBER:
-                View categoryView = inflater.inflate(R.layout.item_contacts_number, parent, false);
-                viewHolder = new ContactsNumber(categoryView);
-                break;
             case NO_RESULT:
                 View noResultView = inflater.inflate(R.layout.item_no_result, parent, false);
                 viewHolder = new NoResultViewHolder(noResultView);
@@ -211,17 +191,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View inviteContacts = inflater.inflate(R.layout.item_invite_contact, parent, false);
                 viewHolder = new InviteContactsViewHolder(inviteContacts);
                 break;
-            case INVITE_FRIENDS:
-                View inviteFriends = inflater.inflate(R.layout.item_invite_friends, parent, false);
-                viewHolder = new InviteFriendsViewHolder(inviteFriends);
-                break;
             case DISCOVER_BOTS:
                 View discoverBots = inflater.inflate(R.layout.item_discover_bots, parent, false);
                 viewHolder = new DiscoverBotsViewHolder(discoverBots);
-                break;
-            case PEOPLE_NEARBY:
-                View peopleNearby = inflater.inflate(R.layout.item_people_nearby, parent, false);
-                viewHolder = new PeopleNearbyViewHolder(peopleNearby);
                 break;
             default:
                 return null;
@@ -235,7 +207,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(!filterQuery.isEmpty() && filteredList.size() > 0 && vPos < filteredList.size())
             position = filteredList.get(vPos);
         else
-            position = vPos - 4;
+            position = vPos - 2;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
@@ -250,15 +222,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 InviteContactsViewHolder ivh = (InviteContactsViewHolder) holder;
                 ivh.renderItem(itemList.get(position).getContactName());
                 break;
-            case INVITE_FRIENDS:
-                break;
             case SEARCH:
                 SearchViewHolder sVH = (SearchViewHolder) holder;
                 sVH.renderItem(itemList.get(position), filterQuery);
-                break;
-            case CONTACTS_NUMBER:
-                ContactsNumber iVH = (ContactsNumber) holder;
-                iVH.renderItem(itemList.size());
                 break;
             case NO_RESULT:
                 NoResultViewHolder noResultViewHolder = (NoResultViewHolder) holder;
@@ -266,7 +232,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
             case HEADER:
                 CategoryViewHolder categoryNameViewHolder3 = (CategoryViewHolder) holder;
-                categoryNameViewHolder3.renderItem("Contacts");
+                categoryNameViewHolder3.renderItem("Favorites");
             default:
                 break;
         }

@@ -9,9 +9,12 @@ import butterknife.ButterKnife;
  * Created by vidhun on 05/07/17.
  */
 public class BotIntroActivity extends AppCompatActivity {
+    final static String KEY_USERNAME = "BotIntroActivity.KEY_USERNAME";
 
-    public static Intent callingIntent(Context context) {
+    private String username;
+    public static Intent callingIntent(Context context, String username) {
         Intent intent = new Intent(context, BotIntroActivity.class);
+        intent.putExtra(KEY_USERNAME, username);
         return intent;
     }
 
@@ -20,6 +23,11 @@ public class BotIntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bot_intro);
         ButterKnife.bind(this);
+
+        Intent receivedIntent = getIntent();
+        if(!receivedIntent.hasExtra(KEY_USERNAME))
+            return;
+        this.username = receivedIntent.getStringExtra(KEY_USERNAME);
     }
 
     @Override

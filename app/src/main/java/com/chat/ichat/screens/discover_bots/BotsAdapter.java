@@ -30,7 +30,6 @@ import butterknife.OnClick;
 /**
  * Created by vidhun on 13/05/17.
  */
-
 public class BotsAdapter extends RecyclerView.Adapter<BotsAdapter.DiscoverBotsViewHolder> {
     private List<ContactResult> contactsModels;
     private DiscoverBotsAdapter.ContactClickListener contactClickListener;
@@ -76,9 +75,9 @@ public class BotsAdapter extends RecyclerView.Adapter<BotsAdapter.DiscoverBotsVi
         public void renderItem(ContactResult contactsModel, int position) {
             Logger.d(this, "ContactsModel: "+contactsModel);
             if(position == 0) {
-                ViewGroup.MarginLayoutParams i = (ViewGroup.MarginLayoutParams) discoverBotsView.getLayoutParams();
-                i.setMargins((int) AndroidUtils.px(5),0,0,0);
-                discoverBotsView.requestLayout();
+                ViewGroup.MarginLayoutParams i = (ViewGroup.MarginLayoutParams) imageView.getLayoutParams();
+                i.setMargins((int) AndroidUtils.px(17),(int) AndroidUtils.px(5),(int) AndroidUtils.px(12),0);
+                imageView.requestLayout();
             }
             name.setText(contactsModel.getContactName());
             name.setTag(contactsModel.getUserId());

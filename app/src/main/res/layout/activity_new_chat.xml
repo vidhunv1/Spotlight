@@ -7,42 +7,63 @@
     android:layout_height="match_parent"
     android:id="@+id/ll_new_chat">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+    <android.support.v7.widget.Toolbar
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        android:id="@+id/tb_new_chat"
+        android:layout_height="?attr/actionBarSize"
         android:layout_width="match_parent"
-        app:elevation="0dp"
-        android:layout_height="wrap_content">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_new_chat"
-            android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/actionBar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
-            android:background="@color/colorPrimary">
+            android:layout_height="match_parent">
             <EditText
                 android:layout_width="242dp"
                 android:layout_height="48dp"
                 android:maxLines="1"
                 android:background="@android:color/transparent"
                 android:id="@+id/et_new_chat_search1"
+                android:layout_toRightOf="@+id/iv_back"
                 android:hint="@string/new_chat_search_hint"
                 android:visibility="gone"
                 android:textCursorDrawable="@drawable/bg_cursor_search"
                 android:textColorHint="@color/textHintColor"
                 android:textSize="18sp"
                 android:textColor="@color/textPrimaryLight" />
+
             <TextView
-                android:text="New Message"
-                android:textSize="19.5dp"
-                android:textAppearance="@style/FontRobotoMedium"
-                android:textColor="@color/textPrimaryLight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginLeft="20.5dp"
+                android:text="Favorites"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:textColor="#373A4B"
+                android:layout_toRightOf="@+id/iv_back"
                 android:id="@+id/tv_new_chat_title" />
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_back"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:paddingRight="12dp"
+                android:paddingLeft="12dp"
+                android:layout_marginLeft="3.75dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_below="@+id/appbar"
+        android:layout_below="@+id/tb_new_chat"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/rv_contact_list"

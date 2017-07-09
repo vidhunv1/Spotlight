@@ -33,6 +33,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -55,6 +56,7 @@ import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
 import com.chat.ichat.screens.settings.SettingsActivity1;
 import com.chat.ichat.screens.web_view.WebViewActivity;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.MessageController;
 import com.chat.ichat.UserSessionManager;
@@ -84,9 +86,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.R.attr.onClick;
+
 public class HomeActivity extends BaseActivity implements HomeContract.View, ChatListAdapter.ChatClickListener{
-	@Bind(R.id.fab)
-	FloatingActionButton fab;
+	@Bind(R.id.fab_menu)
+	FloatingActionMenu fabMenu;
 
 	@Bind(R.id.rv_chat_list)
 	RecyclerView chatList;
@@ -96,6 +100,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
+
+	@Bind(R.id.fab_discover_bots)
+	com.github.clans.fab.FloatingActionButton fabDiscoverBots;
 
 	private ActionBarDrawerToggle toggle;
 
@@ -152,8 +159,28 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		chatListAdapter = new ChatListAdapter(this, this);
 		chatList.setAdapter(chatListAdapter);
 
-		fab.setOnClickListener(view -> {
-			startActivity(SearchActivity.callingIntent(this));
+		fabDiscoverBots.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bot));
+
+		fabDiscoverBots.setOnClickListener(v -> {
+			fabMenu.close(true);
+			startActivity(DiscoverBotsActivity.callingIntent(this));
+		});
+
+		fabMenu.setClosedOnTouchOutside(true);
+		fabMenu.setOnMenuToggleListener(opened -> {
+            if(opened) {
+				fabMenu.getMenuIconView().setImageResource(R.drawable.ic_star_white);
+            } else {
+				fabMenu.getMenuIconView().setImageResource(R.drawable.ic_add);
+            }
+        });
+
+		fabMenu.setOnMenuButtonClickListener(v -> {
+			if(fabMenu.isOpened()) {
+				startActivity(NewChatActivity.callingIntent(this, true));
+			} else {
+				fabMenu.open(true);
+			}
 		});
 
 		try {
@@ -185,9 +212,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@Override
 	protected void onResume() {
+		fabMenu.close(false);
 		super.onResume();
-		if(fab!=null) {
-			fab.setVisibility(View.VISIBLE);
+		if(fabMenu!=null) {
+			fabMenu.setVisibility(View.VISIBLE);
 		}
 		presenter.loadChatList();
 		userSession = UserSessionManager.getInstance().load();
@@ -224,7 +252,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		});
 		alertDialog.setOnDismissListener(dialog -> {
 			firebaseAnalytics.logEvent(AnalyticsConstants.Event.POPUP_ADD_CONTACT_SUCCESS_DISMISS, null);
-        });
+		});
 		alertDialog.show();
 
 		presenter.loadChatList();
@@ -268,19 +296,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.home_toolbar, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == android.R.id.home) {
 			onBackPressed();
-			return true;
-		} else if(id == R.id.action_settings) {
-			startActivity(SettingsActivity1.callingIntent(this));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -403,12 +422,21 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		if(fabMenu.isOpened()) {
+			fabMenu.close(true);
+		} else {
+			super.onBackPressed();
+		}
 	}
 
 	@Override
 	public void onSyncSuccess() {
 		Logger.d(this, "OnSyncSuccess");
 		sharedPreferences.edit().putLong(KEY_LAST_SYNC, DateTime.now().getMillis()).apply();
+	}
+
+	@OnClick(R.id.iv_settings)
+	public void onSettingsClicked() {
+		startActivity(SettingsActivity1.callingIntent(this));
 	}
 }

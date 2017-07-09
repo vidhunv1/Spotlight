@@ -45,6 +45,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
@@ -85,8 +86,8 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         setContentView(R.layout.activity_new_chat);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         fastScroller.setRecyclerView(contactList);
         contactList.setOnScrollListener(fastScroller.getOnScrollListener());
@@ -111,14 +112,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         isNewChat = receivedIntent.getBooleanExtra(KEY_IS_NEW_CHAT, true);
         toolbarSearch.setVisibility(View.GONE);
         toolbarTitle.setVisibility(View.VISIBLE);
-
-        if(isNewChat) {
-            SCREEN_NAME = "newChat";
-            toolbarTitle.setText("New Message");
-        } else {
-            SCREEN_NAME = "contacts";
-            toolbarTitle.setText("Contacts");
-        }
 
         newChatPresenter.attachView(this);
         newChatPresenter.initContactList(!isNewChat);
@@ -150,13 +143,6 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
         if((id == android.R.id.home)) {
             onBackPressed();
             return true;
-        } else if(id == R.id.action_add_contact) {
-            final Handler handler = new Handler();
-            AndroidUtils.hideSoftInput(this);
-            handler.postDelayed(this::showAddContactPopup, 250);
-
-            /*              Analytics           */
-            firebaseAnalytics.logEvent(String.format(AnalyticsConstants.Event.CONTACTS_CLICK_ADD_CONTACT, SCREEN_NAME), null);
         } else if(id == R.id.action_search) {
             toolbarSearch.setVisibility(View.VISIBLE);
             AndroidUtils.showSoftInput(this,toolbarSearch);
@@ -172,6 +158,11 @@ public class NewChatActivity extends BaseActivity implements NewChatContract.Vie
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_toolbar, menu);
         return true;
+    }
+
+    @OnClick(R.id.iv_back)
+    public void onBackClick() {
+        super.onBackPressed();
     }
 
     @Override

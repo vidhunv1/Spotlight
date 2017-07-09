@@ -66,8 +66,6 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
     public void loginClicked() {
         /*              Analytics           */
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_BTN_LOGIN, null);
-
-        startActivity(BotIntroActivity.callingIntent(this));
         finish();
     }
 

@@ -29,7 +29,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by vidhun on 04/07/17.
  */
-
 public class SetNameActivity extends AppCompatActivity {
     @Bind(R.id.tb)
     Toolbar toolbar;

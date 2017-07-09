@@ -82,6 +82,10 @@
             android:name=".screens.bot_intro.BotIntroActivity"
             android:label="@string/app_name" />
 
+        <activity
+            android:name=".screens.TestActivity"
+            android:label="@string/app_name" />
+
         <service
             android:name=".core.FCMMessageHandler"
             android:exported="true"

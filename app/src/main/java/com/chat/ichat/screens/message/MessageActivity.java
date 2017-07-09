@@ -79,6 +79,7 @@ import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
 import com.chat.ichat.screens.message.gallery.GalleryViewHelper;
 import com.chat.ichat.screens.message.gif.GifViewHelper;
 import com.chat.ichat.screens.message.persistent_menu.PersistentMenuViewHelper;
+import com.chat.ichat.screens.new_chat.AddContactUseCase;
 import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
@@ -268,6 +269,48 @@ public class MessageActivity extends BaseActivity
             this.finish();
         } else if(id == R.id.info) {
             startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
+        } else if(id == R.id.favorite) {
+            if(!contactDetails.isAdded()) {
+                new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance())
+                        .execute(contactDetails.getUserId(), true)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<ContactResult>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(ContactResult contactResult) {
+
+                            }
+                        });
+                item.setIcon(R.drawable.ic_favorite_filled);
+                contactDetails.setAdded(true);
+            } else {
+                contactDetails.setAdded(false);
+                item.setIcon(R.drawable.ic_favorite_border);
+                ContactStore.getInstance().update(contactDetails)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<ContactResult>() {
+                            @Override
+                            public void onCompleted() {}
+                            @Override
+                            public void onError(Throwable e) {}
+
+                            @Override
+                            public void onNext(ContactResult contactResult) {
+
+                            }
+                        });
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -276,6 +319,11 @@ public class MessageActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
         getMenuInflater().inflate(R.menu.messages_toolbar, menu);
+        if(contactDetails!=null && contactDetails.isAdded()) {
+            Logger.d(this, "ADDED");
+            menu.findItem(R.id.favorite).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_favorite_filled));
+        } else
+            menu.findItem(R.id.favorite).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_favorite_border));
         return true;
     }
 
@@ -357,7 +405,6 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void setContactDetails(ContactResult contact) {
-        Logger.d(this, "ContactDetails: "+contact);
         this.contactDetails = contact;
 
         title.setText(AndroidUtils.displayNameStyle(contactDetails.getContactName()));

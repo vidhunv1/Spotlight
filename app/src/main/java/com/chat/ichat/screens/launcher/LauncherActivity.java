@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.chat.ichat.screens.TestActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
