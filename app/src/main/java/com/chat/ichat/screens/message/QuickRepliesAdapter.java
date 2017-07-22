@@ -102,7 +102,7 @@ public class QuickRepliesAdapter extends RecyclerView.Adapter<QuickRepliesAdapte
                     textView.setTextColor(ContextCompat.getColor(context, R.color.sendMessageText));
                 } else if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
                     bubbleView.setBackgroundResource(R.drawable.bg_quick_reply_inactive);
-                    textView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.sendMessageBubble));
                     if(event.getAction() == MotionEvent.ACTION_UP) {
                         if(qr.getContentType()!=null && qr.getContentType() == QuickReply.ContentType.location) {
                             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_QUICK_REPLY_CLICK_LOCATION, null);

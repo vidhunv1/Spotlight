@@ -1,79 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:fillViewport="true">
 
-    <ImageView
-        android:id="@+id/welcome_logo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="109.5dp"
-        android:src="@mipmap/ic_launcher"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:id="@+id/welcome_text"
+    <FrameLayout
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="34.5dp"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:text="Welcome to iChat"
-        android:textColor="#373A4B"
-        android:layout_below="@id/welcome_logo"/>
-
-    <FrameLayout
-        android:layout_below="@+id/welcome_text"
-        android:id="@+id/fl_signup"
-        android:layout_marginTop="79dp"
-        android:layout_width="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/ripple_signup"
-        android:layout_height="wrap_content">
-    <Button
-        android:stateListAnimator="@null"
-        android:layout_gravity="center_horizontal"
-        android:text="Sign Up"
-        android:elevation="0dp"
-        android:textSize="16sp"
-        android:layout_width="match_parent"
-        android:layout_height="45.75dp"
-        android:id="@+id/welcome_signup"
-        android:textColor="#ffffffff"
-        android:background="@drawable/ripple_signup" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/fl_login"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_below="@+id/fl_signup"
-        android:layout_width="match_parent"
-        android:background="@drawable/ripple_login"
-        android:layout_height="wrap_content">
-        <Button
-            android:stateListAnimator="@null"
-            android:elevation="0dp"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:text="Log In"
-            android:textSize="16sp"
-            android:textAlignment="center"
+        android:background="#fafafa">
+        <FrameLayout
+            android:layout_gravity="top"
             android:layout_width="match_parent"
-            android:layout_height="45.5dp"
-            android:id="@+id/welcome_login"
-            android:textColor="@color/colorPrimary"
-            android:background="@drawable/ripple_login" />
-    </FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="88dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_alignParentBottom="true"
-        android:textSize="14sp"
-        android:textColor="#BEC0CE"
-        android:text="Made with love in Bengaluru"
-        android:gravity="top|center_horizontal" />
-</RelativeLayout>
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_gravity="center"
+                android:layout_height="100dp"
+                android:id="@+id/icon_image1"
+                app:srcCompat="@mipmap/ic_launcher"/>
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_gravity="center"
+                android:layout_height="100dp"
+                android:id="@+id/icon_image2"/>
+        </FrameLayout>
+        <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/intro_view_pager"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bottom_pages"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="260dp">
+            <FrameLayout
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="@drawable/bg_intro_pager_inactive"/>
+            <FrameLayout
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="@drawable/bg_intro_pager_inactive"
+                android:layout_marginLeft="7dp"/>
+            <FrameLayout
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="@drawable/bg_intro_pager_inactive"
+                android:layout_marginLeft="7dp"/>
+        </LinearLayout>
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="450dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="16dp"
+            android:textColor="#ffffff"
+            android:background="@drawable/ripple_signup"
+            android:gravity="center"
+            android:paddingLeft="18.5dp"
+            android:paddingRight="18.5dp"
+            android:paddingTop="10.75dp"
+            android:paddingBottom="10.75dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:id="@+id/start_messaging_button"/>
+    </FrameLayout>
+</ScrollView>

@@ -5,6 +5,7 @@ import com.chat.ichat.api.bot.BotApi;
 import com.chat.ichat.api.contact.ContactApi;
 import com.chat.ichat.api.location.LocationApi;
 import com.chat.ichat.api.message.MessageApi;
+import com.chat.ichat.api.payment.PaymentApi;
 import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.config.AppConfig;
@@ -41,6 +42,7 @@ public class ApiManager {
     private MessageApi messageApi;
     private ContactApi contactApi;
     private LocationApi locationApi;
+    private PaymentApi paymentApi;
 
     public ApiManager() {
         RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
@@ -81,6 +83,7 @@ public class ApiManager {
         getInstance().messageApi = null;
         getInstance().contactApi = null;
         getInstance().locationApi = null;
+        getInstance().paymentApi = null;
     }
 
     public static PhoneContactsApi getPhoneContactsApi() {
@@ -129,6 +132,13 @@ public class ApiManager {
             getInstance().locationApi = getInstance().retrofitClient.create(LocationApi.class);
         }
         return getInstance().locationApi;
+    }
+
+    public static PaymentApi getPaymentApi() {
+        if(getInstance().paymentApi == null) {
+            getInstance().paymentApi = getInstance().retrofitClient.create(PaymentApi.class);
+        }
+        return getInstance().paymentApi;
     }
 
     public static Retrofit getRetrofitClient() {

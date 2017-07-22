@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/fl_add_contact"
+    android:fitsSystemWindows="true"
+    android:background="#80000000">
+
+    <RelativeLayout
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="239dp"
+        android:id="@+id/rl_add_contact_content"
+        android:background="@drawable/bg_popup">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="14dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textSize="21sp"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/textColor"
+                android:id="@+id/add_contact_title"
+                android:text="Enter card details"/>
+
+            <ImageView
+                android:layout_marginLeft="3dp"
+                android:layout_width="40dp"
+                android:layout_height="24dp"
+                android:src="@drawable/logo_visa"
+                android:layout_marginRight="2dp"
+                android:id="@+id/iv_visa"
+                android:layout_below="@id/add_contact_title"/>
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="24dp"
+                android:layout_marginRight="2dp"
+                android:src="@drawable/mas_icon"
+                android:id="@+id/iv_master"
+                android:layout_toRightOf="@id/iv_visa"
+                android:layout_below="@id/add_contact_title"/>
+
+            <ImageView
+                android:src="@drawable/cb_amex_logo"
+                android:layout_marginRight="2dp"
+                android:layout_width="40dp"
+                android:layout_toRightOf="@id/iv_master"
+                android:id="@+id/iv_amex"
+                android:layout_height="24dp"
+                android:layout_below="@id/add_contact_title"/>
+
+            <EditText
+                android:layout_below="@+id/iv_amex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:layout_marginTop="8dp"
+                android:textSize="18sp"
+                android:paddingTop="10dp"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:enabled="true"
+                android:hint="Card number"
+                android:textColorHint="#9E9E9E"
+                android:inputType="number"
+                android:id="@+id/et_card_number">
+                <requestFocus/>
+            </EditText>
+
+            <EditText
+                android:layout_below="@+id/et_card_number"
+                android:layout_width="88dp"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:focusableInTouchMode="true"
+                android:paddingTop="10dp"
+                android:focusable="true"
+                android:inputType="phone"
+                android:enabled="true"
+                android:layout_alignParentLeft="true"
+                android:hint="MM/YY"
+                android:textColorHint="#9E9E9E"
+                android:id="@+id/et_expiry">
+            </EditText>
+
+            <EditText
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/et_card_number"
+                android:layout_width="84dp"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:paddingTop="10dp"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:enabled="true"
+                android:inputType="number"
+                android:hint="CVV"
+                android:textColorHint="#9E9E9E"
+                android:id="@+id/et_cvv">
+            </EditText>
+
+            <ImageView
+                android:layout_marginTop="1.5dp"
+                android:src="@drawable/icon_card"
+                android:layout_width="46dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/et_card_number"
+                android:layout_toLeftOf="@+id/et_cvv"/>
+
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="36dp"
+                android:text="SAVE"
+                android:textColor="#FFFFFF"
+                android:id="@+id/btn_add_contact"
+                android:textAllCaps="true"
+                android:background="@color/colorPrimary"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+        </RelativeLayout>
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/pb_add_contact"
+            android:paddingTop="89dp"
+            android:paddingBottom="89dp"
+            android:background="#FFFFFF"
+            android:visibility="invisible"
+            android:layout_gravity="center_vertical|center_horizontal"/>
+    </RelativeLayout>
+</FrameLayout>

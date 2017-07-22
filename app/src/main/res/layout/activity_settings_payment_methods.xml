@@ -1,0 +1,194 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            app:elevation="0dp"
+            android:id="@+id/appbar"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetEnd="0dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minHeight="55.75dp"
+                android:background="@color/actionBar">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginLeft="20.5dp"
+                        android:text="Payment Methods"
+                        android:textSize="20sp"
+                        android:layout_centerVertical="true"
+                        android:textColor="#373A4B"
+                        android:layout_toRightOf="@+id/iv_back"
+                        android:id="@+id/tb_message_title" />
+
+                    <ImageView
+                        android:id="@+id/iv_back"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_back"
+                        android:layout_width="48dp"
+                        android:layout_height="42dp"
+                        android:paddingRight="12dp"
+                        android:paddingLeft="12dp"
+                        android:layout_marginLeft="3.75dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"/>
+                </RelativeLayout>
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.25dp"
+            android:layout_below="@+id/tb"
+            android:id="@+id/view_contactItem_divider"
+            android:background="#E0E1E9" />
+
+        <LinearLayout
+            android:id="@+id/viewB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical" >
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="0.25dp"
+                android:id="@+id/profile_first_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_account"
+                android:layout_width="wrap_content"
+                android:layout_height="72dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/close"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:padding="24dp"
+                    android:background="?android:selectableItemBackground"
+                    app:srcCompat="@drawable/ic_credit_card_black"/>
+                <TextView
+                    android:id="@+id/tv_bottomsheet_item1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="16dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/textColor"
+                    android:text="450502xxxxxx6421"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:id="@+id/profile_second_line_divider"
+                android:background="#d9d9d9" />
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="72dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:padding="24dp"
+                    android:background="?android:selectableItemBackground"
+                    app:srcCompat="@drawable/ic_credit_card_black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="16dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/textColor"
+                    android:text="450502xxxxxx6421"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="#d9d9d9" />
+        </LinearLayout>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="48dp"
+            android:textColor="@color/textColor"
+            android:fontFamily="sans-serif-medium"
+            android:paddingLeft="17dp"
+            android:gravity="center_vertical"
+            android:text="Add a payment method"
+            android:background="#d9d9d9" />
+
+        <LinearLayout
+            android:background="?android:selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="72dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="match_parent"
+                android:padding="24dp"
+                android:background="?android:selectableItemBackground"
+                app:srcCompat="@drawable/ic_credit_card_black"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"
+                android:textSize="16sp"
+                android:textColor="@color/textColor"
+                android:text="Add credit or debit card"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.25dp"
+            android:layout_below="@+id/tb"
+            android:layout_marginLeft="72dp"
+            android:background="#E0E1E9" />
+
+        <LinearLayout
+            android:background="?android:selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="72dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="match_parent"
+                android:padding="24dp"
+                android:background="?android:selectableItemBackground"
+                app:srcCompat="@drawable/ic_bank_black"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"
+                android:textSize="16sp"
+                android:textColor="@color/textColor"
+                android:text="Add Netbanking"/>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

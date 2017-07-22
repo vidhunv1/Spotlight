@@ -21,7 +21,7 @@ public class PersistentMenu {
         web_url,
         @SerializedName("postback")
         postback
-    };
+    }
 
     public Type getType() {
         return type;

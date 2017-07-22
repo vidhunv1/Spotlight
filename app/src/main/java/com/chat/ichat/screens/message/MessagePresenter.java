@@ -200,7 +200,7 @@ public class MessagePresenter implements MessageContract.Presenter {
 //                            MessageResult messageResult = messageResults.get(messageResults.size()-1);
 //                            Message message = GsonProvider.getGson().fromJson(messageResult.getMessage(), Message.class);
 //                            messageView.showHidePersistentMenu(!(message.getQuickReplies() != null && message.getQuickReplies().size() > 0));
-                            messageView.showHidePersistentMenu(messageResults.size()==0);
+//                            messageView.showHidePersistentMenu(messageResults.size()==0);
                         }
                     }
                 });

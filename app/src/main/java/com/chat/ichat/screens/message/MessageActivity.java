@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -29,13 +31,19 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -43,9 +51,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import android.widget.Toast;
+
 import com.chat.ichat.MessageController;
 import com.chat.ichat.MessageService;
 import com.chat.ichat.R;
@@ -53,6 +60,8 @@ import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.bot.PersistentMenu;
+import com.chat.ichat.api.payment.MerchantHashRequest;
+import com.chat.ichat.api.payment.MerchantHashResponse;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
@@ -60,18 +69,19 @@ import com.chat.ichat.core.GsonProvider;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.NotificationController;
 import com.chat.ichat.core.lib.AndroidUtils;
-import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.GenericCache;
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.db.SavedCardsStore;
 import com.chat.ichat.models.AudioMessage;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.models.SavedCardModel;
 import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.message.audio.AudioRecord;
 import com.chat.ichat.screens.message.audio.AudioViewHelper;
@@ -80,7 +90,7 @@ import com.chat.ichat.screens.message.gallery.GalleryViewHelper;
 import com.chat.ichat.screens.message.gif.GifViewHelper;
 import com.chat.ichat.screens.message.persistent_menu.PersistentMenuViewHelper;
 import com.chat.ichat.screens.new_chat.AddContactUseCase;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
+import com.chat.ichat.screens.payments.PayuPaymentsHelper;
 import com.chat.ichat.screens.user_profile.UserProfileActivity;
 import com.chat.ichat.screens.web_view.WebViewActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -88,9 +98,13 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.payu.india.Payu.PayuConstants;
+
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,12 +120,13 @@ import rx.schedulers.Schedulers;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
-public class MessageActivity extends BaseActivity
+public class    MessageActivity extends BaseActivity
         implements  MessageContract.View,
                     MessagesAdapter.PostbackClickListener,
                     MessagesAdapter.UrlClickListener,
                     MessagesAdapter.ContactActionListener,
-                    MessagesAdapter.QuickReplyActionListener{
+                    MessagesAdapter.QuickReplyActionListener,
+                    MessagesAdapter.PaymentsListener{
     private MessagePresenter messagePresenter;
 
     @Bind(R.id.rv_messageitem) RecyclerView messageList;
@@ -140,9 +155,9 @@ public class MessageActivity extends BaseActivity
     private String currentPhotoPath;
     public static int index = -1;
     public static int top = -1;
-    private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
     private String chatUserName; // contact user
     private String currentUser; // this user
+    private String botCoverPicture, botDescription, botCategory;
     private MessagesAdapter messagesAdapter;
     private ContactResult contactDetails;
     //send
@@ -158,11 +173,16 @@ public class MessageActivity extends BaseActivity
     //composer
     View smileySelector, audioSelector, gifSelector;
     ImageButton emojiButton, audioButton, gifButton;
-    View persistentMenuButton;
+    View persistentMenuButton, botLayout;
     GalleryViewHelper.Listener openGalleryClickListener;
     PersistentMenuViewHelper.Listener persistentMenuListener;
+    PayuPaymentsHelper payuPaymentsHelper;
 
     private Intent messageServiceIntent;
+    private static final String KEY_CHAT_USER_NAME = "MessageActivity.CHAT_USERNAME";
+    private static final String KEY_BOT_COVER = "MessageActivity.BOT_COVER";
+    private static final String KEY_BOT_DESCRIPTION = "MessageActivity.BOT_DESCRIPTION";
+    private static final String KEY_BOT_CATEGORY = "MessageActivity.BOT_CATEGORY";
 
     public static Intent callingIntent(Context context, String chatUserName) {
         Logger.d("[MessageActivity] "+chatUserName);
@@ -170,6 +190,18 @@ public class MessageActivity extends BaseActivity
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
+        return intent;
+    }
+
+    public static Intent callingIntent(Context context, String chatUserName, String botCover, String description, String botCategory) {
+        Logger.d("[MessageActivity] "+chatUserName);
+        Intent intent = new Intent(context, MessageActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(KEY_CHAT_USER_NAME, chatUserName);
+        intent.putExtra(KEY_BOT_COVER, botCover);
+        intent.putExtra(KEY_BOT_DESCRIPTION, description);
+        intent.putExtra(KEY_BOT_CATEGORY, botCategory);
         return intent;
     }
 
@@ -187,6 +219,21 @@ public class MessageActivity extends BaseActivity
         if(!receivedIntent.hasExtra(KEY_CHAT_USER_NAME))
             return;
         this.chatUserName = receivedIntent.getStringExtra(KEY_CHAT_USER_NAME);
+        if(receivedIntent.hasExtra(KEY_BOT_COVER)) {
+            this.botCoverPicture = receivedIntent.getStringExtra(KEY_BOT_COVER);
+        } else {
+            this.botCoverPicture = "";
+        }
+        if(receivedIntent.hasExtra(KEY_BOT_DESCRIPTION)) {
+            this.botDescription = receivedIntent.getStringExtra(KEY_BOT_DESCRIPTION);
+        } else {
+            this.botDescription = "";
+        }
+        if(receivedIntent.hasExtra(KEY_BOT_CATEGORY)) {
+            this.botCategory = receivedIntent.getStringExtra(KEY_BOT_CATEGORY);
+        } else {
+            this.botCategory = "";
+        }
 
         currentChatState = ChatState.inactive;
         currentUser = UserSessionManager.getInstance().load().getUserName();
@@ -216,6 +263,8 @@ public class MessageActivity extends BaseActivity
 
     @Override
     protected void onResume() {
+        if(progressDialog[0]!=null && progressDialog[0].isShowing())
+            progressDialog[0].dismiss();
         Logger.d(this, "onResume");
         super.onResume();
         messagePresenter.loadMessages(chatUserName);
@@ -252,7 +301,7 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void showError(String title, String message) {
-        if(progressDialog[0].isShowing())
+        if(progressDialog[0]!=null && progressDialog[0].isShowing())
             progressDialog[0].dismiss();
         android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
@@ -270,6 +319,9 @@ public class MessageActivity extends BaseActivity
         } else if(id == R.id.info) {
             startActivity(UserProfileActivity.callingIntent(this, chatUserName, contactDetails.getUserId(), contactDetails.getContactName(), contactDetails.isBlocked(), contactDetails.getProfileDP()));
         } else if(id == R.id.favorite) {
+            Bundle bundle = new Bundle();
+            bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_NAME, chatUserName);
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_FAVORITE, bundle);
             if(!contactDetails.isAdded()) {
                 new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance())
                         .execute(contactDetails.getUserId(), true)
@@ -277,19 +329,13 @@ public class MessageActivity extends BaseActivity
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<ContactResult>() {
                             @Override
-                            public void onCompleted() {
-
-                            }
+                            public void onCompleted() {}
 
                             @Override
-                            public void onError(Throwable e) {
-
-                            }
+                            public void onError(Throwable e) {}
 
                             @Override
-                            public void onNext(ContactResult contactResult) {
-
-                            }
+                            public void onNext(ContactResult contactResult) {}
                         });
                 item.setIcon(R.drawable.ic_favorite_filled);
                 contactDetails.setAdded(true);
@@ -405,13 +451,15 @@ public class MessageActivity extends BaseActivity
 
     @Override
     public void setContactDetails(ContactResult contact) {
+        Logger.d(this, "ContactResult: "+contact);
         this.contactDetails = contact;
 
         title.setText(AndroidUtils.displayNameStyle(contactDetails.getContactName()));
 
         linearLayoutManager = new WrapContentLinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
-        messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contact.getProfileDP(), contact.isAdded(),this, this, this, this);
+        messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contact.getProfileDP(), contact.isAdded(),this, this, this, this, this);
+        messagesAdapter.setBotDetails(botCoverPicture, botDescription, botCategory);
         messageList.setLayoutManager(linearLayoutManager);
 
         RecyclerView.ItemAnimator animator = messageList.getItemAnimator();
@@ -481,12 +529,19 @@ public class MessageActivity extends BaseActivity
     @Override
     public void displayMessages(List<MessageResult> messages) {
         if(messagesAdapter == null) {
-            messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this.contactDetails.isAdded(), this, this, this, this);
+            Logger.d(this, "ContactResult: "+contactDetails);
+            messagesAdapter = new MessagesAdapter(this, chatUserName, AndroidUtils.displayNameStyle(contactDetails.getContactName()), contactDetails.getProfileDP(), this.contactDetails.isAdded(), this, this, this, this, this);
+            messagesAdapter.setBotDetails(botCoverPicture, botDescription, botCategory);
         }
         messagesAdapter.setMessages(messages);
         messagePresenter.sendReadReceipt(chatUserName);
 
         messagePresenter.getLastActivity(chatUserName);
+        if(messages.size()==0) {
+            showHideComposer(false);
+        } else {
+            showHideComposer(true);
+        }
     }
 
     @Override
@@ -496,6 +551,7 @@ public class MessageActivity extends BaseActivity
         rootLayout.removeViewAt(rootLayout.getChildCount()-1);
         if(isBotKeyboard) {
             View botKeyboardView = View.inflate(this, R.layout.layout_bot_keyboard, rootLayout);
+            botLayout = botKeyboardView.findViewById(R.id.bot_layout);
             persistentMenuButton = botKeyboardView.findViewById(R.id.message_menu);
             RelativeLayout sendView = (RelativeLayout) botKeyboardView.findViewById(R.id.btn_sendMessage_send);
             FrameLayout pmLayout = (FrameLayout) botKeyboardView.findViewById(R.id.pm_layout);
@@ -567,10 +623,7 @@ public class MessageActivity extends BaseActivity
             });
             messageEditText.setOnEditTextImeBackListener(() -> {
                 persistentMenuButton.setVisibility(View.VISIBLE);
-                if(!persistentMenuViewHelper.isPMState())
-                    shouldHandleBack = true;
-                else
-                    shouldHandleBack = false;
+                shouldHandleBack = !persistentMenuViewHelper.isPMState();
                 persistentMenuViewHelper.removePMPickerView();
                 messageEditText.requestFocus();
             });
@@ -884,6 +937,16 @@ public class MessageActivity extends BaseActivity
         }
     }
 
+    public void showHideComposer(boolean shoudShow) {
+        if(botLayout==null)
+            return;
+        if (shoudShow) {
+            botLayout.setVisibility(View.VISIBLE);
+        } else {
+            botLayout.setVisibility(View.GONE);
+        }
+    }
+
     public void showAudioLayout() {
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_AUDIO, null);
         int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
@@ -1048,6 +1111,7 @@ public class MessageActivity extends BaseActivity
         } else {
             messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
         }
+        showHideComposer(true);
     }
 
     @Override
@@ -1066,6 +1130,187 @@ public class MessageActivity extends BaseActivity
     @Override
     public void urlButtonClicked(String url) {
         startActivity(WebViewActivity.callingIntent(this, url));
+    }
+
+    @Override
+    public void onPaymentButtonClicked(String amount, String txnid, String productInfo, String udf1, String udf2, String udf3, String udf4, String udf5, String sUrl, String fUrl) {
+        MessageActivity messageActivity = MessageActivity.this;
+        payuPaymentsHelper = new PayuPaymentsHelper(this, amount, txnid, productInfo, sUrl, fUrl, new PayuPaymentsHelper.PaymentsInterface() {
+            @Override
+            public void startPaymentsActivity(Intent intent, int requestCode) {
+                Logger.d(this, "startActivity: ");
+                startActivityForResult(intent, requestCode);
+            }
+        });
+        payuPaymentsHelper.setUdf1(udf1);
+        payuPaymentsHelper.setUdf2(udf2);
+        payuPaymentsHelper.setUdf3(udf3);
+        payuPaymentsHelper.setUdf4(udf4);
+        payuPaymentsHelper.setUdf5(udf5);
+
+        SavedCardsStore.getInstance().getCards()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<SavedCardModel>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<SavedCardModel> savedCardModels) {
+                        if(savedCardModels!=null && savedCardModels.size() > 0) {
+                            BottomSheetDialog bottomSheerDialog = new BottomSheetDialog(MessageActivity.this);
+                            View parentView = getLayoutInflater().inflate(R.layout.bottomsheet_checkout,null);
+                            bottomSheerDialog.setContentView(parentView);
+                            BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) parentView.getParent());
+                            bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+                            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,200,getResources().getDisplayMetrics());
+                            bottomSheerDialog.show();
+
+                            LinearLayout linearLayout = (LinearLayout) parentView.findViewById(R.id.ll_cards);
+                            LinearLayout addCard = (LinearLayout) parentView.findViewById(R.id.ll_add_card);
+                            LinearLayout addNB = (LinearLayout) parentView.findViewById(R.id.ll_add_netbanking);
+
+                            addCard.setOnClickListener(v -> {
+                                bottomSheerDialog.dismiss();
+                                messageActivity.showAddCardDialog();
+                            });
+                            addNB.setOnClickListener(v -> {});
+
+                            for (SavedCardModel savedCardModel : savedCardModels) {
+                                ImageView cardImage = new ImageView(messageActivity);
+                                cardImage.setPadding(0, (int)AndroidUtils.px(6), 0, (int)AndroidUtils.px(6));
+                                switch (savedCardModel.getCardType()) {
+                                    case "MAST":
+                                        cardImage.setImageResource(R.drawable.visa);
+                                        break;
+                                    case "VISA":
+                                        cardImage.setImageResource(R.drawable.master);
+                                        break;
+                                    case "AMEX":
+                                        cardImage.setImageResource(R.drawable.amex);
+                                        break;
+                                }
+
+                                FrameLayout.LayoutParams cardParams = new FrameLayout.LayoutParams((int)AndroidUtils.px(84), (int)AndroidUtils.px(48), Gravity.CENTER);
+                                cardImage.setLayoutParams(cardParams);
+
+                                TextView textView = new TextView(messageActivity);
+                                FrameLayout.LayoutParams textParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, (int)AndroidUtils.px(48), Gravity.CENTER);
+                                textView.setGravity(Gravity.CENTER_VERTICAL);
+                                textView.setLayoutParams(textParams);
+                                textView.setTextSize(16);
+                                textView.setTextColor(ContextCompat.getColor(messageActivity, R.color.textColor));
+                                textView.setText(savedCardModel.getCardNumber());
+
+                                LinearLayout LL = new LinearLayout(messageActivity);
+                                LL.setOrientation(LinearLayout.HORIZONTAL);
+
+                                LinearLayoutCompat.LayoutParams LLParams = new LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                                LL.setLayoutParams(LLParams);
+                                LL.addView(cardImage);
+                                LL.addView(textView);
+
+                                LL.setOnClickListener(v -> {
+                                    progressDialog[0] = ProgressDialog.show(MessageActivity.this, "", "Loading. Please wait...", true);
+                                    bottomSheerDialog.dismiss();
+                                    ApiManager.getPaymentApi().getPaymentCardHashById(savedCardModel.getServerId())
+                                            .subscribeOn(Schedulers.newThread())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(new Subscriber<MerchantHashResponse>() {
+                                                @Override
+                                                public void onCompleted() {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                @Override
+                                                public void onNext(MerchantHashResponse merchantHashResponse) {
+                                                    MerchantHashResponse.Hash hash = merchantHashResponse.getMerchantHashes().get(0);
+                                                    payuPaymentsHelper.makePaymentByStoredCard(hash.getCardToken(), hash.getMerchantHash());
+                                                }
+                                            });
+                                });
+
+                                linearLayout.addView(LL);
+                            }
+                        } else {
+                            messageActivity.showAddCardDialog();
+                        }
+                    }
+                });
+    }
+
+    public void showAddCardDialog() {
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View v = inflater.inflate(R.layout.popup_enter_card, null);
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setView(v);
+
+        Button proceed = (Button)v.findViewById(R.id.btn_add_contact);
+        EditText cardNumber = (EditText) v.findViewById(R.id.et_card_number);
+        EditText expiry = (EditText) v.findViewById(R.id.et_expiry);
+        EditText cvv = (EditText) v.findViewById(R.id.et_cvv);
+
+        expiry.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+
+                if (editable.length() > 0 && (editable.length() % 3) == 0) {
+                    final char c = editable.charAt(editable.length() - 1);
+                    if ('/' == c) {
+                        editable.delete(editable.length() - 1, editable.length());
+                    }
+                }
+                if (editable.length() > 0 && (editable.length() % 3) == 0) {
+                    char c = editable.charAt(editable.length() - 1);
+                    if (Character.isDigit(c) && TextUtils.split(editable.toString(), String.valueOf("/")).length <= 2) {
+                        editable.insert(editable.length() - 1, String.valueOf("/"));
+                    }
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
+        android.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        alertDialog.getWindow().setLayout((int)AndroidUtils.px(328), ViewGroup.LayoutParams.WRAP_CONTENT);
+        cardNumber.requestFocus();
+        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+        alertDialog.setOnDismissListener(dialog -> {
+            ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(cardNumber.getWindowToken(), 0);
+        });
+
+        proceed.setOnClickListener(v1 -> {
+            String exp[] = expiry.getText().toString().split("/");
+            String month = exp[0];
+            String year = "20"+exp[1];
+            alertDialog.dismiss();
+            payuPaymentsHelper.makePaymentByCreditCard(cardNumber.getText().toString(), month, year, cvv.getText().toString());
+        });
     }
 
     @Override
@@ -1240,6 +1485,87 @@ public class MessageActivity extends BaseActivity
                         messagePresenter.sendTextMessage(chatUserName, currentUser, GsonProvider.getGson().toJson(m));
                     }
                 }
+            }
+        } else if (requestCode == PayuConstants.PAYU_REQUEST_CODE) {
+            if (data != null) {
+
+                /**
+                 * Here, data.getStringExtra("payu_response") ---> Implicit response sent by PayU
+                 * data.getStringExtra("result") ---> Response received from merchant's Surl/Furl
+                 *
+                 * PayU sends the same response to merchant server and in app. In response check the value of key "status"
+                 * for identifying status of transaction. There are two possible status like, success or failure
+                 * */
+                new android.app.AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setMessage("Payu's Data : " + data.getStringExtra("payu_response") + "\n\n\n Merchant's Data: " + data.getStringExtra("result"))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+
+                try {
+                    JSONObject jsonObject = new JSONObject(data.getStringExtra("payu_response"));
+                    String cardToken = jsonObject.getString("card_token");
+                    String cardNumber = jsonObject.getString("card_no");
+                    String cardType = jsonObject.getString("card_type");
+                    String merchatnHash = jsonObject.getString("merchant_hash");
+                    String merchantKey = jsonObject.getString("merchant_key");
+
+                    MerchantHashRequest merchantHashRequest = new MerchantHashRequest();
+                    merchantHashRequest.setMerchantKey(merchantKey);
+                    merchantHashRequest.setCardToken(cardToken);
+                    merchantHashRequest.setMerchantHash(merchatnHash);
+                    merchantHashRequest.setCardNumberMasked(cardNumber);
+                    merchantHashRequest.setCardType(cardType);
+
+                    Logger.d(this, "Got Merchant Hash");
+                    ApiManager.getPaymentApi().updarePaymentCardHash(merchantHashRequest)
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Subscriber<MerchantHashResponse>() {
+                                @Override
+                                public void onCompleted() {
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Logger.d(this, e.toString());
+                                    e.printStackTrace();
+                                }
+
+                                @Override
+                                public void onNext(MerchantHashResponse merchantHashResponse) {
+                                    MerchantHashResponse.Hash hash = merchantHashResponse.getMerchantHashes().get(0);
+                                    SavedCardsStore.getInstance().putCard(hash.getCardNumberMasked(), hash.getCardType(), hash.getServerId())
+                                            .subscribeOn(Schedulers.newThread())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(new Subscriber<Boolean>() {
+                                                @Override
+                                                public void onCompleted() {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                @Override
+                                                public void onNext(Boolean aBoolean) {
+
+                                                }
+                                            });
+                                }
+                            });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Toast.makeText(this, getString(R.string.could_not_receive_data), Toast.LENGTH_LONG).show();
             }
         }
     }

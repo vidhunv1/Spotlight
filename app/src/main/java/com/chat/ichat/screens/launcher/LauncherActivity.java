@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.chat.ichat.screens.TestActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
@@ -42,6 +41,8 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
         if(userSessionManager.hasAccessToken()) {
             UserSession userSession = userSessionManager.load();
             if(userSession.getUserId()!=null) {
+//                Intent intent = new Intent(this, TestActivity.class);
+//                startActivity(intent);
                 navigateToHomeActivity();
             } else {
                 startActivity(SetUserIdActivity.callingIntent(this));

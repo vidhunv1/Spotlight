@@ -109,4 +109,22 @@ public abstract class SQLiteContract {
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
+
+    public static final class SavedCards {
+        public static final String TABLE_NAME = "saved_cards";
+
+        public static final String COLUMN_SERVER_ID = "server_id";
+        public static final String COLUMN_CARD_NUM_MASKED = "card_num_masked";
+        public static final String COLUMN_CARD_TYPE = "card_type";
+        public static final String COLUMN_CREATED_AT = "created_at";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_SERVER_ID + " TEXT, " +
+                COLUMN_CARD_NUM_MASKED + " TEXT, " +
+                COLUMN_CARD_TYPE + " TEXT, " +
+                COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                "UNIQUE("+COLUMN_SERVER_ID+") ON CONFLICT REPLACE); ";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
 }

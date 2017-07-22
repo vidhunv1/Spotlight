@@ -10,10 +10,10 @@ import com.chat.ichat.core.BaseView;
 public interface DiscoverBotsContract {
     interface View extends BaseView {
         void displayBots(DiscoverBotsResponse discoverBotsResponse);
-        void navigateToMessage(String username);
+        void navigateToMessage(String username, String coverPicture, String description, String botCategory);
     }
     interface Presenter extends BasePresenter<View> {
         void discoverBots();
-        void openContact(String userId);
+        void openContact(String userId, String coverPicture, String description, String botCategory);
     }
 }

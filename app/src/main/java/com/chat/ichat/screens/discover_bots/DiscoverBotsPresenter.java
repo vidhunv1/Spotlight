@@ -53,7 +53,7 @@ public class DiscoverBotsPresenter implements DiscoverBotsContract.Presenter {
     }
 
     @Override
-    public void openContact(String userId) {
+    public void openContact(String userId, String coverPicture, String description, String category) {
         AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
         addContactUseCase.execute(userId, false)
                 .subscribeOn(Schedulers.newThread())
@@ -71,7 +71,7 @@ public class DiscoverBotsPresenter implements DiscoverBotsContract.Presenter {
 
                     @Override
                     public void onNext(ContactResult contactResult) {
-                        botsView.navigateToMessage(contactResult.getUsername());
+                        botsView.navigateToMessage(contactResult.getUsername(), coverPicture, description, category);
                     }
                 });
     }

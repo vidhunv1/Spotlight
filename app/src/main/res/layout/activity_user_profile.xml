@@ -148,7 +148,7 @@
                 android:layout_width="24dp"
                 android:layout_height="48dp"
                 android:layout_below="@id/profile_second_line_divider"
-                app:srcCompat="@drawable/ic_close_dark"/>
+                app:srcCompat="@drawable/ic_close_red"/>
 
             <LinearLayout
                 android:background="?android:selectableItemBackground"
@@ -164,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="Delete Chat"
-                    android:textColor="@color/textColor"
+                    android:textColor="@color/error"
                     android:textSize="16sp"
                     android:gravity="center_vertical" />
             </LinearLayout>

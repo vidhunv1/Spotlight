@@ -18,7 +18,7 @@ public class QuickReply {
     @Expose
     private ContentType contentType;
 
-    public static enum ContentType {
+    public enum ContentType {
         @SerializedName("text")
         text,
         @SerializedName("location")

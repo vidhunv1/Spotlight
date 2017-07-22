@@ -21,7 +21,7 @@ public class _DefaultAction {
         web_url,
         @SerializedName("postback")
         postback
-    };
+    }
 
     public String getUrl() {
         return url;

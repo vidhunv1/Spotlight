@@ -39,7 +39,7 @@ public class MessageEditText extends EditText{
         mOnImeBack = listener;
     }
     public interface EditTextImeBackListener {
-        public abstract void onImeBack();
+        void onImeBack();
     }
 }
 

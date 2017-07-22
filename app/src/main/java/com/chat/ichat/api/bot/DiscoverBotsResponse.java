@@ -19,7 +19,11 @@ public class DiscoverBotsResponse {
     public class Bots {
         @SerializedName("category")
         private String category;
-        @SerializedName("user")
+        @SerializedName("cover_picture")
+        private String coverPicure;
+        @SerializedName("description")
+        private String description;
+        @SerializedName("bot")
         private _User botUser;
 
         public String getCategory() {
@@ -30,11 +34,20 @@ public class DiscoverBotsResponse {
             return botUser;
         }
 
+        public String getCoverPicure() {
+            return coverPicure;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
         @Override
         public String toString() {
             return "Bots{" +
                     "category='" + category + '\'' +
-                    ", bot=" + botUser +
+                    ", coverPicure='" + coverPicure + '\'' +
+                    ", botUser=" + botUser +
                     '}';
         }
     }

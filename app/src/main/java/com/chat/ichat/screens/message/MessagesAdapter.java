@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,6 +76,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
+import retrofit2.http.Body;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -87,7 +89,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<MessageResult> messageList;
     private SparseArray<Message> messageCache;
     private List<QuickReply> quickReplies;
-    private String chatUserName;
+    private String chatUserName, chatContactName, botCoverPicture, botDescription, botCategory;
 
     private int lastPosition = -1;
 
@@ -110,9 +112,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private PostbackClickListener postbackClickListener;
     private UrlClickListener urlClickListener;
+    private PaymentsListener paymentsListener;
     private QuickReplyActionListener quickReplyActionListener;
     private Drawable textProfileDrawable;
-    private DrawableRequestBuilder dp;
+    private DrawableRequestBuilder dp = null;
     private boolean isContactAdded;
     private boolean isAllMessageReceived;
     private ContactActionListener contactActionListener;
@@ -122,10 +125,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Animation insertAnimation;
 
     private FirebaseAnalytics firebaseAnalytics;
-    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, boolean isContactAdded, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener, ContactActionListener contactActionListener) {
+    public MessagesAdapter(Context context, String chatUserName, String chatContactName, String dpUrl, boolean isContactAdded, PostbackClickListener postbackClickListener, UrlClickListener urlClickListener, QuickReplyActionListener qrActionListener, ContactActionListener contactActionListener, PaymentsListener paymentsListener) {
+        Logger.d(this, "DpUrl: "+dpUrl);
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
         this.quickReplyActionListener = qrActionListener;
+        this.paymentsListener = paymentsListener;
         this.contactActionListener = contactActionListener;
         insertAnimation = AnimationUtils.loadAnimation(context, R.anim.push_bottom_up);
 
@@ -134,6 +139,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messageCache = new SparseArray<>();
         this.textProfileDrawable = ImageUtils.getDefaultProfileImage(chatContactName, chatUserName, 16);
         this.chatUserName = chatUserName;
+        this.chatContactName = chatContactName;
         this.isTyping = false;
         this.isContactAdded = isContactAdded;
 
@@ -147,6 +153,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         lastClickedPosition=-1;
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(context);
+    }
+
+    public void setBotDetails(String botCoverPicture, String description, String botCategory) {
+        this.botCoverPicture = botCoverPicture;
+        this.botDescription = description;
+        this.botCategory = botCategory;
     }
 
     public void setMessages(List<MessageResult> messages) {
@@ -382,15 +394,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        Logger.d(this, "isadded"+isContactAdded+", "+isAllMessageReceived);
-        int add = !isContactAdded && isAllMessageReceived?1:0;
-        Logger.d(this, "Add: "+add);
         if(messageList.size() == 0) {
-            return 1 + add;
+            return 1;
         }
         if(quickReplies!=null && quickReplies.size()>=1 || isTyping)
-            return messageList.size()+1 + add;
-        return messageList.size() + add;
+            return messageList.size()+1;
+        return messageList.size();
     }
 
     @Override
@@ -558,7 +567,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case VIEW_TYPE_NO_MESSAGES:
                 NoMessagesViewHolder noMessagesViewHolder = (NoMessagesViewHolder) holder;
-                noMessagesViewHolder.renderItem("No messages here yet...");
+                noMessagesViewHolder.renderItem(chatContactName);
                 break;
             case VIEW_TYPE_CONTACT_UNKNOWN_FOOTER:
                 NoContactViewHolderFooter noContactViewHolderFooter = (NoContactViewHolderFooter) holder;
@@ -787,16 +796,46 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     class NoMessagesViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.tv_info)
-        TextView info;
+        @Bind(R.id.profile_name)
+        TextView nameView;
+        @Bind(R.id.profile_description)
+        TextView descriptionView;
+        @Bind(R.id.profile_category)
+        TextView category;
+        @Bind(R.id.btn_get_started)
+        Button getStarted;
+        @Bind(R.id.iv_cover_picture)
+        ImageView cover;
+        @Bind(R.id.profile_dp)
+        ImageView profileDp;
 
         NoMessagesViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void renderItem(String text) {
-            info.setText(text);
+        void renderItem(String name) {
+            nameView.setText(name);
+            descriptionView.setText(botDescription);
+            category.setText(botCategory);
+            getStarted.setOnClickListener(v -> {
+                postbackClickListener.sendPostbackMessage("Get Started", "GET_STARTED");
+            });
+
+            if(dp!=null) {
+                dp.into(profileDp);
+            } else {
+                profileDp.setImageDrawable(textProfileDrawable);
+            }
+
+            if(botCoverPicture!=null && !botCoverPicture.isEmpty()) {
+                Glide.with(context)
+                        .load(botCoverPicture.replace("https://", "http://"))
+                        .crossFade()
+                        .bitmapTransform(new FitCenter(context))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(cover);
+            }
         }
     }
 
@@ -845,7 +884,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             templateView.setLayoutManager(layoutManager);
-            templateView.setAdapter(new GenericTemplateAdapter(context, genericTemplates, bubbleType(position), postbackClickListener, urlClickListener));
+            templateView.setAdapter(new GenericTemplateAdapter(context, genericTemplates, bubbleType(position), postbackClickListener, urlClickListener, paymentsListener));
         }
     }
 
@@ -1449,22 +1488,22 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 case 0:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_full);
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
                 case 1:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_top);
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 2:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_mid_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_middle);
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_middle);
                     break;
                 case 3:
                     layout.setPadding(0, 0, 0, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
                     bubble.setBackgroundResource(R.drawable.bg_msg_receive_bottom);
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_bottom);
                     break;
             }
 
@@ -1488,6 +1527,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
                         else if(urlClickListener!=null && btn.getType() == _Button.Type.web_url)
                             urlClickListener.urlButtonClicked(btn.getUrl());
+                        else if(paymentsListener!=null && btn.getType() == _Button.Type.payment) {
+                            _Button.PaymentSummary p = btn.getPaymentSummary();
+                            paymentsListener.onPaymentButtonClicked(p.getAmount(), p.getTransactionId(), p.getProductInfo(), p.getUdf1(), p.getUdf2(), p.getUdf3(), p.getUdf4(), p.getUdf5(), p.getsUrl(), p.getfUrl());
+                        }
                     });
                 }
             }
@@ -2118,6 +2161,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    //TODO: Change to single interface
     interface PostbackClickListener {
         void sendPostbackMessage(String message, String payload);
     }
@@ -2128,6 +2172,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     interface QuickReplyActionListener {
         void navigateToGetLocation();
+    }
+
+    interface PaymentsListener {
+        void onPaymentButtonClicked(String amount, String txnid, String productInfo, String udf1, String udf2, String udf3, String udf4, String udf5, String sUrl, String nfUrl);
     }
 
     interface ContactActionListener {

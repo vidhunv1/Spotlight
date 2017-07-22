@@ -101,7 +101,6 @@ public class BaseActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SETTINGS_BACK, null);
         super.onBackPressed();
     }
 

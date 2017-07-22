@@ -18,7 +18,7 @@ public class ImageMessage {
     @SerializedName("data_type")
     private ImageType dataType;
 
-    public static enum ImageType {
+    public enum ImageType {
         @SerializedName("gif")
         gif,
         @SerializedName("image")

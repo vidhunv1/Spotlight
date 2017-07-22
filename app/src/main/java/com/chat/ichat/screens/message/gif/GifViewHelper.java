@@ -416,8 +416,8 @@ public class GifViewHelper {
     }
 
     public interface GifViewListener {
-        public void onSendGif(String url, int width, int height);
-        public void blockBackPress(boolean shouldBlock);
-        public void onFocusChanged(boolean hasFocus);
+        void onSendGif(String url, int width, int height);
+        void blockBackPress(boolean shouldBlock);
+        void onFocusChanged(boolean hasFocus);
     }
 }

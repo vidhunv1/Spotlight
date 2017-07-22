@@ -10,5 +10,5 @@ import com.chat.ichat.screens.message.emoji.emoji_objects.Emojicon;
  */
 
 public interface EmojiconRecents {
-    public void addRecentEmoji(Context context, Emojicon emojicon);
+    void addRecentEmoji(Context context, Emojicon emojicon);
 }

@@ -141,36 +141,36 @@ public class SearchPresenter implements SearchContract.Presenter {
 
                                     @Override
                                     public void onNext(List<ContactResult> contactResults) {
-                                        AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
+//                                        AddContactUseCase addContactUseCase = new AddContactUseCase(ApiManager.getUserApi(), ContactStore.getInstance(), ApiManager.getBotApi(), BotDetailsStore.getInstance());
                                         List<ContactResult> getContacts = new ArrayList<>(contactsResultsm.size());
                                         getContacts.addAll(contactsResultsm);
-                                        List<Observable<ContactResult>> observables = new ArrayList<>();
+//                                        List<Observable<ContactResult>> observables = new ArrayList<>();
                                         for (ContactResult contactResult : contactResults) {
                                             if(contactResult.isAdded())
                                                 contactsResultsm.remove(contactResult);
                                             getContacts.remove(contactResult);
                                         }
 
-                                        for (ContactResult contactResult : getContacts) {
-                                            observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
-                                        }
-
-                                        Observable.zip(observables, (i) -> "Done Sync")
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(new Subscriber<String>() {
-                                                    @Override
-                                                    public void onCompleted() {}
-
-                                                    @Override
-                                                    public void onError(Throwable e) {}
-
-                                                    @Override
-                                                    public void onNext(String s) {
-                                                        SearchModel searchModel = new SearchModel(null, null, contactsResultsm);
-                                                        searchView.initSearch(searchModel);
-                                                    }
-                                                });
+                                        SearchModel searchModel = new SearchModel(null, null, contactsResultsm);
+                                        searchView.initSearch(searchModel);
+//                                        for (ContactResult contactResult : getContacts) {
+//                                            observables.add(addContactUseCase.execute(contactResult.getUserId(), false));
+//                                        }
+//
+//                                        Observable.zip(observables, (i) -> "Done Sync")
+//                                                .subscribeOn(Schedulers.io())
+//                                                .observeOn(AndroidSchedulers.mainThread())
+//                                                .subscribe(new Subscriber<String>() {
+//                                                    @Override
+//                                                    public void onCompleted() {}
+//
+//                                                    @Override
+//                                                    public void onError(Throwable e) {}
+//
+//                                                    @Override
+//                                                    public void onNext(String s) {
+//                                                    }
+//                                                });
                                     }
                                 });
                     }

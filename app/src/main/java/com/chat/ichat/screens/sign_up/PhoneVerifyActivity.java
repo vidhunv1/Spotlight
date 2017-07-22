@@ -8,20 +8,21 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user.VerifyRequest;
 import com.chat.ichat.application.SpotlightApplication;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.core.DatabaseManager;
 import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.home.HomeActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.UUID;
 
@@ -43,8 +44,11 @@ public class PhoneVerifyActivity extends AppCompatActivity {
     Toolbar toolbar;
     @Bind(R.id.verify_code)
     EditText code;
+    @Bind(R.id.country_selector)
+    TextView text;
     private String countryCode, phone, verificationUUID;
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
+    private FirebaseAnalytics firebaseAnalytics;
 
     public static Intent callingIntent(Context context, String countryCode, String phone, String verificationUUID) {
         Intent intent = new Intent(context, PhoneVerifyActivity.class);
@@ -60,8 +64,10 @@ public class PhoneVerifyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_verify);
         ButterKnife.bind(this);
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SIGNUP_SCREEN, null);
         code.requestFocus();
-
+        text.setText("We've send an SMS with an activation code to your phone "+countryCode+" "+phone+".");
         Intent receivedIntent = getIntent();
         if(!receivedIntent.hasExtra("PhoneVerifyActivity.PHONE"))
             return;
@@ -88,6 +94,8 @@ public class PhoneVerifyActivity extends AppCompatActivity {
 
     @OnClick(R.id.iv_done)
     public void onDone() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_DONE, null);
+
         PhoneVerifyActivity phoneVerifyActivity = PhoneVerifyActivity.this;
         progressDialog[0] = ProgressDialog.show(phoneVerifyActivity, "", "Verifying. Please wait...", true);
         final String password = UUID.randomUUID().toString().replaceAll("-", "");
@@ -110,6 +118,7 @@ public class PhoneVerifyActivity extends AppCompatActivity {
                         if(!userResponse.isSuccess()) {
                             if(userResponse.getError().getCode() == 401) {
                                 //incorrect otp
+                                firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_ERROR_OTP, null);
                                 phoneVerifyActivity.showError("Wrong OTP", "The OTP is incorrect.");
                             }
                         } else {
@@ -125,12 +134,8 @@ public class PhoneVerifyActivity extends AppCompatActivity {
                             ApiManager.getInstance().setAuthorization(ss.getAccessToken());
                             SpotlightApplication.getContext().initSession();
                             DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
-
-                            if(userResponse.getUser().getName()==null || userResponse.getUser().getName().isEmpty()) {
-                                startActivity(SetNameActivity.callingIntent(phoneVerifyActivity));
-                            } else {
-                                startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
-                            }
+                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
+                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
                             finish();
                         }
                     }

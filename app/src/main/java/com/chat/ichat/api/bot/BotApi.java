@@ -10,8 +10,8 @@ import rx.Observable;
 
 public interface BotApi {
     @GET("bot/{user_name}")
-    public Observable<BotResponse> getBotDetails(@Path("user_name") String userName);
+    Observable<BotResponse> getBotDetails(@Path("user_name") String userName);
 
     @GET("discover_bots")
-    public Observable<DiscoverBotsResponse> discoverBots();
+    Observable<DiscoverBotsResponse> discoverBots();
 }

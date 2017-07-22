@@ -3,9 +3,7 @@ package com.chat.ichat.screens.sign_up;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,12 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chat.ichat.R;
@@ -28,28 +23,24 @@ import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.user.UserRequest;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user._User;
-import com.chat.ichat.application.SpotlightApplication;
 import com.chat.ichat.components.HintEditText;
+import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.PhoneFormat;
-import com.chat.ichat.db.core.DatabaseManager;
 import com.chat.ichat.models.UserSession;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static com.chat.ichat.core.FCMRegistrationIntentService.FCM_TOKEN;
 
 /**
  * Created by vidhun on 03/07/17.
@@ -65,6 +56,8 @@ public class SignUpActivity1 extends AppCompatActivity {
     TextView countrySelector;
     private int countryState = 0;
 
+    private FirebaseAnalytics firebaseAnalytics;
+
     private HashMap<String, String> phoneFormatMap = new HashMap<>();
     private ArrayList<String> countriesArray = new ArrayList<>();
     private HashMap<String, String> countriesMap = new HashMap<>();
@@ -73,7 +66,6 @@ public class SignUpActivity1 extends AppCompatActivity {
     private boolean ignoreSelection = false;
     private boolean ignoreOnTextChange = false;
     private boolean ignoreOnPhoneChange = false;
-    private boolean nextPressed = false;
 
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
@@ -88,6 +80,8 @@ public class SignUpActivity1 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         ButterKnife.bind(this);
+        this.firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.setCurrentScreen(this, AnalyticsConstants.Event.SIGNUP_SCREEN, null);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -271,6 +265,11 @@ public class SignUpActivity1 extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     public void showError(String title, String message) {
         if(progressDialog[0]!=null && progressDialog[0].isShowing())
             progressDialog[0].dismiss();
@@ -283,12 +282,15 @@ public class SignUpActivity1 extends AppCompatActivity {
 
     @OnClick(R.id.iv_done)
     public void onDone() {
+        firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_DONE, null);
         if(countryState!=0) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_COUNTRYCODE, null);
             showError(this.getResources().getString(R.string.app_name), "Wrong country code");
         } else if(phoneET.getHintText().length() != phoneET.getText().length()) {
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_ERROR_PHONE, null);
             showError(this.getResources().getString(R.string.app_name), "Invalid phone number");
         } else {
-
+            firebaseAnalytics.logEvent(AnalyticsConstants.Event.SIGNUP_SUCCESS, null);
             String imei = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
             registerUser(countryCodeET.getText().toString(), phoneET.getText().toString().replace(" ", ""), imei);
 //            "", "", UUID.randomUUID().toString().replaceAll("-", ""),

@@ -17,6 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="Start messaging by pressing the new message in the bottom right corner or tap the menu button for more options."
+        android:text="Search for any bot by pressing the search in the bottom right corner or tap the discover button to find bots."
         android:textSize="16sp"/>
 </LinearLayout>

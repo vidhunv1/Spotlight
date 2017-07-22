@@ -33,15 +33,17 @@ import butterknife.ButterKnife;
 public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplateAdapter.ReceiveTemplateGenericViewHolder> {
     private MessagesAdapter.PostbackClickListener postbackClickListener;
     private MessagesAdapter.UrlClickListener urlClickListener;
+    private MessagesAdapter.PaymentsListener paymentsListener;
     private List<GenericTemplate> genericTemplateList;
     private Context context;
     private int conversationBubbleType;
 
-    public GenericTemplateAdapter(Context context, List<GenericTemplate> genericTemplates, int conversationBubbleType, MessagesAdapter.PostbackClickListener postbackClickListener, MessagesAdapter.UrlClickListener urlClickListener) {
+    public GenericTemplateAdapter(Context context, List<GenericTemplate> genericTemplates, int conversationBubbleType, MessagesAdapter.PostbackClickListener postbackClickListener, MessagesAdapter.UrlClickListener urlClickListener, MessagesAdapter.PaymentsListener paymentsListener) {
         this.conversationBubbleType = conversationBubbleType;
         this.context = context;
         this.postbackClickListener = postbackClickListener;
         this.urlClickListener = urlClickListener;
+        this.paymentsListener = paymentsListener;
         this.genericTemplateList = genericTemplates;
         this.conversationBubbleType = conversationBubbleType;
     }
@@ -150,7 +152,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
             switch (bubbleType) {
                 case 0:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int) resources.getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_bottom);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_bottom);
 
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl())
@@ -161,7 +163,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     }
                 case 1:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int) resources.getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_start);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_start);
 
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context).load(genericTemplate.getImageUrl())
@@ -172,7 +174,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     }
                 case 2:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_center);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_center);
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
@@ -184,7 +186,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     break;
                 case 3:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
-                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_middle);
+//                    buttonLayout.setBackgroundResource(R.drawable.bg_lower_template_generic_middle);
                     if(genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty()) {
                         Glide.with(context)
                                 .load(genericTemplate.getImageUrl())
@@ -244,6 +246,10 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                                 postbackClickListener.sendPostbackMessage(btn.getTitle(), btn.getPayload());
                             else if (urlClickListener != null && btn.getType() == _Button.Type.web_url)
                                 urlClickListener.urlButtonClicked(btn.getUrl());
+                            else if(paymentsListener != null && btn.getType() == _Button.Type.payment) {
+                                _Button.PaymentSummary paymentSummary = btn.getPaymentSummary();
+                                paymentsListener.onPaymentButtonClicked(paymentSummary.getAmount(), paymentSummary.getTransactionId(), paymentSummary.getProductInfo(), paymentSummary.getUdf1(), paymentSummary.getUdf2(), paymentSummary.getUdf3(), paymentSummary.getUdf4(), paymentSummary.getUdf5(), paymentSummary.getsUrl(), paymentSummary.getfUrl());
+                            }
                         });
                     }
                 }

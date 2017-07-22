@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl_add_contact"
+    android:fitsSystemWindows="true"
+    android:background="#80000000">
+
+    <RelativeLayout
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/rl_add_contact_content"
+        android:background="@drawable/bg_popup">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="37.6dp"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20sp"
+                android:layout_marginBottom="1dp"
+                android:gravity="bottom"
+                android:textColor="@color/textColor"
+                android:id="@+id/title"
+                android:text="Add Payment"/>
+
+            <TextView
+                android:layout_below="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="25.6dp"
+                android:textSize="14sp"
+                android:layout_marginBottom="2dp"
+                android:gravity="top"
+                android:textColor="@color/textColor"
+                android:id="@+id/subtitle"
+                android:text="9999999999"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingLeft="8dp"
+                android:id="@+id/ll_add_card"
+                android:layout_below="@id/subtitle"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="32dp"
+                    app:srcCompat="@drawable/ic_credit_card_black"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="32dp" />
+
+                <TextView
+                    android:layout_marginLeft="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:textColor="@color/textColor"
+                    android:text="Add credit or debit card"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingLeft="8dp"
+                android:layout_below="@id/ll_add_card"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="32dp"
+                    app:srcCompat="@drawable/ic_bank_black"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="32dp" />
+
+                <TextView
+                    android:layout_marginLeft="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:textColor="@color/textColor"
+                    android:text="Add Net Banking"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

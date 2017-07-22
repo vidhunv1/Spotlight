@@ -1,81 +1,54 @@
 package com.chat.ichat.screens.home;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.MessageController;
+import com.chat.ichat.R;
+import com.chat.ichat.UserSessionManager;
+import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.application.SpotlightApplication;
+import com.chat.ichat.config.AnalyticsConstants;
+import com.chat.ichat.core.BaseActivity;
+import com.chat.ichat.core.Logger;
+import com.chat.ichat.core.NotificationController;
 import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.db.BotDetailsStore;
 import com.chat.ichat.db.ContactStore;
-import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
-import com.chat.ichat.screens.people_nearby.PeopleNearbyActivity;
-import com.chat.ichat.screens.settings.SettingsActivity1;
-import com.chat.ichat.screens.web_view.WebViewActivity;
-import com.github.clans.fab.FloatingActionMenu;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.chat.ichat.MessageController;
-import com.chat.ichat.UserSessionManager;
-import com.chat.ichat.api.ApiManager;
-import com.chat.ichat.config.AnalyticsConstants;
-import com.chat.ichat.core.Logger;
-import com.chat.ichat.core.NotificationController;
-import com.chat.ichat.core.lib.ImageUtils;
-import com.chat.ichat.R;
-import com.chat.ichat.core.BaseActivity;
-
 import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.db.SavedCardsStore;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.MessageResult;
+import com.chat.ichat.models.SavedCardModel;
 import com.chat.ichat.models.UserSession;
+import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.message.MessageActivity;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.search.SearchActivity;
-import com.chat.ichat.screens.settings.SettingsActivity;
+import com.chat.ichat.screens.settings.SettingsActivity1;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.joda.time.DateTime;
@@ -85,13 +58,12 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
-import static android.R.attr.onClick;
+import de.measite.minidns.record.A;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class HomeActivity extends BaseActivity implements HomeContract.View, ChatListAdapter.ChatClickListener{
-	@Bind(R.id.fab_menu)
-	FloatingActionMenu fabMenu;
-
 	@Bind(R.id.rv_chat_list)
 	RecyclerView chatList;
 
@@ -101,8 +73,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 	@Bind(R.id.tb_home)
 	Toolbar toolbar;
 
-	@Bind(R.id.fab_discover_bots)
-	com.github.clans.fab.FloatingActionButton fabDiscoverBots;
+	@Bind(R.id.fab)
+	FloatingActionButton fab;
+
+	@Bind(R.id.tv_home_title)
+	TextView title;
 
 	private ActionBarDrawerToggle toggle;
 
@@ -147,6 +122,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+		Typeface customFont = Typeface.createFromAsset(getAssets(),  "fonts/android.ttf");
+		title.setTypeface(customFont);
+
 		this.presenter = new HomePresenter(MessageController.getInstance(), ApiManager.getAppApi(), MessageStore.getInstance(), ContactStore.getInstance(), ApiManager.getUserApi(), BotDetailsStore.getInstance(), ApiManager.getBotApi());
 		userSession = UserSessionManager.getInstance().load();
 		Logger.d(this, "AccessToken: "+userSession.getAccessToken());
@@ -159,28 +137,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		chatListAdapter = new ChatListAdapter(this, this);
 		chatList.setAdapter(chatListAdapter);
 
-		fabDiscoverBots.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bot));
-
-		fabDiscoverBots.setOnClickListener(v -> {
-			fabMenu.close(true);
-			startActivity(DiscoverBotsActivity.callingIntent(this));
-		});
-
-		fabMenu.setClosedOnTouchOutside(true);
-		fabMenu.setOnMenuToggleListener(opened -> {
-            if(opened) {
-				fabMenu.getMenuIconView().setImageResource(R.drawable.ic_star_white);
-            } else {
-				fabMenu.getMenuIconView().setImageResource(R.drawable.ic_add);
-            }
-        });
-
-		fabMenu.setOnMenuButtonClickListener(v -> {
-			if(fabMenu.isOpened()) {
-				startActivity(NewChatActivity.callingIntent(this, true));
-			} else {
-				fabMenu.open(true);
-			}
+		fab.setOnClickListener(v -> {
+//			fabMenu.close(true);
+			firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_FAB, null);
+			startActivity(SearchActivity.callingIntent(this));
 		});
 
 		try {
@@ -212,10 +172,10 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@Override
 	protected void onResume() {
-		fabMenu.close(false);
+//		fabMenu.close(false);
 		super.onResume();
-		if(fabMenu!=null) {
-			fabMenu.setVisibility(View.VISIBLE);
+		if(fab !=null) {
+			fab.setVisibility(View.VISIBLE);
 		}
 		presenter.loadChatList();
 		userSession = UserSessionManager.getInstance().load();
@@ -322,21 +282,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		Logger.d(this, "DisplayChatList: "+chats.get(0).toString());
 		this.chats = chats;
 		chatListAdapter.setChatList(chats);
-		chatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				final View child = RecyclerViewHelper.findOneVisibleChild(chatList, 0, layoutManager.getChildCount(), true, false);
-				int pos = child == null ? RecyclerView.NO_POSITION : chatList.getChildAdapterPosition(child);
-				if(pos < chats.size()) {
-					Bundle bundle = new Bundle();
-					bundle.putString(AnalyticsConstants.Param.RECIPIENT_NAME, chats.get(pos).getChatName());
-					bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, chats.get(pos).getChatId());
-					firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_SCROLL, bundle);
-				}
-			}
-		});
-
 	}
 
 	@Override
@@ -422,11 +367,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@Override
 	public void onBackPressed() {
-		if(fabMenu.isOpened()) {
-			fabMenu.close(true);
-		} else {
-			super.onBackPressed();
-		}
+		super.onBackPressed();
 	}
 
 	@Override
@@ -437,6 +378,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 
 	@OnClick(R.id.iv_settings)
 	public void onSettingsClicked() {
+		firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_SETTINGS, null);
 		startActivity(SettingsActivity1.callingIntent(this));
+	}
+
+	@OnClick(R.id.iv_bot)
+	public void onBotsClicked() {
+		firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_DISCOVER_BOTS, null);
+		startActivity(DiscoverBotsActivity.callingIntent(this));
 	}
 }

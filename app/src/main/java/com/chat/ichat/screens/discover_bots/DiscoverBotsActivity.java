@@ -10,15 +10,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.chat.ichat.R;
 import com.chat.ichat.api.bot.DiscoverBotsResponse;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.screens.message.MessageActivity;
 import com.chat.ichat.screens.search.SearchActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -115,6 +114,7 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
 
     @Override
     public void displayBots(DiscoverBotsResponse discoverBotsResponse) {
+        Logger.d(this, "DiscoverBotsResponse: "+discoverBotsResponse.toString());
         if(progressDialog[0].isShowing())
             progressDialog[0].dismiss();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -124,17 +124,17 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
     }
 
     @Override
-    public void onContactItemClicked(String userId) {
+    public void onContactItemClicked(String userId, String coverPicture, String description, String category) {
         /*              Analytics           */
         Bundle bundle = new Bundle();
         bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, userId);
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.DISCOVER_BOTS_CHAT_OPEN, bundle);
-        discoverBotsPresenter.openContact(userId);
+        discoverBotsPresenter.openContact(userId, coverPicture, description, category);
     }
 
     @Override
-    public void navigateToMessage(String username) {
-        startActivity(MessageActivity.callingIntent(this, username));
+    public void navigateToMessage(String username, String coverPicture, String description, String botCategory) {
+        startActivity(MessageActivity.callingIntent(this, username, coverPicture, description, botCategory));
         finish();
     }
 

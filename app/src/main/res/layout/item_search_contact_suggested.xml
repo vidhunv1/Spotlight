@@ -4,8 +4,8 @@
     android:id="@+id/suggested_view"
     android:layout_height="118dp">
     <ImageView
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:id="@+id/iv_chatItem_profileImage"
         android:src="@drawable/default_profile_image"
         android:layout_marginTop="5dp"
@@ -13,7 +13,9 @@
         android:layout_marginRight="12dp"/>
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="68dp"
+        android:layout_gravity="center_horizontal"
+        android:maxLines="2"
         android:layout_height="match_parent"
         android:id="@+id/tv_chatItem_name"
         android:textSize="14sp"

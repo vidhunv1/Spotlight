@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
+import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 
 /**
@@ -53,12 +54,13 @@ public class ComposerViewHelper {
                 heightDifference -= mContext.getResources().getDimensionPixelSize(resourceId);
             }
             if ((screenHeight - r.bottom) > (screenHeight * 0.15)) {
-                if(layoutHeightpx!=heightDifference) {
+                if(layoutHeightpx!=heightDifference && AndroidUtils.dp(heightDifference)>=220) {
+                    Logger.d(this, "HeightDifference: "+heightDifference);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putFloat(KEY_KEYBOARD_HEIGHT, AndroidUtils.dp(heightDifference));
                     editor.apply();
+                    layoutHeightpx = heightDifference;
                 }
-                layoutHeightpx = heightDifference;
             } else
                 Log.d("DEF", "CLOSE");
         };

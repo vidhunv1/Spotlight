@@ -117,6 +117,9 @@
             android:name=".screens.new_chat.NewChatActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".screens.payments.PaymentsActivity"
+            android:label="@string/app_name" />
         <activity android:name=".screens.web_view.WebViewActivity" />
         <activity android:name=".screens.discover_bots.DiscoverBotsActivity" />
         <activity android:name=".screens.invite_friends.InviteFriendsActivity" />
@@ -129,7 +132,7 @@
         <activity android:name=".screens.settings.SettingsHelpActivity" />
         <activity android:name=".screens.blocked_contacts.BlockedContactsActivity" />
         <activity android:name=".screens.shared_media.SharedMediaActivity" />
-        <activity android:name=".screens.VerifyOtpActivity"/>
+        <activity android:name=".screens.payments.PayUBaseActivity"/>
         <activity
             android:name=".screens.user_id.SetUserIdActivity"
             android:windowSoftInputMode="stateAlwaysVisible" />

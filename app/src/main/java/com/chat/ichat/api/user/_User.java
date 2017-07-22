@@ -81,7 +81,7 @@ public class _User {
     @Expose
     private String mobileCarrier;
 
-    public static enum UserType {
+    public enum UserType {
         @SerializedName("official")
         official,
         @SerializedName("regular")

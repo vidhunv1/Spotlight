@@ -42,7 +42,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
-
 /**
  * Created by vidhun on 17/12/16.
  */
@@ -58,7 +57,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ContactClickListener contactClickListener;
 
     private final int VIEW_TYPE_CONTACT = 1;
-    private final int VIEW_TYPE_CATEGORY_CONTACTS = 2;;
+    private final int VIEW_TYPE_CATEGORY_CONTACTS = 2;
     private final int VIEW_TYPE_CATEGORY_SUGGESTED = 3;
     private final int VIEW_TYPE_NO_RESULT = 4;
     private final int VIEW_TYPE_SUGGESTIONS = 5;
@@ -335,12 +334,16 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class SuggestionsViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.rv_search_suggestions)
         RecyclerView recyclerView;
+        @Bind(R.id.view_contactItem_divider)
+        View divider;
+
         SuggestionsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         void renderItem(List<ContactResult> contactsModels) {
+            divider.setVisibility(View.GONE);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(new SuggestionsAdapter(context, contactsModels, contactClickListener));
@@ -364,7 +367,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void renderItem(ChatItem chatItem) {
             name.setText(chatItem.getChatName());
-            userId.setText(chatItem.getChatId());
+            userId.setText(chatItem.getChatId().replace("o_", ""));
             name.setTag(chatItem.getChatId());
 
             if(chatItem.getProfileDP()!=null && !chatItem.getProfileDP().isEmpty()) {

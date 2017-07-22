@@ -28,27 +28,23 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"/>
 
-            <FrameLayout
+            <RelativeLayout
                 android:id="@+id/chat_notification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_marginLeft="4.5dp"
+                android:layout_marginTop="9.75dp">
                 <View
                     android:background="@drawable/bg_chat_notification_white"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="9.25dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"/>
                 <View
+                    android:layout_centerInParent="true"
                     android:background="@drawable/bg_chat_notification"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="10.25dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"/>
-            </FrameLayout>
+                    android:layout_width="13.5dp"
+                    android:layout_height="13.5dp" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <LinearLayout

@@ -48,7 +48,6 @@ import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.ImageUtils;
-import com.chat.ichat.screens.shared_media.SharedMediaActivity;
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
 import java.util.List;
