@@ -38,6 +38,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
     private Context context;
     private int conversationBubbleType;
 
+    private boolean anyOneHasImages = false, anyOneHasSubTitle = false, anyOneHasUrl = false;
+
     public GenericTemplateAdapter(Context context, List<GenericTemplate> genericTemplates, int conversationBubbleType, MessagesAdapter.PostbackClickListener postbackClickListener, MessagesAdapter.UrlClickListener urlClickListener, MessagesAdapter.PaymentsListener paymentsListener) {
         this.conversationBubbleType = conversationBubbleType;
         this.context = context;
@@ -46,6 +48,18 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
         this.paymentsListener = paymentsListener;
         this.genericTemplateList = genericTemplates;
         this.conversationBubbleType = conversationBubbleType;
+
+        for (GenericTemplate genericTemplate : genericTemplates) {
+            if(!anyOneHasImages && (genericTemplate.getImageUrl()!=null && !genericTemplate.getImageUrl().isEmpty())) {
+                anyOneHasImages = true;
+            }
+            if(!anyOneHasSubTitle && (genericTemplate.getSubtitle()!=null && !genericTemplate.getSubtitle().isEmpty())) {
+                anyOneHasSubTitle = true;
+            }
+            if(!anyOneHasUrl && (genericTemplate.getDefaultAction().getUrl()!=null && !genericTemplate.getDefaultAction().getUrl().isEmpty())) {
+                anyOneHasUrl = true;
+            }
+        }
     }
 
     @Override
@@ -159,7 +173,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                                 .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
-                        templateImage.setVisibility(View.GONE);
+                        if(!anyOneHasImages)
+                            templateImage.setVisibility(View.GONE);
                     }
                 case 1:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int) resources.getDimension(R.dimen.bubble_start_top_space));
@@ -170,7 +185,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                                 .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
-                        templateImage.setVisibility(View.GONE);
+                        if(!anyOneHasImages)
+                            templateImage.setVisibility(View.GONE);
                     }
                 case 2:
                     bubbleLayout.setPadding(startPadding, 0, endPadding, (int)context.getResources().getDimension(R.dimen.bubble_start_top_space));
@@ -181,7 +197,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                                 .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
-                        templateImage.setVisibility(View.GONE);
+                        if(!anyOneHasImages)
+                            templateImage.setVisibility(View.GONE);
                     }
                     break;
                 case 3:
@@ -193,7 +210,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                                 .bitmapTransform(new CenterCrop(context), roundedCornerTransformationR, roundedCornerTransformationL)
                                 .into(templateImage);
                     } else {
-                        templateImage.setVisibility(View.GONE);
+                        if(!anyOneHasImages)
+                            templateImage.setVisibility(View.GONE);
                     }
                     break;
             }
@@ -203,7 +221,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                 Logger.d(this, "Setting Subtitle:"+genericTemplate.getSubtitle());
                 subtitle.setText(genericTemplate.getSubtitle());
             } else {
-                subtitle.setVisibility(View.GONE);
+                if(!anyOneHasSubTitle)
+                    subtitle.setVisibility(View.GONE);
             }
             if(genericTemplate.getDefaultAction()!=null) {
                 if (genericTemplate.getDefaultAction().getType() == _DefaultAction.Type.web_url) {
@@ -231,7 +250,8 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
                     });
                 }
             } else {
-                url.setVisibility(View.GONE);
+                if(!anyOneHasUrl)
+                    url.setVisibility(View.GONE);
             }
 
             if(genericTemplate.getButtons()!=null) {

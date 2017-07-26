@@ -11,7 +11,6 @@ import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.home.HomeActivity;
-import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 
 import butterknife.ButterKnife;
@@ -39,14 +38,7 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
 
         userSessionManager = UserSessionManager.getInstance();
         if(userSessionManager.hasAccessToken()) {
-            UserSession userSession = userSessionManager.load();
-            if(userSession.getUserId()!=null) {
-//                Intent intent = new Intent(this, TestActivity.class);
-//                startActivity(intent);
-                navigateToHomeActivity();
-            } else {
-                startActivity(SetUserIdActivity.callingIntent(this));
-            }
+            navigateToHomeActivity();
         } else {
             navigateToWelcomeActivity();
         }

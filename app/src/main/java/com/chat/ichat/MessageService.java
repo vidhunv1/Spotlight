@@ -37,7 +37,6 @@ import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.ImageMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
-import com.chat.ichat.screens.new_chat.NewChatActivity;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.ReconnectionManager;

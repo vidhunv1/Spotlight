@@ -125,6 +125,13 @@ public class DiscoverBotsActivity extends BaseActivity implements DiscoverBotsCo
 
     @Override
     public void onContactItemClicked(String userId, String coverPicture, String description, String category) {
+        progressDialog[0] = new ProgressDialog(DiscoverBotsActivity.this) {
+            @Override
+            public void onBackPressed() {
+                finish();
+            }};
+        progressDialog[0].setMessage("loading please wait...");
+        progressDialog[0].show();
         /*              Analytics           */
         Bundle bundle = new Bundle();
         bundle.putString(AnalyticsConstants.Param.RECIPIENT_USER_ID, userId);

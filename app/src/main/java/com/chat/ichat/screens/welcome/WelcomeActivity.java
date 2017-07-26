@@ -180,6 +180,7 @@ public class WelcomeActivity extends AppCompatActivity{
                 startPressed = true;
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.WELCOME_CLICK_START_MESSAGING, null);
                 startActivity(SignUpActivity1.callingIntent(context));
+                finish();
             }
         });
 

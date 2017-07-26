@@ -10,7 +10,6 @@ import com.chat.ichat.api.phone_contacts.PhoneContactsApi;
 import com.chat.ichat.api.user.UserApi;
 import com.chat.ichat.config.AppConfig;
 import com.chat.ichat.core.Logger;
-import com.chat.ichat.screens.people_nearby.Location;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

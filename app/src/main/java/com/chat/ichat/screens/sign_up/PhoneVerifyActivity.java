@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.chat.ichat.R;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.api.ApiManager;
+import com.chat.ichat.api.StatusResponse;
 import com.chat.ichat.api.user.UserResponse;
 import com.chat.ichat.api.user.VerifyRequest;
 import com.chat.ichat.application.SpotlightApplication;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -92,6 +94,14 @@ public class PhoneVerifyActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(SignUpActivity1.callingIntent(this));
+        this.overridePendingTransition(0,0);
+        finish();
+    }
+
     @OnClick(R.id.iv_done)
     public void onDone() {
         firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_DONE, null);
@@ -122,23 +132,62 @@ public class PhoneVerifyActivity extends AppCompatActivity {
                                 phoneVerifyActivity.showError("Wrong OTP", "The OTP is incorrect.");
                             }
                         } else {
-                            UserSession ss = new UserSession();
-                            ss.setExpires(userResponse.getExpires());
-                            ss.setAccessToken(userResponse.getAccessToken());
-                            ss.setPassword(password);
-                            ss.setUserName(userResponse.getUser().getUsername());
-                            ss.setName(userResponse.getUser().getName());
-                            ss.setMobile(userResponse.getUser().getPhone());
-                            ss.setCountryCode(userResponse.getUser().getCountryCode());
-                            UserSessionManager.getInstance().save(ss);
-                            ApiManager.getInstance().setAuthorization(ss.getAccessToken());
-                            SpotlightApplication.getContext().initSession();
-                            DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
-                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
-                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
-                            finish();
+                            ApiManager.getAppApi().appInit()
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Subscriber<StatusResponse>() {
+                                        @Override
+                                        public void onCompleted() {
+
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            UserSession ss = new UserSession();
+                                            ss.setExpires(userResponse.getExpires());
+                                            ss.setAccessToken(userResponse.getAccessToken());
+                                            ss.setPassword(password);
+                                            ss.setUserName(userResponse.getUser().getUsername());
+                                            ss.setName(userResponse.getUser().getName());
+                                            ss.setMobile(userResponse.getUser().getPhone());
+                                            ss.setCountryCode(userResponse.getUser().getCountryCode());
+                                            UserSessionManager.getInstance().save(ss);
+                                            ApiManager.getInstance().setAuthorization(ss.getAccessToken());
+                                            SpotlightApplication.getContext().initSession();
+                                            DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
+                                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
+                                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void onNext(StatusResponse statusResponse) {
+                                            UserSession ss = new UserSession();
+                                            ss.setExpires(userResponse.getExpires());
+                                            ss.setAccessToken(userResponse.getAccessToken());
+                                            ss.setPassword(password);
+                                            ss.setUserName(userResponse.getUser().getUsername());
+                                            ss.setName(userResponse.getUser().getName());
+                                            ss.setMobile(userResponse.getUser().getPhone());
+                                            ss.setCountryCode(userResponse.getUser().getCountryCode());
+                                            UserSessionManager.getInstance().save(ss);
+                                            ApiManager.getInstance().setAuthorization(ss.getAccessToken());
+                                            SpotlightApplication.getContext().initSession();
+                                            DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
+                                            firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
+                                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
+                                            finish();
+                                        }
+                                    });
                         }
                     }
                 });
+    }
+
+    @OnTextChanged(R.id.verify_code)
+    public void onVerifyChanged() {
+        if(code.length() ==4) {
+            onDone();
+        }
     }
 }

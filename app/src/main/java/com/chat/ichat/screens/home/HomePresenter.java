@@ -241,7 +241,8 @@ public class HomePresenter implements HomeContract.Presenter {
                                                             .subscribe(new Subscriber<ContactResult>() {
                                                                 @Override
                                                                 public void onCompleted() {
-                                                                    contactsView.onSyncSuccess();
+                                                                    if(contactsView!=null)
+                                                                        contactsView.onSyncSuccess();
                                                                 }
 
                                                                 @Override

@@ -28,6 +28,7 @@ import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.PhoneFormat;
 import com.chat.ichat.models.UserSession;
+import com.chat.ichat.screens.welcome.WelcomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedReader;
@@ -270,6 +271,14 @@ public class SignUpActivity1 extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(WelcomeActivity.callingIntent(this));
+        this.overridePendingTransition(0,0);
+        finish();
+    }
+
     public void showError(String title, String message) {
         if(progressDialog[0]!=null && progressDialog[0].isShowing())
             progressDialog[0].dismiss();
@@ -338,6 +347,7 @@ public class SignUpActivity1 extends AppCompatActivity {
                             userSessionManager.save(userSession);
                             progressDialog[0].dismiss();
                             startActivity(PhoneVerifyActivity.callingIntent(signUpActivity1, countryCode, mobile, userResponse.getVerificationUuid()));
+                            finish();
                         }
                     }
                 });

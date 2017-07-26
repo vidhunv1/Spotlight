@@ -74,15 +74,4 @@
         android:layout_marginRight="0dp"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_contact" />
-
-    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-        android:layout_below="@+id/appbar"
-        android:id="@+id/fast_scroller"
-        android:layout_width="24dp"
-        android:padding="9dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        app:rfs_barColor="#00000000"
-        app:rfs_handleColor="@color/appElement"
-        app:rfs_handleBackground="@drawable/bg_scrollbar_handle"/>
 </RelativeLayout>

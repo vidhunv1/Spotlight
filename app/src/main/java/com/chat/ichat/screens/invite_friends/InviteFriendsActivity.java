@@ -35,7 +35,6 @@ import com.chat.ichat.core.RecyclerViewHelper;
 import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.db.ContactsContent;
 import com.chat.ichat.models.ContactResult;
-import com.chat.ichat.screens.user_id.SetUserIdActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;

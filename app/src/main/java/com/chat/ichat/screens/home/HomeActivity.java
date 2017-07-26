@@ -46,6 +46,7 @@ import com.chat.ichat.models.SavedCardModel;
 import com.chat.ichat.models.UserSession;
 import com.chat.ichat.screens.discover_bots.DiscoverBotsActivity;
 import com.chat.ichat.screens.message.MessageActivity;
+import com.chat.ichat.screens.new_chat.NewChatActivity;
 import com.chat.ichat.screens.search.SearchActivity;
 import com.chat.ichat.screens.settings.SettingsActivity1;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -140,7 +141,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View, Cha
 		fab.setOnClickListener(v -> {
 //			fabMenu.close(true);
 			firebaseAnalytics.logEvent(AnalyticsConstants.Event.HOME_CLICK_FAB, null);
-			startActivity(SearchActivity.callingIntent(this));
+			startActivity(NewChatActivity.callingIntent(this, true));
 		});
 
 		try {

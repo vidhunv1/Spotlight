@@ -26,6 +26,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="48dp"
                     android:paddingRight="24dp"
                     android:layout_height="?attr/actionBarSize"

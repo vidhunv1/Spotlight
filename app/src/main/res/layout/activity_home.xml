@@ -96,6 +96,6 @@
         android:layout_marginRight="12dp"
         android:layout_marginBottom="18dp"
         app:fabSize="normal"
-        app:srcCompat="@drawable/ic_search_white"
+        app:srcCompat="@drawable/ic_favorite_white"
         app:backgroundTint="#26BEFF"/>
 </android.support.design.widget.CoordinatorLayout>

@@ -48,18 +48,6 @@ public class AnalyticsConstants {
         public static final String PHONE_VERIFY_ERROR_OTP = "phoneVerify_error_otp";
         public static final String PHONE_VERIFY_SUCCESS = "phoneVerify_success";
 
-        /* Login Activity */
-//        public static final String LOGIN_SCREEN = "login";
-//        public static final String LOGIN_BACK = "login_back";
-//        public static final String LOGIN_FOCUS_ID = "login_focus_id";
-//        public static final String LOGIN_FOCUS_PASSWORD = "login_focus_password";
-//        public static final String LOGIN_CLICK_LOGIN = "login_click_login";
-//        public static final String LOGIN_CLICK_TERMS = "login_click_terms";
-//        public static final String LOGIN_CLICK_PRIVACY_POLICY = "login_click_privacy_policy";
-//        public static final String LOGIN_ERROR_ID = "login_error_id";
-//        public static final String LOGIN_ERROR_PASSWORD = "login_error_password";
-//        public static final String LOGIN_SUCCESS = "login_success";
-
         /* Home Activity */
         public static final String HOME_SCREEN = "home";
         public static final String HOME_CLICK_FAB = "home_click_fab";
@@ -69,15 +57,17 @@ public class AnalyticsConstants {
         public static final String HOME_CHAT_CLEAR = "home_chat_clear";
         public static final String HOME_CHAT_DELETE = "home_chat_delete";
 
-//        /* Contacts / NewChat */
-//        public static final String CONTACTS_CLICK_SEARCH = "%s_click_search";
-//        public static final String CONTACTS_BACK = "%s_back";
-//        public static final String CONTACTS_INVITE_FRIENDS = "%s_inviteFriends";
-//        public static final String CONTACTS_CHAT_OPEN = "%s_chat_open";
-//        public static final String CONTACTS_CLICK_INVITECONTACT = "%s_click_inviteContact";
-//        public static final String CONTACTS_CLICK_DISCOVERBOTS = "%s_click_discoverBots";
-//        public static final String CONTACTS_CLICK_PEOPLENEARBY = "%s_click_peopleNearby";
-//        public static final String CONTACTS_SEARCH = "%s_search";
+        /* Contacts / NewChat */
+        public static final String CONTACTS_CLICK_SEARCH = "%s_click_search";
+        public static final String CONTACTS_BACK = "%s_back";
+        public static final String CONTACTS_INVITE_FRIENDS = "%s_inviteFriends";
+        public static final String CONTACTS_CHAT_OPEN = "%s_chat_open";
+        public static final String CONTACTS_SEARCH_CHAT_OPEN = "%s_search_chat_open";
+        public static final String CONTACTS_SUGGESTED_CHAT_OPEN = "%s_suggested_chat_open";
+        public static final String CONTACTS_CLICK_INVITECONTACT = "%s_click_inviteContact";
+        public static final String CONTACTS_CLICK_DISCOVERBOTS = "%s_click_discoverBots";
+        public static final String CONTACTS_CLICK_PEOPLENEARBY = "%s_click_peopleNearby";
+        public static final String CONTACTS_SEARCH = "%s_search";
 
         /* DiscoverBots */
         public static final String DISCOVER_BOTS_SCREEN = "discoverBots_screen";
