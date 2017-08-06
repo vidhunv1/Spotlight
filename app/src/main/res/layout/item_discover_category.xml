@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:id="@+id/rv_layout"
+    android:layout_height="66dp">
+
+    <TextView
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/tv_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Featured"
+        android:layout_marginLeft="19dp"
+        android:textAlignment="center"
+        android:textColor="#747d8e"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Featured"
+        android:textColor="#747d8e"
+        android:layout_marginLeft="19dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:id="@+id/tv_see_all"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="19dp"
+        android:layout_width="92dp"
+        android:layout_height="48dp"
+        android:text="SEE ALL"
+        android:layout_alignParentTop="true"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif-medium"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="14sp"/>
+</RelativeLayout>

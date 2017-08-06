@@ -24,7 +24,7 @@ public class ApiError {
                 this.message = "Could not connect to server";
             } else {
                 this.title = "Network error";
-                this.message = "Please check your connection and try again.";
+                this.message = "Please check your connection.";
             }
         } else if(e instanceof HttpException) {
             this.title = "Server error";

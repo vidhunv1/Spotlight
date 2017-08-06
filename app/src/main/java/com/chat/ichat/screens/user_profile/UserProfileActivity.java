@@ -3,54 +3,41 @@ package com.chat.ichat.screens.user_profile;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.chat.ichat.R;
 import com.chat.ichat.api.ApiError;
 import com.chat.ichat.api.ApiManager;
 import com.chat.ichat.api.user.UserResponse;
-import com.chat.ichat.core.GsonProvider;
-import com.chat.ichat.db.ContactStore;
-import com.chat.ichat.db.MessageStore;
-import com.chat.ichat.models.ContactResult;
-import com.chat.ichat.models.Message;
-import com.chat.ichat.models.MessageResult;
-import com.chat.ichat.screens.home.HomeActivity;
-import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.chat.ichat.MessageController;
-import com.chat.ichat.R;
 import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.ImageUtils;
-import org.jivesoftware.smack.packet.Presence;
-import org.joda.time.DateTime;
-import java.util.List;
+import com.chat.ichat.db.ContactStore;
+import com.chat.ichat.db.MessageStore;
+import com.chat.ichat.models.ContactResult;
+import com.chat.ichat.screens.home.HomeTabActivity;
+import com.chat.ichat.screens.image_viewer.ImageViewerActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -58,8 +45,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
 public class UserProfileActivity extends BaseActivity {
     @Bind(R.id.iv_userprofile_dp)
@@ -345,6 +330,6 @@ public class UserProfileActivity extends BaseActivity {
                     ContactStore.getInstance().deleteContactUsername(username);
                 }
             });
-        startActivity(HomeActivity.callingIntent(this, 0, null));
+        startActivity(HomeTabActivity.callingIntent(this, 0, null));
     }
 }

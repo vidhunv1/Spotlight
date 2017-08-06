@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.chat.ichat.screens.home.HomeTabActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.chat.ichat.UserSessionManager;
 import com.chat.ichat.R;
 import com.chat.ichat.core.Logger;
-import com.chat.ichat.models.UserSession;
-import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 
 import butterknife.ButterKnife;
@@ -69,7 +68,8 @@ public class LauncherActivity extends AppCompatActivity implements LauncherContr
 
     @Override
     public void navigateToHomeActivity() {
-        startActivity(HomeActivity.callingIntent(this,0,null));
+//        startActivity(HomeActivity.callingIntent(this,0,null));
+        startActivity(HomeTabActivity.callingIntent(this,0,null));
         this.overridePendingTransition(0,0);
         finish();
     }

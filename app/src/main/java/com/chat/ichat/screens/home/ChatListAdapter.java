@@ -1,6 +1,7 @@
 package com.chat.ichat.screens.home;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -200,11 +201,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (holder.getItemViewType()) {
             case VIEW_CHAT:
                 ChatItemViewHolder chatItemViewHolder = (ChatItemViewHolder) holder;
-                if(position < (chatList.size()-1)) {
-                    chatItemViewHolder.renderItem(chatList.get(position), true);
-                } else {
-                    chatItemViewHolder.renderItem(chatList.get(position), false);
-                }
+                chatItemViewHolder.renderItem(chatList.get(position));
                 break;
             default:
                 break;
@@ -241,18 +238,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.tv_chatItem_time)
         TextView time;
 
-        @Bind(R.id.view_contactItem_divider)
-        View dividerLine;
-
-        @Bind(R.id.chat_notification)
-        View chatNotification;
-
-//        @Bind(R.id.tv_chatlist_notification)
-//        TextView notification;
-
-        @Bind(R.id.iv_delivery_status)
-        ImageView deliveryStatus;
-
         ChatItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -269,21 +254,20 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
 
-        void renderItem(ChatItem chatListItem, boolean isLineVisible) {
+        void renderItem(ChatItem chatListItem) {
             if(chatListItem.getNotificationCount()==0) {
-                chatNotification.setVisibility(View.GONE);
+                lastMessage.setTypeface(null, Typeface.NORMAL);
+                contactName.setTypeface(null, Typeface.NORMAL);
+                time.setTextColor(0xff9e9e9e);
+                lastMessage.setTextColor(0xff757575);
             } else {
-                lastMessage.setMaxWidth((int)AndroidUtils.px(226));
-                chatNotification.setVisibility(View.VISIBLE);
+                lastMessage.setTypeface(null, Typeface.BOLD);
+                contactName.setTypeface(null, Typeface.BOLD);
+                lastMessage.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+                time.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             }
 
             contactName.setText(AndroidUtils.displayNameStyle(chatListItem.getChatName()));
-
-            if(isLineVisible) {
-                dividerLine.setVisibility(View.VISIBLE);
-            } else {
-                dividerLine.setVisibility(View.GONE);
-            }
 
             try {
                 Message message = GsonProvider.getGson().fromJson(chatListItem.getLastMessage(), Message.class);
@@ -297,6 +281,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 else
                     lastMessage.setText(Html.fromHtml(chatListItem.getLastMessage()));
             }
+
+            if(chatListItem.isMe()) {
+                lastMessage.setText("You: "+ lastMessage.getText());
+            }
+
             time.setText(getFormattedTime(chatListItem.getTime()));
 
             if(chatListItem.getProfileDP()!=null && !chatListItem.getProfileDP().isEmpty()) {
@@ -312,18 +301,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(chatListItem.getChatName(), chatListItem.getChatId(), 18));
             }
 
-            if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.NOT_SENT) {
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_pending);
-            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.SENT || chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_sent);
-            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.DELIVERED) {
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_delivered);
-            } else if(chatListItem.getMessageStatus() == MessageResult.MessageStatus.READ) {
-                deliveryStatus.setImageResource(R.drawable.ic_delivery_read);
-            } else {
-                deliveryStatus.setImageResource(R.drawable.ic_arrow_right);
-            }
-
             contactName.setTag(chatListItem.getChatId());
         }
     }
@@ -332,15 +309,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Bind(R.id.ll_item_chat)
         LinearLayout chatListContent;
 
-        @Bind(R.id.view_contactItem_divider)
-        View dividerLine;
 
         EmptyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             chatListContent.setVisibility(View.INVISIBLE);
-            dividerLine.setVisibility(View.INVISIBLE);
         }
     }
 

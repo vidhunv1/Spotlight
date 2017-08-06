@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.chat.ichat.MessageController;
+import com.chat.ichat.screens.home.HomeTabActivity;
 import com.google.gson.JsonSyntaxException;
 import com.chat.ichat.ForegroundDetector;
 import com.chat.ichat.R;
@@ -26,7 +28,6 @@ import com.chat.ichat.db.MessageStore;
 import com.chat.ichat.models.ContactResult;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
-import com.chat.ichat.screens.home.HomeActivity;
 import com.chat.ichat.screens.message.MessageActivity;
 
 import org.jivesoftware.smack.SmackException;
@@ -233,7 +234,7 @@ public class NotificationController {
                                         if(ForegroundDetector.getInstance().isForeground()) {
                                              intent = MessageActivity.callingIntent(context, messageResults.get(0).getChatId());
                                         } else  {
-                                             intent = HomeActivity.callingIntent(context, 1, messageResults.get(0).getChatId());
+                                             intent = HomeTabActivity.callingIntent(context, 1, messageResults.get(0).getChatId());
                                         }
                                         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
                                         mBuilder.setContentIntent(pendingIntent);
@@ -252,7 +253,7 @@ public class NotificationController {
 
                                         mBuilder.addAction(replyAction);
                                     } else {
-                                        Intent intent = HomeActivity.callingIntent(context, 0, null);
+                                        Intent intent = HomeTabActivity.callingIntent(context, 0, null);
                                         mBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT));
                                         conv = messageCount+" messages from "+uniqueUsernames.size()+" chats";
                                         contentTitle = SpotlightApplication.getContext().getString(R.string.app_name);
@@ -266,7 +267,7 @@ public class NotificationController {
                                             .setNumber(messageCount)
                                             .setGroup("messages")
                                             .setGroupSummary(true)
-                                            .setColor(0xff2ca5e0);
+                                            .setColor(ContextCompat.getColor(context, R.color.colorPrimary));
 
                                     mBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE);
                                     inboxStyle.setBigContentTitle(contentTitle);

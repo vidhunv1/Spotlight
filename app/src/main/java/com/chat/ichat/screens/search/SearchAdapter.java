@@ -109,11 +109,11 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (suggestedUsersList != null && suggestedUsersList.size() > 0) {
                 itemType.add(VIEW_TYPE_SUGGESTIONS);
             }
-            itemType.add(VIEW_TYPE_CATEGORY_CHATTING_WITH);
-            chatPosition = itemType.size();
-            for (int i = 0; i < chatItems.size(); i++) {
-                itemType.add(VIEW_TYPE_CHATTING_WITH);
-            }
+//            itemType.add(VIEW_TYPE_CATEGORY_CHATTING_WITH);
+//            chatPosition = itemType.size();
+//            for (int i = 0; i < chatItems.size(); i++) {
+//                itemType.add(VIEW_TYPE_CHATTING_WITH);
+//            }
         } else {
             if (contactsList != null && contactsList.size() > 0) {
                 itemType.add(VIEW_TYPE_CATEGORY_CONTACTS);
@@ -157,7 +157,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 viewHolder = new CategoryViewHolder(suggestedCategoryView);
                 break;
             case VIEW_TYPE_SUGGESTIONS:
-                View suggestionsView = inflater.inflate(R.layout.item_search_suggestions, parent, false);
+                View suggestionsView = inflater.inflate(R.layout.recycler_view, parent, false);
                 viewHolder = new SuggestionsViewHolder(suggestionsView);
                 break;
             case VIEW_TYPE_CATEGORY_USERNAME_SEARCH:

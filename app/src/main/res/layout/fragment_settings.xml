@@ -1,0 +1,162 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.25dp"
+            android:layout_below="@+id/tb"
+            android:id="@+id/view_contactItem_divider"
+            android:background="#E0E1E9" />
+
+        <RelativeLayout
+            android:id="@+id/viewB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical" >
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_account"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:paddingRight="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/iv_settings_account"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="14dp"
+                    android:layout_below="@id/profile_first_line_divider"
+                    app:srcCompat="@drawable/ic_account"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Account"
+                    android:layout_marginLeft="15dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_notification"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_below="@id/ll_settings_account"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/iv_settings_chat"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="14dp"
+                    app:srcCompat="@drawable/ic_alert"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Notifications"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="15dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_chat"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_below="@id/ll_settings_notification"
+                android:paddingRight="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/iv_settings_notifications"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="14dp"
+                    android:layout_below="@id/profile_second_line_divider"
+                    app:srcCompat="@drawable/ic_close_dark"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chat Settings"
+                    android:layout_marginLeft="15dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_privacy"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_below="@id/ll_settings_chat"
+                android:paddingRight="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/iv_settings_privacy"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="14dp"
+                    android:layout_below="@id/profile_fourth_line_divider"
+                    app:srcCompat="@drawable/ic_lock"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:text="Privacy"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/ll_settings_help"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_below="@id/ll_settings_privacy"
+                android:paddingRight="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/iv_settings_help"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="14dp"
+                    android:layout_below="@id/profile_fifth_line_divider"
+                    app:srcCompat="@drawable/ic_help"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_height="wrap_content"
+                    android:text="Help &amp; About Us"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

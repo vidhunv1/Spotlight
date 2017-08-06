@@ -22,7 +22,7 @@ import com.chat.ichat.config.AnalyticsConstants;
 import com.chat.ichat.core.Logger;
 import com.chat.ichat.db.core.DatabaseManager;
 import com.chat.ichat.models.UserSession;
-import com.chat.ichat.screens.home.HomeActivity;
+import com.chat.ichat.screens.home.HomeTabActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.UUID;
@@ -156,7 +156,7 @@ public class PhoneVerifyActivity extends AppCompatActivity {
                                             SpotlightApplication.getContext().initSession();
                                             DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
                                             firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
-                                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
+                                            startActivity(HomeTabActivity.callingIntent(phoneVerifyActivity,0,null));
                                             finish();
                                         }
 
@@ -175,7 +175,7 @@ public class PhoneVerifyActivity extends AppCompatActivity {
                                             SpotlightApplication.getContext().initSession();
                                             DatabaseManager.getSQLiteHelper().clearData(DatabaseManager.getInstance().openConnection());
                                             firebaseAnalytics.logEvent(AnalyticsConstants.Event.PHONE_VERIFY_SUCCESS, null);
-                                            startActivity(HomeActivity.callingIntent(phoneVerifyActivity,0,null));
+                                            startActivity(HomeTabActivity.callingIntent(phoneVerifyActivity,0,null));
                                             finish();
                                         }
                                     });

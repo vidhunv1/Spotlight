@@ -31,7 +31,7 @@
                         android:text="Privacy"
                         android:textSize="20sp"
                         android:layout_centerVertical="true"
-                        android:textColor="#373A4B"
+                        android:textColor="@color/actionBarText"
                         android:layout_toRightOf="@+id/iv_back"
                         android:id="@+id/tb_message_title" />
 

@@ -41,7 +41,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -82,7 +81,7 @@ import com.chat.ichat.models.LocationMessage;
 import com.chat.ichat.models.Message;
 import com.chat.ichat.models.MessageResult;
 import com.chat.ichat.models.SavedCardModel;
-import com.chat.ichat.screens.home.HomeActivity;
+import com.chat.ichat.screens.home.HomeTabActivity;
 import com.chat.ichat.screens.message.audio.AudioRecord;
 import com.chat.ichat.screens.message.audio.AudioViewHelper;
 import com.chat.ichat.screens.message.emoji.EmojiViewHelper;
@@ -120,7 +119,7 @@ import rx.schedulers.Schedulers;
 
 import static com.chat.ichat.MessageController.LAST_SEEN_PREFS_FILE;
 
-public class    MessageActivity extends BaseActivity
+public class MessageActivity extends BaseActivity
         implements  MessageContract.View,
                     MessagesAdapter.PostbackClickListener,
                     MessagesAdapter.UrlClickListener,
@@ -290,6 +289,7 @@ public class    MessageActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
+        Logger.d(this, "onBackPressed: "+shouldHandleBack);
         if(shouldHandleBack) {
             firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_BACK, null);
             super.onBackPressed();
@@ -520,6 +520,7 @@ public class    MessageActivity extends BaseActivity
             persistentMenuViewHelper.addPMView();
             messageBox.requestFocus();
         } else {
+            Logger.d(this, "shouldHandleBack1: false");
             shouldHandleBack = false;
             persistentMenuButton.setVisibility(View.VISIBLE);
             persistentMenuViewHelper.removePMPickerView();
@@ -617,13 +618,15 @@ public class    MessageActivity extends BaseActivity
                 messageEditText.setCursorVisible(false);
                 persistentMenuButton.setVisibility(View.GONE);
                 messageEditText.requestFocus();
+                Logger.d(this, "shouldHandleBack2: false");
                 shouldHandleBack = false;
                 persistentMenuViewHelper.addPMView();
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_PERSISTENT_MENU, null);
             });
             messageEditText.setOnEditTextImeBackListener(() -> {
                 persistentMenuButton.setVisibility(View.VISIBLE);
-                shouldHandleBack = !persistentMenuViewHelper.isPMState();
+                shouldHandleBack = persistentMenuViewHelper.isNotPMState();
+                Logger.d(this, "shouldHandleBack11:"+shouldHandleBack);
                 persistentMenuViewHelper.removePMPickerView();
                 messageEditText.requestFocus();
             });
@@ -730,6 +733,7 @@ public class    MessageActivity extends BaseActivity
 
                 @Override
                 public void blockBackPress(boolean shouldBlock) {
+                    Logger.d(this, "shouldHandleBack10:"+shouldBlock);
                     shouldHandleBack = !shouldBlock;
                 }
 
@@ -752,7 +756,7 @@ public class    MessageActivity extends BaseActivity
                     // TODO: hack for showing soft input.
                     new Handler().postDelayed(() -> ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
                             .showSoftInput(messageEditText, InputMethodManager.SHOW_FORCED), 500);
-
+                    Logger.d(this, "shouldHandleBack3: false");
                     shouldHandleBack = false;
 
                     emojiViewHelper.hide();
@@ -772,6 +776,7 @@ public class    MessageActivity extends BaseActivity
 
             messageEditText.setOnTouchListener((v, event) -> {
                 firebaseAnalytics.logEvent(AnalyticsConstants.Event.MESSAGE_CLICK_TEXTBOX, null);
+                Logger.d(this, "shouldHandleBack4: false");
                 shouldHandleBack = false;
                 setComposerSelected(0);
 
@@ -822,6 +827,7 @@ public class    MessageActivity extends BaseActivity
                 gifViewHelper.GifButtonToggle();
                 if(!gifViewHelper.isGifState()) {
                     setComposerSelected(6);
+                    Logger.d(this, "shouldHandleBack5: false");
                     shouldHandleBack = false;
                 }
             });
@@ -1321,6 +1327,7 @@ public class    MessageActivity extends BaseActivity
             messagePresenter.updateMessageRead(messageResult);
             final MediaPlayer mp = MediaPlayer.create(this, R.raw.conversation_tone);
             mp.start();
+            NotificationController.getInstance().clearNotification();
         } else {
             NotificationController.getInstance().showNotificationAndAlert(true);
         }
@@ -1727,6 +1734,6 @@ public class    MessageActivity extends BaseActivity
                     }
                 });
         if(closeActivity)
-            startActivity(HomeActivity.callingIntent(this, 0, null));
+            startActivity(HomeTabActivity.callingIntent(this, 0, null));
     }
 }

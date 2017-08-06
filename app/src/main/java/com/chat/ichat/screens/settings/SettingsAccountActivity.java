@@ -22,7 +22,7 @@ import com.chat.ichat.core.BaseActivity;
 import com.chat.ichat.core.FCMRegistrationIntentService;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.models.UserSession;
-import com.chat.ichat.screens.home.HomeActivity;
+import com.chat.ichat.screens.home.HomeTabActivity;
 import com.chat.ichat.screens.welcome.WelcomeActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -41,9 +41,6 @@ import static com.chat.ichat.screens.settings.SettingsActivity1.PREFS_FILE;
  */
 
 public class SettingsAccountActivity extends BaseActivity {
-    @Bind(R.id.settings_account_name)
-    TextView name;
-
     @Bind(R.id.settings_accout_phone)
     TextView phone;
 
@@ -60,8 +57,7 @@ public class SettingsAccountActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         UserSession userSession = UserSessionManager.getInstance().load();
-        name.setText(userSession.getName());
-        phone.setText(userSession.getMobile());
+        phone.setText("+"+userSession.getCountryCode()+" "+userSession.getMobile());
     }
 
     @OnClick(R.id.iv_back)
@@ -114,8 +110,8 @@ public class SettingsAccountActivity extends BaseActivity {
                                 ApiManager.reset();
                                 SharedPreferences sharedPreferences = SpotlightApplication.getContext().getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
                                 sharedPreferences.edit().putBoolean(FCMRegistrationIntentService.SENT_TOKEN_TO_SERVER, false).apply();
-                                SharedPreferences sp = SpotlightApplication.getContext().getSharedPreferences(HomeActivity.APP_PREFS_FILE, Context.MODE_PRIVATE);
-                                sp.edit().putLong(HomeActivity.KEY_LAST_SYNC, -1).apply();
+                                SharedPreferences sp = SpotlightApplication.getContext().getSharedPreferences(HomeTabActivity.APP_PREFS_FILE, Context.MODE_PRIVATE);
+                                sp.edit().putLong(HomeTabActivity.KEY_LAST_SYNC, -1).apply();
 
                                 if(progressDialog[0].isShowing()) {
                                     progressDialog[0].dismiss();

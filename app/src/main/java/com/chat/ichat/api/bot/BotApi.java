@@ -7,7 +7,6 @@ import rx.Observable;
 /**
  * Created by vidhun on 10/02/17.
  */
-
 public interface BotApi {
     @GET("bot/{user_name}")
     Observable<BotResponse> getBotDetails(@Path("user_name") String userName);

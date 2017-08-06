@@ -56,7 +56,7 @@ public class GenericTemplateAdapter extends RecyclerView.Adapter<GenericTemplate
             if(!anyOneHasSubTitle && (genericTemplate.getSubtitle()!=null && !genericTemplate.getSubtitle().isEmpty())) {
                 anyOneHasSubTitle = true;
             }
-            if(!anyOneHasUrl && (genericTemplate.getDefaultAction().getUrl()!=null && !genericTemplate.getDefaultAction().getUrl().isEmpty())) {
+            if(!anyOneHasUrl && (genericTemplate.getDefaultAction()!=null && genericTemplate.getDefaultAction().getUrl()!=null && !genericTemplate.getDefaultAction().getUrl().isEmpty())) {
                 anyOneHasUrl = true;
             }
         }

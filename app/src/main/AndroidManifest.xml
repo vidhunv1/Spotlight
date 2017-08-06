@@ -64,26 +64,13 @@
             android:label="@string/app_name"
             android:noHistory="false"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
-        <activity
-            android:name=".screens.sign_up.SetNameActivity"
-            android:label="@string/app_name"
-            android:noHistory="false"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
 
-        <activity
-            android:name=".screens.login.LoginActivity"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="stateAlwaysVisible" />
         <activity
             android:name=".screens.welcome.WelcomeActivity"
             android:label="@string/app_name" />
 
         <activity
             android:name=".screens.bot_intro.BotIntroActivity"
-            android:label="@string/app_name" />
-
-        <activity
-            android:name=".screens.TestActivity"
             android:label="@string/app_name" />
 
         <service
@@ -123,7 +110,6 @@
         <activity android:name=".screens.web_view.WebViewActivity" />
         <activity android:name=".screens.discover_bots.DiscoverBotsActivity" />
         <activity android:name=".screens.invite_friends.InviteFriendsActivity" />
-        <activity android:name=".screens.settings.SettingsActivity" />
         <activity android:name=".screens.settings.SettingsActivity1" />
         <activity android:name=".screens.settings.SettingsNotificationActivity" />
         <activity android:name=".screens.settings.SettingsAccountActivity" />
@@ -131,12 +117,8 @@
         <activity android:name=".screens.settings.SettingsPrivacyActivity" />
         <activity android:name=".screens.settings.SettingsHelpActivity" />
         <activity android:name=".screens.blocked_contacts.BlockedContactsActivity" />
-        <activity android:name=".screens.shared_media.SharedMediaActivity" />
-        <activity android:name=".screens.payments.PayUBaseActivity"/>
-        <activity
-            android:name=".screens.user_id.SetUserIdActivity"
-            android:windowSoftInputMode="stateAlwaysVisible" />
         <activity android:name=".screens.image_viewer.ImageViewerActivity" />
-        <activity android:name=".screens.people_nearby.PeopleNearbyActivity" />
+        <activity android:name=".screens.home.HomeTabActivity" />
+        <activity android:name=".screens.discover_category.DiscoverCategoryActivity" />
     </application>
 </manifest>

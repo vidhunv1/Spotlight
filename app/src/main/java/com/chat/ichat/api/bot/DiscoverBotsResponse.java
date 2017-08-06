@@ -1,22 +1,27 @@
 package com.chat.ichat.api.bot;
 
+import android.os.Parcelable;
+
 import com.chat.ichat.api.user._User;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by vidhun on 31/05/17.
  */
-public class DiscoverBotsResponse {
+public class DiscoverBotsResponse implements Serializable{
     @SerializedName("status")
     private String status;
     @SerializedName("message")
     private String message;
     @SerializedName("bots")
     private List<Bots> botsList;
+    @SerializedName("categories")
+    private List<Category> categories;
 
-    public class Bots {
+    public class Bots implements Serializable{
         @SerializedName("category")
         private String category;
         @SerializedName("cover_picture")
@@ -25,6 +30,8 @@ public class DiscoverBotsResponse {
         private String description;
         @SerializedName("bot")
         private _User botUser;
+        @SerializedName("stars")
+        private int stars;
 
         public String getCategory() {
             return category;
@@ -32,6 +39,10 @@ public class DiscoverBotsResponse {
 
         public _User getBot() {
             return botUser;
+        }
+
+        public int getStars() {
+            return stars;
         }
 
         public String getCoverPicure() {
@@ -49,6 +60,21 @@ public class DiscoverBotsResponse {
                     ", coverPicure='" + coverPicure + '\'' +
                     ", botUser=" + botUser +
                     '}';
+        }
+    }
+
+    public class Category {
+        @SerializedName("name")
+        private String name;
+        @SerializedName("description")
+        private String description;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 

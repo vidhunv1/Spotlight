@@ -47,6 +47,7 @@ public class UserSessionManager {
     }
 
     public void save(UserSession us) {
+        Logger.d(this, "Save usersession: "+us);
         this.userSession = null;
 
         if(us.getAccessToken()!=null && !us.getAccessToken().isEmpty()) {
@@ -115,8 +116,8 @@ public class UserSessionManager {
         String name = sharedPreferences.getString(KEY_NAME, null);
         String email = sharedPreferences.getString(KEY_EMAIL, null);
         String password = sharedPreferences.getString(KEY_PASSWORD, null);
-        String mobile = sharedPreferences.getString(KEY_MOBILE, null);
-        String countryCode = sharedPreferences.getString(KEY_COUNTRY_CODE, null);
+        String mobile = sharedPreferences.getString(KEY_MOBILE, "");
+        String countryCode = sharedPreferences.getString(KEY_COUNTRY_CODE, "");
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
         String profilePicPath = sharedPreferences.getString(KEY_PROFILE_PIC_PATH, null);
 

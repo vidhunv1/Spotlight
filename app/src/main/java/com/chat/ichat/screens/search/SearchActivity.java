@@ -74,9 +74,7 @@ public class SearchActivity extends BaseActivity implements SearchContract.View,
         MessageController.getInstance().getChatList()
                 .subscribe(new Subscriber<List<ChatItem>>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {}

@@ -3,75 +3,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/ll_item_chat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
         android:background="?android:selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="20dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_marginLeft="20dp"
-            android:text="A"
-            android:visibility="gone"
-            android:id="@+id/start_letter"
-            android:textColor="#808080"
-            android:textAppearance="@style/FontRobotoMedium"
-            android:textSize="22sp" />
+        <RelativeLayout
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:id="@+id/iv_chatItem_profileImage"
+                android:src="@drawable/default_profile_image" />
 
-        <ImageView
-
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:id="@+id/iv_chatItem_profileImage"
-            android:src="@drawable/default_profile_image"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"/>
+            <ImageView
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/chat_notification"
+                app:srcCompat="@drawable/ic_bot_indicator1"
+                android:layout_width="16dp"
+                android:layout_height="17dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/ll_chatItem_content">
-            <TextView
-                android:layout_marginTop="9.25dp"
-                android:layout_width="190dp"
-                tools:ignore="MissingPrefix"
-                android:layout_height="wrap_content"
-                android:text="Name"
-                android:textStyle="normal"
-                android:textColor="#262328"
-                android:textSize="17sp"
-                android:id="@+id/tv_chatItem_contactName"
-                android:maxWidth="190dp" />
+            android:id="@+id/ll_chatItem_content"
+            android:layout_marginRight="8dp"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:layout_marginTop="0.5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:maxLines="1"
-                android:textColor="#546e7a"
-                android:id="@+id/tv_chatItem_message"
-                android:text="message" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="214dp"
+                    tools:ignore="MissingPrefix"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="#373A4B"
+                    android:textSize="16sp"
+                    android:layout_weight="1"
+                    android:id="@+id/tv_chatItem_contactName"
+                    android:maxWidth="190dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-    <View
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_width="fill_parent"
-        android:layout_height="1px"
-        android:id="@+id/view_contactItem_divider"
-        android:layout_marginLeft="72dp"
-        android:background="@color/divider" />
 </LinearLayout>

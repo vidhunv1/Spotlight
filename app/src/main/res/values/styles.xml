@@ -58,6 +58,12 @@
         <item name="fontPath">fonts/roboto-medium.ttf</item>
     </style>
 
+    <style name="TabStyle">
+        <item name="fontPath">fonts/roboto-medium.ttf</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
     <style name="menu_labels_style">
         <item name="android:paddingLeft">9dp</item>

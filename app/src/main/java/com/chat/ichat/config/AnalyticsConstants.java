@@ -56,6 +56,9 @@ public class AnalyticsConstants {
         public static final String HOME_CLICK_SETTINGS = "home_click_settings";
         public static final String HOME_CHAT_CLEAR = "home_chat_clear";
         public static final String HOME_CHAT_DELETE = "home_chat_delete";
+        public static final String HOME_TAB_FAVORITES = "home_tab_favorites";
+        public static final String HOME_TAB_CHAT = "home_tab_chat";
+        public static final String HOME_TAB_DISCOVER = "home_tab_discover";
 
         /* Contacts / NewChat */
         public static final String CONTACTS_CLICK_SEARCH = "%s_click_search";
@@ -186,7 +189,6 @@ public class AnalyticsConstants {
         public static final String RECIPIENT_USER_NAME = "recipient_user_name";
         public static final String RECIPIENT_NAME = "recipient_name";
         public static final String MESSAGE = "message";
-
 
         public static final String TEXT = "text";
         public static final String COUNT = "count";

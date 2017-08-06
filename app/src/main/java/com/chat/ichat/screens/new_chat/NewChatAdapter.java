@@ -24,16 +24,14 @@ import com.chat.ichat.core.Logger;
 import com.chat.ichat.core.lib.AndroidUtils;
 import com.chat.ichat.core.lib.CircleTransformation;
 import com.chat.ichat.core.lib.ImageUtils;
-import com.chat.ichat.db.ContactStore;
 import com.chat.ichat.models.ContactResult;
-import com.chat.ichat.screens.invite_friends.InviteFriendsActivity;
-import com.chat.ichat.screens.search.*;
 
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -155,15 +153,19 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if(filteredList.size()==0 && !filterQuery.isEmpty()) {
             return NO_RESULT;
-        } else if(position == 2 && filterQuery.isEmpty()) {
-            return HEADER;
-        } else if(position == 1 && filterQuery.isEmpty()) {
-            return DISCOVER_BOTS;
-        }  else if(position == 0 && filterQuery.isEmpty()) {
-            return HEADER_DISCOVER_BOTS;
-        } else {
+        }
+//        else if(position == 2 && filterQuery.isEmpty()) {
+//            return HEADER;
+//        } else if(position == 1 && filterQuery.isEmpty()) {
+//            return DISCOVER_BOTS;
+//        }  else if(position == 0 && filterQuery.isEmpty()) {
+//            return HEADER_DISCOVER_BOTS;
+//        }
+        else {
             if(filterQuery.length() == 0) {
-                if(position < invitePosition || invitePosition == -1) {
+                if(itemList.size() == 0 && position == 0) {
+                    return NO_CONTACTS;
+                } else if(position < invitePosition || invitePosition == -1) {
                     return CONTACT;
                 } else {
                     return INVITE_CONTACT;
@@ -209,7 +211,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 viewHolder = new InviteContactsViewHolder(inviteContacts);
                 break;
             case DISCOVER_BOTS:
-                View discoverBots = inflater.inflate(R.layout.item_search_suggestions, parent, false);
+                View discoverBots = inflater.inflate(R.layout.recycler_view, parent, false);
                 viewHolder = new SuggestionsViewHolder(discoverBots);
                 break;
             default:
@@ -224,7 +226,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(!filterQuery.isEmpty() && filteredList.size() > 0 && vPos < filteredList.size())
             position = filteredList.get(vPos);
         else
-            position = vPos - 3;
+            position = vPos;
 
         switch (holder.getItemViewType()) {
             case CONTACT:
@@ -272,7 +274,9 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             else
                 return filteredList.size() + 1;
         }
-        return itemList.size() + 3;
+        if(itemList.size() == 0)
+            return 1;
+        return itemList.size();
     }
 
     class ContactsViewHolder extends RecyclerView.ViewHolder {
@@ -284,15 +288,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Bind(R.id.tv_chatItem_contactName)
         TextView contactName;
-
-        @Bind(R.id.tv_chatItem_message)
-        TextView statusView;
-
-        @Bind(R.id.view_contactItem_divider)
-        View divider;
-
-        @Bind(R.id.start_letter)
-        TextView letter;
 
         ContactsViewHolder(View itemView) {
             super(itemView);
@@ -308,10 +303,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void renderItem(NewChatItemModel contactItem, boolean isStart, boolean isEnd) {
             Logger.d(this, "render: "+contactItem.getContactName());
             contactName.setText(contactItem.getContactName());
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
-                statusView.setText(Html.fromHtml(contactItem.getPresence(), Html.FROM_HTML_MODE_LEGACY));
-            else
-                statusView.setText(Html.fromHtml(contactItem.getPresence()));
 
             if(contactItem.getProfileDP()!=null && !contactItem.getProfileDP().isEmpty()) {
                 Glide.with(context)
@@ -325,19 +316,6 @@ public class NewChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 profileImage.setImageDrawable(ImageUtils.getDefaultProfileImage(contactItem.getContactName(), contactItem.getUserName(), 18));
             }
             contactName.setTag(contactItem.getUserName());
-
-            if(isEnd) {
-                divider.setVisibility(View.VISIBLE);
-            } else {
-                divider.setVisibility(View.GONE);
-            }
-
-            if(isStart) {
-                letter.setVisibility(View.GONE);
-                letter.setText(Character.toUpperCase(contactItem.getContactName().charAt(0))+"");
-            } else {
-                letter.setVisibility(View.GONE);
-            }
         }
     }
 

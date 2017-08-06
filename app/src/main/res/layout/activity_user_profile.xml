@@ -25,10 +25,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:layout_marginLeft="20.5dp"
-                        android:text="Info"
+                        android:text="Details"
                         android:textSize="20sp"
                         android:layout_centerVertical="true"
-                        android:textColor="#373A4B"
+                        android:textColor="@color/actionBarText"
                         android:layout_toRightOf="@+id/iv_back"
                         android:id="@+id/tb_message_title" />
 
@@ -141,39 +141,6 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent" />
             </LinearLayout>
-
-            <ImageView
-                android:layout_marginLeft="16dp"
-                android:id="@+id/profile_second_line"
-                android:layout_width="24dp"
-                android:layout_height="48dp"
-                android:layout_below="@id/profile_second_line_divider"
-                app:srcCompat="@drawable/ic_close_red"/>
-
-            <LinearLayout
-                android:background="?android:selectableItemBackground"
-                android:id="@+id/user_profile_shared_media"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_below="@id/profile_second_line_divider"
-                android:layout_marginLeft="72dp"
-                android:paddingRight="24dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="Delete Chat"
-                    android:textColor="@color/error"
-                    android:textSize="16sp"
-                    android:gravity="center_vertical" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="0.25dp"
-                android:layout_below="@+id/user_profile_shared_media"
-                android:background="#d9d9d9" />
         </RelativeLayout>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

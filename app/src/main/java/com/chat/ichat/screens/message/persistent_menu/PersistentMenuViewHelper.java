@@ -29,7 +29,7 @@ public class PersistentMenuViewHelper {
     private Window window;
 
     private boolean isPMViewInflated = false;
-    private boolean isPMState = true;
+    private boolean isNotPMState = true;
     private Listener listener;
     private List<PersistentMenu> persistentMenus;
     PersistentMenuAdapter persistentMenuAdapter;
@@ -44,6 +44,7 @@ public class PersistentMenuViewHelper {
         composerViewHelper = new ComposerViewHelper(mContext, viewGroup);
         this.persistentMenus = persistentMenuList;
         this.listener = listener;
+        isNotPMState = true;
         persistentMenuAdapter = new PersistentMenuAdapter(mContext, persistentMenuList, new PersistentMenuAdapter.ClickListener() {
             @Override
             public void onPostBackClicked(String title, String payload) {
@@ -58,6 +59,7 @@ public class PersistentMenuViewHelper {
     }
 
     public void addPMView() {
+        isNotPMState = false;
         Activity currentActivity = (Activity) mContext;
         View view = currentActivity.getCurrentFocus();
         if (view != null) {
@@ -78,6 +80,7 @@ public class PersistentMenuViewHelper {
     }
 
     public void removePMPickerView() {
+        isNotPMState = true;
         if(isPMViewInflated) {
             Log.d("DEF", "DEFLATING VIEW");
             isPMViewInflated = false;
@@ -90,7 +93,7 @@ public class PersistentMenuViewHelper {
     }
 
     public void handleBackPress() {
-        if(!isPMState()) {
+        if(!isNotPMState()) {
             reset();
         } else {
             removePMPickerView();
@@ -104,25 +107,25 @@ public class PersistentMenuViewHelper {
             InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        if(isPMState) {
+        if(isNotPMState) {
             addPMView();
-            isPMState = false;
+            isNotPMState = false;
         } else {
-            isPMState = true;
+            isNotPMState = true;
         }
     }
 
-    public boolean isPMState() {
-        return isPMState;
+    public boolean isNotPMState() {
+        return isNotPMState;
     }
 
     public void reset() {
-        isPMState = true;
+        isNotPMState = true;
         removePMPickerView();
     }
 
     public void hide() {
-        isPMState = true;
+        isNotPMState = true;
     }
 
     private View createCustomView() {

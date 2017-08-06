@@ -3,7 +3,10 @@
 
     <!--App-->
     <color name="actionBar">#FAFAFA</color>
+    <color name="actionBarText">#373a4b</color>
+    <color name="actionBarIcon">@color/appElement</color>
     <color name="colorPrimary">#26BEFF</color>
+    <color name="colorPrimary1">#5dcd11</color>
     <color name="colorPrimaryDark">#0B8043</color>
     <color name="colorPrimaryInactive">#800070e0</color>
     <color name="colorPrimaryLight">#5cb3ff</color>
@@ -13,7 +16,7 @@
     <color name="background_default">#FFFFFF</color>
     <color name="statusBar">#CFD0D4</color>
     <color name="activeIndicator">@color/colorPrimary</color>
-    <color name="messageBackground">#FFFFFF</color>
+    <color name="messageBackground">#FAFAFA</color>
 
     <!--chat-->
     <color name="sendMessageBubble">#5DCD11</color>

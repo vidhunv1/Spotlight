@@ -13,15 +13,16 @@
         android:id="@+id/no_contacts_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tap         at the top of your screen to add contacts."
+        android:text="All your favorite will appear here. Tap       at the top of your Chats to add to your favorites."
         android:textAlignment="center"
-        android:textColor="#565656"
+        android:textColor="#7a7d8d"
         android:textSize="17sp" />
 
     <ImageView
         android:layout_alignLeft="@+id/no_contacts_text"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="20dp"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        app:srcCompat="@drawable/ic_contact_add_dark"/>
+        app:srcCompat="@drawable/ic_favorite_border"/>
 </RelativeLayout>

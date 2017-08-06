@@ -17,6 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="Search or discover any bot by pressing the bot icon in the top right corner."
+        android:text="Search or discover any bot using the 'discover' tab to start chatting."
         android:textSize="16sp"/>
 </LinearLayout>

@@ -28,9 +28,9 @@
                     android:inputType="textFilter"
                     android:layout_toRightOf="@+id/iv_back"
                     android:textCursorDrawable="@drawable/bg_cursor_search"
-                    android:textColorHint="@color/textHintColor"
+                    android:textColorHint="#997A7D8D"
                     android:textSize="16sp"
-                    android:textColor="@color/textColor" >
+                    android:textColor="@color/appElement" >
                     <requestFocus/>
                 </EditText>
 

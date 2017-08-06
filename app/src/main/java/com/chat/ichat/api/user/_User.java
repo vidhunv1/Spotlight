@@ -3,10 +3,12 @@ package com.chat.ichat.api.user;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by vidhun on 16/10/16.
  */
-public class _User {
+public class _User implements Serializable{
     public _User(String countryCode, String phone) {
         this.phone = phone;
         this.countryCode = countryCode;
